@@ -1,0 +1,17 @@
+mutation confirmLogin($token: String!) {
+    confirmLogin(token: $token) {
+        __typename
+        ...on LoginConfirmed {
+            token
+        }
+        ...on InvalidToken {
+            message
+        }
+        ...on ExpiredToken {
+            message
+        }
+        ...on ServerError {
+            message
+        }
+    }
+}

@@ -1,0 +1,21 @@
+query profile {
+    profile {
+        __typename
+        ...on UserProfile {
+            email
+            gravatar {
+                url
+            }
+            defaultWorkspace {
+                id
+                name
+            }
+        }
+        ...on Forbidden {
+            message
+        }
+        ...on ServerError {
+            message
+        }
+    }
+}

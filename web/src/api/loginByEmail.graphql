@@ -1,0 +1,14 @@
+mutation loginByEmail($email: String!) {
+    loginByEmail(email: $email) {
+        __typename
+        ...on CheckEmail {
+            email
+        }
+        ...on InvalidEmail {
+            message
+        }
+        ...on ServerError {
+            message
+        }
+    }
+}
