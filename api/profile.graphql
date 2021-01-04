@@ -1,0 +1,16 @@
+extend type Query {
+    profile: UserProfileResult!
+}
+
+union UserProfileResult = UserProfile | Forbidden | ServerError
+
+type UserProfile {
+    id: Int!
+    email: String!
+    gravatar: Gravatar
+    defaultWorkspace: Workspace!
+}
+
+type Gravatar {
+    url: String!
+}

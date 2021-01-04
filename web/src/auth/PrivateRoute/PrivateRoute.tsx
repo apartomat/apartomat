@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import {Route, Redirect, RouteProps} from "react-router-dom";
+import {Route, Redirect, RouteProps } from "react-router-dom";
 
 import useAuthContext, { UserContextStatus } from '../useAuthContext';
 
@@ -12,7 +12,7 @@ function PrivateRoute({ children, ...rest }: RouteProps) {
         if (user.status === UserContextStatus.UNDEFINED) {
             check();
         }
-    }, [user, check, children]);
+    }, [user, check]);
 
     if (error !== undefined) {
         return (
@@ -31,6 +31,13 @@ function PrivateRoute({ children, ...rest }: RouteProps) {
                     return (
                         <Box>
                             <p>Checking...</p>
+                        </Box>
+                    );
+                case UserContextStatus.SERVER_ERROR:
+                    return (
+                        <Box>
+                            <h1>Error</h1>
+                            <p>Can't check profile. Please refresh the page</p>
                         </Box>
                     );
                 case UserContextStatus.LOGGED:

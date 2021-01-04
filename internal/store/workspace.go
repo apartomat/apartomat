@@ -23,4 +23,6 @@ type WorkspaceStore interface {
 type WorkspaceStoreQuery struct {
 	ID     expr.Int
 	UserID expr.Int
+	Limit  int
+	Offset int
 }

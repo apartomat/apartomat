@@ -2,6 +2,7 @@ query profile {
     profile {
         __typename
         ...on UserProfile {
+            id
             email
             gravatar {
                 url

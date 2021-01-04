@@ -1,5 +1,5 @@
 schema:
-  - ./schema.graphql
+  - ./*.graphql
 
 exec:
   filename: graphql/graphql_gen.go
@@ -10,9 +10,9 @@ model:
   package: graphql
 
 models:
-  ShoppingList:
+  ShoppinglistQuery:
     fields:
-      findProductOnPage:
+      productOnPage:
         resolver: true
   UserProfile:
     fields:

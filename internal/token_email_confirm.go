@@ -24,10 +24,6 @@ type EmailConfirmToken struct {
 	paseto.JSONToken
 }
 
-var (
-	ErrTokenValidationError = errors.New("token expired or not valid")
-)
-
 func NewEmailConfirmToken(login string) EmailConfirmToken {
 	token := EmailConfirmToken{
 		JSONToken: paseto.JSONToken{
@@ -77,33 +73,13 @@ func (p *pasetoMailConfirmTokenIssuerVerifier) Verify(str string) (*EmailConfirm
 
 	err := paseto.NewV2().Verify(str, p.privateKey.Public(), &token, &footer)
 	if err != nil {
-		return nil, "", fmt.Errorf("can't verify token: %s", err)
+		return nil, "", errors.Wrapf(ErrTokenVerificationError, "%s", err)
 	}
 
 	err = token.Validate()
 	if err != nil {
-		if errors.Is(err, paseto.ErrTokenValidationError) {
-			return nil, "", ErrTokenValidationError
-		}
-
-		return nil, "", fmt.Errorf("can't validate: %w", err)
+		return nil, "", errors.Wrapf(ErrTokenValidationError, "%s", err)
 	}
 
 	return &token, footer, nil
-}
-
-var (
-	hasPurpose = func(purpose string) paseto.Validator {
-		return hasClaim("purpose", purpose)
-	}
-)
-
-func hasClaim(key, value string) paseto.Validator {
-	return func(token *paseto.JSONToken) error {
-		if token.Get(key) != value {
-			return errors.Wrapf(paseto.ErrTokenValidationError, "incorrect token claim %s", emailConfirmPurpose)
-		}
-
-		return nil
-	}
 }

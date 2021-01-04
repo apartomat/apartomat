@@ -37,7 +37,7 @@ type Config struct {
 type ResolverRoot interface {
 	Mutation() MutationResolver
 	Query() QueryResolver
-	ShoppingList() ShoppingListResolver
+	ShoppinglistQuery() ShoppinglistQueryResolver
 	UserProfile() UserProfileResolver
 }
 
@@ -78,6 +78,10 @@ type ComplexityRoot struct {
 		LoginByEmail func(childComplexity int, email string, workspaceName string) int
 	}
 
+	NotFound struct {
+		Message func(childComplexity int) int
+	}
+
 	Product struct {
 		Description func(childComplexity int) int
 		Image       func(childComplexity int) int
@@ -86,15 +90,17 @@ type ComplexityRoot struct {
 
 	Query struct {
 		Profile      func(childComplexity int) int
-		ShoppingList func(childComplexity int) int
+		Shoppinglist func(childComplexity int) int
+		Version      func(childComplexity int) int
+		Workspace    func(childComplexity int, id int) int
 	}
 
 	ServerError struct {
 		Message func(childComplexity int) int
 	}
 
-	ShoppingList struct {
-		FindProductOnPage func(childComplexity int, url string) int
+	ShoppinglistQuery struct {
+		ProductOnPage func(childComplexity int, url string) int
 	}
 
 	UserProfile struct {
@@ -115,11 +121,13 @@ type MutationResolver interface {
 	ConfirmLogin(ctx context.Context, token string) (ConfirmLoginResult, error)
 }
 type QueryResolver interface {
+	Version(ctx context.Context) (string, error)
 	Profile(ctx context.Context) (UserProfileResult, error)
-	ShoppingList(ctx context.Context) (*ShoppingList, error)
+	Shoppinglist(ctx context.Context) (*ShoppinglistQuery, error)
+	Workspace(ctx context.Context, id int) (WorkspaceResult, error)
 }
-type ShoppingListResolver interface {
-	FindProductOnPage(ctx context.Context, obj *ShoppingList, url string) (*Product, error)
+type ShoppinglistQueryResolver interface {
+	ProductOnPage(ctx context.Context, obj *ShoppinglistQuery, url string) (*Product, error)
 }
 type UserProfileResolver interface {
 	DefaultWorkspace(ctx context.Context, obj *UserProfile) (*Workspace, error)
@@ -213,6 +221,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.LoginByEmail(childComplexity, args["email"].(string), args["workspaceName"].(string)), true
 
+	case "NotFound.message":
+		if e.complexity.NotFound.Message == nil {
+			break
+		}
+
+		return e.complexity.NotFound.Message(childComplexity), true
+
 	case "Product.description":
 		if e.complexity.Product.Description == nil {
 			break
@@ -241,12 +256,31 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Profile(childComplexity), true
 
-	case "Query.shoppingList":
-		if e.complexity.Query.ShoppingList == nil {
+	case "Query.shoppinglist":
+		if e.complexity.Query.Shoppinglist == nil {
 			break
 		}
 
-		return e.complexity.Query.ShoppingList(childComplexity), true
+		return e.complexity.Query.Shoppinglist(childComplexity), true
+
+	case "Query.version":
+		if e.complexity.Query.Version == nil {
+			break
+		}
+
+		return e.complexity.Query.Version(childComplexity), true
+
+	case "Query.workspace":
+		if e.complexity.Query.Workspace == nil {
+			break
+		}
+
+		args, err := ec.field_Query_workspace_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Workspace(childComplexity, args["id"].(int)), true
 
 	case "ServerError.message":
 		if e.complexity.ServerError.Message == nil {
@@ -255,17 +289,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ServerError.Message(childComplexity), true
 
-	case "ShoppingList.findProductOnPage":
-		if e.complexity.ShoppingList.FindProductOnPage == nil {
+	case "ShoppinglistQuery.productOnPage":
+		if e.complexity.ShoppinglistQuery.ProductOnPage == nil {
 			break
 		}
 
-		args, err := ec.field_ShoppingList_findProductOnPage_args(context.TODO(), rawArgs)
+		args, err := ec.field_ShoppinglistQuery_productOnPage_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.ShoppingList.FindProductOnPage(childComplexity, args["url"].(string)), true
+		return e.complexity.ShoppinglistQuery.ProductOnPage(childComplexity, args["url"].(string)), true
 
 	case "UserProfile.defaultWorkspace":
 		if e.complexity.UserProfile.DefaultWorkspace == nil {
@@ -373,57 +407,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var sources = []*ast.Source{
-	{Name: "./schema.graphql", Input: `schema {
-    query: Query
-    mutation: Mutation
-}
-
-type Query {
-    profile: UserProfileResult!
-    shoppingList: ShoppingList!
-}
-
-interface Error {
-    message: String!
-}
-
-type ServerError implements Error {
-    message: String!
-}
-
-union UserProfileResult = UserProfile | Forbidden | ServerError
-
-type UserProfile {
-    id: Int!
-    email: String!
-    gravatar: Gravatar
-    defaultWorkspace: Workspace!
-}
-
-type Gravatar {
-    url: String!
-}
-
-type Forbidden implements Error {
-    message: String!
-}
-
-type ShoppingList {
-    findProductOnPage(url: String!): Product
-}
-
-type Product {
-    name: String!
-    description: String!
-    image: String!
-}
-
-type Mutation {
-    loginByEmail(email: String!, workspaceName: String! = "Workspace"): LoginByEmailResult!
-    confirmLogin(token: String!): ConfirmLoginResult!
-}
-
-union LoginByEmailResult = CheckEmail | InvalidEmail | ServerError
+	{Name: "mutation.graphql", Input: `union LoginByEmailResult = CheckEmail | InvalidEmail | ServerError
 
 type CheckEmail {
     email: String!
@@ -446,6 +430,73 @@ type InvalidToken implements Error {
 type ExpiredToken implements Error {
     message: String!
 }
+
+`, BuiltIn: false},
+	{Name: "profile.graphql", Input: `extend type Query {
+    profile: UserProfileResult!
+}
+
+union UserProfileResult = UserProfile | Forbidden | ServerError
+
+type UserProfile {
+    id: Int!
+    email: String!
+    gravatar: Gravatar
+    defaultWorkspace: Workspace!
+}
+
+type Gravatar {
+    url: String!
+}`, BuiltIn: false},
+	{Name: "root.graphql", Input: `schema {
+    query: Query
+    mutation: Mutation
+}
+
+type Query {
+    version: String!
+}
+
+type Mutation {
+    loginByEmail(email: String!, workspaceName: String! = "Workspace"): LoginByEmailResult!
+    confirmLogin(token: String!): ConfirmLoginResult!
+}
+
+" Common types "
+
+interface Error {
+    message: String!
+}
+
+type ServerError implements Error {
+    message: String!
+}
+
+type Forbidden implements Error {
+    message: String!
+}
+
+type NotFound implements Error {
+    message: String!
+}`, BuiltIn: false},
+	{Name: "shoppinglist.graphql", Input: `extend type Query {
+    shoppinglist: ShoppinglistQuery!
+}
+
+type ShoppinglistQuery {
+    productOnPage(url: String!): Product
+}
+
+type Product {
+    name: String!
+    description: String!
+    image: String!
+}`, BuiltIn: false},
+	{Name: "workspace.graphql", Input: `extend type Query {
+    workspace(id: Int!): WorkspaceResult!
+}
+
+union WorkspaceResult = Workspace | NotFound | Forbidden | ServerError
 
 type Workspace {
     id: Int!
@@ -513,7 +564,22 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 	return args, nil
 }
 
-func (ec *executionContext) field_ShoppingList_findProductOnPage_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_workspace_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_ShoppinglistQuery_productOnPage_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
@@ -895,6 +961,41 @@ func (ec *executionContext) _Mutation_confirmLogin(ctx context.Context, field gr
 	return ec.marshalNConfirmLoginResult2githubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐConfirmLoginResult(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _NotFound_message(ctx context.Context, field graphql.CollectedField, obj *NotFound) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "NotFound",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Message, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Product_name(ctx context.Context, field graphql.CollectedField, obj *Product) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -1000,6 +1101,41 @@ func (ec *executionContext) _Product_image(ctx context.Context, field graphql.Co
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Query_version(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Version(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query_profile(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -1035,7 +1171,7 @@ func (ec *executionContext) _Query_profile(ctx context.Context, field graphql.Co
 	return ec.marshalNUserProfileResult2githubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐUserProfileResult(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Query_shoppingList(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Query_shoppinglist(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1053,7 +1189,7 @@ func (ec *executionContext) _Query_shoppingList(ctx context.Context, field graph
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().ShoppingList(rctx)
+		return ec.resolvers.Query().Shoppinglist(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1065,9 +1201,51 @@ func (ec *executionContext) _Query_shoppingList(ctx context.Context, field graph
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*ShoppingList)
+	res := resTmp.(*ShoppinglistQuery)
 	fc.Result = res
-	return ec.marshalNShoppingList2ᚖgithubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐShoppingList(ctx, field.Selections, res)
+	return ec.marshalNShoppinglistQuery2ᚖgithubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐShoppinglistQuery(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_workspace(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_workspace_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Workspace(rctx, args["id"].(int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(WorkspaceResult)
+	fc.Result = res
+	return ec.marshalNWorkspaceResult2githubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐWorkspaceResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1176,7 +1354,7 @@ func (ec *executionContext) _ServerError_message(ctx context.Context, field grap
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _ShoppingList_findProductOnPage(ctx context.Context, field graphql.CollectedField, obj *ShoppingList) (ret graphql.Marshaler) {
+func (ec *executionContext) _ShoppinglistQuery_productOnPage(ctx context.Context, field graphql.CollectedField, obj *ShoppinglistQuery) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -1184,7 +1362,7 @@ func (ec *executionContext) _ShoppingList_findProductOnPage(ctx context.Context,
 		}
 	}()
 	fc := &graphql.FieldContext{
-		Object:     "ShoppingList",
+		Object:     "ShoppinglistQuery",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   true,
@@ -1193,7 +1371,7 @@ func (ec *executionContext) _ShoppingList_findProductOnPage(ctx context.Context,
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_ShoppingList_findProductOnPage_args(ctx, rawArgs)
+	args, err := ec.field_ShoppinglistQuery_productOnPage_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -1201,7 +1379,7 @@ func (ec *executionContext) _ShoppingList_findProductOnPage(ctx context.Context,
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.ShoppingList().FindProductOnPage(rctx, obj, args["url"].(string))
+		return ec.resolvers.ShoppinglistQuery().ProductOnPage(rctx, obj, args["url"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2554,20 +2732,6 @@ func (ec *executionContext) _Error(ctx context.Context, sel ast.SelectionSet, ob
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
-	case ServerError:
-		return ec._ServerError(ctx, sel, &obj)
-	case *ServerError:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._ServerError(ctx, sel, obj)
-	case Forbidden:
-		return ec._Forbidden(ctx, sel, &obj)
-	case *Forbidden:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._Forbidden(ctx, sel, obj)
 	case InvalidEmail:
 		return ec._InvalidEmail(ctx, sel, &obj)
 	case *InvalidEmail:
@@ -2589,6 +2753,27 @@ func (ec *executionContext) _Error(ctx context.Context, sel ast.SelectionSet, ob
 			return graphql.Null
 		}
 		return ec._ExpiredToken(ctx, sel, obj)
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
+	case NotFound:
+		return ec._NotFound(ctx, sel, &obj)
+	case *NotFound:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._NotFound(ctx, sel, obj)
 	default:
 		panic(fmt.Errorf("unexpected type %T", obj))
 	}
@@ -2635,6 +2820,43 @@ func (ec *executionContext) _UserProfileResult(ctx context.Context, sel ast.Sele
 			return graphql.Null
 		}
 		return ec._UserProfile(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
+func (ec *executionContext) _WorkspaceResult(ctx context.Context, sel ast.SelectionSet, obj WorkspaceResult) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case Workspace:
+		return ec._Workspace(ctx, sel, &obj)
+	case *Workspace:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Workspace(ctx, sel, obj)
+	case NotFound:
+		return ec._NotFound(ctx, sel, &obj)
+	case *NotFound:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._NotFound(ctx, sel, obj)
 	case Forbidden:
 		return ec._Forbidden(ctx, sel, &obj)
 	case *Forbidden:
@@ -2712,7 +2934,7 @@ func (ec *executionContext) _ExpiredToken(ctx context.Context, sel ast.Selection
 	return out
 }
 
-var forbiddenImplementors = []string{"Forbidden", "UserProfileResult", "Error"}
+var forbiddenImplementors = []string{"Forbidden", "UserProfileResult", "Error", "WorkspaceResult"}
 
 func (ec *executionContext) _Forbidden(ctx context.Context, sel ast.SelectionSet, obj *Forbidden) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, forbiddenImplementors)
@@ -2883,6 +3105,33 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 	return out
 }
 
+var notFoundImplementors = []string{"NotFound", "Error", "WorkspaceResult"}
+
+func (ec *executionContext) _NotFound(ctx context.Context, sel ast.SelectionSet, obj *NotFound) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, notFoundImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("NotFound")
+		case "message":
+			out.Values[i] = ec._NotFound_message(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var productImplementors = []string{"Product"}
 
 func (ec *executionContext) _Product(ctx context.Context, sel ast.SelectionSet, obj *Product) graphql.Marshaler {
@@ -2935,6 +3184,20 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Query")
+		case "version":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_version(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		case "profile":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -2949,7 +3212,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}
 				return res
 			})
-		case "shoppingList":
+		case "shoppinglist":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
 				defer func() {
@@ -2957,7 +3220,21 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_shoppingList(ctx, field)
+				res = ec._Query_shoppinglist(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "workspace":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_workspace(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -2978,7 +3255,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 	return out
 }
 
-var serverErrorImplementors = []string{"ServerError", "Error", "UserProfileResult", "LoginByEmailResult", "ConfirmLoginResult"}
+var serverErrorImplementors = []string{"ServerError", "LoginByEmailResult", "ConfirmLoginResult", "UserProfileResult", "Error", "WorkspaceResult"}
 
 func (ec *executionContext) _ServerError(ctx context.Context, sel ast.SelectionSet, obj *ServerError) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, serverErrorImplementors)
@@ -3005,18 +3282,18 @@ func (ec *executionContext) _ServerError(ctx context.Context, sel ast.SelectionS
 	return out
 }
 
-var shoppingListImplementors = []string{"ShoppingList"}
+var shoppinglistQueryImplementors = []string{"ShoppinglistQuery"}
 
-func (ec *executionContext) _ShoppingList(ctx context.Context, sel ast.SelectionSet, obj *ShoppingList) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, shoppingListImplementors)
+func (ec *executionContext) _ShoppinglistQuery(ctx context.Context, sel ast.SelectionSet, obj *ShoppinglistQuery) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, shoppinglistQueryImplementors)
 
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
-			out.Values[i] = graphql.MarshalString("ShoppingList")
-		case "findProductOnPage":
+			out.Values[i] = graphql.MarshalString("ShoppinglistQuery")
+		case "productOnPage":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
 				defer func() {
@@ -3024,7 +3301,7 @@ func (ec *executionContext) _ShoppingList(ctx context.Context, sel ast.Selection
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._ShoppingList_findProductOnPage(ctx, field, obj)
+				res = ec._ShoppinglistQuery_productOnPage(ctx, field, obj)
 				return res
 			})
 		default:
@@ -3086,7 +3363,7 @@ func (ec *executionContext) _UserProfile(ctx context.Context, sel ast.SelectionS
 	return out
 }
 
-var workspaceImplementors = []string{"Workspace"}
+var workspaceImplementors = []string{"Workspace", "WorkspaceResult"}
 
 func (ec *executionContext) _Workspace(ctx context.Context, sel ast.SelectionSet, obj *Workspace) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, workspaceImplementors)
@@ -3413,18 +3690,18 @@ func (ec *executionContext) marshalNLoginByEmailResult2githubᚗcomᚋztsuᚋapa
 	return ec._LoginByEmailResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNShoppingList2githubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐShoppingList(ctx context.Context, sel ast.SelectionSet, v ShoppingList) graphql.Marshaler {
-	return ec._ShoppingList(ctx, sel, &v)
+func (ec *executionContext) marshalNShoppinglistQuery2githubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐShoppinglistQuery(ctx context.Context, sel ast.SelectionSet, v ShoppinglistQuery) graphql.Marshaler {
+	return ec._ShoppinglistQuery(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNShoppingList2ᚖgithubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐShoppingList(ctx context.Context, sel ast.SelectionSet, v *ShoppingList) graphql.Marshaler {
+func (ec *executionContext) marshalNShoppinglistQuery2ᚖgithubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐShoppinglistQuery(ctx context.Context, sel ast.SelectionSet, v *ShoppinglistQuery) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
 		}
 		return graphql.Null
 	}
-	return ec._ShoppingList(ctx, sel, v)
+	return ec._ShoppinglistQuery(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
@@ -3464,6 +3741,16 @@ func (ec *executionContext) marshalNWorkspace2ᚖgithubᚗcomᚋztsuᚋapartomat
 		return graphql.Null
 	}
 	return ec._Workspace(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNWorkspaceResult2githubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐWorkspaceResult(ctx context.Context, sel ast.SelectionSet, v WorkspaceResult) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._WorkspaceResult(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {

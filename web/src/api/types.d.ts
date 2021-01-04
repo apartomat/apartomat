@@ -11,39 +11,42 @@ export type Scalars = {
   Float: number;
 };
 
-export type Query = {
-  __typename?: 'Query';
-  profile: UserProfileResult;
-  shoppingList: ShoppingList;
-};
-
 export type LoginByEmailResult = CheckEmail | InvalidEmail | ServerError;
 
-export type ConfirmLoginResult = LoginConfirmed | InvalidToken | ExpiredToken | ServerError;
-
-export type LoginConfirmed = {
-  __typename?: 'LoginConfirmed';
-  token: Scalars['String'];
+export type ShoppinglistQuery = {
+  __typename?: 'ShoppinglistQuery';
+  productOnPage?: Maybe<Product>;
 };
 
-export type InvalidToken = Error & {
-  __typename?: 'InvalidToken';
-  message: Scalars['String'];
-};
 
-export type UserProfileResult = UserProfile | Forbidden | ServerError;
-
-export type Gravatar = {
-  __typename?: 'Gravatar';
+export type ShoppinglistQueryProductOnPageArgs = {
   url: Scalars['String'];
 };
 
-export type UserProfile = {
-  __typename?: 'UserProfile';
+export type Workspace = {
+  __typename?: 'Workspace';
   id: Scalars['Int'];
-  email: Scalars['String'];
-  gravatar?: Maybe<Gravatar>;
-  defaultWorkspace: Workspace;
+  name: Scalars['String'];
+};
+
+/**  Common types  */
+export type Error = {
+  message: Scalars['String'];
+};
+
+export type ConfirmLoginResult = LoginConfirmed | InvalidToken | ExpiredToken | ServerError;
+
+export type Query = {
+  __typename?: 'Query';
+  version: Scalars['String'];
+  profile: UserProfileResult;
+  shoppinglist: ShoppinglistQuery;
+  workspace: WorkspaceResult;
+};
+
+
+export type QueryWorkspaceArgs = {
+  id: Scalars['Int'];
 };
 
 export type Product = {
@@ -53,9 +56,29 @@ export type Product = {
   image: Scalars['String'];
 };
 
+export type WorkspaceResult = Workspace | NotFound | Forbidden | ServerError;
+
 export type CheckEmail = {
   __typename?: 'CheckEmail';
   email: Scalars['String'];
+};
+
+export type LoginConfirmed = {
+  __typename?: 'LoginConfirmed';
+  token: Scalars['String'];
+};
+
+export type ExpiredToken = Error & {
+  __typename?: 'ExpiredToken';
+  message: Scalars['String'];
+};
+
+export type UserProfile = {
+  __typename?: 'UserProfile';
+  id: Scalars['Int'];
+  email: Scalars['String'];
+  gravatar?: Maybe<Gravatar>;
+  defaultWorkspace: Workspace;
 };
 
 export type InvalidEmail = Error & {
@@ -80,17 +103,13 @@ export type MutationConfirmLoginArgs = {
   token: Scalars['String'];
 };
 
-export type ExpiredToken = Error & {
-  __typename?: 'ExpiredToken';
-  message: Scalars['String'];
-};
-
-export type Error = {
-  message: Scalars['String'];
-};
-
 export type Forbidden = Error & {
   __typename?: 'Forbidden';
+  message: Scalars['String'];
+};
+
+export type InvalidToken = Error & {
+  __typename?: 'InvalidToken';
   message: Scalars['String'];
 };
 
@@ -99,20 +118,16 @@ export type ServerError = Error & {
   message: Scalars['String'];
 };
 
-export type ShoppingList = {
-  __typename?: 'ShoppingList';
-  findProductOnPage?: Maybe<Product>;
+export type NotFound = Error & {
+  __typename?: 'NotFound';
+  message: Scalars['String'];
 };
 
+export type UserProfileResult = UserProfile | Forbidden | ServerError;
 
-export type ShoppingListFindProductOnPageArgs = {
+export type Gravatar = {
+  __typename?: 'Gravatar';
   url: Scalars['String'];
-};
-
-export type Workspace = {
-  __typename?: 'Workspace';
-  id: Scalars['Int'];
-  name: Scalars['String'];
 };
 
 export type ConfirmLoginMutationVariables = Exact<{
@@ -163,7 +178,7 @@ export type ProfileQuery = (
   { __typename?: 'Query' }
   & { profile: (
     { __typename: 'UserProfile' }
-    & Pick<UserProfile, 'email'>
+    & Pick<UserProfile, 'id' | 'email'>
     & { gravatar?: Maybe<(
       { __typename?: 'Gravatar' }
       & Pick<Gravatar, 'url'>
@@ -171,6 +186,28 @@ export type ProfileQuery = (
       { __typename?: 'Workspace' }
       & Pick<Workspace, 'id' | 'name'>
     ) }
+  ) | (
+    { __typename: 'Forbidden' }
+    & Pick<Forbidden, 'message'>
+  ) | (
+    { __typename: 'ServerError' }
+    & Pick<ServerError, 'message'>
+  ) }
+);
+
+export type WorkspaceQueryVariables = Exact<{
+  id: Scalars['Int'];
+}>;
+
+
+export type WorkspaceQuery = (
+  { __typename?: 'Query' }
+  & { workspace: (
+    { __typename: 'Workspace' }
+    & Pick<Workspace, 'id' | 'name'>
+  ) | (
+    { __typename: 'NotFound' }
+    & Pick<NotFound, 'message'>
   ) | (
     { __typename: 'Forbidden' }
     & Pick<Forbidden, 'message'>
@@ -271,6 +308,7 @@ export const ProfileDocument = gql`
   profile {
     __typename
     ... on UserProfile {
+      id
       email
       gravatar {
         url
@@ -314,3 +352,43 @@ export function useProfileLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Pr
 export type ProfileQueryHookResult = ReturnType<typeof useProfileQuery>;
 export type ProfileLazyQueryHookResult = ReturnType<typeof useProfileLazyQuery>;
 export type ProfileQueryResult = Apollo.QueryResult<ProfileQuery, ProfileQueryVariables>;
+export const WorkspaceDocument = gql`
+    query workspace($id: Int!) {
+  workspace(id: $id) {
+    __typename
+    ... on Workspace {
+      id
+      name
+    }
+    ... on Error {
+      message
+    }
+  }
+}
+    `;
+
+/**
+ * __useWorkspaceQuery__
+ *
+ * To run a query within a React component, call `useWorkspaceQuery` and pass it any options that fit your needs.
+ * When your component renders, `useWorkspaceQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useWorkspaceQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useWorkspaceQuery(baseOptions?: Apollo.QueryHookOptions<WorkspaceQuery, WorkspaceQueryVariables>) {
+        return Apollo.useQuery<WorkspaceQuery, WorkspaceQueryVariables>(WorkspaceDocument, baseOptions);
+      }
+export function useWorkspaceLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<WorkspaceQuery, WorkspaceQueryVariables>) {
+          return Apollo.useLazyQuery<WorkspaceQuery, WorkspaceQueryVariables>(WorkspaceDocument, baseOptions);
+        }
+export type WorkspaceQueryHookResult = ReturnType<typeof useWorkspaceQuery>;
+export type WorkspaceLazyQueryHookResult = ReturnType<typeof useWorkspaceLazyQuery>;
+export type WorkspaceQueryResult = Apollo.QueryResult<WorkspaceQuery, WorkspaceQueryVariables>;

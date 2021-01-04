@@ -70,6 +70,7 @@ func main() {
 				ConfirmLogin:        apartomat.NewConfirmLogin(confirmLoginIssuerVerifier, authIssuerVerifier),
 				GetUserProfile:      apartomat.NewGetUserProfile(users),
 				GetDefaultWorkspace: apartomat.NewGetDefaultWorkspace(workspaces),
+				GetWorkspace:        apartomat.NewGetWorkspace(workspaces),
 			},
 		).Run(serverOpts...)
 

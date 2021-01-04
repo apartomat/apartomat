@@ -67,6 +67,8 @@ func (lbe *LoginByEmail) Do(ctx context.Context, email string, workspaceName str
 		if err != nil {
 			return "", err
 		}
+	} else {
+		user = users[0]
 	}
 
 	workspaces, err := lbe.workspaces.List(ctx, store.WorkspaceStoreQuery{UserID: expr.IntEq(user.ID)})

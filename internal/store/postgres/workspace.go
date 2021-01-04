@@ -50,8 +50,14 @@ func (s *workspaceStore) Save(ctx context.Context, workspace *store.Workspace) (
 }
 
 func (s *workspaceStore) List(ctx context.Context, q store.WorkspaceStoreQuery) ([]*store.Workspace, error) {
-	sql, args, err := SelectFromWorkspaces("id", "name", "is_active", "user_id", "created_at", "modified_at").
-		Where(q).ToSql()
+	sql, args, err := SelectFromWorkspaces(
+		"id",
+		"name",
+		"is_active",
+		"user_id",
+		"created_at",
+		"modified_at",
+	).Where(q).Limit(q.Limit).ToSql()
 	if err != nil {
 		return nil, err
 	}
@@ -112,11 +118,19 @@ func SelectFromWorkspaces(columns ...string) *workspaceSelectBuilder {
 
 func (builder *workspaceSelectBuilder) Where(q store.WorkspaceStoreQuery) *workspaceSelectBuilder {
 	if len(q.ID.Eq) > 0 {
-		builder.SelectBuilder.Where(sq.Eq{"id": q.ID.Eq})
+		builder.SelectBuilder = builder.SelectBuilder.Where(sq.Eq{`"id"`: q.ID.Eq})
 	}
 
 	if len(q.UserID.Eq) > 0 {
-		builder.SelectBuilder.Where(sq.Eq{"id": q.ID.Eq})
+		builder.SelectBuilder = builder.SelectBuilder.Where(sq.Eq{"user_id": q.UserID.Eq})
+	}
+
+	return builder
+}
+
+func (builder *workspaceSelectBuilder) Limit(n int) *workspaceSelectBuilder {
+	if n != 0 {
+		builder.SelectBuilder = builder.SelectBuilder.Limit(uint64(n))
 	}
 
 	return builder

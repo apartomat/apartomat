@@ -4,6 +4,7 @@ import (
 	"crypto/ed25519"
 	"fmt"
 	"github.com/o1egl/paseto"
+	"github.com/pkg/errors"
 	"time"
 )
 
@@ -72,12 +73,12 @@ func (p *pasetoAuthTokenIssuerVerifier) Verify(str string) (*AuthToken, string, 
 
 	err := paseto.NewV2().Verify(str, p.privateKey.Public(), &token, &footer)
 	if err != nil {
-		return nil, "", fmt.Errorf("can't varify auth token: %w", err)
+		return nil, "", errors.Wrapf(ErrTokenVerificationError, "%s", err)
 	}
 
 	err = token.Validate()
 	if err != nil {
-		return nil, "", fmt.Errorf("can't validate: %w", err)
+		return nil, "", errors.Wrapf(ErrTokenValidationError, "%s", err)
 	}
 
 	return &token, footer, nil

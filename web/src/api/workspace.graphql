@@ -1,0 +1,12 @@
+query workspace($id: Int!) {
+    workspace(id: $id) {
+        __typename
+        ...on Workspace {
+            id
+            name
+        }
+        ...on Error {
+            message
+        }
+    }
+}

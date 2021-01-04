@@ -18,7 +18,7 @@ func NewGetDefaultWorkspace(
 }
 
 func (u *GetDefaultWorkspace) Do(ctx context.Context, userID int) (*store.Workspace, error) {
-	workspaces, err := u.workspaces.List(ctx, store.WorkspaceStoreQuery{UserID: expr.IntEq(userID)})
+	workspaces, err := u.workspaces.List(ctx, store.WorkspaceStoreQuery{UserID: expr.IntEq(userID), Limit: 1})
 	if err != nil {
 		return nil, err
 	}

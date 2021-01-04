@@ -1,0 +1,24 @@
+union LoginByEmailResult = CheckEmail | InvalidEmail | ServerError
+
+type CheckEmail {
+    email: String!
+}
+
+type InvalidEmail implements Error {
+    message: String!
+}
+
+union ConfirmLoginResult = LoginConfirmed | InvalidToken | ExpiredToken | ServerError
+
+type LoginConfirmed {
+    token: String!
+}
+
+type InvalidToken implements Error {
+    message: String!
+}
+
+type ExpiredToken implements Error {
+    message: String!
+}
+

@@ -1,0 +1,13 @@
+extend type Query {
+    shoppinglist: ShoppinglistQuery!
+}
+
+type ShoppinglistQuery {
+    productOnPage(url: String!): Product
+}
+
+type Product {
+    name: String!
+    description: String!
+    image: String!
+}

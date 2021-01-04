@@ -1,19 +1,19 @@
-import React, { useState } from 'react';
+import React from "react";
 
-import { Clipboard, ProductList, Product } from './Clipboard/Clipboard';
+import UserEmail from "./UserEmail";
 
-import { useAuthContext, UserContext, UserContextStatus } from '../auth/useAuthContext';
+import { useAuthContext } from "../auth/useAuthContext";
 
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
-import Avatar from "@material-ui/core/Avatar";
-import Container from "@material-ui/core/Container";
-import Box from '@material-ui/core/Box';
-import MoreVertIcon from '@material-ui/icons/MoreVert';
-import IconButton from '@material-ui/core/IconButton';
+
+import Box from "@material-ui/core/Box";
 
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+// import useWorkspace from "./useWorkspace";
+
+import { useWorkspace } from "./useWorkspace";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -35,43 +35,51 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export function Workspace () {
     const classes = useStyles();
+    const { user, concreteUser: { defaultWorkspaceId } } = useAuthContext();
+    const { data, loading, error } = useWorkspace(defaultWorkspaceId);
 
-    const { user } = useAuthContext();
-    const [ list, setList ] = useState<Product[]>([]);
 
-    function add(prod: Product) {
-        setList(list.concat([prod]));
+    if (loading) {
+        return (
+            <Box>
+                <p>Loading workspace...</p>
+            </Box>
+        );
     }
 
-    return (
-        <div>
-            <AppBar position="fixed" color="transparent" elevation={0}>
-                <Toolbar>
-                    <Typography variant="h6" component="h1" noWrap className={classes.title}>Apartomat</Typography>
-                    <Box className={classes.workspace}>
-                        <Typography variant="h4" component="h1">Workspace</Typography>
-                    </Box>
-                    
-                    <UserEmail user={user}/>
-                </Toolbar>
-            </AppBar>
-            <main className={classes.content}>
-                <Container>
-                </Container>
-            </main>
-        </div>
-    );
-}
+    if (error) {
+        return (
+            <Box>
+                <h1>Errpr</h1>
+                <p>Can't get workspace: {error}</p>
+            </Box>
+        );
+    }
 
-function UserEmail ({ user }: {user: UserContext}) {
-    switch (user.status) {
-        case UserContextStatus.LOGGED:
+    switch (data?.workspace.__typename) {
+        case "Workspace":
             return (
-                <Avatar src={user.avatar}/>
+                <div>
+                    <AppBar position="fixed" color="transparent" elevation={0}>
+                        <Toolbar>
+                            <Typography variant="h6" component="h1" noWrap className={classes.title}>apartomat</Typography>
+                            <Box className={classes.workspace}>
+                                <Typography variant="h4" component="h1">{data?.workspace.name}</Typography>
+                            </Box>
+                            <UserEmail user={user}/>
+                        </Toolbar>
+                    </AppBar>
+                    <main className={classes.content}>
+                    </main>
+                </div>
             );
         default:
-            return null;
+            return (
+                <div>{data?.workspace.__typename} case in not handled yet</div>
+            );
     }
+
+    
 }
 
 export default Workspace;

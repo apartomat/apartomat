@@ -1,0 +1,10 @@
+extend type Query {
+    workspace(id: Int!): WorkspaceResult!
+}
+
+union WorkspaceResult = Workspace | NotFound | Forbidden | ServerError
+
+type Workspace {
+    id: Int!
+    name: String!
+}

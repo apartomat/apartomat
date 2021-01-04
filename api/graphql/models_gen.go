@@ -6,6 +6,7 @@ type ConfirmLoginResult interface {
 	IsConfirmLoginResult()
 }
 
+//  Common types
 type Error interface {
 	IsError()
 }
@@ -16,6 +17,10 @@ type LoginByEmailResult interface {
 
 type UserProfileResult interface {
 	IsUserProfileResult()
+}
+
+type WorkspaceResult interface {
+	IsWorkspaceResult()
 }
 
 type CheckEmail struct {
@@ -37,6 +42,7 @@ type Forbidden struct {
 
 func (Forbidden) IsUserProfileResult() {}
 func (Forbidden) IsError()             {}
+func (Forbidden) IsWorkspaceResult()   {}
 
 type Gravatar struct {
 	URL string `json:"url"`
@@ -62,6 +68,13 @@ type LoginConfirmed struct {
 
 func (LoginConfirmed) IsConfirmLoginResult() {}
 
+type NotFound struct {
+	Message string `json:"message"`
+}
+
+func (NotFound) IsError()           {}
+func (NotFound) IsWorkspaceResult() {}
+
 type Product struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
@@ -72,13 +85,14 @@ type ServerError struct {
 	Message string `json:"message"`
 }
 
-func (ServerError) IsError()              {}
-func (ServerError) IsUserProfileResult()  {}
 func (ServerError) IsLoginByEmailResult() {}
 func (ServerError) IsConfirmLoginResult() {}
+func (ServerError) IsUserProfileResult()  {}
+func (ServerError) IsError()              {}
+func (ServerError) IsWorkspaceResult()    {}
 
-type ShoppingList struct {
-	FindProductOnPage *Product `json:"findProductOnPage"`
+type ShoppinglistQuery struct {
+	ProductOnPage *Product `json:"productOnPage"`
 }
 
 type UserProfile struct {
@@ -94,3 +108,5 @@ type Workspace struct {
 	ID   int    `json:"id"`
 	Name string `json:"name"`
 }
+
+func (Workspace) IsWorkspaceResult() {}

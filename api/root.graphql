@@ -1,0 +1,31 @@
+schema {
+    query: Query
+    mutation: Mutation
+}
+
+type Query {
+    version: String!
+}
+
+type Mutation {
+    loginByEmail(email: String!, workspaceName: String! = "Workspace"): LoginByEmailResult!
+    confirmLogin(token: String!): ConfirmLoginResult!
+}
+
+" Common types "
+
+interface Error {
+    message: String!
+}
+
+type ServerError implements Error {
+    message: String!
+}
+
+type Forbidden implements Error {
+    message: String!
+}
+
+type NotFound implements Error {
+    message: String!
+}
