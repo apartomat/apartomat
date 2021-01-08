@@ -62,11 +62,12 @@ func main() {
 
 		users := postgres.NewUserStore(pool)
 		workspaces := postgres.NewWorkspaceStore(pool)
+		workspaceUsers := postgres.NewWorkspaceUserStore(pool)
 
 		NewServer(
 			&graphql.UseCases{
 				CheckAuthToken:      apartomat.NewCheckAuthToken(authIssuerVerifier),
-				LoginByEmail:        apartomat.NewLoginByEmail(users, workspaces, confirmLoginIssuerVerifier, mailer),
+				LoginByEmail:        apartomat.NewLoginByEmail(users, workspaces, workspaceUsers, confirmLoginIssuerVerifier, mailer),
 				ConfirmLogin:        apartomat.NewConfirmLogin(confirmLoginIssuerVerifier, authIssuerVerifier),
 				GetUserProfile:      apartomat.NewGetUserProfile(users),
 				GetDefaultWorkspace: apartomat.NewGetDefaultWorkspace(workspaces),

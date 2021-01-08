@@ -12,19 +12,21 @@ import (
 
 // Use case: anonymous inputs own email address to get confirmation token
 type LoginByEmail struct {
-	users      store.UserStore
-	workspaces store.WorkspaceStore
-	issuer     EmailConfirmTokenIssuer
-	mailer     MailSender
+	users          store.UserStore
+	workspaces     store.WorkspaceStore
+	workspaceUsers store.WorkspaceUserStore
+	issuer         EmailConfirmTokenIssuer
+	mailer         MailSender
 }
 
 func NewLoginByEmail(
 	users store.UserStore,
 	workspaces store.WorkspaceStore,
+	workspaceUsers store.WorkspaceUserStore,
 	issuer EmailConfirmTokenIssuer,
 	mailer MailSender,
 ) *LoginByEmail {
-	return &LoginByEmail{users, workspaces, issuer, mailer}
+	return &LoginByEmail{users, workspaces, workspaceUsers, issuer, mailer}
 }
 
 var (
@@ -84,6 +86,17 @@ func (lbe *LoginByEmail) Do(ctx context.Context, email string, workspaceName str
 		}
 
 		workspace, err = lbe.workspaces.Save(ctx, workspace)
+		if err != nil {
+			return "", err
+		}
+
+		wu := &store.WorkspaceUser{
+			WorkspaceID: workspace.ID,
+			UserID:      user.ID,
+			Role:        store.WorkspaceUserRoleAdmin,
+		}
+
+		_, err = lbe.workspaceUsers.Save(ctx, wu)
 		if err != nil {
 			return "", err
 		}
