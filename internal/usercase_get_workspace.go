@@ -2,6 +2,7 @@ package apartomat
 
 import (
 	"context"
+	"github.com/pkg/errors"
 	"github.com/ztsu/apartomat/internal/pkg/expr"
 	"github.com/ztsu/apartomat/internal/store"
 )
@@ -23,7 +24,7 @@ func (u *GetWorkspace) Do(ctx context.Context, id int) (*store.Workspace, error)
 	}
 
 	if len(workspaces) == 0 {
-		return nil, ErrWorkspaceNotFound
+		return nil, errors.Wrapf(ErrNotFound, "workspace %d", id)
 	}
 
 	workspace := workspaces[0]

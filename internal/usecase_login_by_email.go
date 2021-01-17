@@ -10,6 +10,11 @@ import (
 	"github.com/ztsu/apartomat/internal/store"
 )
 
+var (
+	ErrInvalidEmail = errors.New("invalid email")
+	ErrSendError    = errors.New("can't send email")
+)
+
 // Use case: anonymous inputs own email address to get confirmation token
 type LoginByEmail struct {
 	users          store.UserStore
@@ -28,11 +33,6 @@ func NewLoginByEmail(
 ) *LoginByEmail {
 	return &LoginByEmail{users, workspaces, workspaceUsers, issuer, mailer}
 }
-
-var (
-	ErrInvalidEmail = errors.New("invalid email")
-	ErrSendError    = errors.New("can't send email")
-)
 
 func (lbe *LoginByEmail) Do(ctx context.Context, email string, workspaceName string) (string, error) {
 	if err := validation.Validate(email, is.EmailFormat); err != nil {

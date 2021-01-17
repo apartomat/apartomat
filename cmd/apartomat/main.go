@@ -60,6 +60,8 @@ func main() {
 			log.Fatalf("can't connect to postgres: %s", err)
 		}
 
+		acl := apartomat.NewAcl()
+
 		users := postgres.NewUserStore(pool)
 		workspaces := postgres.NewWorkspaceStore(pool)
 		workspaceUsers := postgres.NewWorkspaceUserStore(pool)
@@ -68,7 +70,7 @@ func main() {
 			&graphql.UseCases{
 				CheckAuthToken:      apartomat.NewCheckAuthToken(authIssuerVerifier),
 				LoginByEmail:        apartomat.NewLoginByEmail(users, workspaces, workspaceUsers, confirmLoginIssuerVerifier, mailer),
-				ConfirmLogin:        apartomat.NewConfirmLogin(confirmLoginIssuerVerifier, authIssuerVerifier),
+				ConfirmLogin:        apartomat.NewConfirmLogin(confirmLoginIssuerVerifier, authIssuerVerifier, users, acl),
 				GetUserProfile:      apartomat.NewGetUserProfile(users),
 				GetDefaultWorkspace: apartomat.NewGetDefaultWorkspace(workspaces),
 				GetWorkspace:        apartomat.NewGetWorkspace(workspaces),

@@ -21,8 +21,8 @@ func WithUserHandler(ver *apartomat.CheckAuthToken, next http.Handler) http.Hand
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		token, _ := ver.Do(strings.TrimPrefix(r.Header.Get("Authorization"), "Bearer "))
 		if token != nil {
-			ctx := apartomat.WithUserCtx(r.Context(), &apartomat.UserCtx{Email: token.Subject})
-			r = r.WithContext(ctx)
+			userCtx := &apartomat.UserCtx{Email: token.Subject}
+			r = r.WithContext(apartomat.WithUserCtx(r.Context(), userCtx))
 		}
 
 		next.ServeHTTP(w, r)

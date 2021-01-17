@@ -24,12 +24,8 @@ func (u *GetDefaultWorkspace) Do(ctx context.Context, userID int) (*store.Worksp
 	}
 
 	if len(workspaces) == 0 {
-		return nil, ErrWorkspaceNotFound
+		return nil, errors.Wrapf(ErrNotFound, "workspace of user %d", userID)
 	}
 
 	return workspaces[0], nil
 }
-
-var (
-	ErrWorkspaceNotFound = errors.New("workspace not found")
-)

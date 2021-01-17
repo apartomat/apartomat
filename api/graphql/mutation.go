@@ -27,7 +27,7 @@ func (r *mutationResolver) LoginByEmail(ctx context.Context, email string, works
 }
 
 func (r *mutationResolver) ConfirmLogin(ctx context.Context, token string) (ConfirmLoginResult, error) {
-	str, err := r.useCases.ConfirmLogin.Do(token)
+	str, err := r.useCases.ConfirmLogin.Do(ctx, token)
 	if err != nil {
 		if errors.Is(err, apartomat.ErrTokenValidationError) {
 			return InvalidToken{Message: "token expired or not valid"}, nil

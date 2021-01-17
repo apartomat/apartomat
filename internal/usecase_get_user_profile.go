@@ -24,12 +24,8 @@ func (gup *GetUserProfile) Do(ctx context.Context, email string) (*store.User, e
 	}
 
 	if len(users) == 0 {
-		return nil, ErrUserNotFound
+		return nil, errors.Wrapf(ErrNotFound, "user %s", email)
 	}
 
 	return users[0], nil
 }
-
-var (
-	ErrUserNotFound = errors.New("user not found")
-)

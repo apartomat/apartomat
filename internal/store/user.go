@@ -24,8 +24,8 @@ type UserStoreQuery struct {
 	ID     expr.Int
 	Email  expr.Str
 	Sort   []UserStoreQuerySort
-	Limit  *uint64
-	Offset *uint64
+	Limit  int
+	Offset int
 }
 
 type UserStoreQuerySort int

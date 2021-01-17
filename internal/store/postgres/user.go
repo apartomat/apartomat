@@ -51,7 +51,7 @@ func (s *userStore) Save(ctx context.Context, user *store.User) (*store.User, er
 
 func (s *userStore) List(ctx context.Context, q store.UserStoreQuery) ([]*store.User, error) {
 	sql, args, err := SelectFromUsers("id", "email", "full_name", "is_active", "created_at", "modified_at").
-		Where(q).ToSql()
+		Where(q).Limit(q.Limit).ToSql()
 	if err != nil {
 		return nil, err
 	}
@@ -115,6 +115,14 @@ func (builder *userSelectBuilder) Where(q store.UserStoreQuery) *userSelectBuild
 
 	if len(q.Email.Eq) > 0 {
 		builder.SelectBuilder.Where(sq.Eq{"email": q.Email.Eq})
+	}
+
+	return builder
+}
+
+func (builder *userSelectBuilder) Limit(n int) *userSelectBuilder {
+	if n != 0 {
+		builder.SelectBuilder = builder.SelectBuilder.Limit(uint64(n))
 	}
 
 	return builder

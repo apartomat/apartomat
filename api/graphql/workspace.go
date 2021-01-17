@@ -9,7 +9,7 @@ import (
 func (r *queryResolver) Workspace(ctx context.Context, id int) (WorkspaceResult, error) {
 	ws, err := r.useCases.GetWorkspace.Do(ctx, id)
 	if err != nil {
-		if errors.Is(err, apartomat.ErrWorkspaceNotFound) {
+		if errors.Is(err, apartomat.ErrNotFound) {
 			return NotFound{}, nil
 		}
 
