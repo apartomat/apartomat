@@ -6,12 +6,14 @@ import (
 )
 
 type UseCases struct {
-	LoginByEmail        *apartomat.LoginByEmail
-	ConfirmLogin        *apartomat.ConfirmLogin
-	CheckAuthToken      *apartomat.CheckAuthToken
-	GetUserProfile      *apartomat.GetUserProfile
-	GetDefaultWorkspace *apartomat.GetDefaultWorkspace
-	GetWorkspace        *apartomat.GetWorkspace
+	LoginByEmail            *apartomat.LoginByEmail
+	ConfirmLogin            *apartomat.ConfirmLogin
+	CheckAuthToken          *apartomat.CheckAuthToken
+	GetUserProfile          *apartomat.GetUserProfile
+	GetDefaultWorkspace     *apartomat.GetDefaultWorkspace
+	GetWorkspace            *apartomat.GetWorkspace
+	GetWorkspaceUsers       *apartomat.GetWorkspaceUsers
+	GetWorkspaceUserProfile *apartomat.GetWorkspaceUserProfile
 }
 
 type rootResolver struct {

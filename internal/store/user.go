@@ -21,11 +21,12 @@ type UserStore interface {
 }
 
 type UserStoreQuery struct {
-	ID     expr.Int
-	Email  expr.Str
-	Sort   []UserStoreQuerySort
-	Limit  int
-	Offset int
+	ID          expr.Int
+	Email       expr.Str
+	WorkspaceID expr.Int
+	Sort        []UserStoreQuerySort
+	Limit       int
+	Offset      int
 }
 
 type UserStoreQuerySort int

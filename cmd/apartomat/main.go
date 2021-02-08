@@ -9,6 +9,7 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/ztsu/apartomat/api/graphql"
 	"github.com/ztsu/apartomat/internal"
+	"github.com/ztsu/apartomat/internal/store/dataloader"
 	"github.com/ztsu/apartomat/internal/store/postgres"
 	"io/ioutil"
 	"log"
@@ -66,14 +67,18 @@ func main() {
 		workspaces := postgres.NewWorkspaceStore(pool)
 		workspaceUsers := postgres.NewWorkspaceUserStore(pool)
 
+		usersLoader := dataloader.NewUserLoader(dataloader.NewUserLoaderConfig(ctx, users))
+
 		NewServer(
 			&graphql.UseCases{
-				CheckAuthToken:      apartomat.NewCheckAuthToken(authIssuerVerifier),
-				LoginByEmail:        apartomat.NewLoginByEmail(users, workspaces, workspaceUsers, confirmLoginIssuerVerifier, mailer),
-				ConfirmLogin:        apartomat.NewConfirmLogin(confirmLoginIssuerVerifier, authIssuerVerifier, users, acl),
-				GetUserProfile:      apartomat.NewGetUserProfile(users),
-				GetDefaultWorkspace: apartomat.NewGetDefaultWorkspace(workspaces),
-				GetWorkspace:        apartomat.NewGetWorkspace(workspaces),
+				CheckAuthToken:          apartomat.NewCheckAuthToken(authIssuerVerifier),
+				LoginByEmail:            apartomat.NewLoginByEmail(users, workspaces, workspaceUsers, confirmLoginIssuerVerifier, mailer),
+				ConfirmLogin:            apartomat.NewConfirmLogin(confirmLoginIssuerVerifier, authIssuerVerifier, users, acl),
+				GetUserProfile:          apartomat.NewGetUserProfile(users),
+				GetDefaultWorkspace:     apartomat.NewGetDefaultWorkspace(workspaces),
+				GetWorkspace:            apartomat.NewGetWorkspace(workspaces),
+				GetWorkspaceUsers:       apartomat.NewGetWorkspaceUsers(workspaces, workspaceUsers, acl),
+				GetWorkspaceUserProfile: apartomat.NewGetWorkspaceUserProfile(usersLoader, acl),
 			},
 		).Run(serverOpts...)
 

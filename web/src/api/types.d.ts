@@ -13,28 +13,19 @@ export type Scalars = {
 
 export type LoginByEmailResult = CheckEmail | InvalidEmail | ServerError;
 
-export type ShoppinglistQuery = {
-  __typename?: 'ShoppinglistQuery';
-  productOnPage?: Maybe<Product>;
-};
-
-
-export type ShoppinglistQueryProductOnPageArgs = {
-  url: Scalars['String'];
-};
-
-export type Workspace = {
-  __typename?: 'Workspace';
-  id: Scalars['Int'];
-  name: Scalars['String'];
-};
-
-/**  Common types  */
-export type Error = {
+export type InvalidEmail = Error & {
+  __typename?: 'InvalidEmail';
   message: Scalars['String'];
 };
 
 export type ConfirmLoginResult = LoginConfirmed | InvalidToken | ExpiredToken | ServerError;
+
+export type WorkspaceUsersResult = WorkspaceUsers | Forbidden | ServerError;
+
+export type InvalidToken = Error & {
+  __typename?: 'InvalidToken';
+  message: Scalars['String'];
+};
 
 export type Query = {
   __typename?: 'Query';
@@ -49,29 +40,71 @@ export type QueryWorkspaceArgs = {
   id: Scalars['Int'];
 };
 
-export type Product = {
-  __typename?: 'Product';
-  name: Scalars['String'];
-  description: Scalars['String'];
-  image: Scalars['String'];
+export type Gravatar = {
+  __typename?: 'Gravatar';
+  url: Scalars['String'];
 };
-
-export type WorkspaceResult = Workspace | NotFound | Forbidden | ServerError;
 
 export type CheckEmail = {
   __typename?: 'CheckEmail';
   email: Scalars['String'];
 };
 
-export type LoginConfirmed = {
-  __typename?: 'LoginConfirmed';
-  token: Scalars['String'];
+export type UserProfileResult = UserProfile | Forbidden | ServerError;
+
+export type WorkspaceUsers = {
+  __typename?: 'WorkspaceUsers';
+  items: Array<WorkspaceUser>;
 };
 
-export type ExpiredToken = Error & {
-  __typename?: 'ExpiredToken';
+export type WorkspaceUser = {
+  __typename?: 'WorkspaceUser';
+  id: Scalars['Int'];
+  role: WorkspaceUserRole;
+  profile: WorkspaceUserProfile;
+};
+
+/**  Common types  */
+export type Error = {
   message: Scalars['String'];
 };
+
+export type ServerError = Error & {
+  __typename?: 'ServerError';
+  message: Scalars['String'];
+};
+
+export type Forbidden = Error & {
+  __typename?: 'Forbidden';
+  message: Scalars['String'];
+};
+
+export type Workspace = {
+  __typename?: 'Workspace';
+  id: Scalars['Int'];
+  name: Scalars['String'];
+  users: WorkspaceUsersResult;
+};
+
+export type Id = {
+  __typename?: 'Id';
+  id: Scalars['Int'];
+};
+
+export type ShoppinglistQuery = {
+  __typename?: 'ShoppinglistQuery';
+  productOnPage?: Maybe<Product>;
+};
+
+
+export type ShoppinglistQueryProductOnPageArgs = {
+  url: Scalars['String'];
+};
+
+export enum WorkspaceUserRole {
+  Admin = 'ADMIN',
+  User = 'USER'
+}
 
 export type UserProfile = {
   __typename?: 'UserProfile';
@@ -81,8 +114,8 @@ export type UserProfile = {
   defaultWorkspace: Workspace;
 };
 
-export type InvalidEmail = Error & {
-  __typename?: 'InvalidEmail';
+export type ExpiredToken = Error & {
+  __typename?: 'ExpiredToken';
   message: Scalars['String'];
 };
 
@@ -103,19 +136,18 @@ export type MutationConfirmLoginArgs = {
   token: Scalars['String'];
 };
 
-export type Forbidden = Error & {
-  __typename?: 'Forbidden';
-  message: Scalars['String'];
+export type WorkspaceResult = Workspace | NotFound | Forbidden | ServerError;
+
+export type WorkspaceUserProfile = {
+  __typename?: 'WorkspaceUserProfile';
+  id: Scalars['Int'];
+  email: Scalars['String'];
+  gravatar: Gravatar;
 };
 
-export type InvalidToken = Error & {
-  __typename?: 'InvalidToken';
-  message: Scalars['String'];
-};
-
-export type ServerError = Error & {
-  __typename?: 'ServerError';
-  message: Scalars['String'];
+export type LoginConfirmed = {
+  __typename?: 'LoginConfirmed';
+  token: Scalars['String'];
 };
 
 export type NotFound = Error & {
@@ -123,11 +155,11 @@ export type NotFound = Error & {
   message: Scalars['String'];
 };
 
-export type UserProfileResult = UserProfile | Forbidden | ServerError;
-
-export type Gravatar = {
-  __typename?: 'Gravatar';
-  url: Scalars['String'];
+export type Product = {
+  __typename?: 'Product';
+  name: Scalars['String'];
+  description: Scalars['String'];
+  image: Scalars['String'];
 };
 
 export type ConfirmLoginMutationVariables = Exact<{
@@ -205,6 +237,27 @@ export type WorkspaceQuery = (
   & { workspace: (
     { __typename: 'Workspace' }
     & Pick<Workspace, 'id' | 'name'>
+    & { users: (
+      { __typename: 'WorkspaceUsers' }
+      & { items: Array<(
+        { __typename?: 'WorkspaceUser' }
+        & Pick<WorkspaceUser, 'id' | 'role'>
+        & { profile: (
+          { __typename?: 'WorkspaceUserProfile' }
+          & Pick<WorkspaceUserProfile, 'id' | 'email'>
+          & { gravatar: (
+            { __typename?: 'Gravatar' }
+            & Pick<Gravatar, 'url'>
+          ) }
+        ) }
+      )> }
+    ) | (
+      { __typename: 'Forbidden' }
+      & Pick<Forbidden, 'message'>
+    ) | (
+      { __typename: 'ServerError' }
+      & Pick<ServerError, 'message'>
+    ) }
   ) | (
     { __typename: 'NotFound' }
     & Pick<NotFound, 'message'>
@@ -359,6 +412,25 @@ export const WorkspaceDocument = gql`
     ... on Workspace {
       id
       name
+      users {
+        __typename
+        ... on WorkspaceUsers {
+          items {
+            id
+            role
+            profile {
+              id
+              email
+              gravatar {
+                url
+              }
+            }
+          }
+        }
+        ... on Error {
+          message
+        }
+      }
     }
     ... on Error {
       message

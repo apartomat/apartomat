@@ -4,6 +4,25 @@ query workspace($id: Int!) {
         ...on Workspace {
             id
             name
+            users {
+                __typename
+                ...on WorkspaceUsers {
+                    items {
+                        id
+                        role
+                        profile {
+                            id
+                            email
+                            gravatar {
+                                url
+                            }
+                        }
+                    }
+                }
+                ...on Error {
+                    message
+                }
+            }
         }
         ...on Error {
             message

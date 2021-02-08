@@ -18,3 +18,11 @@ models:
     fields:
       defaultWorkspace:
         resolver: true
+  Workspace:
+    fields:
+      users:
+        resolver: true
+  WorkspaceUser:
+    fields:
+      profile:
+        resolver: true

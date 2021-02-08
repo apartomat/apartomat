@@ -2,9 +2,8 @@ package graphql
 
 import (
 	"context"
-	"crypto/md5"
-	"fmt"
 	apartomat "github.com/ztsu/apartomat/internal"
+	"github.com/ztsu/apartomat/internal/pkg/gravatar"
 	"github.com/ztsu/apartomat/internal/store"
 	"log"
 )
@@ -46,7 +45,7 @@ func (r *queryResolver) Profile(ctx context.Context) (UserProfileResult, error) 
 			ID:    user.ID,
 			Email: user.Email,
 			Gravatar: &Gravatar{
-				URL: fmt.Sprintf("https://www.gravatar.com/avatar/%x", md5.Sum([]byte(user.Email))),
+				URL: gravatar.Url(user.Email),
 			},
 		}, nil
 	}

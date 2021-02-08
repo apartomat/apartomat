@@ -10,7 +10,3 @@ type UserProfile {
     gravatar: Gravatar
     defaultWorkspace: Workspace!
 }
-
-type Gravatar {
-    url: String!
-}

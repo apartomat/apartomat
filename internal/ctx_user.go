@@ -7,6 +7,7 @@ import (
 const userCtxKey = "user"
 
 type UserCtx struct {
+	ID    int
 	Email string
 }
 

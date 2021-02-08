@@ -7,4 +7,28 @@ union WorkspaceResult = Workspace | NotFound | Forbidden | ServerError
 type Workspace {
     id: Int!
     name: String!
+    users: WorkspaceUsersResult!
+}
+
+union WorkspaceUsersResult = WorkspaceUsers | Forbidden | ServerError
+
+type WorkspaceUsers {
+	items: [WorkspaceUser!]!
+}
+
+type WorkspaceUser {
+	id: Int!
+	role: WorkspaceUserRole!
+	profile: WorkspaceUserProfile!
+}
+
+enum WorkspaceUserRole {
+	ADMIN
+	USER
+}
+
+type WorkspaceUserProfile {
+    id: Int!
+    email: String!
+    gravatar: Gravatar!
 }

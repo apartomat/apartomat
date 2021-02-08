@@ -2,6 +2,12 @@
 
 package graphql
 
+import (
+	"fmt"
+	"io"
+	"strconv"
+)
+
 type ConfirmLoginResult interface {
 	IsConfirmLoginResult()
 }
@@ -23,6 +29,10 @@ type WorkspaceResult interface {
 	IsWorkspaceResult()
 }
 
+type WorkspaceUsersResult interface {
+	IsWorkspaceUsersResult()
+}
+
 type CheckEmail struct {
 	Email string `json:"email"`
 }
@@ -40,9 +50,10 @@ type Forbidden struct {
 	Message string `json:"message"`
 }
 
-func (Forbidden) IsUserProfileResult() {}
-func (Forbidden) IsError()             {}
-func (Forbidden) IsWorkspaceResult()   {}
+func (Forbidden) IsUserProfileResult()    {}
+func (Forbidden) IsError()                {}
+func (Forbidden) IsWorkspaceResult()      {}
+func (Forbidden) IsWorkspaceUsersResult() {}
 
 type Gravatar struct {
 	URL string `json:"url"`
@@ -85,11 +96,12 @@ type ServerError struct {
 	Message string `json:"message"`
 }
 
-func (ServerError) IsLoginByEmailResult() {}
-func (ServerError) IsConfirmLoginResult() {}
-func (ServerError) IsUserProfileResult()  {}
-func (ServerError) IsError()              {}
-func (ServerError) IsWorkspaceResult()    {}
+func (ServerError) IsLoginByEmailResult()   {}
+func (ServerError) IsConfirmLoginResult()   {}
+func (ServerError) IsUserProfileResult()    {}
+func (ServerError) IsError()                {}
+func (ServerError) IsWorkspaceResult()      {}
+func (ServerError) IsWorkspaceUsersResult() {}
 
 type ShoppinglistQuery struct {
 	ProductOnPage *Product `json:"productOnPage"`
@@ -105,8 +117,68 @@ type UserProfile struct {
 func (UserProfile) IsUserProfileResult() {}
 
 type Workspace struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
+	ID    int                  `json:"id"`
+	Name  string               `json:"name"`
+	Users WorkspaceUsersResult `json:"users"`
 }
 
 func (Workspace) IsWorkspaceResult() {}
+
+type WorkspaceUser struct {
+	ID      int                   `json:"id"`
+	Role    WorkspaceUserRole     `json:"role"`
+	Profile *WorkspaceUserProfile `json:"profile"`
+}
+
+type WorkspaceUserProfile struct {
+	ID       int       `json:"id"`
+	Email    string    `json:"email"`
+	Gravatar *Gravatar `json:"gravatar"`
+}
+
+type WorkspaceUsers struct {
+	Items []*WorkspaceUser `json:"items"`
+}
+
+func (WorkspaceUsers) IsWorkspaceUsersResult() {}
+
+type WorkspaceUserRole string
+
+const (
+	WorkspaceUserRoleAdmin WorkspaceUserRole = "ADMIN"
+	WorkspaceUserRoleUser  WorkspaceUserRole = "USER"
+)
+
+var AllWorkspaceUserRole = []WorkspaceUserRole{
+	WorkspaceUserRoleAdmin,
+	WorkspaceUserRoleUser,
+}
+
+func (e WorkspaceUserRole) IsValid() bool {
+	switch e {
+	case WorkspaceUserRoleAdmin, WorkspaceUserRoleUser:
+		return true
+	}
+	return false
+}
+
+func (e WorkspaceUserRole) String() string {
+	return string(e)
+}
+
+func (e *WorkspaceUserRole) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = WorkspaceUserRole(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid WorkspaceUserRole", str)
+	}
+	return nil
+}
+
+func (e WorkspaceUserRole) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}

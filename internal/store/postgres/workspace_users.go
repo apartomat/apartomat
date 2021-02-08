@@ -92,7 +92,7 @@ func (s *workspaceUserStore) List(ctx context.Context, q store.WorkspaceUserStor
 	return users, nil
 }
 
-// workspaceInsertBuilder is insert builder shortcut for workspaces table
+// workspaceInsertBuilder is insert builder shortcut for "workspace_users" table
 type workspaceUserInsertBuilder struct {
 	sq.InsertBuilder
 }
