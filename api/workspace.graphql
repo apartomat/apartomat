@@ -8,6 +8,7 @@ type Workspace {
     id: Int!
     name: String!
     users: WorkspaceUsersResult!
+    projects: WorkspaceProjects!
 }
 
 union WorkspaceUsersResult = WorkspaceUsers | Forbidden | ServerError
@@ -31,4 +32,27 @@ type WorkspaceUserProfile {
     id: Int!
     email: String!
     gravatar: Gravatar!
+}
+
+type WorkspaceProjects {
+	workspace: Id
+	list: WorkspaceProjectsListResult!
+	total: WorkspaceProjectsTotalResult!
+}
+
+union WorkspaceProjectsListResult = WorkspaceProjectsList | Forbidden | ServerError
+
+type WorkspaceProjectsList {
+	items: [WorkspaceProject!]!
+}
+
+union WorkspaceProjectsTotalResult = WorkspaceProjectsTotal | Forbidden | ServerError
+
+type WorkspaceProjectsTotal {
+	total: Int!
+}
+
+type WorkspaceProject {
+	id: Int!
+	name: String!
 }

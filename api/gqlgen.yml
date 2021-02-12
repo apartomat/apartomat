@@ -22,7 +22,15 @@ models:
     fields:
       users:
         resolver: true
+      projects:
+        resolver: true
   WorkspaceUser:
     fields:
       profile:
+        resolver: true
+  WorkspaceProjects:
+    fields:
+      list:
+        resolver: true
+      total:
         resolver: true

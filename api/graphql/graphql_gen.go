@@ -40,6 +40,7 @@ type ResolverRoot interface {
 	ShoppinglistQuery() ShoppinglistQueryResolver
 	UserProfile() UserProfileResolver
 	Workspace() WorkspaceResolver
+	WorkspaceProjects() WorkspaceProjectsResolver
 	WorkspaceUser() WorkspaceUserResolver
 }
 
@@ -61,6 +62,10 @@ type ComplexityRoot struct {
 
 	Gravatar struct {
 		URL func(childComplexity int) int
+	}
+
+	ID struct {
+		ID func(childComplexity int) int
 	}
 
 	InvalidEmail struct {
@@ -113,9 +118,29 @@ type ComplexityRoot struct {
 	}
 
 	Workspace struct {
-		ID    func(childComplexity int) int
-		Name  func(childComplexity int) int
-		Users func(childComplexity int) int
+		ID       func(childComplexity int) int
+		Name     func(childComplexity int) int
+		Projects func(childComplexity int) int
+		Users    func(childComplexity int) int
+	}
+
+	WorkspaceProject struct {
+		ID   func(childComplexity int) int
+		Name func(childComplexity int) int
+	}
+
+	WorkspaceProjects struct {
+		List      func(childComplexity int) int
+		Total     func(childComplexity int) int
+		Workspace func(childComplexity int) int
+	}
+
+	WorkspaceProjectsList struct {
+		Items func(childComplexity int) int
+	}
+
+	WorkspaceProjectsTotal struct {
+		Total func(childComplexity int) int
 	}
 
 	WorkspaceUser struct {
@@ -153,6 +178,11 @@ type UserProfileResolver interface {
 }
 type WorkspaceResolver interface {
 	Users(ctx context.Context, obj *Workspace) (WorkspaceUsersResult, error)
+	Projects(ctx context.Context, obj *Workspace) (*WorkspaceProjects, error)
+}
+type WorkspaceProjectsResolver interface {
+	List(ctx context.Context, obj *WorkspaceProjects) (WorkspaceProjectsListResult, error)
+	Total(ctx context.Context, obj *WorkspaceProjects) (WorkspaceProjectsTotalResult, error)
 }
 type WorkspaceUserResolver interface {
 	Profile(ctx context.Context, obj *WorkspaceUser) (*WorkspaceUserProfile, error)
@@ -200,6 +230,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Gravatar.URL(childComplexity), true
+
+	case "Id.id":
+		if e.complexity.ID.ID == nil {
+			break
+		}
+
+		return e.complexity.ID.ID(childComplexity), true
 
 	case "InvalidEmail.message":
 		if e.complexity.InvalidEmail.Message == nil {
@@ -368,12 +405,68 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Workspace.Name(childComplexity), true
 
+	case "Workspace.projects":
+		if e.complexity.Workspace.Projects == nil {
+			break
+		}
+
+		return e.complexity.Workspace.Projects(childComplexity), true
+
 	case "Workspace.users":
 		if e.complexity.Workspace.Users == nil {
 			break
 		}
 
 		return e.complexity.Workspace.Users(childComplexity), true
+
+	case "WorkspaceProject.id":
+		if e.complexity.WorkspaceProject.ID == nil {
+			break
+		}
+
+		return e.complexity.WorkspaceProject.ID(childComplexity), true
+
+	case "WorkspaceProject.name":
+		if e.complexity.WorkspaceProject.Name == nil {
+			break
+		}
+
+		return e.complexity.WorkspaceProject.Name(childComplexity), true
+
+	case "WorkspaceProjects.list":
+		if e.complexity.WorkspaceProjects.List == nil {
+			break
+		}
+
+		return e.complexity.WorkspaceProjects.List(childComplexity), true
+
+	case "WorkspaceProjects.total":
+		if e.complexity.WorkspaceProjects.Total == nil {
+			break
+		}
+
+		return e.complexity.WorkspaceProjects.Total(childComplexity), true
+
+	case "WorkspaceProjects.workspace":
+		if e.complexity.WorkspaceProjects.Workspace == nil {
+			break
+		}
+
+		return e.complexity.WorkspaceProjects.Workspace(childComplexity), true
+
+	case "WorkspaceProjectsList.items":
+		if e.complexity.WorkspaceProjectsList.Items == nil {
+			break
+		}
+
+		return e.complexity.WorkspaceProjectsList.Items(childComplexity), true
+
+	case "WorkspaceProjectsTotal.total":
+		if e.complexity.WorkspaceProjectsTotal.Total == nil {
+			break
+		}
+
+		return e.complexity.WorkspaceProjectsTotal.Total(childComplexity), true
 
 	case "WorkspaceUser.id":
 		if e.complexity.WorkspaceUser.ID == nil {
@@ -559,6 +652,10 @@ type NotFound implements Error {
 
 type Gravatar {
     url: String!
+}
+
+type Id {
+	id: Int!
 }`, BuiltIn: false},
 	{Name: "shoppinglist.graphql", Input: `extend type Query {
     shoppinglist: ShoppinglistQuery!
@@ -583,6 +680,7 @@ type Workspace {
     id: Int!
     name: String!
     users: WorkspaceUsersResult!
+    projects: WorkspaceProjects!
 }
 
 union WorkspaceUsersResult = WorkspaceUsers | Forbidden | ServerError
@@ -606,6 +704,29 @@ type WorkspaceUserProfile {
     id: Int!
     email: String!
     gravatar: Gravatar!
+}
+
+type WorkspaceProjects {
+	workspace: Id
+	list: WorkspaceProjectsListResult!
+	total: WorkspaceProjectsTotalResult!
+}
+
+union WorkspaceProjectsListResult = WorkspaceProjectsList | Forbidden | ServerError
+
+type WorkspaceProjectsList {
+	items: [WorkspaceProject!]!
+}
+
+union WorkspaceProjectsTotalResult = WorkspaceProjectsTotal | Forbidden | ServerError
+
+type WorkspaceProjectsTotal {
+	total: Int!
+}
+
+type WorkspaceProject {
+	id: Int!
+	name: String!
 }`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
@@ -874,6 +995,41 @@ func (ec *executionContext) _Gravatar_url(ctx context.Context, field graphql.Col
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Id_id(ctx context.Context, field graphql.CollectedField, obj *ID) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Id",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _InvalidEmail_message(ctx context.Context, field graphql.CollectedField, obj *InvalidEmail) (ret graphql.Marshaler) {
@@ -1737,6 +1893,283 @@ func (ec *executionContext) _Workspace_users(ctx context.Context, field graphql.
 	res := resTmp.(WorkspaceUsersResult)
 	fc.Result = res
 	return ec.marshalNWorkspaceUsersResult2githubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUsersResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Workspace_projects(ctx context.Context, field graphql.CollectedField, obj *Workspace) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Workspace",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Workspace().Projects(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*WorkspaceProjects)
+	fc.Result = res
+	return ec.marshalNWorkspaceProjects2ᚖgithubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐWorkspaceProjects(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _WorkspaceProject_id(ctx context.Context, field graphql.CollectedField, obj *WorkspaceProject) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "WorkspaceProject",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _WorkspaceProject_name(ctx context.Context, field graphql.CollectedField, obj *WorkspaceProject) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "WorkspaceProject",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _WorkspaceProjects_workspace(ctx context.Context, field graphql.CollectedField, obj *WorkspaceProjects) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "WorkspaceProjects",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Workspace, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*ID)
+	fc.Result = res
+	return ec.marshalOId2ᚖgithubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐID(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _WorkspaceProjects_list(ctx context.Context, field graphql.CollectedField, obj *WorkspaceProjects) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "WorkspaceProjects",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.WorkspaceProjects().List(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(WorkspaceProjectsListResult)
+	fc.Result = res
+	return ec.marshalNWorkspaceProjectsListResult2githubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐWorkspaceProjectsListResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _WorkspaceProjects_total(ctx context.Context, field graphql.CollectedField, obj *WorkspaceProjects) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "WorkspaceProjects",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.WorkspaceProjects().Total(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(WorkspaceProjectsTotalResult)
+	fc.Result = res
+	return ec.marshalNWorkspaceProjectsTotalResult2githubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐWorkspaceProjectsTotalResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _WorkspaceProjectsList_items(ctx context.Context, field graphql.CollectedField, obj *WorkspaceProjectsList) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "WorkspaceProjectsList",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Items, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*WorkspaceProject)
+	fc.Result = res
+	return ec.marshalNWorkspaceProject2ᚕᚖgithubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐWorkspaceProjectᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _WorkspaceProjectsTotal_total(ctx context.Context, field graphql.CollectedField, obj *WorkspaceProjectsTotal) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "WorkspaceProjectsTotal",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Total, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _WorkspaceUser_id(ctx context.Context, field graphql.CollectedField, obj *WorkspaceUser) (ret graphql.Marshaler) {
@@ -3223,6 +3656,66 @@ func (ec *executionContext) _UserProfileResult(ctx context.Context, sel ast.Sele
 	}
 }
 
+func (ec *executionContext) _WorkspaceProjectsListResult(ctx context.Context, sel ast.SelectionSet, obj WorkspaceProjectsListResult) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case WorkspaceProjectsList:
+		return ec._WorkspaceProjectsList(ctx, sel, &obj)
+	case *WorkspaceProjectsList:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._WorkspaceProjectsList(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
+func (ec *executionContext) _WorkspaceProjectsTotalResult(ctx context.Context, sel ast.SelectionSet, obj WorkspaceProjectsTotalResult) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case WorkspaceProjectsTotal:
+		return ec._WorkspaceProjectsTotal(ctx, sel, &obj)
+	case *WorkspaceProjectsTotal:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._WorkspaceProjectsTotal(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
 func (ec *executionContext) _WorkspaceResult(ctx context.Context, sel ast.SelectionSet, obj WorkspaceResult) graphql.Marshaler {
 	switch obj := (obj).(type) {
 	case nil:
@@ -3348,7 +3841,7 @@ func (ec *executionContext) _ExpiredToken(ctx context.Context, sel ast.Selection
 	return out
 }
 
-var forbiddenImplementors = []string{"Forbidden", "UserProfileResult", "Error", "WorkspaceResult", "WorkspaceUsersResult"}
+var forbiddenImplementors = []string{"Forbidden", "UserProfileResult", "Error", "WorkspaceResult", "WorkspaceUsersResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult"}
 
 func (ec *executionContext) _Forbidden(ctx context.Context, sel ast.SelectionSet, obj *Forbidden) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, forbiddenImplementors)
@@ -3388,6 +3881,33 @@ func (ec *executionContext) _Gravatar(ctx context.Context, sel ast.SelectionSet,
 			out.Values[i] = graphql.MarshalString("Gravatar")
 		case "url":
 			out.Values[i] = ec._Gravatar_url(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var idImplementors = []string{"Id"}
+
+func (ec *executionContext) _Id(ctx context.Context, sel ast.SelectionSet, obj *ID) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, idImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Id")
+		case "id":
+			out.Values[i] = ec._Id_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -3669,7 +4189,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 	return out
 }
 
-var serverErrorImplementors = []string{"ServerError", "LoginByEmailResult", "ConfirmLoginResult", "UserProfileResult", "Error", "WorkspaceResult", "WorkspaceUsersResult"}
+var serverErrorImplementors = []string{"ServerError", "LoginByEmailResult", "ConfirmLoginResult", "UserProfileResult", "Error", "WorkspaceResult", "WorkspaceUsersResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult"}
 
 func (ec *executionContext) _ServerError(ctx context.Context, sel ast.SelectionSet, obj *ServerError) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, serverErrorImplementors)
@@ -3812,6 +4332,158 @@ func (ec *executionContext) _Workspace(ctx context.Context, sel ast.SelectionSet
 				}
 				return res
 			})
+		case "projects":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Workspace_projects(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var workspaceProjectImplementors = []string{"WorkspaceProject"}
+
+func (ec *executionContext) _WorkspaceProject(ctx context.Context, sel ast.SelectionSet, obj *WorkspaceProject) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, workspaceProjectImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("WorkspaceProject")
+		case "id":
+			out.Values[i] = ec._WorkspaceProject_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "name":
+			out.Values[i] = ec._WorkspaceProject_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var workspaceProjectsImplementors = []string{"WorkspaceProjects"}
+
+func (ec *executionContext) _WorkspaceProjects(ctx context.Context, sel ast.SelectionSet, obj *WorkspaceProjects) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, workspaceProjectsImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("WorkspaceProjects")
+		case "workspace":
+			out.Values[i] = ec._WorkspaceProjects_workspace(ctx, field, obj)
+		case "list":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._WorkspaceProjects_list(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "total":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._WorkspaceProjects_total(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var workspaceProjectsListImplementors = []string{"WorkspaceProjectsList", "WorkspaceProjectsListResult"}
+
+func (ec *executionContext) _WorkspaceProjectsList(ctx context.Context, sel ast.SelectionSet, obj *WorkspaceProjectsList) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, workspaceProjectsListImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("WorkspaceProjectsList")
+		case "items":
+			out.Values[i] = ec._WorkspaceProjectsList_items(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var workspaceProjectsTotalImplementors = []string{"WorkspaceProjectsTotal", "WorkspaceProjectsTotalResult"}
+
+func (ec *executionContext) _WorkspaceProjectsTotal(ctx context.Context, sel ast.SelectionSet, obj *WorkspaceProjectsTotal) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, workspaceProjectsTotalImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("WorkspaceProjectsTotal")
+		case "total":
+			out.Values[i] = ec._WorkspaceProjectsTotal_total(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -4291,6 +4963,87 @@ func (ec *executionContext) marshalNWorkspace2ᚖgithubᚗcomᚋztsuᚋapartomat
 	return ec._Workspace(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNWorkspaceProject2ᚕᚖgithubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐWorkspaceProjectᚄ(ctx context.Context, sel ast.SelectionSet, v []*WorkspaceProject) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNWorkspaceProject2ᚖgithubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐWorkspaceProject(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalNWorkspaceProject2ᚖgithubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐWorkspaceProject(ctx context.Context, sel ast.SelectionSet, v *WorkspaceProject) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._WorkspaceProject(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNWorkspaceProjects2githubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐWorkspaceProjects(ctx context.Context, sel ast.SelectionSet, v WorkspaceProjects) graphql.Marshaler {
+	return ec._WorkspaceProjects(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNWorkspaceProjects2ᚖgithubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐWorkspaceProjects(ctx context.Context, sel ast.SelectionSet, v *WorkspaceProjects) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._WorkspaceProjects(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNWorkspaceProjectsListResult2githubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐWorkspaceProjectsListResult(ctx context.Context, sel ast.SelectionSet, v WorkspaceProjectsListResult) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._WorkspaceProjectsListResult(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNWorkspaceProjectsTotalResult2githubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐWorkspaceProjectsTotalResult(ctx context.Context, sel ast.SelectionSet, v WorkspaceProjectsTotalResult) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._WorkspaceProjectsTotalResult(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNWorkspaceResult2githubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐWorkspaceResult(ctx context.Context, sel ast.SelectionSet, v WorkspaceResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -4640,6 +5393,13 @@ func (ec *executionContext) marshalOGravatar2ᚖgithubᚗcomᚋztsuᚋapartomat�
 		return graphql.Null
 	}
 	return ec._Gravatar(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOId2ᚖgithubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐID(ctx context.Context, sel ast.SelectionSet, v *ID) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Id(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOProduct2ᚖgithubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐProduct(ctx context.Context, sel ast.SelectionSet, v *Product) graphql.Marshaler {

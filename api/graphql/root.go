@@ -14,6 +14,7 @@ type UseCases struct {
 	GetWorkspace            *apartomat.GetWorkspace
 	GetWorkspaceUsers       *apartomat.GetWorkspaceUsers
 	GetWorkspaceUserProfile *apartomat.GetWorkspaceUserProfile
+	GetWorkspaceProjects    *apartomat.GetWorkspaceProjects
 }
 
 type rootResolver struct {

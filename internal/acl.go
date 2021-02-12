@@ -25,3 +25,8 @@ func (acl *Acl) CanGetWorkspaceUserProfile(ctx context.Context, subj *UserCtx, o
 	// todo check subj has access to workspace
 	return true
 }
+
+func (acl *Acl) CanGetWorkspaceProjects(ctx context.Context, subj *UserCtx, obj *store.Workspace) bool {
+	// todo check subj is workspace owner or admin
+	return true
+}

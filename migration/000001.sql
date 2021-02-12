@@ -30,3 +30,13 @@ CREATE TABLE apartomat.workspace_users (
     CONSTRAINT workspace_users_workspace_id_fkey FOREIGN KEY (workspace_id) REFERENCES apartomat.workspaces ON DELETE CASCADE,
     CONSTRAINT workspace_users_user_id_fkey FOREIGN KEY (user_id) REFERENCES apartomat.users ON DELETE CASCADE
 );
+
+CREATE TABLE apartomat.projects (
+    id SERIAL PRIMARY KEY,
+    name text NOT NULL,
+    is_active boolean NOT NULL,
+    workspace_id INT NOT NULL,
+    created_at timestamp with time zone NOT NULL DEFAULT now(),
+    modified_at timestamp with time zone NOT NULL DEFAULT now(),
+    CONSTRAINT projects_workspace_id_fkey FOREIGN KEY (workspace_id) REFERENCES apartomat.workspaces ON DELETE CASCADE
+);

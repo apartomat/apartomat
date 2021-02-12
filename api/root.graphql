@@ -33,3 +33,7 @@ type NotFound implements Error {
 type Gravatar {
     url: String!
 }
+
+type Id {
+	id: Int!
+}

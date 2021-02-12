@@ -25,6 +25,14 @@ type UserProfileResult interface {
 	IsUserProfileResult()
 }
 
+type WorkspaceProjectsListResult interface {
+	IsWorkspaceProjectsListResult()
+}
+
+type WorkspaceProjectsTotalResult interface {
+	IsWorkspaceProjectsTotalResult()
+}
+
 type WorkspaceResult interface {
 	IsWorkspaceResult()
 }
@@ -50,13 +58,19 @@ type Forbidden struct {
 	Message string `json:"message"`
 }
 
-func (Forbidden) IsUserProfileResult()    {}
-func (Forbidden) IsError()                {}
-func (Forbidden) IsWorkspaceResult()      {}
-func (Forbidden) IsWorkspaceUsersResult() {}
+func (Forbidden) IsUserProfileResult()            {}
+func (Forbidden) IsError()                        {}
+func (Forbidden) IsWorkspaceResult()              {}
+func (Forbidden) IsWorkspaceUsersResult()         {}
+func (Forbidden) IsWorkspaceProjectsListResult()  {}
+func (Forbidden) IsWorkspaceProjectsTotalResult() {}
 
 type Gravatar struct {
 	URL string `json:"url"`
+}
+
+type ID struct {
+	ID int `json:"id"`
 }
 
 type InvalidEmail struct {
@@ -96,12 +110,14 @@ type ServerError struct {
 	Message string `json:"message"`
 }
 
-func (ServerError) IsLoginByEmailResult()   {}
-func (ServerError) IsConfirmLoginResult()   {}
-func (ServerError) IsUserProfileResult()    {}
-func (ServerError) IsError()                {}
-func (ServerError) IsWorkspaceResult()      {}
-func (ServerError) IsWorkspaceUsersResult() {}
+func (ServerError) IsLoginByEmailResult()           {}
+func (ServerError) IsConfirmLoginResult()           {}
+func (ServerError) IsUserProfileResult()            {}
+func (ServerError) IsError()                        {}
+func (ServerError) IsWorkspaceResult()              {}
+func (ServerError) IsWorkspaceUsersResult()         {}
+func (ServerError) IsWorkspaceProjectsListResult()  {}
+func (ServerError) IsWorkspaceProjectsTotalResult() {}
 
 type ShoppinglistQuery struct {
 	ProductOnPage *Product `json:"productOnPage"`
@@ -117,12 +133,36 @@ type UserProfile struct {
 func (UserProfile) IsUserProfileResult() {}
 
 type Workspace struct {
-	ID    int                  `json:"id"`
-	Name  string               `json:"name"`
-	Users WorkspaceUsersResult `json:"users"`
+	ID       int                  `json:"id"`
+	Name     string               `json:"name"`
+	Users    WorkspaceUsersResult `json:"users"`
+	Projects *WorkspaceProjects   `json:"projects"`
 }
 
 func (Workspace) IsWorkspaceResult() {}
+
+type WorkspaceProject struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}
+
+type WorkspaceProjects struct {
+	Workspace *ID                          `json:"workspace"`
+	List      WorkspaceProjectsListResult  `json:"list"`
+	Total     WorkspaceProjectsTotalResult `json:"total"`
+}
+
+type WorkspaceProjectsList struct {
+	Items []*WorkspaceProject `json:"items"`
+}
+
+func (WorkspaceProjectsList) IsWorkspaceProjectsListResult() {}
+
+type WorkspaceProjectsTotal struct {
+	Total int `json:"total"`
+}
+
+func (WorkspaceProjectsTotal) IsWorkspaceProjectsTotalResult() {}
 
 type WorkspaceUser struct {
 	ID      int                   `json:"id"`

@@ -52,6 +52,10 @@ func (r *workspaceResolver) Users(ctx context.Context, obj *Workspace) (Workspac
 	return &WorkspaceUsers{Items: workspacUsersToGraphQL(users)}, nil
 }
 
+func (r *workspaceResolver) Projects(ctx context.Context, obj *Workspace) (*WorkspaceProjects, error) {
+	return &WorkspaceProjects{Workspace: &ID{ID: obj.ID}}, nil
+}
+
 func workspaceUserToGraphQL(user *store.WorkspaceUser) *WorkspaceUser {
 	return &WorkspaceUser{ID: user.ID, Role: workspaceUserRoleToGraphQL(user.Role)}
 }

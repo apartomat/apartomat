@@ -15,7 +15,7 @@ import AvatarGroup from '@material-ui/lab/AvatarGroup';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 // import useWorkspace from "./useWorkspace";
 
-import { useWorkspace, WorkspaceUsersResult } from "./useWorkspace";
+import { useWorkspace, WorkspaceUsersResult, WorkspaceProjectsListResult } from "./useWorkspace";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -72,6 +72,7 @@ export function Workspace () {
                     <main className={classes.content}>
                         <Typography variant="h4" component="h1">{workspace.name}</Typography>
                         <WorkspaceUsers users={workspace.users} />
+                        <Projects projects={workspace.projects.list} />
                     </main>
                 </div>
             );
@@ -89,6 +90,19 @@ function WorkspaceUsers({ users }: {users: WorkspaceUsersResult}) {
                 <AvatarGroup max={2}>
                     {users.items.map(user => <Avatar key={user.id} src={user.profile.gravatar.url} alt={user.profile.email}/>)}
                 </AvatarGroup>
+            )
+        default:
+            return <div>n/a</div>
+    }
+}
+
+function Projects({ projects }: { projects: WorkspaceProjectsListResult }) {
+    switch (projects.__typename) {
+        case "WorkspaceProjectsList":
+            return (
+                <ul>
+                    {projects.items.map(project => <li key={project.id}>{project.name}</li>)}
+                </ul>
             )
         default:
             return <div>n/a</div>

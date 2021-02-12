@@ -23,6 +23,21 @@ query workspace($id: Int!) {
                     message
                 }
             }
+            projects {
+                __typename
+                list {
+                    __typename
+                    ...on WorkspaceProjectsList{
+                        items {
+                            id
+                            name
+                        }
+                    }
+                    ...on Error {
+                        message
+                    }
+                }
+            }
         }
         ...on Error {
             message
