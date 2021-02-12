@@ -2,7 +2,7 @@ package graphql
 
 import (
 	"github.com/99designs/gqlgen/graphql/handler"
-	apartomat "github.com/ztsu/apartomat/internal"
+	apartomat "github.com/apartomat/apartomat/internal"
 	"log"
 	"net/http"
 	"strconv"

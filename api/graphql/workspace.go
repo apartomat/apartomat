@@ -3,8 +3,8 @@ package graphql
 import (
 	"context"
 	"github.com/pkg/errors"
-	apartomat "github.com/ztsu/apartomat/internal"
-	"github.com/ztsu/apartomat/internal/store"
+	apartomat "github.com/apartomat/apartomat/internal"
+	"github.com/apartomat/apartomat/internal/store"
 	"log"
 )
 

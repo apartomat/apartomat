@@ -2,7 +2,7 @@ package graphql
 
 import (
 	"context"
-	"github.com/ztsu/apartomat/internal/pkg/gravatar"
+	"github.com/apartomat/apartomat/internal/pkg/gravatar"
 )
 
 func (r *rootResolver) WorkspaceUser() WorkspaceUserResolver {

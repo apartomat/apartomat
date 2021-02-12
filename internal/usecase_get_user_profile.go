@@ -3,8 +3,8 @@ package apartomat
 import (
 	"context"
 	"github.com/pkg/errors"
-	"github.com/ztsu/apartomat/internal/pkg/expr"
-	"github.com/ztsu/apartomat/internal/store"
+	"github.com/apartomat/apartomat/internal/pkg/expr"
+	"github.com/apartomat/apartomat/internal/store"
 )
 
 type GetUserProfile struct {

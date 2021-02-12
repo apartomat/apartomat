@@ -2,9 +2,9 @@ package graphql
 
 import (
 	"context"
-	apartomat "github.com/ztsu/apartomat/internal"
-	"github.com/ztsu/apartomat/internal/pkg/gravatar"
-	"github.com/ztsu/apartomat/internal/store"
+	apartomat "github.com/apartomat/apartomat/internal"
+	"github.com/apartomat/apartomat/internal/pkg/gravatar"
+	"github.com/apartomat/apartomat/internal/store"
 	"log"
 )
 

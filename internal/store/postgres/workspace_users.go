@@ -4,7 +4,7 @@ import (
 	"context"
 	sq "github.com/Masterminds/squirrel"
 	"github.com/jackc/pgx/v4/pgxpool"
-	"github.com/ztsu/apartomat/internal/store"
+	"github.com/apartomat/apartomat/internal/store"
 	"time"
 )
 

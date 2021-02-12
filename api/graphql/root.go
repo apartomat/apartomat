@@ -2,7 +2,7 @@ package graphql
 
 import (
 	"context"
-	apartomat "github.com/ztsu/apartomat/internal"
+	apartomat "github.com/apartomat/apartomat/internal"
 )
 
 type UseCases struct {

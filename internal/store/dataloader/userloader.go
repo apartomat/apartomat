@@ -2,8 +2,8 @@ package dataloader
 
 import (
 	"context"
-	"github.com/ztsu/apartomat/internal/pkg/expr"
-	"github.com/ztsu/apartomat/internal/store"
+	"github.com/apartomat/apartomat/internal/pkg/expr"
+	"github.com/apartomat/apartomat/internal/store"
 )
 
 func NewUserLoaderConfig(ctx context.Context, userStore store.UserStore) UserLoaderConfig {

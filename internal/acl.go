@@ -2,7 +2,7 @@ package apartomat
 
 import (
 	"context"
-	"github.com/ztsu/apartomat/internal/store"
+	"github.com/apartomat/apartomat/internal/store"
 )
 
 type Acl struct {

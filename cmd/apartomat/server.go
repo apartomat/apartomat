@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"github.com/99designs/gqlgen/graphql/playground"
-	"github.com/ztsu/apartomat/api/graphql"
+	"github.com/apartomat/apartomat/api/graphql"
 	"log"
 	foundation "net/http"
 	"os"

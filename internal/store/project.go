@@ -2,7 +2,7 @@ package store
 
 import (
 	"context"
-	"github.com/ztsu/apartomat/internal/pkg/expr"
+	"github.com/apartomat/apartomat/internal/pkg/expr"
 	"time"
 )
 

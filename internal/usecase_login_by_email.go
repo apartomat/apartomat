@@ -6,8 +6,8 @@ import (
 	"fmt"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
-	"github.com/ztsu/apartomat/internal/pkg/expr"
-	"github.com/ztsu/apartomat/internal/store"
+	"github.com/apartomat/apartomat/internal/pkg/expr"
+	"github.com/apartomat/apartomat/internal/store"
 )
 
 var (

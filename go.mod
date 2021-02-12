@@ -1,4 +1,4 @@
-module github.com/ztsu/apartomat
+module github.com/apartomat/apartomat
 
 go 1.14
 

@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/ztsu/apartomat/internal/store"
+	"github.com/apartomat/apartomat/internal/store"
 )
 
 // UserLoaderConfig captures the config to create a new UserLoader

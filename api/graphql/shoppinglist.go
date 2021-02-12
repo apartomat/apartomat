@@ -3,7 +3,7 @@ package graphql
 import (
 	"context"
 	"fmt"
-	schemaorg "github.com/ztsu/apartomat/internal/pkg/schema.org"
+	schemaorg "github.com/apartomat/apartomat/internal/pkg/schema.org"
 )
 
 func (r *rootResolver) ShoppinglistQuery() ShoppinglistQueryResolver {

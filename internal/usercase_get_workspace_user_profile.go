@@ -3,8 +3,8 @@ package apartomat
 import (
 	"context"
 	"github.com/pkg/errors"
-	"github.com/ztsu/apartomat/internal/store"
-	"github.com/ztsu/apartomat/internal/store/dataloader"
+	"github.com/apartomat/apartomat/internal/store"
+	"github.com/apartomat/apartomat/internal/store/dataloader"
 )
 
 type GetWorkspaceUserProfile struct {
