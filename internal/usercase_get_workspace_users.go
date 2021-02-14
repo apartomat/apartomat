@@ -2,9 +2,9 @@ package apartomat
 
 import (
 	"context"
-	"github.com/pkg/errors"
 	"github.com/apartomat/apartomat/internal/pkg/expr"
 	"github.com/apartomat/apartomat/internal/store"
+	"github.com/pkg/errors"
 )
 
 type GetWorkspaceUsers struct {

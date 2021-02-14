@@ -4,10 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	validation "github.com/go-ozzo/ozzo-validation/v4"
-	"github.com/go-ozzo/ozzo-validation/v4/is"
 	"github.com/apartomat/apartomat/internal/pkg/expr"
 	"github.com/apartomat/apartomat/internal/store"
+	validation "github.com/go-ozzo/ozzo-validation/v4"
+	"github.com/go-ozzo/ozzo-validation/v4/is"
 )
 
 var (
