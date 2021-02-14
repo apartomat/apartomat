@@ -1,5 +1,7 @@
 import React from "react";
 
+import { useParams } from "react-router-dom";
+
 import UserEmail from "./UserEmail";
 
 import { useAuthContext } from "../auth/useAuthContext";
@@ -35,11 +37,15 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
+interface RouteParams {
+    id: string
+};
+
 export function Workspace () {
     const classes = useStyles();
-    const { user, concreteUser: { defaultWorkspaceId } } = useAuthContext();
-    const { data, loading, error } = useWorkspace(defaultWorkspaceId);
-
+    const { user } = useAuthContext();
+    let { id } = useParams<RouteParams>();
+    const { data, loading, error } = useWorkspace(parseInt(id, 10));
 
     if (loading) {
         return (
@@ -52,7 +58,7 @@ export function Workspace () {
     if (error) {
         return (
             <Box>
-                <h1>Errpr</h1>
+                <h1>Error</h1>
                 <p>Can't get workspace: {error}</p>
             </Box>
         );
@@ -76,9 +82,26 @@ export function Workspace () {
                     </main>
                 </div>
             );
+        case "NotFound":
+            return (
+                <Box>
+                    <h1>Error</h1>
+                    <p>Workspace not found</p>
+                </Box>
+            );
+        case "Forbidden":
+            return (
+                <Box>
+                    <h1>Error</h1>
+                    <p>Access is denied</p>
+                </Box>
+            );
         default:
             return (
-                <div>{data?.workspace.__typename} case in not handled yet</div>
+                <Box>
+                    <h1>Error</h1>
+                    <p>{data?.workspace.__typename}</p>
+                </Box>
             );
     }
 }
