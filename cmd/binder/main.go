@@ -3,8 +3,10 @@ package main
 import (
 	"github.com/docopt/docopt-go"
 	"github.com/jung-kurt/gofpdf"
+	"image"
 	"io/ioutil"
 	"log"
+	"os"
 	"path/filepath"
 )
 
@@ -13,10 +15,7 @@ const usage = `binder
 Book binder.
 
 Usage:
-	album <format> [<orientation>] [--dir=DIR]
-
-Options:
-	--dir=DIR  Directory name with images [default: ./]
+	binder <format> <orientation> <path>
 `
 
 type Orientation string
@@ -54,6 +53,13 @@ var (
 		width, height float64
 	}
 )
+
+func sz(st struct {
+	left, top     float64
+	width, height float64
+}) (left float64, top float64, width float64, height float64) {
+	return st.left, st.top, st.width, st.height
+}
 
 func init() {
 	defaultSizes = map[Format]map[Orientation]struct {
@@ -103,11 +109,11 @@ func main() {
 
 	formatStr, _ := opts.String("<format>")
 	orientationStr, _ := opts.String("<orientation>")
-	dirname, _ := opts.String("--dir")
+	dirname, _ := opts.String("<path>")
 
 	var (
-		format Format      = A4
-		orient Orientation = Landscape
+		format = A4
+		orient = Landscape
 	)
 
 	switch formatStr {
@@ -139,8 +145,6 @@ func main() {
 		log.Fatalf("can't find out directory: %s", err)
 	}
 
-	println(path)
-
 	files, err := ioutil.ReadDir(path)
 	if err != nil {
 		log.Fatalf("can't read dir %s: %s", path, err)
@@ -167,16 +171,9 @@ func main() {
 
 	pdf := gofpdf.New(orient.String(), "mm", format.String(), "")
 
-	println(orient.String(), format.String())
-
-	x := defaultSizes[format][orient].left
-	y := defaultSizes[format][orient].top
-	w := defaultSizes[format][orient].width
-	h := defaultSizes[format][orient].height
-
-	println(x,y,w,h)
-
 	for _, path := range images {
+		x, y, w, h := sz(defaultSizes[format][orient])
+
 		var (
 			opt gofpdf.ImageOptions
 		)
@@ -184,6 +181,57 @@ func main() {
 		opt.ImageType = "jpg"
 
 		pdf.AddPage()
+
+		f, err := os.Open(path)
+		if err != nil {
+			log.Fatalf("can't read file: %s", err)
+		}
+
+		img, _, err := image.Decode(f)
+		if err != nil {
+			log.Fatalf("can't decode file: %s", err)
+		}
+
+		maxX := img.Bounds().Max.X
+		maxY := img.Bounds().Max.Y
+
+		imgRatio := float64(maxX) / float64(maxY)
+		pageRatio := float64(w) / float64(h)
+
+		// landscape
+		if pageRatio > 1 {
+			if imgRatio >= 1 {
+				nwmm := float64(h) * imgRatio
+				nxmm := ((w - nwmm) / 2) + x
+
+				x = nxmm
+				w = nwmm
+
+			} else {
+				nhmm := float64(w) * imgRatio
+				nymm := ((h - nhmm) / 2) + y
+
+				y = nymm
+				h = nhmm
+			}
+
+			// portrait
+		} else {
+			if imgRatio >= 1 {
+				nhmm := float64(w) / imgRatio
+				nymm := ((h - nhmm) / 2) + y
+
+				y = nymm
+				h = nhmm
+
+			} else {
+				nhmm := float64(w) / imgRatio
+				nymm := ((h - nhmm) / 2) + y
+
+				y = nymm
+				h = nhmm
+			}
+		}
 
 		pdf.ImageOptions(path, x, y, w, h, false, opt, 0, "")
 	}
