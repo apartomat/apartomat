@@ -12,5 +12,6 @@ require (
 	github.com/jung-kurt/gofpdf v1.4.2
 	github.com/o1egl/paseto v1.0.0
 	github.com/pkg/errors v0.9.1
+	github.com/prometheus/client_golang v1.10.0
 	github.com/vektah/gqlparser/v2 v2.1.0
 )

@@ -5,8 +5,10 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/apartomat/apartomat/api/graphql"
 	"github.com/go-chi/chi/v5"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"log"
-	foundation "net/http"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -16,7 +18,7 @@ import (
 const defaultAddr = ":80"
 
 type Option interface {
-	Apply(server *foundation.Server)
+	Apply(server *http.Server)
 }
 
 type addrOpt struct {
@@ -27,7 +29,7 @@ func Addr(addr string) addrOpt {
 	return addrOpt{addr: addr}
 }
 
-func (opt addrOpt) Apply(s *foundation.Server) {
+func (opt addrOpt) Apply(s *http.Server) {
 	s.Addr = opt.addr
 }
 
@@ -44,8 +46,11 @@ func NewServer(useCases *graphql.UseCases) *server {
 
 func (server *server) Run(opts ...Option) {
 	bgCtx := context.Background()
+	reg := prometheus.NewRegistry()
 
 	mux := chi.NewRouter()
+
+	mux.Use(PrometheusMiddleware(reg))
 
 	mux.Handle("/graphql", graphql.Handler(
 		server.useCases.CheckAuthToken,
@@ -55,7 +60,9 @@ func (server *server) Run(opts ...Option) {
 
 	mux.Handle("/pg", playground.Handler("GraphQL playground", "/graphql"))
 
-	s := foundation.Server{
+	mux.Handle("/metrics", promhttp.HandlerFor(reg, promhttp.HandlerOpts{}))
+
+	s := http.Server{
 		Addr:         defaultAddr,
 		Handler:      mux,
 		ReadTimeout:  5 * time.Second,
@@ -88,7 +95,7 @@ func (server *server) Run(opts ...Option) {
 	log.Printf("Starting server at %s...", s.Addr)
 
 	go func() {
-		if err := s.ListenAndServe(); err != nil && err != foundation.ErrServerClosed {
+		if err := s.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("can't start server: %s", err)
 		}
 	}()
