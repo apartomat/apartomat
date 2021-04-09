@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/apartomat/apartomat/api/graphql"
+	"github.com/go-chi/chi/v5"
 	"log"
 	foundation "net/http"
 	"os"
@@ -44,7 +45,7 @@ func NewServer(useCases *graphql.UseCases) *server {
 func (server *server) Run(opts ...Option) {
 	bgCtx := context.Background()
 
-	mux := foundation.NewServeMux()
+	mux := chi.NewRouter()
 
 	mux.Handle("/graphql", graphql.Handler(
 		server.useCases.CheckAuthToken,
