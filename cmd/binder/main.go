@@ -1,9 +1,15 @@
 package main
 
 import (
+	"bytes"
+	"crypto/md5"
+	"fmt"
+	"github.com/disintegration/gift"
 	"github.com/docopt/docopt-go"
 	"github.com/jung-kurt/gofpdf"
 	"image"
+	"image/jpeg"
+	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -47,55 +53,53 @@ func (f Format) String() string {
 	return string(f)
 }
 
-var (
-	defaultSizes map[Format]map[Orientation]struct {
-		left, top     float64
-		width, height float64
-	}
+type PageSizeUnit string
+
+func (s PageSizeUnit) String() string {
+	return string(s)
+}
+
+const (
+	mm PageSizeUnit = "mm"
 )
 
-func sz(st struct {
-	left, top     float64
-	width, height float64
-}) (left float64, top float64, width float64, height float64) {
-	return st.left, st.top, st.width, st.height
+type PageSize struct {
+	Width, Height float64
+	Units         PageSizeUnit
+}
+
+var (
+	defaultSizes map[Format]map[Orientation]PageSize
+)
+
+func sz(s PageSize) (left float64, top float64, width float64, height float64, units PageSizeUnit) {
+	return 0, 0, s.Width, s.Height, s.Units
 }
 
 func init() {
-	defaultSizes = map[Format]map[Orientation]struct {
-		left, top     float64
-		width, height float64
-	}{
+	defaultSizes = map[Format]map[Orientation]PageSize{
 		A3: {
-			// 297x420
 			Portrait: {
-				left:   20,
-				top:    5,
-				width:  272,
-				height: 410,
+				Width:  297,
+				Height: 420,
+				Units:  mm,
 			},
-			// 420x297
 			Landscape: {
-				left:   20,
-				top:    5,
-				width:  395,
-				height: 287,
+				Width:  420,
+				Height: 297,
+				Units:  mm,
 			},
 		},
 		A4: {
-			// 210x297
 			Portrait: {
-				left:   20,
-				top:    5,
-				width:  185,
-				height: 287,
+				Width:  210,
+				Height: 297,
+				Units:  mm,
 			},
-			// 297x210
 			Landscape: {
-				left:   20,
-				top:    5,
-				width:  272,
-				height: 200,
+				Width:  297,
+				Height: 210,
+				Units:  mm,
 			},
 		},
 	}
@@ -112,8 +116,8 @@ func main() {
 	dirname, _ := opts.String("<path>")
 
 	var (
-		format = A4
-		orient = Landscape
+		format      = A4
+		orientation = Landscape
 	)
 
 	switch formatStr {
@@ -131,9 +135,9 @@ func main() {
 
 	switch orientationStr {
 	case "landscape":
-		orient = Landscape
+		orientation = Landscape
 	case "portrait":
-		orient = Portrait
+		orientation = Portrait
 	default:
 		if len(orientationStr) > 0 {
 			log.Fatal("not valid orientation (should be landscape or portrait)")
@@ -169,76 +173,173 @@ func main() {
 		log.Fatal("no files")
 	}
 
-	pdf := gofpdf.New(orient.String(), "mm", format.String(), "")
+	page := defaultSizes[format][orientation]
+
+	pdf := gofpdf.New(orientation.String(), page.Units.String(), format.String(), "")
 
 	for _, path := range images {
-		x, y, w, h := sz(defaultSizes[format][orient])
-
 		var (
 			opt gofpdf.ImageOptions
 		)
 
-		opt.ImageType = "jpg"
-
 		pdf.AddPage()
+
+		opt.ImageType = "jpg" // @todo
 
 		f, err := os.Open(path)
 		if err != nil {
 			log.Fatalf("can't read file: %s", err)
 		}
 
-		img, _, err := image.Decode(f)
+		orig, img, err := decode(f)
 		if err != nil {
 			log.Fatalf("can't decode file: %s", err)
 		}
 
-		maxX := img.Bounds().Max.X
-		maxY := img.Bounds().Max.Y
+		outp, img, rt, x, y, w, h := process(img, orientation, page)
 
-		imgRatio := float64(maxX) / float64(maxY)
-		pageRatio := float64(w) / float64(h)
-
-		// landscape
-		if pageRatio > 1 {
-			if imgRatio >= 1 {
-				nwmm := float64(h) * imgRatio
-				nxmm := ((w - nwmm) / 2) + x
-
-				x = nxmm
-				w = nwmm
-
-			} else {
-				nhmm := float64(w) * imgRatio
-				nymm := ((h - nhmm) / 2) + y
-
-				y = nymm
-				h = nhmm
-			}
-
-			// portrait
-		} else {
-			if imgRatio >= 1 {
-				nhmm := float64(w) / imgRatio
-				nymm := ((h - nhmm) / 2) + y
-
-				y = nymm
-				h = nhmm
-
-			} else {
-				nhmm := float64(w) / imgRatio
-				nymm := ((h - nhmm) / 2) + y
-
-				y = nymm
-				h = nhmm
-			}
+		err = f.Close()
+		if err != nil {
+			log.Printf("can't close file: %s\n", err)
 		}
 
-		pdf.ImageOptions(path, x, y, w, h, false, opt, 0, "")
+		name := fmt.Sprintf("%x", md5.Sum([]byte(path)))
+
+		pdf.RegisterImageOptionsReader(name, opt, img)
+		pdf.ImageOptions(name, x, y, w, h, false, opt, 0, "")
+
+		//
+
+		msg := fmt.Sprintf(
+			"%s: orig: %dx%d, rotate: %+v, outp: %dx%d, place: %f,%f; %f,%f",
+			path,
+			orig.Bounds().Dx(),
+			orig.Bounds().Dy(),
+			rt,
+			outp.Bounds().Dx(),
+			outp.Bounds().Dy(),
+			x, y,
+			w, h,
+		)
+
+		pdf.SetFont("Arial", "", 12)
+		pdf.Cell(100, 10, msg)
+
+		log.Print(msg)
 	}
 
 	if err := pdf.OutputFileAndClose("book.pdf"); err != nil {
-		log.Fatal("can't write pdf file")
+		log.Fatal("can't write pdf file; %s", err)
 	}
 
 	log.Print("Done")
+}
+
+func rotate(img image.Image, orientation Orientation) (io.Reader, error, bool) {
+	rotated := false
+
+	g := gift.New()
+
+	x := img.Bounds().Dx()
+	y := img.Bounds().Dy()
+	if (orientation == Landscape && y/x > 1) || (orientation == Portrait && y/x < 1) {
+		g.Add(gift.Rotate270())
+		rotated = true
+	}
+
+	dst := image.NewRGBA(g.Bounds(img.Bounds()))
+
+	g.Draw(dst, img)
+
+	b := &bytes.Buffer{}
+	err := jpeg.Encode(b, dst, nil)
+	if err != nil {
+		return nil, err, false
+	}
+
+	return b, nil, rotated
+}
+
+func place(img image.Image, page PageSize, orientation Orientation) (float64, float64, float64, float64) {
+	//imgRat := imgRat(img)
+	//pageRat := pageRat(page)
+
+	switch orientation {
+	case Portrait:
+		bw1, bw2, bw3, bw4 := placeByWidth(img, page)
+		if bw1 < 0 || bw2 < 0 {
+			return placeByHeight(img, page)
+		}
+		return bw1, bw2, bw3, bw4
+	case Landscape:
+		bw1, bw2, bw3, bw4 := placeByHeight(img, page)
+		if bw1 < 0 || bw2 < 0 {
+			return placeByWidth(img, page)
+		}
+		return bw1, bw2, bw3, bw4
+	}
+
+	return 0, 0, 0, 0
+}
+
+func placeByWidth(img image.Image, page PageSize) (float64, float64, float64, float64) {
+	imgRat := float64(img.Bounds().Dy()) / float64(img.Bounds().Dx())
+	nh := page.Width * imgRat
+	return 0, (page.Height - nh) / 2, page.Width, nh
+}
+
+//func placeByHeight(img image.Image, page PageSize) (float64, float64, float64, float64) {
+	//imgRat := float64(img.Bounds().Dy()) / float64(img.Bounds().Dx())
+	//nw := page.Height * imgRat
+	//return (page.Width - nw) / 2, 0, nw, page.Height
+//}
+
+func placeByHeight(img image.Image, page PageSize) (float64, float64, float64, float64) {
+	imgRat := float64(img.Bounds().Dy()) / float64(img.Bounds().Dx())
+	nw := page.Height / imgRat
+	return (page.Width - nw) / 2, 0, nw, page.Height
+}
+
+
+func process(img io.Reader, orientation Orientation, page PageSize) (image.Image, io.Reader, bool, float64, float64, float64, float64) {
+	i, img, err := decode(img)
+	if err != nil {
+		log.Fatalf("can't decode: %s", err)
+	}
+
+	img, err, rotated := rotate(i, orientation)
+	if err != nil {
+		log.Fatalf("can't rotate: %s", err)
+	}
+
+	i, img, err = decode(img)
+	if err != nil {
+		log.Fatalf("can't decode: %s", err)
+	}
+
+	x, y, w, h := place(i, page, orientation)
+
+	return i, img, rotated, x, y, w, h
+}
+
+func decode(img io.Reader) (image.Image, io.Reader, error) {
+	b, err := ioutil.ReadAll(img)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	i, _, err := image.Decode(bytes.NewReader(b))
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return i, bytes.NewReader(b), nil
+}
+
+func imgRat(img image.Image) float64 {
+	return float64(img.Bounds().Dy()) / float64(img.Bounds().Dx())
+}
+
+func pageRat(page PageSize) float64 {
+	return float64(page.Height) / float64(page.Width)
 }
