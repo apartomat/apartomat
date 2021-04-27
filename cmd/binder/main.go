@@ -317,9 +317,25 @@ func process(img io.Reader, orientation Orientation, page PageSize) (image.Image
 		log.Fatalf("can't decode: %s", err)
 	}
 
+	var (
+		x0, y0 float64
+	)
+	switch orientation {
+	case Portrait:
+		page, x0, y0 = pad(page, 20, 5, 5, 5)
+	case Landscape:
+		page, x0, y0 = pad(page, 5, 5, 5, 20)
+	}
+
+
+
 	x, y, w, h := place(i, page, orientation)
 
-	return i, img, rotated, x, y, w, h
+	return i, img, rotated, x0 + x, y0 + y, w, h
+}
+
+func pad(p PageSize, t, r, b, l float64) (PageSize, float64, float64) {
+	return PageSize{Width: p.Width - r - l, Height: p.Height - t - b, Units: p.Units}, l, t
 }
 
 func decode(img io.Reader) (image.Image, io.Reader, error) {
