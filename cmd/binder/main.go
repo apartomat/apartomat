@@ -21,7 +21,7 @@ const usage = `binder
 Book binder.
 
 Usage:
-	binder <format> <orientation> <path>
+	binder <format> <orientation> <path> [--debug]
 `
 
 type Orientation string
@@ -114,6 +114,7 @@ func main() {
 	formatStr, _ := opts.String("<format>")
 	orientationStr, _ := opts.String("<orientation>")
 	dirname, _ := opts.String("<path>")
+	debug, _ := opts.Bool("--debug")
 
 	var (
 		format      = A4
@@ -222,8 +223,10 @@ func main() {
 			w, h,
 		)
 
-		pdf.SetFont("Arial", "", 12)
-		pdf.Cell(100, 10, msg)
+		if debug {
+			pdf.SetFont("Arial", "", 12)
+			pdf.Cell(100, 10, msg)
+		}
 
 		log.Print(msg)
 	}
@@ -289,9 +292,9 @@ func placeByWidth(img image.Image, page PageSize) (float64, float64, float64, fl
 }
 
 //func placeByHeight(img image.Image, page PageSize) (float64, float64, float64, float64) {
-	//imgRat := float64(img.Bounds().Dy()) / float64(img.Bounds().Dx())
-	//nw := page.Height * imgRat
-	//return (page.Width - nw) / 2, 0, nw, page.Height
+//imgRat := float64(img.Bounds().Dy()) / float64(img.Bounds().Dx())
+//nw := page.Height * imgRat
+//return (page.Width - nw) / 2, 0, nw, page.Height
 //}
 
 func placeByHeight(img image.Image, page PageSize) (float64, float64, float64, float64) {
@@ -299,7 +302,6 @@ func placeByHeight(img image.Image, page PageSize) (float64, float64, float64, f
 	nw := page.Height / imgRat
 	return (page.Width - nw) / 2, 0, nw, page.Height
 }
-
 
 func process(img io.Reader, orientation Orientation, page PageSize) (image.Image, io.Reader, bool, float64, float64, float64, float64) {
 	i, img, err := decode(img)
@@ -326,8 +328,6 @@ func process(img io.Reader, orientation Orientation, page PageSize) (image.Image
 	case Landscape:
 		page, x0, y0 = pad(page, 5, 5, 5, 20)
 	}
-
-
 
 	x, y, w, h := place(i, page, orientation)
 
