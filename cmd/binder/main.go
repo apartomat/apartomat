@@ -178,7 +178,7 @@ func main() {
 
 	pdf := gofpdf.New(orientation.String(), page.Units.String(), format.String(), "")
 
-	for _, path := range images {
+	for i, path := range images {
 		var (
 			opt gofpdf.ImageOptions
 		)
@@ -211,6 +211,18 @@ func main() {
 
 		//
 
+		if orientation == Portrait && i != 0 {
+			pdf.SetDrawColor(255,255,255)
+			pdf.SetTextColor(255,255,255)
+			pdf.SetAlpha(0.99, "Normal")
+			pdf.SetFont("Arial", "", 14)
+			pdf.SetXY(x+w-43-1,y+1)
+			pdf.CellFormat(43, 7, "OXANA_PUHOVA", "1", 0, "R", false, 0, "https://www.instagram.com/oxana_puhova/")
+			pdf.SetAlpha(1.0, "Normal")
+		}
+
+		//
+
 		msg := fmt.Sprintf(
 			"%s: orig: %dx%d, rotate: %+v, outp: %dx%d, place: %f,%f; %f,%f",
 			path,
@@ -224,7 +236,9 @@ func main() {
 		)
 
 		if debug {
+			pdf.SetTextColor(0,0,0)
 			pdf.SetFont("Arial", "", 12)
+			pdf.SetXY(10,10)
 			pdf.Cell(100, 10, msg)
 		}
 
@@ -264,9 +278,6 @@ func rotate(img image.Image, orientation Orientation) (io.Reader, error, bool) {
 }
 
 func place(img image.Image, page PageSize, orientation Orientation) (float64, float64, float64, float64) {
-	//imgRat := imgRat(img)
-	//pageRat := pageRat(page)
-
 	switch orientation {
 	case Portrait:
 		bw1, bw2, bw3, bw4 := placeByWidth(img, page)
@@ -290,12 +301,6 @@ func placeByWidth(img image.Image, page PageSize) (float64, float64, float64, fl
 	nh := page.Width * imgRat
 	return 0, (page.Height - nh) / 2, page.Width, nh
 }
-
-//func placeByHeight(img image.Image, page PageSize) (float64, float64, float64, float64) {
-//imgRat := float64(img.Bounds().Dy()) / float64(img.Bounds().Dx())
-//nw := page.Height * imgRat
-//return (page.Width - nw) / 2, 0, nw, page.Height
-//}
 
 func placeByHeight(img image.Image, page PageSize) (float64, float64, float64, float64) {
 	imgRat := float64(img.Bounds().Dy()) / float64(img.Bounds().Dx())
