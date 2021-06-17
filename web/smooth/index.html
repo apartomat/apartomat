@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>My Workspace</title>
+        <meta charset="utf-8">
+        <style type="text/css">
+            html, body {
+                margin: 0;
+            }
+    
+            html {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+                font-size: 1.8rem;
+            }
+    
+            .navbar {
+                position: sticky;
+                z-index: 9;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                margin: 0.25rem 0;
+                width: 100%;
+                height: 100%;
+            }
+    
+            .navbar__logo {
+                font-weight: 700;
+                background: -webkit-linear-gradient(-45deg, #904e95, #ee7752);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+    
+            .main {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-direction: column;
+                flex: 1;
+            }
+    
+            h1 {
+                font-size: 1.65rem;
+            }
+
+            .page {
+                margin: 0 auto;
+                max-width: 1100px;
+                width: 100%;
+                display: flex;
+                justify-content: center;
+                flex-direction: column;
+            }
+
+            .page-sheet {
+                box-shadow: 0 0 3rem rgba( 226, 221, 215, 0.5);
+                border-radius: 0.25em;
+                border-bottom-left-radius: 0;
+                border-bottom-right-radius: 0;
+                padding: 0 2em 2em 2em;
+                min-height: calc(100vh);
+            }
+
+            .page-header {
+                text-align: center;
+                border-bottom: #904e95 2px solid;
+                height: 75px;
+                margin: 0.75em 0;
+            }
+
+            .workspace {
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .project {
+                padding: 0.5em 0;
+                display: grid;
+                grid-template-columns: calc(1.75em + 0.25rem) calc(100% - 1.75em - 0.25rem);
+                border-bottom: 1px solid #ccc;
+            }
+
+            .project:last-child {
+                border-bottom: 1px solid transparent;
+            }
+
+            .project__link {
+                text-decoration: none;
+                outline: none;
+                display: flex;
+                align-items: center;
+                justify-content: stretch;
+            }
+
+            .project__title {
+                font-weight: 400;
+                font-size: 20px;
+                line-height: 26px;
+                margin: 0;
+                color: rgb(17,17,17);
+            }
+            .project__description {
+                font-weight: 400;
+                font-size: 20px;
+                line-height: 18px;
+                margin: 0;
+                color: rgba(0, 0, 0, 0.6);
+            }
+
+            .projects-in-progress {
+                text-transform: uppercase;
+                font-size: 16px;
+            }
+
+            .projects-closed {
+                text-transform: uppercase;
+                font-size: 16px;
+                margin-top: 3em;
+            }
+
+            .avatar {
+                border-radius: 100%;
+                width: 1.75em;
+                height: 1.75em;
+            }
+        </style>
+    </head>
+    <body>
+        <nav class="navbar">
+            <div class="navbar__logo">apartomat</div>
+        </nav>
+        <main class="main">
+            <div class="page">
+                <div class="page-sheet">
+                    <header>
+                        <h1 class="page-header">My Workspace</h1>
+                    </header>
+                    <div class="workspace">
+                        <h2 class="projects-in-progress">В работе</h2>
+                        <section class="projects">
+                            <article class="project">
+                                <img src="ava-project-1.png" class="avatar"/>
+                                <a class="project__link" href="">
+                                    <div class="project__column">
+                                        <h3 class="project__title">3-к квартира на Европейском береге</h3>
+                                        <p class="project__description">Новосибирск</p>
+                                    </div>
+                                </a>
+                            </article>
+                            <article class="project">
+                                <img src="ava-project-2.png" class="avatar"/>
+                                <a class="project__link" href="">
+                                    <h3 class="project__title">Квартира Чаплыгина, 115</h3>
+                                </a>
+                            </article>
+                        </section>
+                        <h2 class="projects-closed">Прошлые</h2>
+                        <section class="projects">
+                            <article class="project">
+                                <img src="ava-project-3.png" class="avatar"/>
+                                <a class="project__link" href="">
+                                    <h3 class="project__title">Дом в Академе</h3>
+                                </a>
+                            </article>
+                            <article class="project">
+                                <img src="ava-project-4.png" class="avatar"/>
+                                <a class="project__link" href="">
+                                    <h3 class="project__title">Однушка на Европейском береге</h3>
+                                </a>
+                            </article>
+                            <article class="project">
+                                <img src="ava-project-5.png" class="avatar"/>
+                                <a class="project__link" href="">
+                                    <h3 class="project__title">Владимира Заровного, 24</h3>
+                                </a>
+                            </article>
+                        </section>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </body>
+</html>
