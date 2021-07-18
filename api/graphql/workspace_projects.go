@@ -28,23 +28,22 @@ func (r *workspaceProjectsResolver) List(ctx context.Context, obj *WorkspaceProj
 		return ServerError{Message: "internal server error"}, nil
 	}
 
-	return WorkspaceProjectsList{Items: projectsToGraphQL(projects)}, nil
+	return WorkspaceProjectsList{Items: projectsToGraphQLWorkspaceProjects(projects)}, nil
 }
 
 func (r *workspaceProjectsResolver) Total(ctx context.Context, obj *WorkspaceProjects) (WorkspaceProjectsTotalResult, error) {
-	// todo
-	return ServerError{Message: "not implemented yet"}, nil
+	return notImplementedYetError() //todo
 }
 
-func projectToGraphQL(project *store.Project) *WorkspaceProject {
+func projectToGraphQLWorkspaceProject(project *store.Project) *WorkspaceProject {
 	return &WorkspaceProject{ID: project.ID, Name: project.Name}
 }
 
-func projectsToGraphQL(projects []*store.Project) []*WorkspaceProject {
+func projectsToGraphQLWorkspaceProjects(projects []*store.Project) []*WorkspaceProject {
 	result := make([]*WorkspaceProject, 0, len(projects))
 
 	for _, u := range projects {
-		result = append(result, projectToGraphQL(u))
+		result = append(result, projectToGraphQLWorkspaceProject(u))
 	}
 
 	return result

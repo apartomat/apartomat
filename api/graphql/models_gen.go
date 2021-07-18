@@ -21,6 +21,22 @@ type LoginByEmailResult interface {
 	IsLoginByEmailResult()
 }
 
+type ProjectFilesListResult interface {
+	IsProjectFilesListResult()
+}
+
+type ProjectFilesResult interface {
+	IsProjectFilesResult()
+}
+
+type ProjectFilesTotalResult interface {
+	IsProjectFilesTotalResult()
+}
+
+type ProjectResult interface {
+	IsProjectResult()
+}
+
 type UserProfileResult interface {
 	IsUserProfileResult()
 }
@@ -59,6 +75,10 @@ type Forbidden struct {
 }
 
 func (Forbidden) IsUserProfileResult()            {}
+func (Forbidden) IsProjectResult()                {}
+func (Forbidden) IsProjectFilesListResult()       {}
+func (Forbidden) IsProjectFilesTotalResult()      {}
+func (Forbidden) IsProjectFilesResult()           {}
 func (Forbidden) IsError()                        {}
 func (Forbidden) IsWorkspaceResult()              {}
 func (Forbidden) IsWorkspaceUsersResult()         {}
@@ -97,6 +117,7 @@ type NotFound struct {
 	Message string `json:"message"`
 }
 
+func (NotFound) IsProjectResult()   {}
 func (NotFound) IsError()           {}
 func (NotFound) IsWorkspaceResult() {}
 
@@ -106,6 +127,33 @@ type Product struct {
 	Image       string `json:"image"`
 }
 
+type Project struct {
+	ID    int           `json:"id"`
+	Title string        `json:"title"`
+	Files *ProjectFiles `json:"files"`
+}
+
+func (Project) IsProjectResult() {}
+
+type ProjectFile struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+	URL  string `json:"url"`
+	Type string `json:"type"`
+}
+
+type ProjectFilesList struct {
+	Items []*ProjectFile `json:"items"`
+}
+
+func (ProjectFilesList) IsProjectFilesListResult() {}
+
+type ProjectFilesTotal struct {
+	Total int `json:"total"`
+}
+
+func (ProjectFilesTotal) IsProjectFilesTotalResult() {}
+
 type ServerError struct {
 	Message string `json:"message"`
 }
@@ -113,6 +161,10 @@ type ServerError struct {
 func (ServerError) IsLoginByEmailResult()           {}
 func (ServerError) IsConfirmLoginResult()           {}
 func (ServerError) IsUserProfileResult()            {}
+func (ServerError) IsProjectResult()                {}
+func (ServerError) IsProjectFilesListResult()       {}
+func (ServerError) IsProjectFilesTotalResult()      {}
+func (ServerError) IsProjectFilesResult()           {}
 func (ServerError) IsError()                        {}
 func (ServerError) IsWorkspaceResult()              {}
 func (ServerError) IsWorkspaceUsersResult()         {}

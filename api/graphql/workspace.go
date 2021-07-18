@@ -8,11 +8,6 @@ import (
 	"log"
 )
 
-func (r *rootResolver) Workspace() WorkspaceResolver {
-	return &workspaceResolver{r}
-
-}
-
 func (r *queryResolver) Workspace(ctx context.Context, id int) (WorkspaceResult, error) {
 	ws, err := r.useCases.GetWorkspace.Do(ctx, id)
 	if err != nil {
@@ -30,8 +25,9 @@ func (r *queryResolver) Workspace(ctx context.Context, id int) (WorkspaceResult,
 	}
 
 	return Workspace{ID: ws.ID, Name: ws.Name}, nil
-
 }
+
+func (r *rootResolver) Workspace() WorkspaceResolver { return &workspaceResolver{r} }
 
 type workspaceResolver struct {
 	*rootResolver
@@ -49,7 +45,7 @@ func (r *workspaceResolver) Users(ctx context.Context, obj *Workspace) (Workspac
 		return ServerError{Message: "internal server error"}, nil
 	}
 
-	return &WorkspaceUsers{Items: workspacUsersToGraphQL(users)}, nil
+	return &WorkspaceUsers{Items: workspaceUsersToGraphQL(users)}, nil
 }
 
 func (r *workspaceResolver) Projects(ctx context.Context, obj *Workspace) (*WorkspaceProjects, error) {
@@ -60,7 +56,7 @@ func workspaceUserToGraphQL(user *store.WorkspaceUser) *WorkspaceUser {
 	return &WorkspaceUser{ID: user.ID, Role: workspaceUserRoleToGraphQL(user.Role)}
 }
 
-func workspacUsersToGraphQL(users []*store.WorkspaceUser) []*WorkspaceUser {
+func workspaceUsersToGraphQL(users []*store.WorkspaceUser) []*WorkspaceUser {
 	result := make([]*WorkspaceUser, 0, len(users))
 
 	for _, u := range users {

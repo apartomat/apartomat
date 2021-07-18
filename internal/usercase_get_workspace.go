@@ -27,7 +27,5 @@ func (u *GetWorkspace) Do(ctx context.Context, id int) (*store.Workspace, error)
 		return nil, errors.Wrapf(ErrNotFound, "workspace %d", id)
 	}
 
-	workspace := workspaces[0]
-
-	return workspace, nil
+	return workspaces[0], nil
 }

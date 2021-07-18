@@ -30,3 +30,12 @@ func (acl *Acl) CanGetWorkspaceProjects(ctx context.Context, subj *UserCtx, obj 
 	// todo check subj is workspace owner or admin
 	return true
 }
+
+func (acl *Acl) CanGetProject(ctx context.Context, subj *UserCtx, obj *store.Project) bool {
+	// todo check subj is workspace owner or admin
+	return true
+}
+
+func (acl *Acl) CanGetProjectFiles(ctx context.Context, subj *UserCtx, obj *store.Project) bool {
+	return true
+}

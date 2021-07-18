@@ -1,0 +1,37 @@
+extend type Query {
+    project(id: Int!): ProjectResult!
+}
+
+union ProjectResult = Project | NotFound | Forbidden | ServerError
+
+type Project {
+    id: Int!
+    title: String!
+    files: ProjectFiles!
+}
+
+type ProjectFiles {
+    list: ProjectFilesListResult!
+    total: ProjectFilesTotalResult!
+}
+
+union ProjectFilesListResult = ProjectFilesList | Forbidden | ServerError
+
+type ProjectFilesList {
+    items: [ProjectFile!]!
+}
+
+union ProjectFilesTotalResult = ProjectFilesTotal | Forbidden | ServerError
+
+type ProjectFilesTotal {
+    total: Int!
+}
+
+union ProjectFilesResult = ProjectFiles | Forbidden | ServerError
+
+type ProjectFile {
+    id: Int!
+    name: String!
+    url: Url!
+    type: String!
+}

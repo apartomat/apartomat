@@ -36,6 +36,8 @@ type Config struct {
 
 type ResolverRoot interface {
 	Mutation() MutationResolver
+	Project() ProjectResolver
+	ProjectFiles() ProjectFilesResolver
 	Query() QueryResolver
 	ShoppinglistQuery() ShoppinglistQueryResolver
 	UserProfile() UserProfileResolver
@@ -95,8 +97,35 @@ type ComplexityRoot struct {
 		Name        func(childComplexity int) int
 	}
 
+	Project struct {
+		Files func(childComplexity int) int
+		ID    func(childComplexity int) int
+		Title func(childComplexity int) int
+	}
+
+	ProjectFile struct {
+		ID   func(childComplexity int) int
+		Name func(childComplexity int) int
+		Type func(childComplexity int) int
+		URL  func(childComplexity int) int
+	}
+
+	ProjectFiles struct {
+		List  func(childComplexity int) int
+		Total func(childComplexity int) int
+	}
+
+	ProjectFilesList struct {
+		Items func(childComplexity int) int
+	}
+
+	ProjectFilesTotal struct {
+		Total func(childComplexity int) int
+	}
+
 	Query struct {
 		Profile      func(childComplexity int) int
+		Project      func(childComplexity int, id int) int
 		Shoppinglist func(childComplexity int) int
 		Version      func(childComplexity int) int
 		Workspace    func(childComplexity int, id int) int
@@ -164,9 +193,17 @@ type MutationResolver interface {
 	LoginByEmail(ctx context.Context, email string, workspaceName string) (LoginByEmailResult, error)
 	ConfirmLogin(ctx context.Context, token string) (ConfirmLoginResult, error)
 }
+type ProjectResolver interface {
+	Files(ctx context.Context, obj *Project) (*ProjectFiles, error)
+}
+type ProjectFilesResolver interface {
+	List(ctx context.Context, obj *ProjectFiles) (ProjectFilesListResult, error)
+	Total(ctx context.Context, obj *ProjectFiles) (ProjectFilesTotalResult, error)
+}
 type QueryResolver interface {
 	Version(ctx context.Context) (string, error)
 	Profile(ctx context.Context) (UserProfileResult, error)
+	Project(ctx context.Context, id int) (ProjectResult, error)
 	Shoppinglist(ctx context.Context) (*ShoppinglistQuery, error)
 	Workspace(ctx context.Context, id int) (WorkspaceResult, error)
 }
@@ -311,12 +348,101 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Product.Name(childComplexity), true
 
+	case "Project.files":
+		if e.complexity.Project.Files == nil {
+			break
+		}
+
+		return e.complexity.Project.Files(childComplexity), true
+
+	case "Project.id":
+		if e.complexity.Project.ID == nil {
+			break
+		}
+
+		return e.complexity.Project.ID(childComplexity), true
+
+	case "Project.title":
+		if e.complexity.Project.Title == nil {
+			break
+		}
+
+		return e.complexity.Project.Title(childComplexity), true
+
+	case "ProjectFile.id":
+		if e.complexity.ProjectFile.ID == nil {
+			break
+		}
+
+		return e.complexity.ProjectFile.ID(childComplexity), true
+
+	case "ProjectFile.name":
+		if e.complexity.ProjectFile.Name == nil {
+			break
+		}
+
+		return e.complexity.ProjectFile.Name(childComplexity), true
+
+	case "ProjectFile.type":
+		if e.complexity.ProjectFile.Type == nil {
+			break
+		}
+
+		return e.complexity.ProjectFile.Type(childComplexity), true
+
+	case "ProjectFile.url":
+		if e.complexity.ProjectFile.URL == nil {
+			break
+		}
+
+		return e.complexity.ProjectFile.URL(childComplexity), true
+
+	case "ProjectFiles.list":
+		if e.complexity.ProjectFiles.List == nil {
+			break
+		}
+
+		return e.complexity.ProjectFiles.List(childComplexity), true
+
+	case "ProjectFiles.total":
+		if e.complexity.ProjectFiles.Total == nil {
+			break
+		}
+
+		return e.complexity.ProjectFiles.Total(childComplexity), true
+
+	case "ProjectFilesList.items":
+		if e.complexity.ProjectFilesList.Items == nil {
+			break
+		}
+
+		return e.complexity.ProjectFilesList.Items(childComplexity), true
+
+	case "ProjectFilesTotal.total":
+		if e.complexity.ProjectFilesTotal.Total == nil {
+			break
+		}
+
+		return e.complexity.ProjectFilesTotal.Total(childComplexity), true
+
 	case "Query.profile":
 		if e.complexity.Query.Profile == nil {
 			break
 		}
 
 		return e.complexity.Query.Profile(childComplexity), true
+
+	case "Query.project":
+		if e.complexity.Query.Project == nil {
+			break
+		}
+
+		args, err := ec.field_Query_project_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Project(childComplexity, args["id"].(int)), true
 
 	case "Query.shoppinglist":
 		if e.complexity.Query.Shoppinglist == nil {
@@ -618,6 +744,44 @@ type UserProfile {
     gravatar: Gravatar
     defaultWorkspace: Workspace!
 }`, BuiltIn: false},
+	{Name: "project.graphql", Input: `extend type Query {
+    project(id: Int!): ProjectResult!
+}
+
+union ProjectResult = Project | NotFound | Forbidden | ServerError
+
+type Project {
+    id: Int!
+    title: String!
+    files: ProjectFiles!
+}
+
+type ProjectFiles {
+    list: ProjectFilesListResult!
+    total: ProjectFilesTotalResult!
+}
+
+union ProjectFilesListResult = ProjectFilesList | Forbidden | ServerError
+
+type ProjectFilesList {
+    items: [ProjectFile!]!
+}
+
+union ProjectFilesTotalResult = ProjectFilesTotal | Forbidden | ServerError
+
+type ProjectFilesTotal {
+    total: Int!
+}
+
+union ProjectFilesResult = ProjectFiles | Forbidden | ServerError
+
+type ProjectFile {
+    id: Int!
+    name: String!
+    url: Url!
+    type: String!
+}
+`, BuiltIn: false},
 	{Name: "root.graphql", Input: `schema {
     query: Query
     mutation: Mutation
@@ -656,7 +820,9 @@ type Gravatar {
 
 type Id {
 	id: Int!
-}`, BuiltIn: false},
+}
+
+scalar Url`, BuiltIn: false},
 	{Name: "shoppinglist.graphql", Input: `extend type Query {
     shoppinglist: ShoppinglistQuery!
 }
@@ -786,6 +952,21 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 		}
 	}
 	args["name"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_project_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
 	return args, nil
 }
 
@@ -1176,7 +1357,7 @@ func (ec *executionContext) _Mutation_loginByEmail(ctx context.Context, field gr
 	}
 	res := resTmp.(LoginByEmailResult)
 	fc.Result = res
-	return ec.marshalNLoginByEmailResult2githubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐLoginByEmailResult(ctx, field.Selections, res)
+	return ec.marshalNLoginByEmailResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐLoginByEmailResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_confirmLogin(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1218,7 +1399,7 @@ func (ec *executionContext) _Mutation_confirmLogin(ctx context.Context, field gr
 	}
 	res := resTmp.(ConfirmLoginResult)
 	fc.Result = res
-	return ec.marshalNConfirmLoginResult2githubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐConfirmLoginResult(ctx, field.Selections, res)
+	return ec.marshalNConfirmLoginResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐConfirmLoginResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _NotFound_message(ctx context.Context, field graphql.CollectedField, obj *NotFound) (ret graphql.Marshaler) {
@@ -1361,6 +1542,391 @@ func (ec *executionContext) _Product_image(ctx context.Context, field graphql.Co
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Project_id(ctx context.Context, field graphql.CollectedField, obj *Project) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Project",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Project_title(ctx context.Context, field graphql.CollectedField, obj *Project) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Project",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Title, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Project_files(ctx context.Context, field graphql.CollectedField, obj *Project) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Project",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Project().Files(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*ProjectFiles)
+	fc.Result = res
+	return ec.marshalNProjectFiles2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectFiles(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ProjectFile_id(ctx context.Context, field graphql.CollectedField, obj *ProjectFile) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ProjectFile",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ProjectFile_name(ctx context.Context, field graphql.CollectedField, obj *ProjectFile) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ProjectFile",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ProjectFile_url(ctx context.Context, field graphql.CollectedField, obj *ProjectFile) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ProjectFile",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.URL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNUrl2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ProjectFile_type(ctx context.Context, field graphql.CollectedField, obj *ProjectFile) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ProjectFile",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Type, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ProjectFiles_list(ctx context.Context, field graphql.CollectedField, obj *ProjectFiles) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ProjectFiles",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.ProjectFiles().List(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(ProjectFilesListResult)
+	fc.Result = res
+	return ec.marshalNProjectFilesListResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectFilesListResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ProjectFiles_total(ctx context.Context, field graphql.CollectedField, obj *ProjectFiles) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ProjectFiles",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.ProjectFiles().Total(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(ProjectFilesTotalResult)
+	fc.Result = res
+	return ec.marshalNProjectFilesTotalResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectFilesTotalResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ProjectFilesList_items(ctx context.Context, field graphql.CollectedField, obj *ProjectFilesList) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ProjectFilesList",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Items, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*ProjectFile)
+	fc.Result = res
+	return ec.marshalNProjectFile2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectFileᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ProjectFilesTotal_total(ctx context.Context, field graphql.CollectedField, obj *ProjectFilesTotal) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ProjectFilesTotal",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Total, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query_version(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -1428,7 +1994,49 @@ func (ec *executionContext) _Query_profile(ctx context.Context, field graphql.Co
 	}
 	res := resTmp.(UserProfileResult)
 	fc.Result = res
-	return ec.marshalNUserProfileResult2githubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐUserProfileResult(ctx, field.Selections, res)
+	return ec.marshalNUserProfileResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐUserProfileResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Query_project(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Query_project_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Project(rctx, args["id"].(int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(ProjectResult)
+	fc.Result = res
+	return ec.marshalNProjectResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_shoppinglist(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1463,7 +2071,7 @@ func (ec *executionContext) _Query_shoppinglist(ctx context.Context, field graph
 	}
 	res := resTmp.(*ShoppinglistQuery)
 	fc.Result = res
-	return ec.marshalNShoppinglistQuery2ᚖgithubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐShoppinglistQuery(ctx, field.Selections, res)
+	return ec.marshalNShoppinglistQuery2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐShoppinglistQuery(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_workspace(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1505,7 +2113,7 @@ func (ec *executionContext) _Query_workspace(ctx context.Context, field graphql.
 	}
 	res := resTmp.(WorkspaceResult)
 	fc.Result = res
-	return ec.marshalNWorkspaceResult2githubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐWorkspaceResult(ctx, field.Selections, res)
+	return ec.marshalNWorkspaceResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1650,7 +2258,7 @@ func (ec *executionContext) _ShoppinglistQuery_productOnPage(ctx context.Context
 	}
 	res := resTmp.(*Product)
 	fc.Result = res
-	return ec.marshalOProduct2ᚖgithubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐProduct(ctx, field.Selections, res)
+	return ec.marshalOProduct2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProduct(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _UserProfile_id(ctx context.Context, field graphql.CollectedField, obj *UserProfile) (ret graphql.Marshaler) {
@@ -1752,7 +2360,7 @@ func (ec *executionContext) _UserProfile_gravatar(ctx context.Context, field gra
 	}
 	res := resTmp.(*Gravatar)
 	fc.Result = res
-	return ec.marshalOGravatar2ᚖgithubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐGravatar(ctx, field.Selections, res)
+	return ec.marshalOGravatar2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐGravatar(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _UserProfile_defaultWorkspace(ctx context.Context, field graphql.CollectedField, obj *UserProfile) (ret graphql.Marshaler) {
@@ -1787,7 +2395,7 @@ func (ec *executionContext) _UserProfile_defaultWorkspace(ctx context.Context, f
 	}
 	res := resTmp.(*Workspace)
 	fc.Result = res
-	return ec.marshalNWorkspace2ᚖgithubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐWorkspace(ctx, field.Selections, res)
+	return ec.marshalNWorkspace2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspace(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Workspace_id(ctx context.Context, field graphql.CollectedField, obj *Workspace) (ret graphql.Marshaler) {
@@ -1892,7 +2500,7 @@ func (ec *executionContext) _Workspace_users(ctx context.Context, field graphql.
 	}
 	res := resTmp.(WorkspaceUsersResult)
 	fc.Result = res
-	return ec.marshalNWorkspaceUsersResult2githubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUsersResult(ctx, field.Selections, res)
+	return ec.marshalNWorkspaceUsersResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUsersResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Workspace_projects(ctx context.Context, field graphql.CollectedField, obj *Workspace) (ret graphql.Marshaler) {
@@ -1927,7 +2535,7 @@ func (ec *executionContext) _Workspace_projects(ctx context.Context, field graph
 	}
 	res := resTmp.(*WorkspaceProjects)
 	fc.Result = res
-	return ec.marshalNWorkspaceProjects2ᚖgithubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐWorkspaceProjects(ctx, field.Selections, res)
+	return ec.marshalNWorkspaceProjects2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceProjects(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _WorkspaceProject_id(ctx context.Context, field graphql.CollectedField, obj *WorkspaceProject) (ret graphql.Marshaler) {
@@ -2029,7 +2637,7 @@ func (ec *executionContext) _WorkspaceProjects_workspace(ctx context.Context, fi
 	}
 	res := resTmp.(*ID)
 	fc.Result = res
-	return ec.marshalOId2ᚖgithubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐID(ctx, field.Selections, res)
+	return ec.marshalOId2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐID(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _WorkspaceProjects_list(ctx context.Context, field graphql.CollectedField, obj *WorkspaceProjects) (ret graphql.Marshaler) {
@@ -2064,7 +2672,7 @@ func (ec *executionContext) _WorkspaceProjects_list(ctx context.Context, field g
 	}
 	res := resTmp.(WorkspaceProjectsListResult)
 	fc.Result = res
-	return ec.marshalNWorkspaceProjectsListResult2githubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐWorkspaceProjectsListResult(ctx, field.Selections, res)
+	return ec.marshalNWorkspaceProjectsListResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceProjectsListResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _WorkspaceProjects_total(ctx context.Context, field graphql.CollectedField, obj *WorkspaceProjects) (ret graphql.Marshaler) {
@@ -2099,7 +2707,7 @@ func (ec *executionContext) _WorkspaceProjects_total(ctx context.Context, field 
 	}
 	res := resTmp.(WorkspaceProjectsTotalResult)
 	fc.Result = res
-	return ec.marshalNWorkspaceProjectsTotalResult2githubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐWorkspaceProjectsTotalResult(ctx, field.Selections, res)
+	return ec.marshalNWorkspaceProjectsTotalResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceProjectsTotalResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _WorkspaceProjectsList_items(ctx context.Context, field graphql.CollectedField, obj *WorkspaceProjectsList) (ret graphql.Marshaler) {
@@ -2134,7 +2742,7 @@ func (ec *executionContext) _WorkspaceProjectsList_items(ctx context.Context, fi
 	}
 	res := resTmp.([]*WorkspaceProject)
 	fc.Result = res
-	return ec.marshalNWorkspaceProject2ᚕᚖgithubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐWorkspaceProjectᚄ(ctx, field.Selections, res)
+	return ec.marshalNWorkspaceProject2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceProjectᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _WorkspaceProjectsTotal_total(ctx context.Context, field graphql.CollectedField, obj *WorkspaceProjectsTotal) (ret graphql.Marshaler) {
@@ -2239,7 +2847,7 @@ func (ec *executionContext) _WorkspaceUser_role(ctx context.Context, field graph
 	}
 	res := resTmp.(WorkspaceUserRole)
 	fc.Result = res
-	return ec.marshalNWorkspaceUserRole2githubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserRole(ctx, field.Selections, res)
+	return ec.marshalNWorkspaceUserRole2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserRole(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _WorkspaceUser_profile(ctx context.Context, field graphql.CollectedField, obj *WorkspaceUser) (ret graphql.Marshaler) {
@@ -2274,7 +2882,7 @@ func (ec *executionContext) _WorkspaceUser_profile(ctx context.Context, field gr
 	}
 	res := resTmp.(*WorkspaceUserProfile)
 	fc.Result = res
-	return ec.marshalNWorkspaceUserProfile2ᚖgithubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserProfile(ctx, field.Selections, res)
+	return ec.marshalNWorkspaceUserProfile2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserProfile(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _WorkspaceUserProfile_id(ctx context.Context, field graphql.CollectedField, obj *WorkspaceUserProfile) (ret graphql.Marshaler) {
@@ -2379,7 +2987,7 @@ func (ec *executionContext) _WorkspaceUserProfile_gravatar(ctx context.Context, 
 	}
 	res := resTmp.(*Gravatar)
 	fc.Result = res
-	return ec.marshalNGravatar2ᚖgithubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐGravatar(ctx, field.Selections, res)
+	return ec.marshalNGravatar2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐGravatar(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _WorkspaceUsers_items(ctx context.Context, field graphql.CollectedField, obj *WorkspaceUsers) (ret graphql.Marshaler) {
@@ -2414,7 +3022,7 @@ func (ec *executionContext) _WorkspaceUsers_items(ctx context.Context, field gra
 	}
 	res := resTmp.([]*WorkspaceUser)
 	fc.Result = res
-	return ec.marshalNWorkspaceUser2ᚕᚖgithubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserᚄ(ctx, field.Selections, res)
+	return ec.marshalNWorkspaceUser2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) ___Directive_name(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
@@ -3626,6 +4234,133 @@ func (ec *executionContext) _LoginByEmailResult(ctx context.Context, sel ast.Sel
 	}
 }
 
+func (ec *executionContext) _ProjectFilesListResult(ctx context.Context, sel ast.SelectionSet, obj ProjectFilesListResult) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case ProjectFilesList:
+		return ec._ProjectFilesList(ctx, sel, &obj)
+	case *ProjectFilesList:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ProjectFilesList(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
+func (ec *executionContext) _ProjectFilesResult(ctx context.Context, sel ast.SelectionSet, obj ProjectFilesResult) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case ProjectFiles:
+		return ec._ProjectFiles(ctx, sel, &obj)
+	case *ProjectFiles:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ProjectFiles(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
+func (ec *executionContext) _ProjectFilesTotalResult(ctx context.Context, sel ast.SelectionSet, obj ProjectFilesTotalResult) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case ProjectFilesTotal:
+		return ec._ProjectFilesTotal(ctx, sel, &obj)
+	case *ProjectFilesTotal:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ProjectFilesTotal(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
+func (ec *executionContext) _ProjectResult(ctx context.Context, sel ast.SelectionSet, obj ProjectResult) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case Project:
+		return ec._Project(ctx, sel, &obj)
+	case *Project:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Project(ctx, sel, obj)
+	case NotFound:
+		return ec._NotFound(ctx, sel, &obj)
+	case *NotFound:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._NotFound(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
 func (ec *executionContext) _UserProfileResult(ctx context.Context, sel ast.SelectionSet, obj UserProfileResult) graphql.Marshaler {
 	switch obj := (obj).(type) {
 	case nil:
@@ -3841,7 +4576,7 @@ func (ec *executionContext) _ExpiredToken(ctx context.Context, sel ast.Selection
 	return out
 }
 
-var forbiddenImplementors = []string{"Forbidden", "UserProfileResult", "Error", "WorkspaceResult", "WorkspaceUsersResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult"}
+var forbiddenImplementors = []string{"Forbidden", "UserProfileResult", "ProjectResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectFilesResult", "Error", "WorkspaceResult", "WorkspaceUsersResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult"}
 
 func (ec *executionContext) _Forbidden(ctx context.Context, sel ast.SelectionSet, obj *Forbidden) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, forbiddenImplementors)
@@ -4039,7 +4774,7 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 	return out
 }
 
-var notFoundImplementors = []string{"NotFound", "Error", "WorkspaceResult"}
+var notFoundImplementors = []string{"NotFound", "ProjectResult", "Error", "WorkspaceResult"}
 
 func (ec *executionContext) _NotFound(ctx context.Context, sel ast.SelectionSet, obj *NotFound) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, notFoundImplementors)
@@ -4103,6 +4838,198 @@ func (ec *executionContext) _Product(ctx context.Context, sel ast.SelectionSet, 
 	return out
 }
 
+var projectImplementors = []string{"Project", "ProjectResult"}
+
+func (ec *executionContext) _Project(ctx context.Context, sel ast.SelectionSet, obj *Project) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, projectImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Project")
+		case "id":
+			out.Values[i] = ec._Project_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "title":
+			out.Values[i] = ec._Project_title(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "files":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Project_files(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var projectFileImplementors = []string{"ProjectFile"}
+
+func (ec *executionContext) _ProjectFile(ctx context.Context, sel ast.SelectionSet, obj *ProjectFile) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, projectFileImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ProjectFile")
+		case "id":
+			out.Values[i] = ec._ProjectFile_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "name":
+			out.Values[i] = ec._ProjectFile_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "url":
+			out.Values[i] = ec._ProjectFile_url(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "type":
+			out.Values[i] = ec._ProjectFile_type(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var projectFilesImplementors = []string{"ProjectFiles", "ProjectFilesResult"}
+
+func (ec *executionContext) _ProjectFiles(ctx context.Context, sel ast.SelectionSet, obj *ProjectFiles) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, projectFilesImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ProjectFiles")
+		case "list":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._ProjectFiles_list(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "total":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._ProjectFiles_total(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var projectFilesListImplementors = []string{"ProjectFilesList", "ProjectFilesListResult"}
+
+func (ec *executionContext) _ProjectFilesList(ctx context.Context, sel ast.SelectionSet, obj *ProjectFilesList) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, projectFilesListImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ProjectFilesList")
+		case "items":
+			out.Values[i] = ec._ProjectFilesList_items(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var projectFilesTotalImplementors = []string{"ProjectFilesTotal", "ProjectFilesTotalResult"}
+
+func (ec *executionContext) _ProjectFilesTotal(ctx context.Context, sel ast.SelectionSet, obj *ProjectFilesTotal) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, projectFilesTotalImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ProjectFilesTotal")
+		case "total":
+			out.Values[i] = ec._ProjectFilesTotal_total(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var queryImplementors = []string{"Query"}
 
 func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
@@ -4141,6 +5068,20 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_profile(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "project":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_project(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -4189,7 +5130,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 	return out
 }
 
-var serverErrorImplementors = []string{"ServerError", "LoginByEmailResult", "ConfirmLoginResult", "UserProfileResult", "Error", "WorkspaceResult", "WorkspaceUsersResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult"}
+var serverErrorImplementors = []string{"ServerError", "LoginByEmailResult", "ConfirmLoginResult", "UserProfileResult", "ProjectResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectFilesResult", "Error", "WorkspaceResult", "WorkspaceUsersResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult"}
 
 func (ec *executionContext) _ServerError(ctx context.Context, sel ast.SelectionSet, obj *ServerError) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, serverErrorImplementors)
@@ -4865,7 +5806,7 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) marshalNConfirmLoginResult2githubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐConfirmLoginResult(ctx context.Context, sel ast.SelectionSet, v ConfirmLoginResult) graphql.Marshaler {
+func (ec *executionContext) marshalNConfirmLoginResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐConfirmLoginResult(ctx context.Context, sel ast.SelectionSet, v ConfirmLoginResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -4875,7 +5816,7 @@ func (ec *executionContext) marshalNConfirmLoginResult2githubᚗcomᚋztsuᚋapa
 	return ec._ConfirmLoginResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNGravatar2ᚖgithubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐGravatar(ctx context.Context, sel ast.SelectionSet, v *Gravatar) graphql.Marshaler {
+func (ec *executionContext) marshalNGravatar2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐGravatar(ctx context.Context, sel ast.SelectionSet, v *Gravatar) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -4900,7 +5841,7 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 	return res
 }
 
-func (ec *executionContext) marshalNLoginByEmailResult2githubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐLoginByEmailResult(ctx context.Context, sel ast.SelectionSet, v LoginByEmailResult) graphql.Marshaler {
+func (ec *executionContext) marshalNLoginByEmailResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐLoginByEmailResult(ctx context.Context, sel ast.SelectionSet, v LoginByEmailResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -4910,11 +5851,102 @@ func (ec *executionContext) marshalNLoginByEmailResult2githubᚗcomᚋztsuᚋapa
 	return ec._LoginByEmailResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNShoppinglistQuery2githubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐShoppinglistQuery(ctx context.Context, sel ast.SelectionSet, v ShoppinglistQuery) graphql.Marshaler {
+func (ec *executionContext) marshalNProjectFile2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectFileᚄ(ctx context.Context, sel ast.SelectionSet, v []*ProjectFile) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNProjectFile2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectFile(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalNProjectFile2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectFile(ctx context.Context, sel ast.SelectionSet, v *ProjectFile) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._ProjectFile(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNProjectFiles2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectFiles(ctx context.Context, sel ast.SelectionSet, v ProjectFiles) graphql.Marshaler {
+	return ec._ProjectFiles(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNProjectFiles2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectFiles(ctx context.Context, sel ast.SelectionSet, v *ProjectFiles) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._ProjectFiles(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNProjectFilesListResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectFilesListResult(ctx context.Context, sel ast.SelectionSet, v ProjectFilesListResult) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._ProjectFilesListResult(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNProjectFilesTotalResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectFilesTotalResult(ctx context.Context, sel ast.SelectionSet, v ProjectFilesTotalResult) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._ProjectFilesTotalResult(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNProjectResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectResult(ctx context.Context, sel ast.SelectionSet, v ProjectResult) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._ProjectResult(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNShoppinglistQuery2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐShoppinglistQuery(ctx context.Context, sel ast.SelectionSet, v ShoppinglistQuery) graphql.Marshaler {
 	return ec._ShoppinglistQuery(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNShoppinglistQuery2ᚖgithubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐShoppinglistQuery(ctx context.Context, sel ast.SelectionSet, v *ShoppinglistQuery) graphql.Marshaler {
+func (ec *executionContext) marshalNShoppinglistQuery2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐShoppinglistQuery(ctx context.Context, sel ast.SelectionSet, v *ShoppinglistQuery) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -4939,7 +5971,22 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 	return res
 }
 
-func (ec *executionContext) marshalNUserProfileResult2githubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐUserProfileResult(ctx context.Context, sel ast.SelectionSet, v UserProfileResult) graphql.Marshaler {
+func (ec *executionContext) unmarshalNUrl2string(ctx context.Context, v interface{}) (string, error) {
+	res, err := graphql.UnmarshalString(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNUrl2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
+	res := graphql.MarshalString(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
+}
+
+func (ec *executionContext) marshalNUserProfileResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐUserProfileResult(ctx context.Context, sel ast.SelectionSet, v UserProfileResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -4949,11 +5996,11 @@ func (ec *executionContext) marshalNUserProfileResult2githubᚗcomᚋztsuᚋapar
 	return ec._UserProfileResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNWorkspace2githubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐWorkspace(ctx context.Context, sel ast.SelectionSet, v Workspace) graphql.Marshaler {
+func (ec *executionContext) marshalNWorkspace2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspace(ctx context.Context, sel ast.SelectionSet, v Workspace) graphql.Marshaler {
 	return ec._Workspace(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNWorkspace2ᚖgithubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐWorkspace(ctx context.Context, sel ast.SelectionSet, v *Workspace) graphql.Marshaler {
+func (ec *executionContext) marshalNWorkspace2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspace(ctx context.Context, sel ast.SelectionSet, v *Workspace) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -4963,7 +6010,7 @@ func (ec *executionContext) marshalNWorkspace2ᚖgithubᚗcomᚋztsuᚋapartomat
 	return ec._Workspace(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNWorkspaceProject2ᚕᚖgithubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐWorkspaceProjectᚄ(ctx context.Context, sel ast.SelectionSet, v []*WorkspaceProject) graphql.Marshaler {
+func (ec *executionContext) marshalNWorkspaceProject2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceProjectᚄ(ctx context.Context, sel ast.SelectionSet, v []*WorkspaceProject) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -4987,7 +6034,7 @@ func (ec *executionContext) marshalNWorkspaceProject2ᚕᚖgithubᚗcomᚋztsu�
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNWorkspaceProject2ᚖgithubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐWorkspaceProject(ctx, sel, v[i])
+			ret[i] = ec.marshalNWorkspaceProject2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceProject(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -5000,7 +6047,7 @@ func (ec *executionContext) marshalNWorkspaceProject2ᚕᚖgithubᚗcomᚋztsu�
 	return ret
 }
 
-func (ec *executionContext) marshalNWorkspaceProject2ᚖgithubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐWorkspaceProject(ctx context.Context, sel ast.SelectionSet, v *WorkspaceProject) graphql.Marshaler {
+func (ec *executionContext) marshalNWorkspaceProject2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceProject(ctx context.Context, sel ast.SelectionSet, v *WorkspaceProject) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -5010,11 +6057,11 @@ func (ec *executionContext) marshalNWorkspaceProject2ᚖgithubᚗcomᚋztsuᚋap
 	return ec._WorkspaceProject(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNWorkspaceProjects2githubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐWorkspaceProjects(ctx context.Context, sel ast.SelectionSet, v WorkspaceProjects) graphql.Marshaler {
+func (ec *executionContext) marshalNWorkspaceProjects2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceProjects(ctx context.Context, sel ast.SelectionSet, v WorkspaceProjects) graphql.Marshaler {
 	return ec._WorkspaceProjects(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNWorkspaceProjects2ᚖgithubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐWorkspaceProjects(ctx context.Context, sel ast.SelectionSet, v *WorkspaceProjects) graphql.Marshaler {
+func (ec *executionContext) marshalNWorkspaceProjects2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceProjects(ctx context.Context, sel ast.SelectionSet, v *WorkspaceProjects) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -5024,7 +6071,7 @@ func (ec *executionContext) marshalNWorkspaceProjects2ᚖgithubᚗcomᚋztsuᚋa
 	return ec._WorkspaceProjects(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNWorkspaceProjectsListResult2githubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐWorkspaceProjectsListResult(ctx context.Context, sel ast.SelectionSet, v WorkspaceProjectsListResult) graphql.Marshaler {
+func (ec *executionContext) marshalNWorkspaceProjectsListResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceProjectsListResult(ctx context.Context, sel ast.SelectionSet, v WorkspaceProjectsListResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -5034,7 +6081,7 @@ func (ec *executionContext) marshalNWorkspaceProjectsListResult2githubᚗcomᚋz
 	return ec._WorkspaceProjectsListResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNWorkspaceProjectsTotalResult2githubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐWorkspaceProjectsTotalResult(ctx context.Context, sel ast.SelectionSet, v WorkspaceProjectsTotalResult) graphql.Marshaler {
+func (ec *executionContext) marshalNWorkspaceProjectsTotalResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceProjectsTotalResult(ctx context.Context, sel ast.SelectionSet, v WorkspaceProjectsTotalResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -5044,7 +6091,7 @@ func (ec *executionContext) marshalNWorkspaceProjectsTotalResult2githubᚗcomᚋ
 	return ec._WorkspaceProjectsTotalResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNWorkspaceResult2githubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐWorkspaceResult(ctx context.Context, sel ast.SelectionSet, v WorkspaceResult) graphql.Marshaler {
+func (ec *executionContext) marshalNWorkspaceResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceResult(ctx context.Context, sel ast.SelectionSet, v WorkspaceResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -5054,7 +6101,7 @@ func (ec *executionContext) marshalNWorkspaceResult2githubᚗcomᚋztsuᚋaparto
 	return ec._WorkspaceResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNWorkspaceUser2ᚕᚖgithubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserᚄ(ctx context.Context, sel ast.SelectionSet, v []*WorkspaceUser) graphql.Marshaler {
+func (ec *executionContext) marshalNWorkspaceUser2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserᚄ(ctx context.Context, sel ast.SelectionSet, v []*WorkspaceUser) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -5078,7 +6125,7 @@ func (ec *executionContext) marshalNWorkspaceUser2ᚕᚖgithubᚗcomᚋztsuᚋap
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNWorkspaceUser2ᚖgithubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUser(ctx, sel, v[i])
+			ret[i] = ec.marshalNWorkspaceUser2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUser(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -5091,7 +6138,7 @@ func (ec *executionContext) marshalNWorkspaceUser2ᚕᚖgithubᚗcomᚋztsuᚋap
 	return ret
 }
 
-func (ec *executionContext) marshalNWorkspaceUser2ᚖgithubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUser(ctx context.Context, sel ast.SelectionSet, v *WorkspaceUser) graphql.Marshaler {
+func (ec *executionContext) marshalNWorkspaceUser2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUser(ctx context.Context, sel ast.SelectionSet, v *WorkspaceUser) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -5101,11 +6148,11 @@ func (ec *executionContext) marshalNWorkspaceUser2ᚖgithubᚗcomᚋztsuᚋapart
 	return ec._WorkspaceUser(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNWorkspaceUserProfile2githubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserProfile(ctx context.Context, sel ast.SelectionSet, v WorkspaceUserProfile) graphql.Marshaler {
+func (ec *executionContext) marshalNWorkspaceUserProfile2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserProfile(ctx context.Context, sel ast.SelectionSet, v WorkspaceUserProfile) graphql.Marshaler {
 	return ec._WorkspaceUserProfile(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNWorkspaceUserProfile2ᚖgithubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserProfile(ctx context.Context, sel ast.SelectionSet, v *WorkspaceUserProfile) graphql.Marshaler {
+func (ec *executionContext) marshalNWorkspaceUserProfile2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserProfile(ctx context.Context, sel ast.SelectionSet, v *WorkspaceUserProfile) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -5115,17 +6162,17 @@ func (ec *executionContext) marshalNWorkspaceUserProfile2ᚖgithubᚗcomᚋztsu�
 	return ec._WorkspaceUserProfile(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNWorkspaceUserRole2githubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserRole(ctx context.Context, v interface{}) (WorkspaceUserRole, error) {
+func (ec *executionContext) unmarshalNWorkspaceUserRole2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserRole(ctx context.Context, v interface{}) (WorkspaceUserRole, error) {
 	var res WorkspaceUserRole
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNWorkspaceUserRole2githubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserRole(ctx context.Context, sel ast.SelectionSet, v WorkspaceUserRole) graphql.Marshaler {
+func (ec *executionContext) marshalNWorkspaceUserRole2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserRole(ctx context.Context, sel ast.SelectionSet, v WorkspaceUserRole) graphql.Marshaler {
 	return v
 }
 
-func (ec *executionContext) marshalNWorkspaceUsersResult2githubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUsersResult(ctx context.Context, sel ast.SelectionSet, v WorkspaceUsersResult) graphql.Marshaler {
+func (ec *executionContext) marshalNWorkspaceUsersResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUsersResult(ctx context.Context, sel ast.SelectionSet, v WorkspaceUsersResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
@@ -5388,21 +6435,21 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return graphql.MarshalBoolean(*v)
 }
 
-func (ec *executionContext) marshalOGravatar2ᚖgithubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐGravatar(ctx context.Context, sel ast.SelectionSet, v *Gravatar) graphql.Marshaler {
+func (ec *executionContext) marshalOGravatar2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐGravatar(ctx context.Context, sel ast.SelectionSet, v *Gravatar) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._Gravatar(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOId2ᚖgithubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐID(ctx context.Context, sel ast.SelectionSet, v *ID) graphql.Marshaler {
+func (ec *executionContext) marshalOId2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐID(ctx context.Context, sel ast.SelectionSet, v *ID) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._Id(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOProduct2ᚖgithubᚗcomᚋztsuᚋapartomatᚋapiᚋgraphqlᚐProduct(ctx context.Context, sel ast.SelectionSet, v *Product) graphql.Marshaler {
+func (ec *executionContext) marshalOProduct2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProduct(ctx context.Context, sel ast.SelectionSet, v *Product) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}

@@ -67,6 +67,7 @@ func main() {
 		workspaces := postgres.NewWorkspaceStore(pool)
 		workspaceUsers := postgres.NewWorkspaceUserStore(pool)
 		projects := postgres.NewProjectStore(pool)
+		projectFiles := postgres.NewProjectFileStore(pool)
 
 		usersLoader := dataloader.NewUserLoader(dataloader.NewUserLoaderConfig(ctx, users))
 
@@ -81,6 +82,8 @@ func main() {
 				GetWorkspaceUsers:       apartomat.NewGetWorkspaceUsers(workspaces, workspaceUsers, acl),
 				GetWorkspaceUserProfile: apartomat.NewGetWorkspaceUserProfile(usersLoader, acl),
 				GetWorkspaceProjects:    apartomat.NewGetWorkspaceProjects(workspaces, projects, acl),
+				GetProject:              apartomat.NewGetProject(projects, acl),
+				GetProjectFiles:         apartomat.NewGetProjectFiles(projects, projectFiles, acl),
 			},
 		).Run(serverOpts...)
 
