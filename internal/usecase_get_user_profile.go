@@ -17,8 +17,8 @@ func NewGetUserProfile(
 	return &GetUserProfile{users}
 }
 
-func (gup *GetUserProfile) Do(ctx context.Context, email string) (*store.User, error) {
-	users, err := gup.users.List(ctx, store.UserStoreQuery{Email: expr.StrEq(email)})
+func (u *GetUserProfile) Do(ctx context.Context, email string) (*store.User, error) {
+	users, err := u.users.List(ctx, store.UserStoreQuery{Email: expr.StrEq(email)})
 	if err != nil {
 		return nil, err
 	}

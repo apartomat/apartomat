@@ -34,17 +34,17 @@ func NewLoginByEmail(
 	return &LoginByEmail{users, workspaces, workspaceUsers, issuer, mailer}
 }
 
-func (lbe *LoginByEmail) Do(ctx context.Context, email string, workspaceName string) (string, error) {
+func (u *LoginByEmail) Do(ctx context.Context, email string, workspaceName string) (string, error) {
 	if err := validation.Validate(email, is.EmailFormat); err != nil {
 		return "", ErrInvalidEmail
 	}
 
-	token, err := lbe.issuer.Issue(email)
+	token, err := u.issuer.Issue(email)
 	if err != nil {
 		return "", err
 	}
 
-	err = lbe.mailer.Send(NewMailAuth("no-reply@zaibatsu.ru", email, token))
+	err = u.mailer.Send(NewMailAuth("no-reply@zaibatsu.ru", email, token))
 	if err != nil {
 		return "", fmt.Errorf("sent error: %w", ErrSendError)
 	}
@@ -54,7 +54,7 @@ func (lbe *LoginByEmail) Do(ctx context.Context, email string, workspaceName str
 		workspace *store.Workspace
 	)
 
-	users, err := lbe.users.List(ctx, store.UserStoreQuery{Email: expr.StrEq(email)})
+	users, err := u.users.List(ctx, store.UserStoreQuery{Email: expr.StrEq(email)})
 	if err != nil {
 		return "", err
 	}
@@ -65,7 +65,7 @@ func (lbe *LoginByEmail) Do(ctx context.Context, email string, workspaceName str
 			IsActive: true,
 		}
 
-		user, err = lbe.users.Save(ctx, user)
+		user, err = u.users.Save(ctx, user)
 		if err != nil {
 			return "", err
 		}
@@ -73,7 +73,7 @@ func (lbe *LoginByEmail) Do(ctx context.Context, email string, workspaceName str
 		user = users[0]
 	}
 
-	workspaces, err := lbe.workspaces.List(ctx, store.WorkspaceStoreQuery{UserID: expr.IntEq(user.ID)})
+	workspaces, err := u.workspaces.List(ctx, store.WorkspaceStoreQuery{UserID: expr.IntEq(user.ID)})
 	if err != nil {
 		return "", err
 	}
@@ -85,7 +85,7 @@ func (lbe *LoginByEmail) Do(ctx context.Context, email string, workspaceName str
 			UserID:   user.ID,
 		}
 
-		workspace, err = lbe.workspaces.Save(ctx, workspace)
+		workspace, err = u.workspaces.Save(ctx, workspace)
 		if err != nil {
 			return "", err
 		}
@@ -96,7 +96,7 @@ func (lbe *LoginByEmail) Do(ctx context.Context, email string, workspaceName str
 			Role:        store.WorkspaceUserRoleAdmin,
 		}
 
-		_, err = lbe.workspaceUsers.Save(ctx, wu)
+		_, err = u.workspaceUsers.Save(ctx, wu)
 		if err != nil {
 			return "", err
 		}
