@@ -50,6 +50,10 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
+	AlreadyExists struct {
+		Message func(childComplexity int) int
+	}
+
 	CheckEmail struct {
 		Email func(childComplexity int) int
 	}
@@ -241,6 +245,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	ec := executionContext{nil, e}
 	_ = ec
 	switch typeName + "." + field {
+
+	case "AlreadyExists.message":
+		if e.complexity.AlreadyExists.Message == nil {
+			break
+		}
+
+		return e.complexity.AlreadyExists.Message(childComplexity), true
 
 	case "CheckEmail.email":
 		if e.complexity.CheckEmail.Email == nil {
@@ -805,7 +816,7 @@ input UploadProjectFileInput {
     file: Upload!
 }
 
-union UploadProjectFileResult = ProjectFile | Forbidden | ServerError`, BuiltIn: false},
+union UploadProjectFileResult = ProjectFile | Forbidden | AlreadyExists | ServerError`, BuiltIn: false},
 	{Name: "root.graphql", Input: `schema {
     query: Query
     mutation: Mutation
@@ -835,6 +846,10 @@ type Forbidden implements Error {
 }
 
 type NotFound implements Error {
+    message: String!
+}
+
+type AlreadyExists implements Error {
     message: String!
 }
 
@@ -1078,6 +1093,41 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 // endregion ************************** directives.gotpl **************************
 
 // region    **************************** field.gotpl *****************************
+
+func (ec *executionContext) _AlreadyExists_message(ctx context.Context, field graphql.CollectedField, obj *AlreadyExists) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "AlreadyExists",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Message, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
 
 func (ec *executionContext) _CheckEmail_email(ctx context.Context, field graphql.CollectedField, obj *CheckEmail) (ret graphql.Marshaler) {
 	defer func() {
@@ -4310,6 +4360,13 @@ func (ec *executionContext) _Error(ctx context.Context, sel ast.SelectionSet, ob
 			return graphql.Null
 		}
 		return ec._NotFound(ctx, sel, obj)
+	case AlreadyExists:
+		return ec._AlreadyExists(ctx, sel, &obj)
+	case *AlreadyExists:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._AlreadyExists(ctx, sel, obj)
 	default:
 		panic(fmt.Errorf("unexpected type %T", obj))
 	}
@@ -4490,6 +4547,13 @@ func (ec *executionContext) _UploadProjectFileResult(ctx context.Context, sel as
 			return graphql.Null
 		}
 		return ec._Forbidden(ctx, sel, obj)
+	case AlreadyExists:
+		return ec._AlreadyExists(ctx, sel, &obj)
+	case *AlreadyExists:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._AlreadyExists(ctx, sel, obj)
 	case ServerError:
 		return ec._ServerError(ctx, sel, &obj)
 	case *ServerError:
@@ -4662,6 +4726,33 @@ func (ec *executionContext) _WorkspaceUsersResult(ctx context.Context, sel ast.S
 // endregion ************************** interface.gotpl ***************************
 
 // region    **************************** object.gotpl ****************************
+
+var alreadyExistsImplementors = []string{"AlreadyExists", "UploadProjectFileResult", "Error"}
+
+func (ec *executionContext) _AlreadyExists(ctx context.Context, sel ast.SelectionSet, obj *AlreadyExists) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, alreadyExistsImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AlreadyExists")
+		case "message":
+			out.Values[i] = ec._AlreadyExists_message(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
 
 var checkEmailImplementors = []string{"CheckEmail", "LoginByEmailResult"}
 

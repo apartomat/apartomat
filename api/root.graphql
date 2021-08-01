@@ -30,6 +30,10 @@ type NotFound implements Error {
     message: String!
 }
 
+type AlreadyExists implements Error {
+    message: String!
+}
+
 type Gravatar {
     url: String!
 }

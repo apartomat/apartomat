@@ -12,6 +12,7 @@ require (
 	github.com/docopt/docopt-go v0.0.0-20180111231733-ee0de3bc6815
 	github.com/go-chi/chi/v5 v5.0.2
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
+	github.com/jackc/pgconn v1.8.0 // indirect
 	github.com/jackc/pgx/v4 v4.10.0
 	github.com/jung-kurt/gofpdf v1.4.2
 	github.com/o1egl/paseto v1.0.0

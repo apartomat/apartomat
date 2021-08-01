@@ -62,6 +62,10 @@ func (u *UploadProjectFile) Do(
 
 	f, err = u.files.Save(ctx, f)
 	if err != nil {
+		if errors.Is(err, store.ErrAlreadyExists) {
+			return nil, errors.Wrapf(ErrAlreadyExists, "%s", name)
+		}
+
 		return nil, err
 	}
 

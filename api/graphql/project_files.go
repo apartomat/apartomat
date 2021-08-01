@@ -70,6 +70,10 @@ func (r *mutationResolver) UploadProjectFile(
 			return Forbidden{}, nil
 		}
 
+		if errors.Is(err, apartomat.ErrAlreadyExists) {
+			return AlreadyExists{}, nil
+		}
+
 		log.Printf("can't upload file to project (id=%d): %s", input.ProjectID, err)
 
 		return serverError()

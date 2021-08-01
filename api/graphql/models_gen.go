@@ -63,6 +63,13 @@ type WorkspaceUsersResult interface {
 	IsWorkspaceUsersResult()
 }
 
+type AlreadyExists struct {
+	Message string `json:"message"`
+}
+
+func (AlreadyExists) IsUploadProjectFileResult() {}
+func (AlreadyExists) IsError()                   {}
+
 type CheckEmail struct {
 	Email string `json:"email"`
 }

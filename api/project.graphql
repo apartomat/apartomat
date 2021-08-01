@@ -45,4 +45,4 @@ input UploadProjectFileInput {
     file: Upload!
 }
 
-union UploadProjectFileResult = ProjectFile | Forbidden | ServerError
+union UploadProjectFileResult = ProjectFile | Forbidden | AlreadyExists | ServerError
