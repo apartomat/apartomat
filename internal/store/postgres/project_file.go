@@ -34,8 +34,8 @@ func (s *projectFileStore) Save(ctx context.Context, file *store.ProjectFile) (*
 	}
 
 	q, args, err := InsertIntoProjectFiles().
-		Columns("name", "url", "created_at", "modified_at").
-		Values(file.Name, file.URL, file.CreatedAt, file.ModifiedAt).
+		Columns("project_id", "name", "url", "type", "created_at", "modified_at").
+		Values(file.ProjectID, file.Name, file.URL, file.Type, file.CreatedAt, file.ModifiedAt).
 		ToSql()
 	if err != nil {
 		return nil, err
@@ -52,6 +52,7 @@ func (s *projectFileStore) Save(ctx context.Context, file *store.ProjectFile) (*
 func (s *projectFileStore) List(ctx context.Context, q store.ProjectFileStoreQuery) ([]*store.ProjectFile, error) {
 	sql, args, err := SelectFromProjectFiles(
 		"id",
+		"project_id",
 		"name",
 		"url",
 		"type",
@@ -76,6 +77,7 @@ func (s *projectFileStore) List(ctx context.Context, q store.ProjectFileStoreQue
 
 		err := rows.Scan(
 			&file.ID,
+			&file.ProjectID,
 			&file.Name,
 			&file.URL,
 			&file.Type,

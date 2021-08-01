@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"io"
 	"strconv"
+
+	"github.com/99designs/gqlgen/graphql"
 )
 
 type ConfirmLoginResult interface {
@@ -35,6 +37,10 @@ type ProjectFilesTotalResult interface {
 
 type ProjectResult interface {
 	IsProjectResult()
+}
+
+type UploadProjectFileResult interface {
+	IsUploadProjectFileResult()
 }
 
 type UserProfileResult interface {
@@ -79,6 +85,7 @@ func (Forbidden) IsProjectResult()                {}
 func (Forbidden) IsProjectFilesListResult()       {}
 func (Forbidden) IsProjectFilesTotalResult()      {}
 func (Forbidden) IsProjectFilesResult()           {}
+func (Forbidden) IsUploadProjectFileResult()      {}
 func (Forbidden) IsError()                        {}
 func (Forbidden) IsWorkspaceResult()              {}
 func (Forbidden) IsWorkspaceUsersResult()         {}
@@ -142,6 +149,8 @@ type ProjectFile struct {
 	Type string `json:"type"`
 }
 
+func (ProjectFile) IsUploadProjectFileResult() {}
+
 type ProjectFilesList struct {
 	Items []*ProjectFile `json:"items"`
 }
@@ -165,6 +174,7 @@ func (ServerError) IsProjectResult()                {}
 func (ServerError) IsProjectFilesListResult()       {}
 func (ServerError) IsProjectFilesTotalResult()      {}
 func (ServerError) IsProjectFilesResult()           {}
+func (ServerError) IsUploadProjectFileResult()      {}
 func (ServerError) IsError()                        {}
 func (ServerError) IsWorkspaceResult()              {}
 func (ServerError) IsWorkspaceUsersResult()         {}
@@ -173,6 +183,11 @@ func (ServerError) IsWorkspaceProjectsTotalResult() {}
 
 type ShoppinglistQuery struct {
 	ProductOnPage *Product `json:"productOnPage"`
+}
+
+type UploadProjectFileInput struct {
+	ProjectID int            `json:"projectId"`
+	File      graphql.Upload `json:"file"`
 }
 
 type UserProfile struct {

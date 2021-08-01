@@ -39,3 +39,7 @@ func (acl *Acl) CanGetProject(ctx context.Context, subj *UserCtx, obj *store.Pro
 func (acl *Acl) CanGetProjectFiles(ctx context.Context, subj *UserCtx, obj *store.Project) bool {
 	return true
 }
+
+func (acl *Acl) CanUploadProjectFile(ctx context.Context, subj *UserCtx, obj *store.Project) bool {
+	return true
+}

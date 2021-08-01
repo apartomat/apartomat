@@ -5,6 +5,10 @@ go 1.14
 require (
 	github.com/99designs/gqlgen v0.13.0
 	github.com/Masterminds/squirrel v1.5.0
+	github.com/aws/aws-sdk-go-v2 v1.7.1 // indirect
+	github.com/aws/aws-sdk-go-v2/config v1.5.0 // indirect
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.11.1 // indirect
+	github.com/disintegration/gift v1.2.1 // indirect
 	github.com/docopt/docopt-go v0.0.0-20180111231733-ee0de3bc6815
 	github.com/go-chi/chi/v5 v5.0.2
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0

@@ -71,6 +71,17 @@ func main() {
 
 		usersLoader := dataloader.NewUserLoader(dataloader.NewUserLoaderConfig(ctx, users))
 
+		uploader, err := apartomat.NewS3ImageUploaderWithCred(
+			ctx,
+			os.Getenv("S3_ACCESS_KEY_ID"),
+			os.Getenv("S3_SECRET_ACCESS_KEY"),
+			os.Getenv("S3_REGION"),
+			os.Getenv("S3_BUCKET_NAME"),
+		)
+		if err != nil {
+			log.Fatalf("can't init s3: %s", err)
+		}
+
 		NewServer(
 			&graphql.UseCases{
 				CheckAuthToken:          apartomat.NewCheckAuthToken(authIssuerVerifier),
@@ -84,6 +95,7 @@ func main() {
 				GetWorkspaceProjects:    apartomat.NewGetWorkspaceProjects(workspaces, projects, acl),
 				GetProject:              apartomat.NewGetProject(projects, acl),
 				GetProjectFiles:         apartomat.NewGetProjectFiles(projects, projectFiles, acl),
+				UploadProjectFile:       apartomat.NewUploadProjectFile(projects, projectFiles, acl, uploader),
 			},
 		).Run(serverOpts...)
 

@@ -8,6 +8,7 @@ import (
 
 type ProjectFile struct {
 	ID         int
+	ProjectID  int
 	Name       string
 	URL        string
 	Type       string

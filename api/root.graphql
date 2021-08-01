@@ -39,3 +39,5 @@ type Id {
 }
 
 scalar Url
+
+scalar Upload

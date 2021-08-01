@@ -83,8 +83,9 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		ConfirmLogin func(childComplexity int, token string) int
-		LoginByEmail func(childComplexity int, email string, workspaceName string) int
+		ConfirmLogin      func(childComplexity int, token string) int
+		LoginByEmail      func(childComplexity int, email string, workspaceName string) int
+		UploadProjectFile func(childComplexity int, file UploadProjectFileInput) int
 	}
 
 	NotFound struct {
@@ -192,6 +193,7 @@ type ComplexityRoot struct {
 type MutationResolver interface {
 	LoginByEmail(ctx context.Context, email string, workspaceName string) (LoginByEmailResult, error)
 	ConfirmLogin(ctx context.Context, token string) (ConfirmLoginResult, error)
+	UploadProjectFile(ctx context.Context, file UploadProjectFileInput) (UploadProjectFileResult, error)
 }
 type ProjectResolver interface {
 	Files(ctx context.Context, obj *Project) (*ProjectFiles, error)
@@ -319,6 +321,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.LoginByEmail(childComplexity, args["email"].(string), args["workspaceName"].(string)), true
+
+	case "Mutation.uploadProjectFile":
+		if e.complexity.Mutation.UploadProjectFile == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_uploadProjectFile_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UploadProjectFile(childComplexity, args["file"].(UploadProjectFileInput)), true
 
 	case "NotFound.message":
 		if e.complexity.NotFound.Message == nil {
@@ -781,7 +795,17 @@ type ProjectFile {
     url: Url!
     type: String!
 }
-`, BuiltIn: false},
+
+extend type Mutation {
+    uploadProjectFile(file: UploadProjectFileInput!): UploadProjectFileResult!
+}
+
+input UploadProjectFileInput {
+    projectId: Int!
+    file: Upload!
+}
+
+union UploadProjectFileResult = ProjectFile | Forbidden | ServerError`, BuiltIn: false},
 	{Name: "root.graphql", Input: `schema {
     query: Query
     mutation: Mutation
@@ -822,7 +846,9 @@ type Id {
 	id: Int!
 }
 
-scalar Url`, BuiltIn: false},
+scalar Url
+
+scalar Upload`, BuiltIn: false},
 	{Name: "shoppinglist.graphql", Input: `extend type Query {
     shoppinglist: ShoppinglistQuery!
 }
@@ -937,6 +963,21 @@ func (ec *executionContext) field_Mutation_loginByEmail_args(ctx context.Context
 		}
 	}
 	args["workspaceName"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_uploadProjectFile_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 UploadProjectFileInput
+	if tmp, ok := rawArgs["file"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("file"))
+		arg0, err = ec.unmarshalNUploadProjectFileInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐUploadProjectFileInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["file"] = arg0
 	return args, nil
 }
 
@@ -1400,6 +1441,48 @@ func (ec *executionContext) _Mutation_confirmLogin(ctx context.Context, field gr
 	res := resTmp.(ConfirmLoginResult)
 	fc.Result = res
 	return ec.marshalNConfirmLoginResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐConfirmLoginResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_uploadProjectFile(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_uploadProjectFile_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UploadProjectFile(rctx, args["file"].(UploadProjectFileInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(UploadProjectFileResult)
+	fc.Result = res
+	return ec.marshalNUploadProjectFileResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐUploadProjectFileResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _NotFound_message(ctx context.Context, field graphql.CollectedField, obj *NotFound) (ret graphql.Marshaler) {
@@ -4112,6 +4195,34 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputUploadProjectFileInput(ctx context.Context, obj interface{}) (UploadProjectFileInput, error) {
+	var it UploadProjectFileInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "projectId":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("projectId"))
+			it.ProjectID, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "file":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("file"))
+			it.File, err = ec.unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
@@ -4361,6 +4472,36 @@ func (ec *executionContext) _ProjectResult(ctx context.Context, sel ast.Selectio
 	}
 }
 
+func (ec *executionContext) _UploadProjectFileResult(ctx context.Context, sel ast.SelectionSet, obj UploadProjectFileResult) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case ProjectFile:
+		return ec._ProjectFile(ctx, sel, &obj)
+	case *ProjectFile:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ProjectFile(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
 func (ec *executionContext) _UserProfileResult(ctx context.Context, sel ast.SelectionSet, obj UserProfileResult) graphql.Marshaler {
 	switch obj := (obj).(type) {
 	case nil:
@@ -4576,7 +4717,7 @@ func (ec *executionContext) _ExpiredToken(ctx context.Context, sel ast.Selection
 	return out
 }
 
-var forbiddenImplementors = []string{"Forbidden", "UserProfileResult", "ProjectResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectFilesResult", "Error", "WorkspaceResult", "WorkspaceUsersResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult"}
+var forbiddenImplementors = []string{"Forbidden", "UserProfileResult", "ProjectResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectFilesResult", "UploadProjectFileResult", "Error", "WorkspaceResult", "WorkspaceUsersResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult"}
 
 func (ec *executionContext) _Forbidden(ctx context.Context, sel ast.SelectionSet, obj *Forbidden) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, forbiddenImplementors)
@@ -4763,6 +4904,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "uploadProjectFile":
+			out.Values[i] = ec._Mutation_uploadProjectFile(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -4884,7 +5030,7 @@ func (ec *executionContext) _Project(ctx context.Context, sel ast.SelectionSet, 
 	return out
 }
 
-var projectFileImplementors = []string{"ProjectFile"}
+var projectFileImplementors = []string{"ProjectFile", "UploadProjectFileResult"}
 
 func (ec *executionContext) _ProjectFile(ctx context.Context, sel ast.SelectionSet, obj *ProjectFile) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, projectFileImplementors)
@@ -5130,7 +5276,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 	return out
 }
 
-var serverErrorImplementors = []string{"ServerError", "LoginByEmailResult", "ConfirmLoginResult", "UserProfileResult", "ProjectResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectFilesResult", "Error", "WorkspaceResult", "WorkspaceUsersResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult"}
+var serverErrorImplementors = []string{"ServerError", "LoginByEmailResult", "ConfirmLoginResult", "UserProfileResult", "ProjectResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectFilesResult", "UploadProjectFileResult", "Error", "WorkspaceResult", "WorkspaceUsersResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult"}
 
 func (ec *executionContext) _ServerError(ctx context.Context, sel ast.SelectionSet, obj *ServerError) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, serverErrorImplementors)
@@ -5969,6 +6115,36 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx context.Context, v interface{}) (graphql.Upload, error) {
+	res, err := graphql.UnmarshalUpload(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx context.Context, sel ast.SelectionSet, v graphql.Upload) graphql.Marshaler {
+	res := graphql.MarshalUpload(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
+}
+
+func (ec *executionContext) unmarshalNUploadProjectFileInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐUploadProjectFileInput(ctx context.Context, v interface{}) (UploadProjectFileInput, error) {
+	res, err := ec.unmarshalInputUploadProjectFileInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNUploadProjectFileResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐUploadProjectFileResult(ctx context.Context, sel ast.SelectionSet, v UploadProjectFileResult) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._UploadProjectFileResult(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNUrl2string(ctx context.Context, v interface{}) (string, error) {

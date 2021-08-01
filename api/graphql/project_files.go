@@ -53,3 +53,36 @@ func fileToGraphQLProjectFile(file *store.ProjectFile) *ProjectFile {
 func (r *projectFilesResolver) Total(ctx context.Context, obj *ProjectFiles) (ProjectFilesTotalResult, error) {
 	return notImplementedYetError() // todo
 }
+
+func (r *mutationResolver) UploadProjectFile(
+	ctx context.Context,
+	input UploadProjectFileInput,
+) (UploadProjectFileResult, error) {
+	pf, err := r.useCases.UploadProjectFile.Do(
+		ctx,
+		input.ProjectID,
+		input.File.Filename,
+		input.File.ContentType,
+		input.File.File,
+	)
+	if err != nil {
+		if errors.Is(err, apartomat.ErrForbidden) {
+			return Forbidden{}, nil
+		}
+
+		log.Printf("can't upload file to project (id=%d): %s", input.ProjectID, err)
+
+		return serverError()
+	}
+
+	return projectFileToGraphQL(pf), nil
+}
+
+func projectFileToGraphQL(pf *store.ProjectFile) ProjectFile {
+	return ProjectFile{
+		ID:   pf.ID,
+		Name: pf.Name,
+		URL:  pf.URL,
+		Type: pf.Type,
+	}
+}
