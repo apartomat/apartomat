@@ -3,3 +3,4 @@
 *.key.pub
 .idea/
 bin/
+.DS_Store
