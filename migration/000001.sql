@@ -50,5 +50,5 @@ CREATE TABLE apartomat.project_files (
     created_at timestamp with time zone NOT NULL DEFAULT now(),
     modified_at timestamp with time zone NOT NULL DEFAULT now(),
     CONSTRAINT project_files_project_id_fkey FOREIGN KEY (project_id) REFERENCES apartomat.projects ON DELETE CASCADE,
-    CONSTRAINT project_files_user_id_fkey FOREIGN KEY (user_id) REFERENCES apartomat.users ON DELETE CASCADE
+    CONSTRAINT project_files_ukey UNIQUE (project_id, name)
 );
