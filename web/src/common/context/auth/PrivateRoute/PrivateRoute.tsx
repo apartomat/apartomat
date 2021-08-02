@@ -1,9 +1,7 @@
 import React, { useEffect } from "react";
 import {Route, Redirect, RouteProps } from "react-router-dom";
 
-import useAuthContext, { UserContextStatus } from '../useAuthContext';
-
-import Box from "@material-ui/core/Box";
+import useAuthContext, { UserContextStatus } from "../useAuthContext";
 
 function PrivateRoute({ children, ...rest }: RouteProps) {
     const { user, check, error } = useAuthContext();
@@ -16,10 +14,10 @@ function PrivateRoute({ children, ...rest }: RouteProps) {
 
     if (error !== undefined) {
         return (
-            <Box>
+            <div>
                 <h1>Error</h1>
                 <p>Can't check profile: {error}</p>
-            </Box>
+            </div>
         );
     }
 
@@ -29,16 +27,16 @@ function PrivateRoute({ children, ...rest }: RouteProps) {
                 case UserContextStatus.UNDEFINED:
                 case UserContextStatus.CHEKING:
                     return (
-                        <Box>
+                        <div>
                             <p>Checking...</p>
-                        </Box>
+                        </div>
                     );
                 case UserContextStatus.SERVER_ERROR:
                     return (
-                        <Box>
+                        <div>
                             <h1>Error</h1>
                             <p>Can't check profile. Please refresh the page</p>
-                        </Box>
+                        </div>
                     );
                 case UserContextStatus.LOGGED:
                     return children;

@@ -1,5 +1,5 @@
 import { FetchResult, useApolloClient } from "@apollo/client";
-import { useLoginByEmailMutation, LoginByEmailMutation, LoginByEmailMutationResult } from "../../api/types.d";
+import { useLoginByEmailMutation, LoginByEmailMutation, LoginByEmailMutationResult } from "../api/types.d";
 
 export type LoginByEmailFn = (email: string) => Promise<FetchResult<LoginByEmailMutation>>;
 

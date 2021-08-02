@@ -1,7 +1,6 @@
 import React, { useState, useEffect }from 'react';
-import './Clipboard.css';
 
-import CircularProgress from '@material-ui/core/CircularProgress';
+import './Clipboard.css';
 
 function useLoading(): [boolean, (fn: () => void) => void] {
     const [ isLoading, setLoading ] = useState(false);
@@ -123,5 +122,11 @@ export function ProductList({ list }: {list: Product[]}) {
 function ProductListItem({ item }: { item: Product }) {
     return (
         <li>{ item.name } <img width="100px" height="100px" src={item.image} alt="" /></li>
+    );
+}
+
+function CircularProgress() {
+    return (
+        <div>Loading...</div>
     );
 }

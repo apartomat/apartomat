@@ -1,0 +1,26 @@
+query project($id: Int!) {
+    project(id: $id) {
+        __typename
+        ...on Project {
+            id
+            title
+            files {
+                __typename
+                list {
+                    __typename
+                    ...on ProjectFilesList {
+                        items {
+                            url
+                        }
+                    }
+                    ...on Error {
+                        message
+                    }
+                }
+            }
+        }
+        ...on Error {
+            message
+        }
+    }
+}

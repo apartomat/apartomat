@@ -1,8 +1,8 @@
 import React, { useEffect } from "react"
 import { Redirect } from "react-router-dom";
 
-import useToken from "../useToken";
-import useAuthContext from "../useAuthContext";
+import useToken from "../common/context/auth/useToken";
+import useAuthContext from "../common/context/auth/useAuthContext";
 
 function Logout() {
     const [,, removeToken] = useToken();

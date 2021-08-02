@@ -3,10 +3,8 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useHistory } from "react-router-dom";
 
 import useConfirmLogin from "./useConfirmLogin";
-import useAuthContext from "../useAuthContext";
-import useToken from "../useToken";
-
-import Box from "@material-ui/core/Box";
+import useAuthContext from "../common/context/auth/useAuthContext";
+import useToken from "../common/context/auth/useToken";
 
 export function Confirm({ redrectTo = "/"}) {
     const location = useLocation();
@@ -37,24 +35,24 @@ export function Confirm({ redrectTo = "/"}) {
     switch (confirmLoginResult?.confirmLogin.__typename) {
         case "InvalidToken":
             return (
-                <Box width={1/4}>
+                <div>
                     <h1>Invalid token</h1>
                     <p>Please <a href="/login">login</a> again</p>
-                </Box>
+                </div>
             );
         case "ServerError":
             return (
-                <Box width={1/4}>
+                <div>
                     <h1>Server error</h1>
                     <p>Please try again</p>
-                </Box>
+                </div>
             );
         default:
             return (
-                <Box width={1/4}>
+                <div>
                     <h1>Confirm login</h1>
                     <p>Please wait a moment...</p>
-                </Box>
+                </div>
             );
     }
 }

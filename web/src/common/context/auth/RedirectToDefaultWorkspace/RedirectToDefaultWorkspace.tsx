@@ -13,7 +13,7 @@ function RedirectToDefaultWorkspace({ children, ...rest }: RouteProps) {
             );
         default:
             return (
-                <div>Error...r34</div>
+                <div>Error...</div>
             );
     }
 }

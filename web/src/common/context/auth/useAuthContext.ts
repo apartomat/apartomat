@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { useProfileLazyQuery } from "../api/types.d";
+
+import { useProfileLazyQuery } from "../../../api/types.d";
 
 export type UserContext =
     | UserCheckingContext

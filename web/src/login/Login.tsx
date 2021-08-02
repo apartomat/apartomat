@@ -5,7 +5,7 @@ import Form from "./Form";
 import CheckEmail from "./CheckEmail";
 
 import { useLoginByEmail } from "./useLoginByEmail";
-import useAuthContext, { UserContextStatus } from '../useAuthContext';
+import useAuthContext, { UserContextStatus } from '../common/context/auth/useAuthContext';
 
 export function Login () {
     const [login, { data, loading, error }] = useLoginByEmail();

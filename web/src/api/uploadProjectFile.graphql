@@ -1,0 +1,12 @@
+mutation uploadProjectFile($file: UploadProjectFileInput!) {
+    uploadProjectFile(file: $file) {
+        __typename
+        ...on ProjectFile {
+            id
+            url
+        }
+        ...on ServerError {
+            message
+        }
+    }
+}
