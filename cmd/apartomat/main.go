@@ -96,6 +96,7 @@ func main() {
 				GetProject:              apartomat.NewGetProject(projects, acl),
 				GetProjectFiles:         apartomat.NewGetProjectFiles(projects, projectFiles, acl),
 				UploadProjectFile:       apartomat.NewUploadProjectFile(projects, projectFiles, acl, uploader),
+				CreateProject:           apartomat.NewCreateProject(workspaces, projects, acl),
 			},
 		).Run(serverOpts...)
 

@@ -14,6 +14,10 @@ type ConfirmLoginResult interface {
 	IsConfirmLoginResult()
 }
 
+type CreateProjectResult interface {
+	IsCreateProjectResult()
+}
+
 //  Common types
 type Error interface {
 	IsError()
@@ -76,6 +80,11 @@ type CheckEmail struct {
 
 func (CheckEmail) IsLoginByEmailResult() {}
 
+type CreateProjectInput struct {
+	WorkspaceID int    `json:"workspaceId"`
+	Title       string `json:"title"`
+}
+
 type ExpiredToken struct {
 	Message string `json:"message"`
 }
@@ -93,6 +102,7 @@ func (Forbidden) IsProjectFilesListResult()       {}
 func (Forbidden) IsProjectFilesTotalResult()      {}
 func (Forbidden) IsProjectFilesResult()           {}
 func (Forbidden) IsUploadProjectFileResult()      {}
+func (Forbidden) IsCreateProjectResult()          {}
 func (Forbidden) IsError()                        {}
 func (Forbidden) IsWorkspaceResult()              {}
 func (Forbidden) IsWorkspaceUsersResult()         {}
@@ -147,7 +157,8 @@ type Project struct {
 	Files *ProjectFiles `json:"files"`
 }
 
-func (Project) IsProjectResult() {}
+func (Project) IsProjectResult()       {}
+func (Project) IsCreateProjectResult() {}
 
 type ProjectFile struct {
 	ID   int    `json:"id"`
@@ -182,6 +193,7 @@ func (ServerError) IsProjectFilesListResult()       {}
 func (ServerError) IsProjectFilesTotalResult()      {}
 func (ServerError) IsProjectFilesResult()           {}
 func (ServerError) IsUploadProjectFileResult()      {}
+func (ServerError) IsCreateProjectResult()          {}
 func (ServerError) IsError()                        {}
 func (ServerError) IsWorkspaceResult()              {}
 func (ServerError) IsWorkspaceUsersResult()         {}

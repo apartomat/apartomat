@@ -18,6 +18,7 @@ type UseCases struct {
 	GetProject              *apartomat.GetProject
 	GetProjectFiles         *apartomat.GetProjectFiles
 	UploadProjectFile       *apartomat.UploadProjectFile
+	CreateProject           *apartomat.CreateProject
 }
 
 type rootResolver struct {

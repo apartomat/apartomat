@@ -46,3 +46,14 @@ input UploadProjectFileInput {
 }
 
 union UploadProjectFileResult = ProjectFile | Forbidden | AlreadyExists | ServerError
+
+extend type Mutation {
+    createProject(input: CreateProjectInput!): CreateProjectResult!
+}
+
+input CreateProjectInput {
+    workspaceId: Int!
+    title: String!
+}
+
+union CreateProjectResult = Project | Forbidden | ServerError

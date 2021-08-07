@@ -88,6 +88,7 @@ type ComplexityRoot struct {
 
 	Mutation struct {
 		ConfirmLogin      func(childComplexity int, token string) int
+		CreateProject     func(childComplexity int, input CreateProjectInput) int
 		LoginByEmail      func(childComplexity int, email string, workspaceName string) int
 		UploadProjectFile func(childComplexity int, file UploadProjectFileInput) int
 	}
@@ -198,6 +199,7 @@ type MutationResolver interface {
 	LoginByEmail(ctx context.Context, email string, workspaceName string) (LoginByEmailResult, error)
 	ConfirmLogin(ctx context.Context, token string) (ConfirmLoginResult, error)
 	UploadProjectFile(ctx context.Context, file UploadProjectFileInput) (UploadProjectFileResult, error)
+	CreateProject(ctx context.Context, input CreateProjectInput) (CreateProjectResult, error)
 }
 type ProjectResolver interface {
 	Files(ctx context.Context, obj *Project) (*ProjectFiles, error)
@@ -320,6 +322,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.ConfirmLogin(childComplexity, args["token"].(string)), true
+
+	case "Mutation.createProject":
+		if e.complexity.Mutation.CreateProject == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createProject_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateProject(childComplexity, args["input"].(CreateProjectInput)), true
 
 	case "Mutation.loginByEmail":
 		if e.complexity.Mutation.LoginByEmail == nil {
@@ -816,7 +830,18 @@ input UploadProjectFileInput {
     file: Upload!
 }
 
-union UploadProjectFileResult = ProjectFile | Forbidden | AlreadyExists | ServerError`, BuiltIn: false},
+union UploadProjectFileResult = ProjectFile | Forbidden | AlreadyExists | ServerError
+
+extend type Mutation {
+    createProject(input: CreateProjectInput!): CreateProjectResult!
+}
+
+input CreateProjectInput {
+    workspaceId: Int!
+    title: String!
+}
+
+union CreateProjectResult = Project | Forbidden | ServerError`, BuiltIn: false},
 	{Name: "root.graphql", Input: `schema {
     query: Query
     mutation: Mutation
@@ -954,6 +979,21 @@ func (ec *executionContext) field_Mutation_confirmLogin_args(ctx context.Context
 		}
 	}
 	args["token"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_createProject_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 CreateProjectInput
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNCreateProjectInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐCreateProjectInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
 	return args, nil
 }
 
@@ -1533,6 +1573,48 @@ func (ec *executionContext) _Mutation_uploadProjectFile(ctx context.Context, fie
 	res := resTmp.(UploadProjectFileResult)
 	fc.Result = res
 	return ec.marshalNUploadProjectFileResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐUploadProjectFileResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_createProject(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_createProject_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateProject(rctx, args["input"].(CreateProjectInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(CreateProjectResult)
+	fc.Result = res
+	return ec.marshalNCreateProjectResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐCreateProjectResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _NotFound_message(ctx context.Context, field graphql.CollectedField, obj *NotFound) (ret graphql.Marshaler) {
@@ -4245,6 +4327,34 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputCreateProjectInput(ctx context.Context, obj interface{}) (CreateProjectInput, error) {
+	var it CreateProjectInput
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "workspaceId":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("workspaceId"))
+			it.WorkspaceID, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "title":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
+			it.Title, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUploadProjectFileInput(ctx context.Context, obj interface{}) (UploadProjectFileInput, error) {
 	var it UploadProjectFileInput
 	var asMap = obj.(map[string]interface{})
@@ -4302,6 +4412,36 @@ func (ec *executionContext) _ConfirmLoginResult(ctx context.Context, sel ast.Sel
 			return graphql.Null
 		}
 		return ec._ExpiredToken(ctx, sel, obj)
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
+func (ec *executionContext) _CreateProjectResult(ctx context.Context, sel ast.SelectionSet, obj CreateProjectResult) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case Project:
+		return ec._Project(ctx, sel, &obj)
+	case *Project:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Project(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
 	case ServerError:
 		return ec._ServerError(ctx, sel, &obj)
 	case *ServerError:
@@ -4808,7 +4948,7 @@ func (ec *executionContext) _ExpiredToken(ctx context.Context, sel ast.Selection
 	return out
 }
 
-var forbiddenImplementors = []string{"Forbidden", "UserProfileResult", "ProjectResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectFilesResult", "UploadProjectFileResult", "Error", "WorkspaceResult", "WorkspaceUsersResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult"}
+var forbiddenImplementors = []string{"Forbidden", "UserProfileResult", "ProjectResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectFilesResult", "UploadProjectFileResult", "CreateProjectResult", "Error", "WorkspaceResult", "WorkspaceUsersResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult"}
 
 func (ec *executionContext) _Forbidden(ctx context.Context, sel ast.SelectionSet, obj *Forbidden) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, forbiddenImplementors)
@@ -5000,6 +5140,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "createProject":
+			out.Values[i] = ec._Mutation_createProject(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -5075,7 +5220,7 @@ func (ec *executionContext) _Product(ctx context.Context, sel ast.SelectionSet, 
 	return out
 }
 
-var projectImplementors = []string{"Project", "ProjectResult"}
+var projectImplementors = []string{"Project", "ProjectResult", "CreateProjectResult"}
 
 func (ec *executionContext) _Project(ctx context.Context, sel ast.SelectionSet, obj *Project) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, projectImplementors)
@@ -5367,7 +5512,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 	return out
 }
 
-var serverErrorImplementors = []string{"ServerError", "LoginByEmailResult", "ConfirmLoginResult", "UserProfileResult", "ProjectResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectFilesResult", "UploadProjectFileResult", "Error", "WorkspaceResult", "WorkspaceUsersResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult"}
+var serverErrorImplementors = []string{"ServerError", "LoginByEmailResult", "ConfirmLoginResult", "UserProfileResult", "ProjectResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectFilesResult", "UploadProjectFileResult", "CreateProjectResult", "Error", "WorkspaceResult", "WorkspaceUsersResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult"}
 
 func (ec *executionContext) _ServerError(ctx context.Context, sel ast.SelectionSet, obj *ServerError) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, serverErrorImplementors)
@@ -6051,6 +6196,21 @@ func (ec *executionContext) marshalNConfirmLoginResult2githubᚗcomᚋapartomat�
 		return graphql.Null
 	}
 	return ec._ConfirmLoginResult(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNCreateProjectInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐCreateProjectInput(ctx context.Context, v interface{}) (CreateProjectInput, error) {
+	res, err := ec.unmarshalInputCreateProjectInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNCreateProjectResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐCreateProjectResult(ctx context.Context, sel ast.SelectionSet, v CreateProjectResult) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._CreateProjectResult(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNGravatar2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐGravatar(ctx context.Context, sel ast.SelectionSet, v *Gravatar) graphql.Marshaler {

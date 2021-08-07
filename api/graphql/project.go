@@ -47,3 +47,18 @@ type projectResolver struct {
 func (r *projectResolver) Files(ctx context.Context, obj *Project) (*ProjectFiles, error) {
 	return &ProjectFiles{Project: &ID{ID: obj.ID}}, nil
 }
+
+func (r *mutationResolver) CreateProject(ctx context.Context, input CreateProjectInput) (CreateProjectResult, error) {
+	project, err := r.useCases.CreateProject.Do(ctx, input.WorkspaceID, input.Title)
+	if err != nil {
+		if errors.Is(err, apartomat.ErrForbidden) {
+			return forbidden()
+		}
+
+		log.Printf("can't create project in workspace (id=%d): %s", input.WorkspaceID, err)
+
+		return serverError()
+	}
+
+	return projectToGraphQL(project), nil
+}
