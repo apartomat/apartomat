@@ -8,6 +8,8 @@ import Avatar from "../common/ui/Avatar";
 import AvatarGroup from "../common/ui/AvatarGroup";
 
 import { useWorkspace, WorkspaceUsersResult, WorkspaceProjectsListResult } from "./useWorkspace";
+import { useCreateProject } from "./useCreateProject";
+import { useState } from "react";
 
 interface RouteParams {
     id: string
@@ -50,6 +52,7 @@ export function Workspace () {
                     <h2>{workspace.name}</h2>
                     <WorkspaceUsers users={workspace.users} />
                     <Projects projects={workspace.projects.list} />
+                    <CreateProject workspaceId={workspace.id}/>
                 </Fragment>
             );
         case "NotFound":
@@ -102,6 +105,34 @@ function Projects({ projects }: { projects: WorkspaceProjectsListResult }) {
         default:
             return <div>n/a</div>
     }
+}
+
+function CreateProject({ workspaceId }: { workspaceId: number }) {
+    const [ title, setTitle ] = useState("")
+    const [ create, { loading, error } ] = useCreateProject()
+
+    const handleSubmit = async (event: React.FormEvent) => {
+        event.preventDefault()
+        create({ workspaceId, title: title })
+    }
+
+    const handleChangeTitle = (event: React.FormEvent<HTMLInputElement>) => {
+        setTitle(event.currentTarget.value)
+    }
+
+    if (loading) {
+        return (
+            <div>Createing project...</div>
+        )
+    }
+
+    return (
+        <form onSubmit={handleSubmit}>
+            {error ? <p>{error.message}</p> : null}
+            <input type="text" onChange={handleChangeTitle} />
+            <input type="submit"/>
+        </form>
+    )
 }
 
 export default Workspace;

@@ -1,0 +1,15 @@
+mutation createProject($input: CreateProjectInput!) {
+    createProject(input: $input) {
+        __typename
+        ...on ServerError {
+            message
+        }
+        ...on Forbidden {
+            message
+        }
+        ...on Project {
+            id
+            title
+        }
+    }
+}
