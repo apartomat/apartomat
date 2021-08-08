@@ -14,7 +14,7 @@ import Project from './project/Project';
 
 import "./index.css";
 
-import { ApolloClient, InMemoryCache, createHttpLink, ApolloProvider } from "@apollo/client";
+import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
 import { setContext } from '@apollo/client/link/context';
 import { createUploadLink } from "apollo-upload-client";
 
