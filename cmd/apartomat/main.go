@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"github.com/apartomat/apartomat/api/graphql"
 	"github.com/apartomat/apartomat/internal"
+	"github.com/apartomat/apartomat/internal/store"
 	"github.com/apartomat/apartomat/internal/store/dataloader"
 	"github.com/apartomat/apartomat/internal/store/postgres"
 	"github.com/jackc/pgx/v4/pgxpool"
@@ -61,13 +62,17 @@ func main() {
 			log.Fatalf("can't connect to postgres: %s", err)
 		}
 
-		acl := apartomat.NewAcl()
-
 		users := postgres.NewUserStore(pool)
 		workspaces := postgres.NewWorkspaceStore(pool)
 		workspaceUsers := postgres.NewWorkspaceUserStore(pool)
 		projects := postgres.NewProjectStore(pool)
 		projectFiles := postgres.NewProjectFileStore(pool)
+
+		mega := store.Store{
+			WorkspaceUsers: workspaceUsers,
+		}
+
+		acl := apartomat.NewAcl(mega)
 
 		usersLoader := dataloader.NewUserLoader(dataloader.NewUserLoaderConfig(ctx, users))
 
@@ -89,7 +94,7 @@ func main() {
 				ConfirmLogin:            apartomat.NewConfirmLogin(confirmLoginIssuerVerifier, authIssuerVerifier, users, acl),
 				GetUserProfile:          apartomat.NewGetUserProfile(users),
 				GetDefaultWorkspace:     apartomat.NewGetDefaultWorkspace(workspaces),
-				GetWorkspace:            apartomat.NewGetWorkspace(workspaces),
+				GetWorkspace:            apartomat.NewGetWorkspace(workspaces, acl),
 				GetWorkspaceUsers:       apartomat.NewGetWorkspaceUsers(workspaces, workspaceUsers, acl),
 				GetWorkspaceUserProfile: apartomat.NewGetWorkspaceUserProfile(usersLoader, acl),
 				GetWorkspaceProjects:    apartomat.NewGetWorkspaceProjects(workspaces, projects, acl),

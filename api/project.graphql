@@ -1,12 +1,10 @@
-extend type Query {
-    project(id: Int!): ProjectResult!
-}
-
 union ProjectResult = Project | NotFound | Forbidden | ServerError
 
 type Project {
     id: Int!
     title: String!
+    startAt: Time
+    endAt: Time
     files: ProjectFiles!
 }
 
@@ -35,25 +33,3 @@ type ProjectFile {
     url: Url!
     type: String!
 }
-
-extend type Mutation {
-    uploadProjectFile(file: UploadProjectFileInput!): UploadProjectFileResult!
-}
-
-input UploadProjectFileInput {
-    projectId: Int!
-    file: Upload!
-}
-
-union UploadProjectFileResult = ProjectFile | Forbidden | AlreadyExists | ServerError
-
-extend type Mutation {
-    createProject(input: CreateProjectInput!): CreateProjectResult!
-}
-
-input CreateProjectInput {
-    workspaceId: Int!
-    title: String!
-}
-
-union CreateProjectResult = Project | Forbidden | ServerError

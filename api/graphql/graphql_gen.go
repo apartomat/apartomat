@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"sync"
 	"sync/atomic"
+	"time"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
@@ -35,11 +36,15 @@ type Config struct {
 }
 
 type ResolverRoot interface {
+	FilesScreen() FilesScreenResolver
 	Mutation() MutationResolver
 	Project() ProjectResolver
 	ProjectFiles() ProjectFilesResolver
+	ProjectScreen() ProjectScreenResolver
 	Query() QueryResolver
+	ScreenQuery() ScreenQueryResolver
 	ShoppinglistQuery() ShoppinglistQueryResolver
+	SpecScreen() SpecScreenResolver
 	UserProfile() UserProfileResolver
 	Workspace() WorkspaceResolver
 	WorkspaceProjects() WorkspaceProjectsResolver
@@ -60,6 +65,11 @@ type ComplexityRoot struct {
 
 	ExpiredToken struct {
 		Message func(childComplexity int) int
+	}
+
+	FilesScreen struct {
+		Menu    func(childComplexity int) int
+		Project func(childComplexity int) int
 	}
 
 	Forbidden struct {
@@ -86,6 +96,15 @@ type ComplexityRoot struct {
 		Token func(childComplexity int) int
 	}
 
+	MenuItem struct {
+		Title func(childComplexity int) int
+		URL   func(childComplexity int) int
+	}
+
+	MenuItems struct {
+		Items func(childComplexity int) int
+	}
+
 	Mutation struct {
 		ConfirmLogin      func(childComplexity int, token string) int
 		CreateProject     func(childComplexity int, input CreateProjectInput) int
@@ -104,9 +123,11 @@ type ComplexityRoot struct {
 	}
 
 	Project struct {
-		Files func(childComplexity int) int
-		ID    func(childComplexity int) int
-		Title func(childComplexity int) int
+		EndAt   func(childComplexity int) int
+		Files   func(childComplexity int) int
+		ID      func(childComplexity int) int
+		StartAt func(childComplexity int) int
+		Title   func(childComplexity int) int
 	}
 
 	ProjectFile struct {
@@ -129,12 +150,24 @@ type ComplexityRoot struct {
 		Total func(childComplexity int) int
 	}
 
+	ProjectScreen struct {
+		Menu    func(childComplexity int) int
+		Project func(childComplexity int) int
+	}
+
 	Query struct {
 		Profile      func(childComplexity int) int
-		Project      func(childComplexity int, id int) int
+		Screen       func(childComplexity int) int
 		Shoppinglist func(childComplexity int) int
 		Version      func(childComplexity int) int
 		Workspace    func(childComplexity int, id int) int
+	}
+
+	ScreenQuery struct {
+		Files   func(childComplexity int, projectID int) int
+		Project func(childComplexity int, id int) int
+		Spec    func(childComplexity int, projectID int) int
+		Version func(childComplexity int) int
 	}
 
 	ServerError struct {
@@ -145,9 +178,16 @@ type ComplexityRoot struct {
 		ProductOnPage func(childComplexity int, url string) int
 	}
 
+	SpecScreen struct {
+		Menu    func(childComplexity int) int
+		Project func(childComplexity int) int
+	}
+
 	UserProfile struct {
+		Abbr             func(childComplexity int) int
 		DefaultWorkspace func(childComplexity int) int
 		Email            func(childComplexity int) int
+		FullName         func(childComplexity int) int
 		Gravatar         func(childComplexity int) int
 		ID               func(childComplexity int) int
 	}
@@ -160,8 +200,9 @@ type ComplexityRoot struct {
 	}
 
 	WorkspaceProject struct {
-		ID   func(childComplexity int) int
-		Name func(childComplexity int) int
+		ID     func(childComplexity int) int
+		Name   func(childComplexity int) int
+		Period func(childComplexity int) int
 	}
 
 	WorkspaceProjects struct {
@@ -179,13 +220,16 @@ type ComplexityRoot struct {
 	}
 
 	WorkspaceUser struct {
-		ID      func(childComplexity int) int
-		Profile func(childComplexity int) int
-		Role    func(childComplexity int) int
+		ID        func(childComplexity int) int
+		Profile   func(childComplexity int) int
+		Role      func(childComplexity int) int
+		Workspace func(childComplexity int) int
 	}
 
 	WorkspaceUserProfile struct {
+		Abbr     func(childComplexity int) int
 		Email    func(childComplexity int) int
+		FullName func(childComplexity int) int
 		Gravatar func(childComplexity int) int
 		ID       func(childComplexity int) int
 	}
@@ -195,6 +239,10 @@ type ComplexityRoot struct {
 	}
 }
 
+type FilesScreenResolver interface {
+	Project(ctx context.Context, obj *FilesScreen) (ProjectResult, error)
+	Menu(ctx context.Context, obj *FilesScreen) (MenuResult, error)
+}
 type MutationResolver interface {
 	LoginByEmail(ctx context.Context, email string, workspaceName string) (LoginByEmailResult, error)
 	ConfirmLogin(ctx context.Context, token string) (ConfirmLoginResult, error)
@@ -208,15 +256,26 @@ type ProjectFilesResolver interface {
 	List(ctx context.Context, obj *ProjectFiles) (ProjectFilesListResult, error)
 	Total(ctx context.Context, obj *ProjectFiles) (ProjectFilesTotalResult, error)
 }
+type ProjectScreenResolver interface {
+	Project(ctx context.Context, obj *ProjectScreen) (ProjectResult, error)
+	Menu(ctx context.Context, obj *ProjectScreen) (MenuResult, error)
+}
 type QueryResolver interface {
 	Version(ctx context.Context) (string, error)
 	Profile(ctx context.Context) (UserProfileResult, error)
-	Project(ctx context.Context, id int) (ProjectResult, error)
+	Screen(ctx context.Context) (*ScreenQuery, error)
 	Shoppinglist(ctx context.Context) (*ShoppinglistQuery, error)
 	Workspace(ctx context.Context, id int) (WorkspaceResult, error)
 }
+type ScreenQueryResolver interface {
+	Project(ctx context.Context, obj *ScreenQuery, id int) (*ProjectScreen, error)
+}
 type ShoppinglistQueryResolver interface {
 	ProductOnPage(ctx context.Context, obj *ShoppinglistQuery, url string) (*Product, error)
+}
+type SpecScreenResolver interface {
+	Project(ctx context.Context, obj *SpecScreen) (ProjectResult, error)
+	Menu(ctx context.Context, obj *SpecScreen) (MenuResult, error)
 }
 type UserProfileResolver interface {
 	DefaultWorkspace(ctx context.Context, obj *UserProfile) (*Workspace, error)
@@ -269,6 +328,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ExpiredToken.Message(childComplexity), true
 
+	case "FilesScreen.menu":
+		if e.complexity.FilesScreen.Menu == nil {
+			break
+		}
+
+		return e.complexity.FilesScreen.Menu(childComplexity), true
+
+	case "FilesScreen.project":
+		if e.complexity.FilesScreen.Project == nil {
+			break
+		}
+
+		return e.complexity.FilesScreen.Project(childComplexity), true
+
 	case "Forbidden.message":
 		if e.complexity.Forbidden.Message == nil {
 			break
@@ -310,6 +383,27 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.LoginConfirmed.Token(childComplexity), true
+
+	case "MenuItem.title":
+		if e.complexity.MenuItem.Title == nil {
+			break
+		}
+
+		return e.complexity.MenuItem.Title(childComplexity), true
+
+	case "MenuItem.url":
+		if e.complexity.MenuItem.URL == nil {
+			break
+		}
+
+		return e.complexity.MenuItem.URL(childComplexity), true
+
+	case "MenuItems.items":
+		if e.complexity.MenuItems.Items == nil {
+			break
+		}
+
+		return e.complexity.MenuItems.Items(childComplexity), true
 
 	case "Mutation.confirmLogin":
 		if e.complexity.Mutation.ConfirmLogin == nil {
@@ -387,6 +481,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Product.Name(childComplexity), true
 
+	case "Project.endAt":
+		if e.complexity.Project.EndAt == nil {
+			break
+		}
+
+		return e.complexity.Project.EndAt(childComplexity), true
+
 	case "Project.files":
 		if e.complexity.Project.Files == nil {
 			break
@@ -400,6 +501,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Project.ID(childComplexity), true
+
+	case "Project.startAt":
+		if e.complexity.Project.StartAt == nil {
+			break
+		}
+
+		return e.complexity.Project.StartAt(childComplexity), true
 
 	case "Project.title":
 		if e.complexity.Project.Title == nil {
@@ -464,6 +572,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ProjectFilesTotal.Total(childComplexity), true
 
+	case "ProjectScreen.menu":
+		if e.complexity.ProjectScreen.Menu == nil {
+			break
+		}
+
+		return e.complexity.ProjectScreen.Menu(childComplexity), true
+
+	case "ProjectScreen.project":
+		if e.complexity.ProjectScreen.Project == nil {
+			break
+		}
+
+		return e.complexity.ProjectScreen.Project(childComplexity), true
+
 	case "Query.profile":
 		if e.complexity.Query.Profile == nil {
 			break
@@ -471,17 +593,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Profile(childComplexity), true
 
-	case "Query.project":
-		if e.complexity.Query.Project == nil {
+	case "Query.screen":
+		if e.complexity.Query.Screen == nil {
 			break
 		}
 
-		args, err := ec.field_Query_project_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.Project(childComplexity, args["id"].(int)), true
+		return e.complexity.Query.Screen(childComplexity), true
 
 	case "Query.shoppinglist":
 		if e.complexity.Query.Shoppinglist == nil {
@@ -509,6 +626,49 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Workspace(childComplexity, args["id"].(int)), true
 
+	case "ScreenQuery.files":
+		if e.complexity.ScreenQuery.Files == nil {
+			break
+		}
+
+		args, err := ec.field_ScreenQuery_files_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.ScreenQuery.Files(childComplexity, args["projectId"].(int)), true
+
+	case "ScreenQuery.project":
+		if e.complexity.ScreenQuery.Project == nil {
+			break
+		}
+
+		args, err := ec.field_ScreenQuery_project_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.ScreenQuery.Project(childComplexity, args["id"].(int)), true
+
+	case "ScreenQuery.spec":
+		if e.complexity.ScreenQuery.Spec == nil {
+			break
+		}
+
+		args, err := ec.field_ScreenQuery_spec_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.ScreenQuery.Spec(childComplexity, args["projectId"].(int)), true
+
+	case "ScreenQuery.version":
+		if e.complexity.ScreenQuery.Version == nil {
+			break
+		}
+
+		return e.complexity.ScreenQuery.Version(childComplexity), true
+
 	case "ServerError.message":
 		if e.complexity.ServerError.Message == nil {
 			break
@@ -528,6 +688,27 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ShoppinglistQuery.ProductOnPage(childComplexity, args["url"].(string)), true
 
+	case "SpecScreen.menu":
+		if e.complexity.SpecScreen.Menu == nil {
+			break
+		}
+
+		return e.complexity.SpecScreen.Menu(childComplexity), true
+
+	case "SpecScreen.project":
+		if e.complexity.SpecScreen.Project == nil {
+			break
+		}
+
+		return e.complexity.SpecScreen.Project(childComplexity), true
+
+	case "UserProfile.abbr":
+		if e.complexity.UserProfile.Abbr == nil {
+			break
+		}
+
+		return e.complexity.UserProfile.Abbr(childComplexity), true
+
 	case "UserProfile.defaultWorkspace":
 		if e.complexity.UserProfile.DefaultWorkspace == nil {
 			break
@@ -541,6 +722,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.UserProfile.Email(childComplexity), true
+
+	case "UserProfile.fullName":
+		if e.complexity.UserProfile.FullName == nil {
+			break
+		}
+
+		return e.complexity.UserProfile.FullName(childComplexity), true
 
 	case "UserProfile.gravatar":
 		if e.complexity.UserProfile.Gravatar == nil {
@@ -598,6 +786,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.WorkspaceProject.Name(childComplexity), true
 
+	case "WorkspaceProject.period":
+		if e.complexity.WorkspaceProject.Period == nil {
+			break
+		}
+
+		return e.complexity.WorkspaceProject.Period(childComplexity), true
+
 	case "WorkspaceProjects.list":
 		if e.complexity.WorkspaceProjects.List == nil {
 			break
@@ -654,12 +849,33 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.WorkspaceUser.Role(childComplexity), true
 
+	case "WorkspaceUser.workspace":
+		if e.complexity.WorkspaceUser.Workspace == nil {
+			break
+		}
+
+		return e.complexity.WorkspaceUser.Workspace(childComplexity), true
+
+	case "WorkspaceUserProfile.abbr":
+		if e.complexity.WorkspaceUserProfile.Abbr == nil {
+			break
+		}
+
+		return e.complexity.WorkspaceUserProfile.Abbr(childComplexity), true
+
 	case "WorkspaceUserProfile.email":
 		if e.complexity.WorkspaceUserProfile.Email == nil {
 			break
 		}
 
 		return e.complexity.WorkspaceUserProfile.Email(childComplexity), true
+
+	case "WorkspaceUserProfile.fullName":
+		if e.complexity.WorkspaceUserProfile.FullName == nil {
+			break
+		}
+
+		return e.complexity.WorkspaceUserProfile.FullName(childComplexity), true
 
 	case "WorkspaceUserProfile.gravatar":
 		if e.complexity.WorkspaceUserProfile.Gravatar == nil {
@@ -780,18 +996,18 @@ union UserProfileResult = UserProfile | Forbidden | ServerError
 type UserProfile {
     id: Int!
     email: String!
+    fullName: String!
+    abbr: String!
     gravatar: Gravatar
     defaultWorkspace: Workspace!
 }`, BuiltIn: false},
-	{Name: "project.graphql", Input: `extend type Query {
-    project(id: Int!): ProjectResult!
-}
-
-union ProjectResult = Project | NotFound | Forbidden | ServerError
+	{Name: "project.graphql", Input: `union ProjectResult = Project | NotFound | Forbidden | ServerError
 
 type Project {
     id: Int!
     title: String!
+    startAt: Time
+    endAt: Time
     files: ProjectFiles!
 }
 
@@ -819,9 +1035,8 @@ type ProjectFile {
     name: String!
     url: Url!
     type: String!
-}
-
-extend type Mutation {
+}`, BuiltIn: false},
+	{Name: "project_create.graphql", Input: `extend type Mutation {
     uploadProjectFile(file: UploadProjectFileInput!): UploadProjectFileResult!
 }
 
@@ -888,7 +1103,51 @@ type Id {
 
 scalar Url
 
-scalar Upload`, BuiltIn: false},
+scalar Upload
+
+scalar Time`, BuiltIn: false},
+	{Name: "screen.graphql", Input: `extend type Query {
+    screen: ScreenQuery!
+}
+
+type ScreenQuery {
+    version: String!
+}`, BuiltIn: false},
+	{Name: "screen_files.graphql", Input: `extend type ScreenQuery {
+    files(projectId: Int!): FilesScreen!
+}
+
+type FilesScreen {
+    project: ProjectResult!
+    menu: MenuResult!
+}`, BuiltIn: false},
+	{Name: "screen_project.graphql", Input: `extend type ScreenQuery {
+    project(id: Int!): ProjectScreen!
+}
+
+type ProjectScreen {
+    project: ProjectResult!
+    menu: MenuResult!
+}
+
+union MenuResult = MenuItems | ServerError
+
+type MenuItems {
+    items: [MenuItem!]!
+}
+
+type MenuItem {
+    title: String!
+    url: String!
+}`, BuiltIn: false},
+	{Name: "screen_spec.graphql", Input: `extend type ScreenQuery {
+    spec(projectId: Int!): SpecScreen!
+}
+
+type SpecScreen {
+    project: ProjectResult!
+    menu: MenuResult!
+}`, BuiltIn: false},
 	{Name: "shoppinglist.graphql", Input: `extend type Query {
     shoppinglist: ShoppinglistQuery!
 }
@@ -923,6 +1182,7 @@ type WorkspaceUsers {
 
 type WorkspaceUser {
 	id: Int!
+	workspace: Id!
 	role: WorkspaceUserRole!
 	profile: WorkspaceUserProfile!
 }
@@ -935,7 +1195,9 @@ enum WorkspaceUserRole {
 type WorkspaceUserProfile {
     id: Int!
     email: String!
-    gravatar: Gravatar!
+	fullName: String!
+	abbr: String!
+    gravatar: Gravatar
 }
 
 type WorkspaceProjects {
@@ -959,6 +1221,7 @@ type WorkspaceProjectsTotal {
 type WorkspaceProject {
 	id: Int!
 	name: String!
+	period: String
 }`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
@@ -1051,7 +1314,7 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_project_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_workspace_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 int
@@ -1066,7 +1329,22 @@ func (ec *executionContext) field_Query_project_args(ctx context.Context, rawArg
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_workspace_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_ScreenQuery_files_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["projectId"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("projectId"))
+		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["projectId"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_ScreenQuery_project_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 int
@@ -1078,6 +1356,21 @@ func (ec *executionContext) field_Query_workspace_args(ctx context.Context, rawA
 		}
 	}
 	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_ScreenQuery_spec_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["projectId"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("projectId"))
+		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["projectId"] = arg0
 	return args, nil
 }
 
@@ -1237,6 +1530,76 @@ func (ec *executionContext) _ExpiredToken_message(ctx context.Context, field gra
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _FilesScreen_project(ctx context.Context, field graphql.CollectedField, obj *FilesScreen) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "FilesScreen",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.FilesScreen().Project(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(ProjectResult)
+	fc.Result = res
+	return ec.marshalNProjectResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _FilesScreen_menu(ctx context.Context, field graphql.CollectedField, obj *FilesScreen) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "FilesScreen",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.FilesScreen().Menu(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(MenuResult)
+	fc.Result = res
+	return ec.marshalNMenuResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐMenuResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Forbidden_message(ctx context.Context, field graphql.CollectedField, obj *Forbidden) (ret graphql.Marshaler) {
@@ -1447,6 +1810,111 @@ func (ec *executionContext) _LoginConfirmed_token(ctx context.Context, field gra
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MenuItem_title(ctx context.Context, field graphql.CollectedField, obj *MenuItem) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MenuItem",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Title, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MenuItem_url(ctx context.Context, field graphql.CollectedField, obj *MenuItem) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MenuItem",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.URL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _MenuItems_items(ctx context.Context, field graphql.CollectedField, obj *MenuItems) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "MenuItems",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Items, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*MenuItem)
+	fc.Result = res
+	return ec.marshalNMenuItem2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐMenuItemᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_loginByEmail(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -1827,6 +2295,70 @@ func (ec *executionContext) _Project_title(ctx context.Context, field graphql.Co
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Project_startAt(ctx context.Context, field graphql.CollectedField, obj *Project) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Project",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.StartAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	fc.Result = res
+	return ec.marshalOTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Project_endAt(ctx context.Context, field graphql.CollectedField, obj *Project) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Project",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.EndAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*time.Time)
+	fc.Result = res
+	return ec.marshalOTime2ᚖtimeᚐTime(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Project_files(ctx context.Context, field graphql.CollectedField, obj *Project) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -2142,6 +2674,76 @@ func (ec *executionContext) _ProjectFilesTotal_total(ctx context.Context, field 
 	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _ProjectScreen_project(ctx context.Context, field graphql.CollectedField, obj *ProjectScreen) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ProjectScreen",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.ProjectScreen().Project(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(ProjectResult)
+	fc.Result = res
+	return ec.marshalNProjectResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ProjectScreen_menu(ctx context.Context, field graphql.CollectedField, obj *ProjectScreen) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ProjectScreen",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.ProjectScreen().Menu(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(MenuResult)
+	fc.Result = res
+	return ec.marshalNMenuResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐMenuResult(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Query_version(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -2212,7 +2814,7 @@ func (ec *executionContext) _Query_profile(ctx context.Context, field graphql.Co
 	return ec.marshalNUserProfileResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐUserProfileResult(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Query_project(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Query_screen(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2228,16 +2830,9 @@ func (ec *executionContext) _Query_project(ctx context.Context, field graphql.Co
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Query_project_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Project(rctx, args["id"].(int))
+		return ec.resolvers.Query().Screen(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2249,9 +2844,9 @@ func (ec *executionContext) _Query_project(ctx context.Context, field graphql.Co
 		}
 		return graphql.Null
 	}
-	res := resTmp.(ProjectResult)
+	res := resTmp.(*ScreenQuery)
 	fc.Result = res
-	return ec.marshalNProjectResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectResult(ctx, field.Selections, res)
+	return ec.marshalNScreenQuery2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐScreenQuery(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_shoppinglist(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2402,6 +2997,167 @@ func (ec *executionContext) _Query___schema(ctx context.Context, field graphql.C
 	return ec.marshalO__Schema2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐSchema(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _ScreenQuery_version(ctx context.Context, field graphql.CollectedField, obj *ScreenQuery) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ScreenQuery",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Version, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ScreenQuery_files(ctx context.Context, field graphql.CollectedField, obj *ScreenQuery) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ScreenQuery",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_ScreenQuery_files_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Files, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*FilesScreen)
+	fc.Result = res
+	return ec.marshalNFilesScreen2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐFilesScreen(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ScreenQuery_project(ctx context.Context, field graphql.CollectedField, obj *ScreenQuery) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ScreenQuery",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_ScreenQuery_project_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.ScreenQuery().Project(rctx, obj, args["id"].(int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*ProjectScreen)
+	fc.Result = res
+	return ec.marshalNProjectScreen2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectScreen(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ScreenQuery_spec(ctx context.Context, field graphql.CollectedField, obj *ScreenQuery) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ScreenQuery",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_ScreenQuery_spec_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Spec, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*SpecScreen)
+	fc.Result = res
+	return ec.marshalNSpecScreen2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐSpecScreen(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _ServerError_message(ctx context.Context, field graphql.CollectedField, obj *ServerError) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -2476,6 +3232,76 @@ func (ec *executionContext) _ShoppinglistQuery_productOnPage(ctx context.Context
 	return ec.marshalOProduct2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProduct(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _SpecScreen_project(ctx context.Context, field graphql.CollectedField, obj *SpecScreen) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "SpecScreen",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.SpecScreen().Project(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(ProjectResult)
+	fc.Result = res
+	return ec.marshalNProjectResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _SpecScreen_menu(ctx context.Context, field graphql.CollectedField, obj *SpecScreen) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "SpecScreen",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.SpecScreen().Menu(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(MenuResult)
+	fc.Result = res
+	return ec.marshalNMenuResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐMenuResult(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _UserProfile_id(ctx context.Context, field graphql.CollectedField, obj *UserProfile) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -2530,6 +3356,76 @@ func (ec *executionContext) _UserProfile_email(ctx context.Context, field graphq
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Email, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UserProfile_fullName(ctx context.Context, field graphql.CollectedField, obj *UserProfile) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "UserProfile",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FullName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _UserProfile_abbr(ctx context.Context, field graphql.CollectedField, obj *UserProfile) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "UserProfile",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Abbr, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2823,6 +3719,38 @@ func (ec *executionContext) _WorkspaceProject_name(ctx context.Context, field gr
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _WorkspaceProject_period(ctx context.Context, field graphql.CollectedField, obj *WorkspaceProject) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "WorkspaceProject",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Period, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _WorkspaceProjects_workspace(ctx context.Context, field graphql.CollectedField, obj *WorkspaceProjects) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -3030,6 +3958,41 @@ func (ec *executionContext) _WorkspaceUser_id(ctx context.Context, field graphql
 	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _WorkspaceUser_workspace(ctx context.Context, field graphql.CollectedField, obj *WorkspaceUser) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "WorkspaceUser",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Workspace, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*ID)
+	fc.Result = res
+	return ec.marshalNId2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐID(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _WorkspaceUser_role(ctx context.Context, field graphql.CollectedField, obj *WorkspaceUser) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -3170,6 +4133,76 @@ func (ec *executionContext) _WorkspaceUserProfile_email(ctx context.Context, fie
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _WorkspaceUserProfile_fullName(ctx context.Context, field graphql.CollectedField, obj *WorkspaceUserProfile) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "WorkspaceUserProfile",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FullName, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _WorkspaceUserProfile_abbr(ctx context.Context, field graphql.CollectedField, obj *WorkspaceUserProfile) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "WorkspaceUserProfile",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Abbr, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _WorkspaceUserProfile_gravatar(ctx context.Context, field graphql.CollectedField, obj *WorkspaceUserProfile) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -3195,14 +4228,11 @@ func (ec *executionContext) _WorkspaceUserProfile_gravatar(ctx context.Context, 
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
 	res := resTmp.(*Gravatar)
 	fc.Result = res
-	return ec.marshalNGravatar2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐGravatar(ctx, field.Selections, res)
+	return ec.marshalOGravatar2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐGravatar(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _WorkspaceUsers_items(ctx context.Context, field graphql.CollectedField, obj *WorkspaceUsers) (ret graphql.Marshaler) {
@@ -4542,6 +5572,29 @@ func (ec *executionContext) _LoginByEmailResult(ctx context.Context, sel ast.Sel
 	}
 }
 
+func (ec *executionContext) _MenuResult(ctx context.Context, sel ast.SelectionSet, obj MenuResult) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case MenuItems:
+		return ec._MenuItems(ctx, sel, &obj)
+	case *MenuItems:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._MenuItems(ctx, sel, obj)
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
 func (ec *executionContext) _ProjectFilesListResult(ctx context.Context, sel ast.SelectionSet, obj ProjectFilesListResult) graphql.Marshaler {
 	switch obj := (obj).(type) {
 	case nil:
@@ -4948,6 +6001,56 @@ func (ec *executionContext) _ExpiredToken(ctx context.Context, sel ast.Selection
 	return out
 }
 
+var filesScreenImplementors = []string{"FilesScreen"}
+
+func (ec *executionContext) _FilesScreen(ctx context.Context, sel ast.SelectionSet, obj *FilesScreen) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, filesScreenImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("FilesScreen")
+		case "project":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._FilesScreen_project(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "menu":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._FilesScreen_menu(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var forbiddenImplementors = []string{"Forbidden", "UserProfileResult", "ProjectResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectFilesResult", "UploadProjectFileResult", "CreateProjectResult", "Error", "WorkspaceResult", "WorkspaceUsersResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult"}
 
 func (ec *executionContext) _Forbidden(ctx context.Context, sel ast.SelectionSet, obj *Forbidden) graphql.Marshaler {
@@ -5110,6 +6213,65 @@ func (ec *executionContext) _LoginConfirmed(ctx context.Context, sel ast.Selecti
 	return out
 }
 
+var menuItemImplementors = []string{"MenuItem"}
+
+func (ec *executionContext) _MenuItem(ctx context.Context, sel ast.SelectionSet, obj *MenuItem) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, menuItemImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("MenuItem")
+		case "title":
+			out.Values[i] = ec._MenuItem_title(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "url":
+			out.Values[i] = ec._MenuItem_url(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var menuItemsImplementors = []string{"MenuItems", "MenuResult"}
+
+func (ec *executionContext) _MenuItems(ctx context.Context, sel ast.SelectionSet, obj *MenuItems) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, menuItemsImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("MenuItems")
+		case "items":
+			out.Values[i] = ec._MenuItems_items(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var mutationImplementors = []string{"Mutation"}
 
 func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
@@ -5241,6 +6403,10 @@ func (ec *executionContext) _Project(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
+		case "startAt":
+			out.Values[i] = ec._Project_startAt(ctx, field, obj)
+		case "endAt":
+			out.Values[i] = ec._Project_endAt(ctx, field, obj)
 		case "files":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
@@ -5412,6 +6578,56 @@ func (ec *executionContext) _ProjectFilesTotal(ctx context.Context, sel ast.Sele
 	return out
 }
 
+var projectScreenImplementors = []string{"ProjectScreen"}
+
+func (ec *executionContext) _ProjectScreen(ctx context.Context, sel ast.SelectionSet, obj *ProjectScreen) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, projectScreenImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ProjectScreen")
+		case "project":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._ProjectScreen_project(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "menu":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._ProjectScreen_menu(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var queryImplementors = []string{"Query"}
 
 func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
@@ -5455,7 +6671,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				}
 				return res
 			})
-		case "project":
+		case "screen":
 			field := field
 			out.Concurrently(i, func() (res graphql.Marshaler) {
 				defer func() {
@@ -5463,7 +6679,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_project(ctx, field)
+				res = ec._Query_screen(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -5512,7 +6728,58 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 	return out
 }
 
-var serverErrorImplementors = []string{"ServerError", "LoginByEmailResult", "ConfirmLoginResult", "UserProfileResult", "ProjectResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectFilesResult", "UploadProjectFileResult", "CreateProjectResult", "Error", "WorkspaceResult", "WorkspaceUsersResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult"}
+var screenQueryImplementors = []string{"ScreenQuery"}
+
+func (ec *executionContext) _ScreenQuery(ctx context.Context, sel ast.SelectionSet, obj *ScreenQuery) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, screenQueryImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ScreenQuery")
+		case "version":
+			out.Values[i] = ec._ScreenQuery_version(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "files":
+			out.Values[i] = ec._ScreenQuery_files(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "project":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._ScreenQuery_project(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "spec":
+			out.Values[i] = ec._ScreenQuery_spec(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var serverErrorImplementors = []string{"ServerError", "LoginByEmailResult", "ConfirmLoginResult", "UserProfileResult", "ProjectResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectFilesResult", "UploadProjectFileResult", "CreateProjectResult", "Error", "MenuResult", "WorkspaceResult", "WorkspaceUsersResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult"}
 
 func (ec *executionContext) _ServerError(ctx context.Context, sel ast.SelectionSet, obj *ServerError) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, serverErrorImplementors)
@@ -5572,6 +6839,56 @@ func (ec *executionContext) _ShoppinglistQuery(ctx context.Context, sel ast.Sele
 	return out
 }
 
+var specScreenImplementors = []string{"SpecScreen"}
+
+func (ec *executionContext) _SpecScreen(ctx context.Context, sel ast.SelectionSet, obj *SpecScreen) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, specScreenImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("SpecScreen")
+		case "project":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._SpecScreen_project(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "menu":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._SpecScreen_menu(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var userProfileImplementors = []string{"UserProfile", "UserProfileResult"}
 
 func (ec *executionContext) _UserProfile(ctx context.Context, sel ast.SelectionSet, obj *UserProfile) graphql.Marshaler {
@@ -5590,6 +6907,16 @@ func (ec *executionContext) _UserProfile(ctx context.Context, sel ast.SelectionS
 			}
 		case "email":
 			out.Values[i] = ec._UserProfile_email(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "fullName":
+			out.Values[i] = ec._UserProfile_fullName(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "abbr":
+			out.Values[i] = ec._UserProfile_abbr(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
@@ -5701,6 +7028,8 @@ func (ec *executionContext) _WorkspaceProject(ctx context.Context, sel ast.Selec
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "period":
+			out.Values[i] = ec._WorkspaceProject_period(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -5834,6 +7163,11 @@ func (ec *executionContext) _WorkspaceUser(ctx context.Context, sel ast.Selectio
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
+		case "workspace":
+			out.Values[i] = ec._WorkspaceUser_workspace(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
 		case "role":
 			out.Values[i] = ec._WorkspaceUser_role(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -5885,11 +7219,18 @@ func (ec *executionContext) _WorkspaceUserProfile(ctx context.Context, sel ast.S
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "gravatar":
-			out.Values[i] = ec._WorkspaceUserProfile_gravatar(ctx, field, obj)
+		case "fullName":
+			out.Values[i] = ec._WorkspaceUserProfile_fullName(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "abbr":
+			out.Values[i] = ec._WorkspaceUserProfile_abbr(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "gravatar":
+			out.Values[i] = ec._WorkspaceUserProfile_gravatar(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -6213,14 +7554,24 @@ func (ec *executionContext) marshalNCreateProjectResult2githubᚗcomᚋapartomat
 	return ec._CreateProjectResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNGravatar2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐGravatar(ctx context.Context, sel ast.SelectionSet, v *Gravatar) graphql.Marshaler {
+func (ec *executionContext) marshalNFilesScreen2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐFilesScreen(ctx context.Context, sel ast.SelectionSet, v *FilesScreen) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
 		}
 		return graphql.Null
 	}
-	return ec._Gravatar(ctx, sel, v)
+	return ec._FilesScreen(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNId2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐID(ctx context.Context, sel ast.SelectionSet, v *ID) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._Id(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}) (int, error) {
@@ -6246,6 +7597,63 @@ func (ec *executionContext) marshalNLoginByEmailResult2githubᚗcomᚋapartomat�
 		return graphql.Null
 	}
 	return ec._LoginByEmailResult(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNMenuItem2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐMenuItemᚄ(ctx context.Context, sel ast.SelectionSet, v []*MenuItem) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNMenuItem2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐMenuItem(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalNMenuItem2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐMenuItem(ctx context.Context, sel ast.SelectionSet, v *MenuItem) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._MenuItem(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNMenuResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐMenuResult(ctx context.Context, sel ast.SelectionSet, v MenuResult) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._MenuResult(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNProjectFile2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectFileᚄ(ctx context.Context, sel ast.SelectionSet, v []*ProjectFile) graphql.Marshaler {
@@ -6339,6 +7747,34 @@ func (ec *executionContext) marshalNProjectResult2githubᚗcomᚋapartomatᚋapa
 	return ec._ProjectResult(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNProjectScreen2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectScreen(ctx context.Context, sel ast.SelectionSet, v ProjectScreen) graphql.Marshaler {
+	return ec._ProjectScreen(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNProjectScreen2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectScreen(ctx context.Context, sel ast.SelectionSet, v *ProjectScreen) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._ProjectScreen(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNScreenQuery2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐScreenQuery(ctx context.Context, sel ast.SelectionSet, v ScreenQuery) graphql.Marshaler {
+	return ec._ScreenQuery(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNScreenQuery2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐScreenQuery(ctx context.Context, sel ast.SelectionSet, v *ScreenQuery) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._ScreenQuery(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNShoppinglistQuery2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐShoppinglistQuery(ctx context.Context, sel ast.SelectionSet, v ShoppinglistQuery) graphql.Marshaler {
 	return ec._ShoppinglistQuery(ctx, sel, &v)
 }
@@ -6351,6 +7787,16 @@ func (ec *executionContext) marshalNShoppinglistQuery2ᚖgithubᚗcomᚋapartoma
 		return graphql.Null
 	}
 	return ec._ShoppinglistQuery(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNSpecScreen2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐSpecScreen(ctx context.Context, sel ast.SelectionSet, v *SpecScreen) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._SpecScreen(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
@@ -6905,6 +8351,21 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 		return graphql.Null
 	}
 	return graphql.MarshalString(*v)
+}
+
+func (ec *executionContext) unmarshalOTime2ᚖtimeᚐTime(ctx context.Context, v interface{}) (*time.Time, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalTime(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOTime2ᚖtimeᚐTime(ctx context.Context, sel ast.SelectionSet, v *time.Time) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return graphql.MarshalTime(*v)
 }
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {

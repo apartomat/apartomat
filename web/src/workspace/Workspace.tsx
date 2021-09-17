@@ -1,39 +1,57 @@
-import React, { Fragment } from "react";
-import { useParams } from "react-router-dom";
+import React from "react"
+import { Main, Box, Header, Heading, Text, Avatar, List, Button, Tip, Paragraph, Spinner, SpinnerExtendedProps, Anchor } from "grommet"
+
+import { useParams } from "react-router-dom"
 
 import UserAvatar from "./UserAvatar";
-import { useAuthContext } from "../common/context/auth/useAuthContext";
+import { useAuthContext } from "../common/context/auth/useAuthContext"
 
-import Avatar from "../common/ui/Avatar";
-import AvatarGroup from "../common/ui/AvatarGroup";
+import AvatarGroup from "../common/ui/AvatarGroup"
 
-import { useWorkspace, WorkspaceUsersResult, WorkspaceProjectsListResult } from "./useWorkspace";
-import { useCreateProject } from "./useCreateProject";
-import { useState } from "react";
+import { useWorkspace, WorkspaceUsersResult, WorkspaceProjectsListResult, WorkspaceProject } from "./useWorkspace"
+import { useCreateProject } from "./useCreateProject"
+import { useState } from "react"
 
 interface RouteParams {
     id: string
 };
 
+const Loading = (props: SpinnerExtendedProps) => {
+    return (
+        <Spinner
+            border={[
+                { side: 'all', color: 'background-contrast', size: 'medium' },
+                { side: 'right', color: 'brand', size: 'medium' },
+                { side: 'top', color: 'brand', size: 'medium' },
+                { side: 'left', color: 'brand', size: 'medium' },
+            ]}
+            {...props}
+        />
+    )
+}
+
 export function Workspace () {
-    const { user } = useAuthContext();
-    let { id } = useParams<RouteParams>();
-    const { data, loading, error } = useWorkspace(parseInt(id, 10));
+    const { user } = useAuthContext()
+    let { id } = useParams<RouteParams>()
+    const { data, loading, error } = useWorkspace(parseInt(id, 10))
 
     if (loading) {
         return (
-            <div>
-                <p>Loading workspace...</p>
-            </div>
+            <Main pad="large">
+                <Box direction="row" gap="small" align="center">
+                    <Loading message="Загрузка..."/>
+                    <Text>Загрузка...</Text>
+                </Box>
+            </Main>
         );
     }
 
     if (error) {
         return (
-            <div>
-                <h1>Error</h1>
-                <p>Can't get workspace: {error}</p>
-            </div>
+            <Main pad="large">
+                <Heading>Ошибка</Heading>
+                <Paragraph>Can't get workspace: {error}</Paragraph>
+            </Main>
         );
     }
 
@@ -41,40 +59,51 @@ export function Workspace () {
         case "Workspace":
             const { workspace } = data;
             return (
-                <Fragment>
-                    <nav className="navbar">
-                        <div className="navbar__logo">apartomat</div>
-                        <div className="navbar__user">
-                            <UserAvatar user={user} className="header-user" />
-                        </div>
-                    </nav>
-                    
-                    <h2>{workspace.name}</h2>
-                    <WorkspaceUsers users={workspace.users} />
-                    <Projects projects={workspace.projects.list} />
-                    <CreateProject workspaceId={workspace.id}/>
-                </Fragment>
+                <Main>
+                    <Header background="white" margin={{top:"large", horizontal:"large", bottom:"medium"}}>
+                        <Box>
+                            <Text size="xlarge" weight="bold" color="brand">apartomat</Text>
+                        </Box>
+                        <Box><UserAvatar user={user} className="header-user" /></Box>
+                    </Header>
+
+                    <Box margin={{horizontal: "large"}}>
+                        <Box direction="row" margin={{vertical: "medium"}} justify="between">
+                            <Heading level={2} margin="none">{workspace.name}</Heading>
+                            <Box>
+                                <Button color="brand" label="Новый проект"></Button>
+                            </Box>
+                        </Box>
+                        <Projects projects={workspace.projects.list} />
+                        {/* <CreateProject workspaceId={workspace.id}/> */}
+                        <Box margin={{top: "xlarge"}}>
+                            <WorkspaceUsers users={workspace.users} />
+                        </Box>
+                    </Box>
+                </Main>
             );
         case "NotFound":
             return (
-                <div>
-                    <h1>Error</h1>
-                    <p>Workspace not found</p>
-                </div>
+                <Main pad="large">
+                    <Heading level={2}>Ошибка</Heading>
+                    <Box>
+                        <Text>Workspace not found</Text>
+                    </Box>
+                </Main>
             );
         case "Forbidden":
             return (
-                <div>
-                    <h1>Error</h1>
-                    <p>Access is denied</p>
-                </div>
+                <Main pad="large">
+                    <Heading level={2}>Ошибка</Heading>
+                    <Paragraph>Access is denied</Paragraph>
+                </Main>
             );
         default:
             return (
-                <div>
-                    <h1>Error</h1>
-                    <p>{data?.workspace.__typename}</p>
-                </div>
+                <Main pad="large">
+                    <Heading>Ошибка</Heading>
+                    <Paragraph>Unknown error</Paragraph>
+                </Main>
             );
     }
 }
@@ -84,11 +113,23 @@ function WorkspaceUsers({ users }: {users: WorkspaceUsersResult}) {
         case "WorkspaceUsers":
             return (
                 <AvatarGroup>
-                    {users.items.map(user => <Avatar key={user.id} src={user.profile.gravatar.url} alt={user.profile.email}/>)}
+                    {users.items.map(user => {
+                        return (
+                            <Tip content={user.profile.email}>
+                                <Avatar
+                                    key={user.id}
+                                    src={user.profile.gravatar?.url}
+                                    size="medium"
+                                    background="light-1"
+                                    border={{ color: 'white', size: 'small' }}
+                                >{user.profile.abbr}</Avatar>
+                            </Tip>
+                        )
+                    })}
                 </AvatarGroup>
             )
         default:
-            return <div>n/a</div>
+            return null
     }
 }
 
@@ -96,11 +137,18 @@ function Projects({ projects }: { projects: WorkspaceProjectsListResult }) {
     switch (projects.__typename) {
         case "WorkspaceProjectsList":
             return (
-                <ul>
-                    {projects.items.map(project => <li key={project.id}>
-                        <a href={`/p/${project.id}`}>{project.name}</a>
-                    </li>)}
-                </ul>
+                <List
+                    primaryKey="name"
+                    data={projects.items}
+                    pad={{vertical:"small"}}
+                    margin={{vertical: "medium"}}>
+                    {(pr: WorkspaceProject) => (
+                        <Box direction="row" justify="between">
+                            <Anchor href={`/p/${pr.id}`}>{pr.name}</Anchor>
+                            <Text>{pr.period}</Text>
+                        </Box>
+                    )}
+                </List>
             )
         default:
             return <div>n/a</div>

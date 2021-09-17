@@ -42,8 +42,10 @@ func (r *queryResolver) Profile(ctx context.Context) (UserProfileResult, error) 
 		}
 
 		return UserProfile{
-			ID:    user.ID,
-			Email: user.Email,
+			ID:       user.ID,
+			Email:    user.Email,
+			FullName: user.FullName,
+			Abbr:     abbr(user.FullName),
 			Gravatar: &Gravatar{
 				URL: gravatar.Url(user.Email),
 			},

@@ -1,26 +1,42 @@
 query project($id: Int!) {
-    project(id: $id) {
-        __typename
-        ...on Project {
-            id
-            title
-            files {
+    screen {
+        projectScreen: project(id: $id) {
+            project {
                 __typename
-                list {
-                    __typename
-                    ...on ProjectFilesList {
-                        items {
-                            url
+                ...on Project {
+                    id
+                    title
+                    files {
+                        list {
+                            __typename
+                            ...on ProjectFilesList {
+                                items {
+                                    id
+                                    name
+                                    url
+                                    type
+                                }
+                            }
+                            ...on Error {
+                                message
+                            }
                         }
                     }
-                    ...on Error {
-                        message
+                }
+                ...on Error {
+                    message
+                }
+               
+            }
+            menu {
+                __typename
+                ...on MenuItems {
+                    items {
+                        title
+                        url
                     }
                 }
             }
-        }
-        ...on Error {
-            message
         }
     }
 }

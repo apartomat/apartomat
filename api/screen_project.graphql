@@ -1,0 +1,19 @@
+extend type ScreenQuery {
+    project(id: Int!): ProjectScreen!
+}
+
+type ProjectScreen {
+    project: ProjectResult!
+    menu: MenuResult!
+}
+
+union MenuResult = MenuItems | ServerError
+
+type MenuItems {
+    items: [MenuItem!]!
+}
+
+type MenuItem {
+    title: String!
+    url: String!
+}

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"strconv"
+	"time"
 
 	"github.com/99designs/gqlgen/graphql"
 )
@@ -25,6 +26,10 @@ type Error interface {
 
 type LoginByEmailResult interface {
 	IsLoginByEmailResult()
+}
+
+type MenuResult interface {
+	IsMenuResult()
 }
 
 type ProjectFilesListResult interface {
@@ -92,6 +97,11 @@ type ExpiredToken struct {
 func (ExpiredToken) IsConfirmLoginResult() {}
 func (ExpiredToken) IsError()              {}
 
+type FilesScreen struct {
+	Project ProjectResult `json:"project"`
+	Menu    MenuResult    `json:"menu"`
+}
+
 type Forbidden struct {
 	Message string `json:"message"`
 }
@@ -137,6 +147,17 @@ type LoginConfirmed struct {
 
 func (LoginConfirmed) IsConfirmLoginResult() {}
 
+type MenuItem struct {
+	Title string `json:"title"`
+	URL   string `json:"url"`
+}
+
+type MenuItems struct {
+	Items []*MenuItem `json:"items"`
+}
+
+func (MenuItems) IsMenuResult() {}
+
 type NotFound struct {
 	Message string `json:"message"`
 }
@@ -152,9 +173,11 @@ type Product struct {
 }
 
 type Project struct {
-	ID    int           `json:"id"`
-	Title string        `json:"title"`
-	Files *ProjectFiles `json:"files"`
+	ID      int           `json:"id"`
+	Title   string        `json:"title"`
+	StartAt *time.Time    `json:"startAt"`
+	EndAt   *time.Time    `json:"endAt"`
+	Files   *ProjectFiles `json:"files"`
 }
 
 func (Project) IsProjectResult()       {}
@@ -181,6 +204,18 @@ type ProjectFilesTotal struct {
 
 func (ProjectFilesTotal) IsProjectFilesTotalResult() {}
 
+type ProjectScreen struct {
+	Project ProjectResult `json:"project"`
+	Menu    MenuResult    `json:"menu"`
+}
+
+type ScreenQuery struct {
+	Version string         `json:"version"`
+	Files   *FilesScreen   `json:"files"`
+	Project *ProjectScreen `json:"project"`
+	Spec    *SpecScreen    `json:"spec"`
+}
+
 type ServerError struct {
 	Message string `json:"message"`
 }
@@ -195,6 +230,7 @@ func (ServerError) IsProjectFilesResult()           {}
 func (ServerError) IsUploadProjectFileResult()      {}
 func (ServerError) IsCreateProjectResult()          {}
 func (ServerError) IsError()                        {}
+func (ServerError) IsMenuResult()                   {}
 func (ServerError) IsWorkspaceResult()              {}
 func (ServerError) IsWorkspaceUsersResult()         {}
 func (ServerError) IsWorkspaceProjectsListResult()  {}
@@ -202,6 +238,11 @@ func (ServerError) IsWorkspaceProjectsTotalResult() {}
 
 type ShoppinglistQuery struct {
 	ProductOnPage *Product `json:"productOnPage"`
+}
+
+type SpecScreen struct {
+	Project ProjectResult `json:"project"`
+	Menu    MenuResult    `json:"menu"`
 }
 
 type UploadProjectFileInput struct {
@@ -212,6 +253,8 @@ type UploadProjectFileInput struct {
 type UserProfile struct {
 	ID               int        `json:"id"`
 	Email            string     `json:"email"`
+	FullName         string     `json:"fullName"`
+	Abbr             string     `json:"abbr"`
 	Gravatar         *Gravatar  `json:"gravatar"`
 	DefaultWorkspace *Workspace `json:"defaultWorkspace"`
 }
@@ -228,8 +271,9 @@ type Workspace struct {
 func (Workspace) IsWorkspaceResult() {}
 
 type WorkspaceProject struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
+	ID     int     `json:"id"`
+	Name   string  `json:"name"`
+	Period *string `json:"period"`
 }
 
 type WorkspaceProjects struct {
@@ -251,14 +295,17 @@ type WorkspaceProjectsTotal struct {
 func (WorkspaceProjectsTotal) IsWorkspaceProjectsTotalResult() {}
 
 type WorkspaceUser struct {
-	ID      int                   `json:"id"`
-	Role    WorkspaceUserRole     `json:"role"`
-	Profile *WorkspaceUserProfile `json:"profile"`
+	ID        int                   `json:"id"`
+	Workspace *ID                   `json:"workspace"`
+	Role      WorkspaceUserRole     `json:"role"`
+	Profile   *WorkspaceUserProfile `json:"profile"`
 }
 
 type WorkspaceUserProfile struct {
 	ID       int       `json:"id"`
 	Email    string    `json:"email"`
+	FullName string    `json:"fullName"`
+	Abbr     string    `json:"abbr"`
 	Gravatar *Gravatar `json:"gravatar"`
 }
 

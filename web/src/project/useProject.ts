@@ -1,7 +1,7 @@
 import { useApolloClient } from "@apollo/client";
 import { useProjectQuery } from "../api/types.d";
 
-import type { ProjectFile, Forbidden, ServerError } from "../api/types.d";
+import type { ProjectFile, Forbidden, ServerError, MenuItem } from "../api/types.d";
 
 export function useProject(id: number) {
     const client = useApolloClient(); 
@@ -10,16 +10,27 @@ export function useProject(id: number) {
 
 export default useProject;
 
-export type ProjectFilesList = (
-    { __typename: 'ProjectFilesList' }
+export type ProjectFiles = (
+    { __typename?: 'ProjectFiles' }
+& { list: (
+  { __typename: 'ProjectFilesList' }
+  & { items: Array<(
+    { __typename?: 'ProjectFile' }
+    & Pick<ProjectFile, 'id' | 'name' | 'url' | 'type'>
+  )> }
+) | (
+  { __typename: 'Forbidden' }
+  & Pick<Forbidden, 'message'>
+) | (
+  { __typename: 'ServerError' }
+  & Pick<ServerError, 'message'>
+) }
+);
+
+export type MenuResult = (
+    { __typename: 'MenuItems' }
     & { items: Array<(
-        { __typename?: 'ProjectFile' }
-        & Pick<ProjectFile, 'url'>
+      { __typename?: 'MenuItem' }
+      & Pick<MenuItem, 'title' | 'url'>
     )> }
-    ) | (
-    { __typename: 'Forbidden' }
-    & Pick<Forbidden, 'message'>
-    ) | (
-    { __typename: 'ServerError' }
-    & Pick<ServerError, 'message'>
-)
+  ) | { __typename: 'ServerError' };

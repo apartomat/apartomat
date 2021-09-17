@@ -6,10 +6,11 @@ import (
 )
 
 type Acl struct {
+	store store.Store
 }
 
-func NewAcl() *Acl {
-	return &Acl{}
+func NewAcl(st store.Store) *Acl {
+	return &Acl{st}
 }
 
 func (acl *Acl) CanConfirmLogin(ctx context.Context, subj *UserCtx, obj string) bool {
@@ -18,11 +19,6 @@ func (acl *Acl) CanConfirmLogin(ctx context.Context, subj *UserCtx, obj string) 
 
 func (acl *Acl) CanGetWorkspaceUsers(ctx context.Context, subj *UserCtx, obj *store.Workspace) bool {
 	// todo check subj is workspace owner or admin
-	return true
-}
-
-func (acl *Acl) CanGetWorkspaceUserProfile(ctx context.Context, subj *UserCtx, obj struct{ WorkspaceID, UserID int }) bool {
-	// todo check subj has access to workspace
 	return true
 }
 

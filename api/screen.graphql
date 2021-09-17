@@ -1,0 +1,7 @@
+extend type Query {
+    screen: ScreenQuery!
+}
+
+type ScreenQuery {
+    version: String!
+}

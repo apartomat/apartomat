@@ -2,10 +2,12 @@ package graphql
 
 import (
 	"context"
+	"fmt"
 	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/store"
 	"github.com/pkg/errors"
 	"log"
+	"time"
 )
 
 func (r *rootResolver) WorkspaceProjects() WorkspaceProjectsResolver {
@@ -36,7 +38,16 @@ func (r *workspaceProjectsResolver) Total(ctx context.Context, obj *WorkspacePro
 }
 
 func projectToGraphQLWorkspaceProject(project *store.Project) *WorkspaceProject {
-	return &WorkspaceProject{ID: project.ID, Name: project.Name}
+	wp := &WorkspaceProject{
+		ID:   project.ID,
+		Name: project.Name,
+	}
+
+	if project.StartAt != nil {
+		wp.Period = period(project.StartAt, project.EndAt)
+	}
+
+	return wp
 }
 
 func projectsToGraphQLWorkspaceProjects(projects []*store.Project) []*WorkspaceProject {
@@ -47,4 +58,44 @@ func projectsToGraphQLWorkspaceProjects(projects []*store.Project) []*WorkspaceP
 	}
 
 	return result
+}
+
+func period(start, end *time.Time) *string {
+	if start == nil {
+		return pstring("")
+	}
+
+	if end == nil {
+		return pstring(fmt.Sprintf("%d", start.Year()))
+	}
+
+	var (
+		per string
+
+		mmap = map[time.Month]string{
+			time.January:   "янв",
+			time.February:  "фев",
+			time.March:     "мар",
+			time.April:     "апр",
+			time.May:       "май",
+			time.June:      "июн",
+			time.July:      "июл",
+			time.August:    "авг",
+			time.September: "сен",
+			time.October:   "окт",
+			time.November:  "ноя",
+			time.December:  "дек",
+		}
+	)
+
+	switch {
+	case start.Year() == end.Year() && start.Month() == end.Month():
+		per = fmt.Sprintf("%s, %d", mmap[start.Month()], start.Year())
+	case end.Year() > start.Year():
+		per = fmt.Sprintf("%s-%s, %d", mmap[start.Month()], mmap[end.Month()], end.Year())
+	default:
+		per = fmt.Sprintf("%s-%s, %d", mmap[start.Month()], mmap[end.Month()], start.Year())
+	}
+
+	return pstring(per)
 }

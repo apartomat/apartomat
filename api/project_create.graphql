@@ -1,0 +1,21 @@
+extend type Mutation {
+    uploadProjectFile(file: UploadProjectFileInput!): UploadProjectFileResult!
+}
+
+input UploadProjectFileInput {
+    projectId: Int!
+    file: Upload!
+}
+
+union UploadProjectFileResult = ProjectFile | Forbidden | AlreadyExists | ServerError
+
+extend type Mutation {
+    createProject(input: CreateProjectInput!): CreateProjectResult!
+}
+
+input CreateProjectInput {
+    workspaceId: Int!
+    title: String!
+}
+
+union CreateProjectResult = Project | Forbidden | ServerError

@@ -34,7 +34,7 @@ func (s *userStore) Save(ctx context.Context, user *store.User) (*store.User, er
 	}
 
 	q, args, err := InsertIntoUsers().
-		Columns("email", "full_name", "is_active", "created_at", "modified_at").
+		Columns("email", "full_name", "is_active", "use_gravatar", "created_at", "modified_at").
 		Values(user.Email, user.FullName, user.IsActive, user.CreatedAt, user.ModifiedAt).
 		ToSql()
 	if err != nil {
@@ -50,8 +50,15 @@ func (s *userStore) Save(ctx context.Context, user *store.User) (*store.User, er
 }
 
 func (s *userStore) List(ctx context.Context, q store.UserStoreQuery) ([]*store.User, error) {
-	sql, args, err := SelectFromUsers("id", "email", "full_name", "is_active", "created_at", "modified_at").
-		Where(q).Limit(q.Limit).ToSql()
+	sql, args, err := SelectFromUsers(
+		"id",
+		"email",
+		"full_name",
+		"is_active",
+		"use_gravatar",
+		"created_at",
+		"modified_at",
+	).Where(q).Limit(q.Limit).ToSql()
 	if err != nil {
 		return nil, err
 	}
@@ -73,6 +80,7 @@ func (s *userStore) List(ctx context.Context, q store.UserStoreQuery) ([]*store.
 			&user.Email,
 			&user.FullName,
 			&user.IsActive,
+			&user.UseGravatar,
 			&user.CreatedAt,
 			&user.ModifiedAt,
 		)
@@ -110,11 +118,11 @@ func SelectFromUsers(columns ...string) *userSelectBuilder {
 
 func (builder *userSelectBuilder) Where(q store.UserStoreQuery) *userSelectBuilder {
 	if len(q.ID.Eq) > 0 {
-		builder.SelectBuilder.Where(sq.Eq{"id": q.ID.Eq})
+		builder.SelectBuilder = builder.SelectBuilder.Where(sq.Eq{"id": q.ID.Eq})
 	}
 
 	if len(q.Email.Eq) > 0 {
-		builder.SelectBuilder.Where(sq.Eq{"email": q.Email.Eq})
+		builder.SelectBuilder = builder.SelectBuilder.Where(sq.Eq{"email": q.Email.Eq})
 	}
 
 	return builder

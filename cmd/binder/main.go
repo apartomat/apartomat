@@ -212,11 +212,11 @@ func main() {
 		//
 
 		if orientation == Portrait && i != 0 {
-			pdf.SetDrawColor(255,255,255)
-			pdf.SetTextColor(255,255,255)
+			pdf.SetDrawColor(255, 255, 255)
+			pdf.SetTextColor(255, 255, 255)
 			pdf.SetAlpha(0.99, "Normal")
 			pdf.SetFont("Arial", "", 14)
-			pdf.SetXY(x+w-43-1,y+1)
+			pdf.SetXY(x+w-43-1, y+1)
 			pdf.CellFormat(43, 7, "OXANA_PUHOVA", "1", 0, "R", false, 0, "https://www.instagram.com/oxana_puhova/")
 			pdf.SetAlpha(1.0, "Normal")
 		}
@@ -236,9 +236,9 @@ func main() {
 		)
 
 		if debug {
-			pdf.SetTextColor(0,0,0)
+			pdf.SetTextColor(0, 0, 0)
 			pdf.SetFont("Arial", "", 12)
-			pdf.SetXY(10,10)
+			pdf.SetXY(10, 10)
 			pdf.Cell(100, 10, msg)
 		}
 

@@ -34,8 +34,16 @@ func (s *projectStore) Save(ctx context.Context, project *store.Project) (*store
 	}
 
 	q, args, err := InsertIntoProjects().
-		Columns("name", "is_active", "workspace_id", "created_at", "modified_at").
-		Values(project.Name, project.IsActive, project.WorkspaceID, project.CreatedAt, project.ModifiedAt).
+		Columns(
+			"name",
+			"is_active",
+			"workspace_id",
+			"start_id",
+			"end_at",
+			"created_at",
+			"modified_at",
+		).
+		Values(project.Name, project.IsActive, project.WorkspaceID, project.StartAt, project.EndAt, project.CreatedAt, project.ModifiedAt).
 		ToSql()
 	if err != nil {
 		return nil, err
@@ -55,6 +63,8 @@ func (s *projectStore) List(ctx context.Context, q store.ProjectStoreQuery) ([]*
 		"name",
 		"is_active",
 		"workspace_id",
+		"start_at",
+		"end_at",
 		"created_at",
 		"modified_at",
 	).Where(q).Limit(q.Limit).ToSql()
@@ -79,6 +89,8 @@ func (s *projectStore) List(ctx context.Context, q store.ProjectStoreQuery) ([]*
 			&project.Name,
 			&project.IsActive,
 			&project.WorkspaceID,
+			&project.StartAt,
+			&project.EndAt,
 			&project.CreatedAt,
 			&project.ModifiedAt,
 		)

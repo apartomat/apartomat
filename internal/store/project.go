@@ -11,6 +11,8 @@ type Project struct {
 	Name        string
 	IsActive    bool
 	WorkspaceID int
+	StartAt     *time.Time
+	EndAt       *time.Time
 	CreatedAt   time.Time
 	ModifiedAt  time.Time
 }

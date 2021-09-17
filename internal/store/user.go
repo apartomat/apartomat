@@ -7,12 +7,13 @@ import (
 )
 
 type User struct {
-	ID         int
-	Email      string
-	FullName   string
-	IsActive   bool
-	CreatedAt  time.Time
-	ModifiedAt time.Time
+	ID          int
+	Email       string
+	FullName    string
+	IsActive    bool
+	UseGravatar bool
+	CreatedAt   time.Time
+	ModifiedAt  time.Time
 }
 
 type UserStore interface {

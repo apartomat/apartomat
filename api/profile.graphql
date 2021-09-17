@@ -7,6 +7,8 @@ union UserProfileResult = UserProfile | Forbidden | ServerError
 type UserProfile {
     id: Int!
     email: String!
+    fullName: String!
+    abbr: String!
     gravatar: Gravatar
     defaultWorkspace: Workspace!
 }

@@ -19,6 +19,7 @@ type WorkspaceUsers {
 
 type WorkspaceUser {
 	id: Int!
+	workspace: Id!
 	role: WorkspaceUserRole!
 	profile: WorkspaceUserProfile!
 }
@@ -31,7 +32,9 @@ enum WorkspaceUserRole {
 type WorkspaceUserProfile {
     id: Int!
     email: String!
-    gravatar: Gravatar!
+	fullName: String!
+	abbr: String!
+    gravatar: Gravatar
 }
 
 type WorkspaceProjects {
@@ -55,4 +58,5 @@ type WorkspaceProjectsTotal {
 type WorkspaceProject {
 	id: Int!
 	name: String!
+	period: String
 }

@@ -5,6 +5,7 @@ CREATE TABLE apartomat.users (
     email text NOT NULL,
     full_name text NOT NULL,
     is_active boolean NOT NULL,
+    use_gravatar boolean NOT NULL,
     created_at timestamp with time zone NOT NULL DEFAULT now(),
     modified_at timestamp with time zone NOT NULL DEFAULT now(),
     CONSTRAINT users_email_ukey UNIQUE (email)

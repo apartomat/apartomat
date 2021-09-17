@@ -10,9 +10,14 @@ query workspace($id: Int!) {
                     items {
                         id
                         role
+                        workspace {
+                            id
+                        }
                         profile {
                             id
                             email
+                            fullName
+                            abbr
                             gravatar {
                                 url
                             }
@@ -31,6 +36,7 @@ query workspace($id: Int!) {
                         items {
                             id
                             name
+                            period
                         }
                     }
                     ...on Error {
