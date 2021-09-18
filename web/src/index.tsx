@@ -7,7 +7,6 @@ import AuthProvider from "./common/context/auth/AuthProvider/AuthProvider";
 import PrivateRoute from "./common/context/auth/PrivateRoute/PrivateRoute";
 import RedirectToDefaultWorkspace from "./common/context/auth/RedirectToDefaultWorkspace/RedirectToDefaultWorkspace";
 
-import Index from "./common/ui/Index"
 import Login from "./login/Login";
 import Logout from "./logout/Logout";
 import Confirm from "./confirm/Confirm";
@@ -53,9 +52,6 @@ ReactDOM.render(
                 <AuthProvider>
                     <Router>
                         <Switch>
-                            <Route exact path="/ui-kit">
-                                <Index/>
-                            </Route>
                             <PrivateRoute exact path="/">
                                 <RedirectToDefaultWorkspace/>
                             </PrivateRoute>

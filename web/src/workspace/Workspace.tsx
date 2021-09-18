@@ -6,8 +6,6 @@ import { useParams } from "react-router-dom"
 import UserAvatar from "./UserAvatar";
 import { useAuthContext } from "../common/context/auth/useAuthContext"
 
-import AvatarGroup from "../common/ui/AvatarGroup"
-
 import { useWorkspace, WorkspaceUsersResult, WorkspaceProjectsListResult, WorkspaceProject } from "./useWorkspace"
 import { useCreateProject } from "./useCreateProject"
 import { useState } from "react"
@@ -112,7 +110,7 @@ function WorkspaceUsers({ users }: {users: WorkspaceUsersResult}) {
     switch (users.__typename) {
         case "WorkspaceUsers":
             return (
-                <AvatarGroup>
+                <Box direction="row">
                     {users.items.map(user => {
                         return (
                             <Tip content={user.profile.email}>
@@ -126,7 +124,7 @@ function WorkspaceUsers({ users }: {users: WorkspaceUsersResult}) {
                             </Tip>
                         )
                     })}
-                </AvatarGroup>
+                </Box>
             )
         default:
             return null
