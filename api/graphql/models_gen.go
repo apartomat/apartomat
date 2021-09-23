@@ -111,8 +111,8 @@ func (Forbidden) IsProjectResult()                {}
 func (Forbidden) IsProjectFilesListResult()       {}
 func (Forbidden) IsProjectFilesTotalResult()      {}
 func (Forbidden) IsProjectFilesResult()           {}
-func (Forbidden) IsUploadProjectFileResult()      {}
 func (Forbidden) IsCreateProjectResult()          {}
+func (Forbidden) IsUploadProjectFileResult()      {}
 func (Forbidden) IsError()                        {}
 func (Forbidden) IsWorkspaceResult()              {}
 func (Forbidden) IsWorkspaceUsersResult()         {}
@@ -184,10 +184,11 @@ func (Project) IsProjectResult()       {}
 func (Project) IsCreateProjectResult() {}
 
 type ProjectFile struct {
-	ID   int    `json:"id"`
-	Name string `json:"name"`
-	URL  string `json:"url"`
-	Type string `json:"type"`
+	ID       int             `json:"id"`
+	Name     string          `json:"name"`
+	URL      string          `json:"url"`
+	Type     ProjectFileType `json:"type"`
+	MimeType string          `json:"mimeType"`
 }
 
 func (ProjectFile) IsUploadProjectFileResult() {}
@@ -197,6 +198,10 @@ type ProjectFilesList struct {
 }
 
 func (ProjectFilesList) IsProjectFilesListResult() {}
+
+type ProjectFilesListFilter struct {
+	Type []ProjectFileType `json:"type"`
+}
 
 type ProjectFilesTotal struct {
 	Total int `json:"total"`
@@ -227,8 +232,8 @@ func (ServerError) IsProjectResult()                {}
 func (ServerError) IsProjectFilesListResult()       {}
 func (ServerError) IsProjectFilesTotalResult()      {}
 func (ServerError) IsProjectFilesResult()           {}
-func (ServerError) IsUploadProjectFileResult()      {}
 func (ServerError) IsCreateProjectResult()          {}
+func (ServerError) IsUploadProjectFileResult()      {}
 func (ServerError) IsError()                        {}
 func (ServerError) IsMenuResult()                   {}
 func (ServerError) IsWorkspaceResult()              {}
@@ -246,8 +251,9 @@ type SpecScreen struct {
 }
 
 type UploadProjectFileInput struct {
-	ProjectID int            `json:"projectId"`
-	File      graphql.Upload `json:"file"`
+	ProjectID int              `json:"projectId"`
+	File      graphql.Upload   `json:"file"`
+	Type      *ProjectFileType `json:"type"`
 }
 
 type UserProfile struct {
@@ -314,6 +320,47 @@ type WorkspaceUsers struct {
 }
 
 func (WorkspaceUsers) IsWorkspaceUsersResult() {}
+
+type ProjectFileType string
+
+const (
+	ProjectFileTypeNone  ProjectFileType = "NONE"
+	ProjectFileTypeImage ProjectFileType = "IMAGE"
+)
+
+var AllProjectFileType = []ProjectFileType{
+	ProjectFileTypeNone,
+	ProjectFileTypeImage,
+}
+
+func (e ProjectFileType) IsValid() bool {
+	switch e {
+	case ProjectFileTypeNone, ProjectFileTypeImage:
+		return true
+	}
+	return false
+}
+
+func (e ProjectFileType) String() string {
+	return string(e)
+}
+
+func (e *ProjectFileType) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ProjectFileType(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ProjectFileType", str)
+	}
+	return nil
+}
+
+func (e ProjectFileType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
 
 type WorkspaceUserRole string
 

@@ -1,0 +1,11 @@
+extend type Mutation {
+    uploadProjectFile(file: UploadProjectFileInput!): UploadProjectFileResult!
+}
+
+input UploadProjectFileInput {
+    projectId: Int!
+    file: Upload!
+    type: ProjectFileType = NONE
+}
+
+union UploadProjectFileResult = ProjectFile | Forbidden | AlreadyExists | ServerError

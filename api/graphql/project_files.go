@@ -16,8 +16,22 @@ type projectFilesResolver struct {
 	*rootResolver
 }
 
-func (r *projectFilesResolver) List(ctx context.Context, obj *ProjectFiles) (ProjectFilesListResult, error) {
-	files, err := r.useCases.GetProjectFiles.Do(ctx, obj.Project.ID, 10, 0)
+func (r *projectFilesResolver) List(
+	ctx context.Context,
+	obj *ProjectFiles,
+	filter ProjectFilesListFilter,
+	limit int,
+	offset int,
+) (ProjectFilesListResult, error) {
+	files, err := r.useCases.GetProjectFiles.Do(
+		ctx,
+		obj.Project.ID,
+		apartomat.GetProjectFilesFilter{
+			Type: store.ProjectFileTypeExpr{Eq: toProjectFileTypes(filter.Type)},
+		},
+		limit,
+		offset,
+	)
 	if err != nil {
 		if errors.Is(err, apartomat.ErrForbidden) {
 			return Forbidden{}, nil
@@ -28,30 +42,31 @@ func (r *projectFilesResolver) List(ctx context.Context, obj *ProjectFiles) (Pro
 		return ServerError{Message: "internal server error"}, nil
 	}
 
-	return ProjectFilesList{Items: filesToGraphQLProjectFiles(files)}, nil
+	return ProjectFilesList{Items: projectFilesToGraphQL(files)}, nil
 }
 
-func filesToGraphQLProjectFiles(projects []*store.ProjectFile) []*ProjectFile {
+func projectFilesToGraphQL(projects []*store.ProjectFile) []*ProjectFile {
 	result := make([]*ProjectFile, 0, len(projects))
 
 	for _, u := range projects {
-		result = append(result, fileToGraphQLProjectFile(u))
+		result = append(result, projectFileToGraphQL(u))
 	}
 
 	return result
 }
 
-func fileToGraphQLProjectFile(file *store.ProjectFile) *ProjectFile {
+func projectFileToGraphQL(file *store.ProjectFile) *ProjectFile {
 	return &ProjectFile{
-		ID:   file.ID,
-		Name: file.Name,
-		URL:  file.URL,
-		Type: file.Type,
+		ID:       file.ID,
+		Name:     file.Name,
+		URL:      file.URL,
+		Type:     projectFileTypeToGraphQL(file.Type),
+		MimeType: file.MimeType,
 	}
 }
 
 func (r *projectFilesResolver) Total(ctx context.Context, obj *ProjectFiles) (ProjectFilesTotalResult, error) {
-	return notImplementedYetError() // todo
+	return ProjectFilesTotal{Total: 99}, nil // todo
 }
 
 func (r *mutationResolver) UploadProjectFile(
@@ -79,14 +94,37 @@ func (r *mutationResolver) UploadProjectFile(
 		return serverError()
 	}
 
-	return projectFileToGraphQL(pf), nil
+	return *projectFileToGraphQL(pf), nil
 }
 
-func projectFileToGraphQL(pf *store.ProjectFile) ProjectFile {
-	return ProjectFile{
-		ID:   pf.ID,
-		Name: pf.Name,
-		URL:  pf.URL,
-		Type: pf.Type,
+func projectFileTypeToGraphQL(t store.ProjectFileType) ProjectFileType {
+	switch t {
+	case store.ProjectFileTypeImage:
+		return ProjectFileTypeImage
+	case store.ProjectFileTypeNone:
+		return ProjectFileTypeNone
+	default:
+		return ProjectFileTypeNone
 	}
+}
+
+func toProjectFileType(t ProjectFileType) store.ProjectFileType {
+	switch t {
+	case ProjectFileTypeImage:
+		return store.ProjectFileTypeImage
+	case ProjectFileTypeNone:
+		return store.ProjectFileTypeNone
+	default:
+		return store.ProjectFileTypeNone
+	}
+}
+
+func toProjectFileTypes(l []ProjectFileType) []store.ProjectFileType {
+	res := make([]store.ProjectFileType, len(l))
+
+	for i, t := range l {
+		res[i] = toProjectFileType(t)
+	}
+
+	return res
 }

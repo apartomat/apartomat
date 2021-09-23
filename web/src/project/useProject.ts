@@ -1,7 +1,7 @@
 import { useApolloClient } from "@apollo/client";
 import { useProjectQuery } from "../api/types.d";
 
-import type { ProjectFile, Forbidden, ServerError, MenuItem } from "../api/types.d";
+import type { ProjectFile, ProjectFilesTotal, Forbidden, ServerError, MenuItem } from "../api/types.d";
 
 export function useProject(id: number) {
     const client = useApolloClient(); 
@@ -11,20 +11,23 @@ export function useProject(id: number) {
 export default useProject;
 
 export type ProjectFiles = (
-    { __typename?: 'ProjectFiles' }
-& { list: (
-  { __typename: 'ProjectFilesList' }
-  & { items: Array<(
-    { __typename?: 'ProjectFile' }
-    & Pick<ProjectFile, 'id' | 'name' | 'url' | 'type'>
-  )> }
-) | (
-  { __typename: 'Forbidden' }
-  & Pick<Forbidden, 'message'>
-) | (
-  { __typename: 'ServerError' }
-  & Pick<ServerError, 'message'>
-) }
+  { __typename?: 'ProjectFiles' }
+  & { list: (
+    { __typename: 'ProjectFilesList' }
+    & { items: Array<(
+      { __typename?: 'ProjectFile' }
+      & Pick<ProjectFile, 'id' | 'name' | 'url' | 'type'>
+    )> }
+  ) | (
+    { __typename: 'Forbidden' }
+    & Pick<Forbidden, 'message'>
+  ) | (
+    { __typename: 'ServerError' }
+    & Pick<ServerError, 'message'>
+  ), total: (
+    { __typename: 'ProjectFilesTotal' }
+    & Pick<ProjectFilesTotal, 'total'>
+  ) | { __typename: 'Forbidden' } | { __typename: 'ServerError' } }
 );
 
 export type MenuResult = (

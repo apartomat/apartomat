@@ -35,8 +35,8 @@ func (s *projectFileStore) Save(ctx context.Context, file *store.ProjectFile) (*
 	}
 
 	q, args, err := InsertIntoProjectFiles().
-		Columns("project_id", "name", "url", "type", "created_at", "modified_at").
-		Values(file.ProjectID, file.Name, file.URL, file.Type, file.CreatedAt, file.ModifiedAt).
+		Columns("project_id", "name", "url", "type", "mime_type", "created_at", "modified_at").
+		Values(file.ProjectID, file.Name, file.URL, file.Type, file.MimeType, file.CreatedAt, file.ModifiedAt).
 		ToSql()
 	if err != nil {
 		return nil, err
@@ -61,6 +61,7 @@ func (s *projectFileStore) List(ctx context.Context, q store.ProjectFileStoreQue
 		"name",
 		"url",
 		"type",
+		"mime_type",
 		"created_at",
 		"modified_at",
 	).Where(q).Limit(q.Limit).ToSql()
@@ -86,6 +87,7 @@ func (s *projectFileStore) List(ctx context.Context, q store.ProjectFileStoreQue
 			&file.Name,
 			&file.URL,
 			&file.Type,
+			&file.MimeType,
 			&file.CreatedAt,
 			&file.ModifiedAt,
 		)
@@ -128,8 +130,20 @@ func (builder *projectFilesSelectBuilder) Where(q store.ProjectFileStoreQuery) *
 		builder.SelectBuilder = builder.SelectBuilder.Where(sq.Eq{`"id"`: q.ID.Eq})
 	}
 
+	if q.ID.Gt != nil {
+		builder.SelectBuilder = builder.SelectBuilder.Where(sq.Gt{`"id"`: *q.ID.Gt})
+	}
+
+	if q.ID.Gte != nil {
+		builder.SelectBuilder = builder.SelectBuilder.Where(sq.GtOrEq{`"id"`: *q.ID.Gte})
+	}
+
 	if len(q.ProjectID.Eq) > 0 {
 		builder.SelectBuilder = builder.SelectBuilder.Where(sq.Eq{"project_id": q.ProjectID.Eq})
+	}
+
+	if len(q.Type.Eq) > 0 {
+		builder.SelectBuilder = builder.SelectBuilder.Where(sq.Eq{"type": q.Type.Eq})
 	}
 
 	return builder

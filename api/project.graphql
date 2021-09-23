@@ -9,8 +9,17 @@ type Project {
 }
 
 type ProjectFiles {
-    list: ProjectFilesListResult!
+    list(filter: ProjectFilesListFilter! = {} limit: Int! = 10 offset: Int! = 0): ProjectFilesListResult!
     total: ProjectFilesTotalResult!
+}
+
+input ProjectFilesListFilter {
+    type: [ProjectFileType!]
+}
+
+enum ProjectFileType {
+    NONE
+    IMAGE
 }
 
 union ProjectFilesListResult = ProjectFilesList | Forbidden | ServerError
@@ -31,5 +40,6 @@ type ProjectFile {
     id: Int!
     name: String!
     url: Url!
-    type: String!
+    type: ProjectFileType!
+    mimeType: String!
 }

@@ -21,7 +21,12 @@ func NewGetProjectFiles(
 	return &GetProjectFiles{projects, projectFiles, acl}
 }
 
-func (u *GetProjectFiles) Do(ctx context.Context, projectID, limit, offset int) ([]*store.ProjectFile, error) {
+func (u *GetProjectFiles) Do(
+	ctx context.Context,
+	projectID int,
+	filter GetProjectFilesFilter,
+	limit, offset int,
+) ([]*store.ProjectFile, error) {
 	projects, err := u.projects.List(ctx, store.ProjectStoreQuery{ID: expr.IntEq(projectID)})
 	if err != nil {
 		return nil, err
@@ -37,10 +42,22 @@ func (u *GetProjectFiles) Do(ctx context.Context, projectID, limit, offset int) 
 		return nil, errors.Wrapf(ErrForbidden, "can't get project (id=%d) files", project.ID)
 	}
 
-	p, err := u.projectFiles.List(ctx, store.ProjectFileStoreQuery{ProjectID: expr.IntEq(projectID)})
+	p, err := u.projectFiles.List(
+		ctx,
+		store.ProjectFileStoreQuery{
+			ProjectID: expr.IntEq(projectID),
+			Type:      filter.Type,
+			Limit:     limit,
+			Offset:    offset,
+		},
+	)
 	if err != nil {
 		return nil, err
 	}
 
 	return p, nil
+}
+
+type GetProjectFilesFilter struct {
+	Type store.ProjectFileTypeExpr
 }

@@ -47,6 +47,7 @@ CREATE TABLE apartomat.project_files (
     project_id integer NOT NULL,
     name text NOT NULL,
     type text NOT NULL,
+    mime_type text NOT NULL,
     url text NOT NULL,
     created_at timestamp with time zone NOT NULL DEFAULT now(),
     modified_at timestamp with time zone NOT NULL DEFAULT now(),

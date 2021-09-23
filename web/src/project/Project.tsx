@@ -1,17 +1,17 @@
-import React, { ChangeEvent, useState } from "react"
+import React, { ChangeEvent, Dispatch, SetStateAction, useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
 
 import { Main, Box, Header, Heading, Text,
     Paragraph, Spinner, SpinnerExtendedProps, Anchor, Image,
-FileInput, RangeInput, Button } from "grommet"
+FileInput, Button, Layer, Form, FormField } from "grommet"
+import { FormClose, StatusGood } from 'grommet-icons'
 
-import UserAvatar from "./UserAvatar";
+import UserAvatar from "./UserAvatar"
 
-import { useProject, ProjectFiles, MenuResult } from "./useProject"
+import { useProject, ProjectFiles } from "./useProject"
 import { useUploadProjectFile } from "./useUploadProjectFile"
 
 import { useAuthContext } from "../common/context/auth/useAuthContext"
-import { HeightType } from "grommet/utils";
 
 interface RouteParams {
     id: string
@@ -22,6 +22,19 @@ export function Project () {
 
     const { user } = useAuthContext()
     const { data, loading, error } = useProject(parseInt(id, 10));
+
+    const [ notification, setNotification ] = useState('')
+    const [ showNotification, setShowNotification ] = useState(false)
+
+    const notify = ({ message }: { message: string }) => {
+        setNotification(message)
+        setShowNotification(true)
+        setTimeout(() => {
+            setShowNotification(false)
+        }, 3000)
+    }
+
+    const [showUploadFiles, setShowUploadFiles] = useState(false);
 
     if (loading) {
         return (
@@ -49,8 +62,31 @@ export function Project () {
 
             return (
                 <Main pad={{vertical: "medium", horizontal: "large"}}>
+
+                    {showNotification ? <Layer
+                        position="top"
+                        modal={false}
+                        responsive={false}
+                        margin={{ vertical: "small", horizontal: "small"}}
+                    >
+                        <Box
+                            align="center"
+                            direction="row"
+                            gap="xsmall"
+                            justify="between"
+                            elevation="small"
+                            background="status-ok"
+                            round="medium"
+                            pad={{ vertical: "xsmall", horizontal: "small"}}
+                        >
+                            <StatusGood/>
+                            <Text>{notification}</Text>
+                        </Box>
+                    </Layer> : null}
+
                     <Header background="white" margin={{vertical: "medium"}}>
                         <Box>
+                            
                             <Text size="xlarge" weight="bold" color="brand">
                                 <Anchor href="/">apartomat</Anchor>
                             </Text>
@@ -84,8 +120,27 @@ export function Project () {
                                 </Box>
                             </Box>
                         </Box>
-                        <Files files={project.files} />
-                        <Upload projectId={project.id} />
+
+                        <Files files={project.files} showUploadFiles={setShowUploadFiles}/>
+
+                        <Box>
+                            <Box direction="row" justify="between">
+                                <Heading level={3}>Спецификация</Heading>
+                            </Box>
+                        </Box>
+
+                        <Box>
+                            <Box direction="row" justify="between">
+                                <Heading level={3}>Альбом</Heading>
+                            </Box>
+                        </Box>
+
+                        {showUploadFiles ?
+                            <UploadFiles
+                                projectId={project.id}
+                                setShow={setShowUploadFiles}
+                                onUploadComplete={({message}) => notify({ message })}
+                            /> : null}
                     </Box>
                 </Main>
             );
@@ -117,25 +172,10 @@ export function Project () {
 
 export default Project;
 
-function Files({ files }: { files: ProjectFiles }) {
+function Files({ files, showUploadFiles }: { files: ProjectFiles, showUploadFiles: Dispatch<SetStateAction<boolean>> }) {
 
-    const [size, setSize] = useState(2)
-
-    const onChange = (event: ChangeEvent<HTMLInputElement>) => setSize(parseInt(event.target.value, 10))
-
-    console.log(size);
-
-    const imageSize = (s: Number): HeightType => {
-        switch (s) {
-            case 1:
-                return "xsmall"
-            case 2:
-                return "small"
-            case 3:
-                return "medium"
-            default:
-                return "small";
-        }
+    const handleUploadFiles = () => {
+        showUploadFiles(true)
     }
 
     switch (files.list.__typename) {
@@ -144,17 +184,13 @@ function Files({ files }: { files: ProjectFiles }) {
                 <Box margin={{vertical: "medium"}}>
                     <Box direction="row" justify="between">
                         <Heading level={3}>Файлы</Heading>
-                        <Box margin={{vertical: "medium", right: "medium"}} justify="center">
-                            <RangeInput
-                                min={1} max={3}step={1}
-                                value={size}
-                                onChange={onChange}
-                            />
+                        <Box justify="center">
+                            <Button color="brand" label="Загрузить файлы" onClick={handleUploadFiles} />
                         </Box>
                     </Box>
                     <Box direction="row" gap="small" overflow={{"horizontal":"auto"}} >
                         {files.list.items.map(file =>
-                            <Box key={file.id} height={imageSize(size)} width={imageSize(size)} margin={{bottom: "small"}} flex={{"shrink":0}}>
+                            <Box key={file.id} height="small" width="small" margin={{bottom: "small"}} flex={{"shrink":0}}>
                                 <Image
                                     fit="cover"
                                     src={`${file.url}?w=192`}
@@ -162,6 +198,12 @@ function Files({ files }: { files: ProjectFiles }) {
                                 />
                             </Box>
                         )}
+                        {files.total.__typename === 'ProjectFilesTotal' && files.total.total > files.list.items.length
+                            ? <Box height="small" width="small" margin={{bottom: "small"}} flex={{"shrink":0}} align="center" justify="center">
+                                <Text>ещё файлов {files.total.total - files.list.items.length}</Text>
+                            </Box>
+                            : null
+                        }
                     </Box>
                 </Box>
             )
@@ -170,53 +212,86 @@ function Files({ files }: { files: ProjectFiles }) {
     }
 }
 
-function Upload({ projectId }: {projectId: number}) {
-    const [ file, setFile ] = useState<File | null>(null)
-    const [ upload, { loading, error } ] = useUploadProjectFile()
-
-    const onChange = (event: ChangeEvent<HTMLInputElement>) => {
-        if (event.target.files) {
-            setFile(event.target.files[0])
-        }
+function UploadFiles(
+    { projectId, setShow, onUploadComplete }:
+    {
+        projectId: number,
+        setShow: Dispatch<SetStateAction<boolean>>,
+        onUploadComplete: ({message}: { message: string}) => void
     }
+) {
+    const [ files, setFiles ] = useState<FileList | null>(null)
+    const [ upload, { loading, error, data, called } ] = useUploadProjectFile()
+
+    console.log({ loading, error, data, called });
 
     const handleSubmit = (event: React.FormEvent) => {
-        console.log({ file, loading, error });
-        if (file && !loading) {
-            upload({ projectId, file })
+        if (files && !loading) {
+            upload({ projectId, file: files[0] })
         }
 
-        event.preventDefault();
+        event.preventDefault()
     }
+
+    const handleFileInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files) {
+            setFiles(event.target.files)
+        }
+    }
+
+    useEffect(() => {
+        if (called && data && !error) {
+            setShow(false)
+            onUploadComplete({ message: files?.length === 1 ? "Файл загружен" : `Загружено файлов ${files?.length}`})
+        }
+    })
 
     return (
-        <div>
-            {error ? <p>{error.message}</p> : null}
-            {loading ? null : <FileInput name="file" multiple onChange={onChange} messages={{browse:"выбрать", dropPrompt:"перетащите файл сюда", dropPromptMultiple:"перетащите файлы сюда"}}/>}
-            {loading ? <p>Upload file...</p> : <Button disabled={!file} onClick={handleSubmit} label="Загрузить" />}
-        </div>
+        <Layer
+            onClickOutside={() => setShow(false)}
+            onEsc={() => setShow(false)}
+        >
+            <Form validate="submit" onSubmit={handleSubmit}>
+                <Box pad="medium" gap="medium" width="large">
+                    <Box direction="row"justify="between"align="center">
+                        <Heading level={3} margin="none">Загрузить файлы</Heading>
+                        <Button icon={ <FormClose/> } onClick={() => setShow(false)}/>
+                    </Box>
+                    <FormField name="files" htmlFor="files" required margin="none">
+                        <FileInput
+                            name="files"
+                            renderFile={(file) => (
+                                <Box pad="small" direction="row" justify="between" align="center">
+                                    <Box width="xsmall" height="xsmall">
+                                        <Image src={ URL.createObjectURL(file) } fit="cover" />
+                                    </Box>
+                                    <Text>{file.name}</Text>
+                                </Box>
+                            )}
+                            multiple={{"aggregateThreshold": 5}}
+                            messages={{
+                                browse: "выбрать",
+                                dropPrompt: "перетащите файл сюда",
+                                dropPromptMultiple: "перетащите файлы сюда",
+                                files: "файлов",
+                                remove: "удалить",
+                                removeAll: "удалить все"
+                            }}
+                            onChange={handleFileInputChange}
+                        />
+                    </FormField>
+                    <Box align="center">
+                        <Button
+                            type="submit"
+                            primary
+                            label={loading ? 'Загрузка...' : 'Загрузить' }
+                            disabled={loading}
+                        />
+                    </Box>
+                </Box>
+            </Form>
+        </Layer>
     )
-}
-
-function Nav({ menu }: { menu: MenuResult }) {
-    switch (menu.__typename) {
-        case "MenuItems":
-            const items = menu.items;
-
-            return (
-                <nav>
-                    <ul style={{backgroundColor:'#eee'}}>
-                        {
-                            items.map(item => <li key={item.url}>
-                                <a href={item.url}>{item.title}</a>
-                            </li>)
-                        }
-                    </ul>
-                </nav>
-            )
-    }
-    
-    return null;
 }
 
 const Loading = (props: SpinnerExtendedProps) => {

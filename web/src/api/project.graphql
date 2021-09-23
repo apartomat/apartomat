@@ -7,7 +7,7 @@ query project($id: Int!) {
                     id
                     title
                     files {
-                        list {
+                        list(filter: {type: [IMAGE]} limit: 10 offset: 0) {
                             __typename
                             ...on ProjectFilesList {
                                 items {
@@ -19,6 +19,12 @@ query project($id: Int!) {
                             }
                             ...on Error {
                                 message
+                            }
+                        }
+                        total {
+                            __typename
+                            ...on ProjectFilesTotal {
+                                total
                             }
                         }
                     }

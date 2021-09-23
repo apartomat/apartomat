@@ -57,7 +57,8 @@ func (u *UploadProjectFile) Do(
 		ProjectID: projectID,
 		Name:      name,
 		URL:       url,
-		Type:      contentType,
+		Type:      "NONE",
+		MimeType:  contentType,
 	}
 
 	f, err = u.files.Save(ctx, f)
