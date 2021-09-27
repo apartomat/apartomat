@@ -1,10 +1,10 @@
-import React, { ChangeEvent, Dispatch, SetStateAction, useEffect, useState } from "react"
-import { useParams } from "react-router-dom"
+import React, { ChangeEvent, Dispatch, SetStateAction, useEffect, useState, useRef } from "react"
+import { useParams, Link, LinkProps } from "react-router-dom"
 
 import { Main, Box, Header, Heading, Text,
     Paragraph, Spinner, SpinnerExtendedProps, Anchor, Image,
-FileInput, Button, Layer, Form, FormField } from "grommet"
-import { FormClose, StatusGood } from 'grommet-icons'
+FileInput, Button, Layer, Form, FormField, Drop, AnchorExtendedProps } from "grommet"
+import { FormClose, StatusGood, Add } from "grommet-icons"
 
 import UserAvatar from "./UserAvatar"
 
@@ -18,10 +18,10 @@ interface RouteParams {
 };
 
 export function Project () {
-    let { id } = useParams<RouteParams>();
+    let { id } = useParams<RouteParams>()
 
     const { user } = useAuthContext()
-    const { data, loading, error } = useProject(parseInt(id, 10));
+    const { data, loading, error } = useProject(parseInt(id, 10))
 
     const [ notification, setNotification ] = useState('')
     const [ showNotification, setShowNotification ] = useState(false)
@@ -63,85 +63,111 @@ export function Project () {
             return (
                 <Main pad={{vertical: "medium", horizontal: "large"}}>
 
-                    {showNotification ? <Layer
-                        position="top"
-                        modal={false}
-                        responsive={false}
-                        margin={{ vertical: "small", horizontal: "small"}}
+                {showNotification ? <Layer
+                    position="top"
+                    modal={false}
+                    responsive={false}
+                    margin={{ vertical: "small", horizontal: "small"}}
+                >
+                    <Box
+                        align="center"
+                        direction="row"
+                        gap="xsmall"
+                        justify="between"
+                        elevation="small"
+                        background="status-ok"
+                        round="medium"
+                        pad={{ vertical: "xsmall", horizontal: "small"}}
                     >
-                        <Box
-                            align="center"
-                            direction="row"
-                            gap="xsmall"
-                            justify="between"
-                            elevation="small"
-                            background="status-ok"
-                            round="medium"
-                            pad={{ vertical: "xsmall", horizontal: "small"}}
-                        >
-                            <StatusGood/>
-                            <Text>{notification}</Text>
-                        </Box>
-                    </Layer> : null}
-
-                    <Header background="white" margin={{vertical: "medium"}}>
-                        <Box>
-                            
-                            <Text size="xlarge" weight="bold" color="brand">
-                                <Anchor href="/">apartomat</Anchor>
-                            </Text>
-                        </Box>
-                        <Box><UserAvatar user={user} className="header-user" /></Box>
-                    </Header>
-
-                    <Box>
-                        <Box margin={{vertical: "medium"}}>
-                            <Heading level={2} margin="none">{project.title}</Heading>
-                        </Box>
-                        <Box direction="row" justify="between" wrap={true}>
-                            <Box width="medium">
-                                <Box margin="none">
-                                    <Heading level={4} margin={{bottom: "xxsmall"}}>Сроки проекта</Heading>
-                                    <Text margin={{top: "xxsmall"}}>2021/08/12&mdash;2021/09/12</Text>
-                                </Box>
-                                <Box margin={{top: "small"}}>
-                                    <Heading level={4} margin={{bottom: "xxsmall"}}>Комплектация</Heading>
-                                    <Text margin={{top: "xxsmall"}}>3 комнаты, 2 санузла, коридор</Text>
-                                </Box>
-                            </Box>
-                            <Box width="medium">
-                                <Box margin="none">
-                                    <Heading level={4} margin={{bottom: "xxsmall"}}>Адрес</Heading>
-                                    <Text margin={{top: "xxsmall"}}>Москва, ул. Амурская, ЖК LEVEL</Text>
-                                </Box>
-                                <Box margin={{top: "small"}}>
-                                    <Heading level={4} margin={{bottom: "xxsmall"}}>Заказчик</Heading>
-                                    <Text margin={{top: "xxsmall"}}><Anchor href="">Екатерина</Anchor>, <Anchor href="">Иван</Anchor></Text>
-                                </Box>
-                            </Box>
-                        </Box>
-
-                        <Files files={project.files} showUploadFiles={setShowUploadFiles}/>
-
-                        <Box>
-                            <Box direction="row" justify="between">
-                                <Heading level={3}>Спецификация</Heading>
-                            </Box>
-                        </Box>
-
-                        <Box>
-                            <Box direction="row" justify="between">
-                                <Heading level={3}>Альбом</Heading>
-                            </Box>
-                        </Box>
-
-                        {showUploadFiles ?
-                            <UploadFiles
-                                projectId={project.id}
-                                setShow={setShowUploadFiles}
-                                onUploadComplete={({message}) => notify({ message })}
-                            /> : null}
+                        <StatusGood/>
+                        <Text>{notification}</Text>
                     </Box>
+                </Layer> : null}
+
+                <Header background="white" margin={{vertical: "medium"}}>
+                    <Box>
+                        
+                        <Text size="xlarge" weight="bold" color="brand">
+                            <AnchorLink to="/">apartomat</AnchorLink>
+                        </Text>
+                    </Box>
+                    <Box><UserAvatar user={user} className="header-user" /></Box>
+                </Header>
+
+                <Box>
+                    <Box margin={{vertical: "medium"}}>
+                        <Heading level={2} margin="none">{project.title}</Heading>
+                    </Box>
+                    <Box direction="row" justify="between" wrap={true}>
+                        <Box width="medium">
+                            <Box margin="none">
+                                <Heading level={4} margin={{bottom: "xxsmall"}}>Сроки проекта</Heading>
+                                <Text margin={{top: "xxsmall"}}>2021/08/12&mdash;2021/09/12</Text>
+                            </Box>
+                            <Box margin={{top: "small"}}>
+                                <Heading level={4} margin={{bottom: "xxsmall"}}>Комплектация</Heading>
+                                <Text margin={{top: "xxsmall"}}>3 комнаты, 2 санузла, коридор</Text>
+                            </Box>
+                        </Box>
+                        <Box width="medium">
+                            <Box margin="none">
+                                <Heading level={4} margin={{bottom: "xxsmall"}}>Адрес</Heading>
+                                <Text margin={{top: "xxsmall"}}>Москва, ул. Амурская, ЖК LEVEL</Text>
+                            </Box>
+                            <Box margin={{top: "small"}}>
+                                <Heading level={4} margin={{bottom: "xxsmall"}}>Заказчик</Heading>
+                                <Text margin={{top: "xxsmall"}}><Anchor href="">Екатерина</Anchor>, <Anchor href="">Иван</Anchor></Text>
+                            </Box>
+                        </Box>
+                    </Box>
+
+                    <Visualizations files={project.files} showUploadFiles={setShowUploadFiles}/>
+
+                    {/* <Box margin={{vertical: "medium"}}>
+                        <Box direction="row" justify="between">
+                            <Heading level={3}>Планы</Heading>
+                            <Box justify="center">
+                                <Button color="brand" label="Загрузить" />
+                            </Box>
+                        </Box>
+                    </Box>
+
+                    <Box margin={{vertical: "medium"}}>
+                        <Box direction="row" justify="between">
+                            <Heading level={3}>Спецификация</Heading>
+                            <Box justify="center">
+                                <Button color="brand" label="Создать" />
+                            </Box>
+                        </Box>
+                    </Box>
+
+                    <Box margin={{vertical: "medium"}}>
+                        <Box direction="row" justify="between">
+                            <Heading level={3}>Альбом</Heading>
+                            <Box justify="center">
+                                <Button color="brand" label="Создать" />
+                            </Box>
+                        </Box>
+                    </Box>
+
+                    <Box margin={{vertical: "medium"}}>
+                        <Box direction="row" justify="between">
+                            <Heading level={3}>Исходники</Heading>
+                            <Box justify="center">
+                                <Button color="brand" label="Загрузить" />
+                            </Box>
+                        </Box>
+                    </Box> */}
+
+                    <AddSomething/>
+
+                    {showUploadFiles ?
+                        <UploadFiles
+                            projectId={project.id}
+                            setShow={setShowUploadFiles}
+                            onUploadComplete={({message}) => notify({ message })}
+                        /> : null}
+                </Box>
                 </Main>
             );
         case "NotFound":
@@ -172,7 +198,43 @@ export function Project () {
 
 export default Project;
 
-function Files({ files, showUploadFiles }: { files: ProjectFiles, showUploadFiles: Dispatch<SetStateAction<boolean>> }) {
+function AddSomething () {
+
+    const [show, setShow] = useState(false)
+
+    const targetRef = useRef<HTMLDivElement>(null)
+
+    return (
+        <Box align="center" margin={{top:"medium"}}>
+            <Box round="full" overflow="hidden" background="neutral-1" ref={targetRef}>
+                <Button icon={<Add />} hoverIndicator onClick={() => setShow(true)} />
+            </Box>
+            {show && targetRef.current && (
+                <Drop
+                    elevation="small"
+                    round="small"
+                    align={{bottom: "top"}}
+                    target={targetRef.current}
+                    margin={{bottom:"small"}}
+                    onClickOutside={() => setShow(false)}
+                    onEsc={() => setShow(false)}
+                >
+                    <Box pad="small"><Text>План</Text></Box>
+                    <Box pad="small">Визуализации</Box>
+                    <Box pad="small"><Text>Спецификация</Text></Box>
+                    <Box pad="small"><Text>Альбом</Text></Box>
+                    <Box pad="small"><Text>Исходники</Text></Box>
+                </Drop>
+            )}
+            
+            <Box margin={{top: "medium"}}>
+                <Text size="small">вы можете загрузить планы, визуализации и исходники, создать спецификацию или альбом</Text>
+            </Box>
+        </Box>
+    )
+}
+
+function Visualizations({ files, showUploadFiles }: { files: ProjectFiles, showUploadFiles: Dispatch<SetStateAction<boolean>> }) {
 
     const handleUploadFiles = () => {
         showUploadFiles(true)
@@ -183,9 +245,9 @@ function Files({ files, showUploadFiles }: { files: ProjectFiles, showUploadFile
             return (
                 <Box margin={{vertical: "medium"}}>
                     <Box direction="row" justify="between">
-                        <Heading level={3}>Файлы</Heading>
+                        <Heading level={3}>Визуализации</Heading>
                         <Box justify="center">
-                            <Button color="brand" label="Загрузить файлы" onClick={handleUploadFiles} />
+                            <Button color="brand" label="Загрузить" onClick={handleUploadFiles} />
                         </Box>
                     </Box>
                     <Box direction="row" gap="small" overflow={{"horizontal":"auto"}} >
@@ -200,7 +262,7 @@ function Files({ files, showUploadFiles }: { files: ProjectFiles, showUploadFile
                         )}
                         {files.total.__typename === 'ProjectFilesTotal' && files.total.total > files.list.items.length
                             ? <Box height="small" width="small" margin={{bottom: "small"}} flex={{"shrink":0}} align="center" justify="center">
-                                <Text>ещё файлов {files.total.total - files.list.items.length}</Text>
+                                <Text>ещё {files.total.total - files.list.items.length}</Text>
                             </Box>
                             : null
                         }
@@ -221,9 +283,25 @@ function UploadFiles(
     }
 ) {
     const [ files, setFiles ] = useState<FileList | null>(null)
-    const [ upload, { loading, error, data, called } ] = useUploadProjectFile()
+    const [ upload, { loading, error, data, called }, state ] = useUploadProjectFile()
 
-    console.log({ loading, error, data, called });
+    console.log("error", { loading, error, data, called });
+    
+    useEffect(() => {
+
+        if (state.state === "DONE") {
+            console.log(state.file);
+        }
+
+        if (state.state === "FAILED") {
+            if (state.error instanceof Error) {
+                console.log("------------", state.error.message)
+            } else {
+                console.log(state.error.__typename, state.error.message)
+            }
+            
+        }
+    })
 
     const handleSubmit = (event: React.FormEvent) => {
         if (files && !loading) {
@@ -307,3 +385,10 @@ const Loading = (props: SpinnerExtendedProps) => {
         />
     )
 }
+
+
+const AnchorLink: React.FC<AnchorLinkProps> = (props) => {
+    return <Anchor as={Link} {...props} />;
+  };
+  
+  type AnchorLinkProps = LinkProps & AnchorExtendedProps;

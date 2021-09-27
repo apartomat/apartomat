@@ -9,164 +9,13 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
-  Time: any;
-  Upload: any;
   Url: any;
+  Upload: any;
+  Time: any;
 };
 
-export type ShoppinglistQuery = {
-  __typename?: 'ShoppinglistQuery';
-  productOnPage?: Maybe<Product>;
-};
+export type UploadProjectFileResult = ProjectFileUploaded | Forbidden | AlreadyExists | ServerError;
 
-
-export type ShoppinglistQueryProductOnPageArgs = {
-  url: Scalars['String'];
-};
-
-export type UserProfileResult = UserProfile | Forbidden | ServerError;
-
-export type Query = {
-  __typename?: 'Query';
-  version: Scalars['String'];
-  profile: UserProfileResult;
-  screen: ScreenQuery;
-  shoppinglist: ShoppinglistQuery;
-  workspace: WorkspaceResult;
-};
-
-
-export type QueryWorkspaceArgs = {
-  id: Scalars['Int'];
-};
-
-export type Gravatar = {
-  __typename?: 'Gravatar';
-  url: Scalars['String'];
-};
-
-export type Id = {
-  __typename?: 'Id';
-  id: Scalars['Int'];
-};
-
-export type ConfirmLoginResult = LoginConfirmed | InvalidToken | ExpiredToken | ServerError;
-
-export type LoginConfirmed = {
-  __typename?: 'LoginConfirmed';
-  token: Scalars['String'];
-};
-
-export type ProjectFilesList = {
-  __typename?: 'ProjectFilesList';
-  items: Array<ProjectFile>;
-};
-
-export type ScreenQuery = {
-  __typename?: 'ScreenQuery';
-  version: Scalars['String'];
-  files: FilesScreen;
-  project: ProjectScreen;
-  spec: SpecScreen;
-};
-
-
-export type ScreenQueryFilesArgs = {
-  projectId: Scalars['Int'];
-};
-
-
-export type ScreenQueryProjectArgs = {
-  id: Scalars['Int'];
-};
-
-
-export type ScreenQuerySpecArgs = {
-  projectId: Scalars['Int'];
-};
-
-export type MenuItem = {
-  __typename?: 'MenuItem';
-  title: Scalars['String'];
-  url: Scalars['String'];
-};
-
-export enum WorkspaceUserRole {
-  Admin = 'ADMIN',
-  User = 'USER'
-}
-
-export type ProjectFilesListFilter = {
-  type?: Maybe<Array<ProjectFileType>>;
-};
-
-/**  Common types  */
-export type Error = {
-  message: Scalars['String'];
-};
-
-export type Forbidden = Error & {
-  __typename?: 'Forbidden';
-  message: Scalars['String'];
-};
-
-export type WorkspaceUser = {
-  __typename?: 'WorkspaceUser';
-  id: Scalars['Int'];
-  workspace: Id;
-  role: WorkspaceUserRole;
-  profile: WorkspaceUserProfile;
-};
-
-export type WorkspaceProjectsList = {
-  __typename?: 'WorkspaceProjectsList';
-  items: Array<WorkspaceProject>;
-};
-
-export enum ProjectFileType {
-  None = 'NONE',
-  Image = 'IMAGE'
-}
-
-export type ProjectFilesResult = ProjectFiles | Forbidden | ServerError;
-
-export type FilesScreen = {
-  __typename?: 'FilesScreen';
-  project: ProjectResult;
-  menu: MenuResult;
-};
-
-export type ProjectScreen = {
-  __typename?: 'ProjectScreen';
-  project: ProjectResult;
-  menu: MenuResult;
-};
-
-export type WorkspaceUsersResult = WorkspaceUsers | Forbidden | ServerError;
-
-export type InvalidToken = Error & {
-  __typename?: 'InvalidToken';
-  message: Scalars['String'];
-};
-
-export type ProjectFile = {
-  __typename?: 'ProjectFile';
-  id: Scalars['Int'];
-  name: Scalars['String'];
-  url: Scalars['Url'];
-  type: ProjectFileType;
-  mimeType: Scalars['String'];
-};
-
-export type UploadProjectFileInput = {
-  projectId: Scalars['Int'];
-  file: Scalars['Upload'];
-  type?: Maybe<ProjectFileType>;
-};
-
-export type MenuResult = MenuItems | ServerError;
-
-export type CreateProjectResult = Project | Forbidden | ServerError;
 
 export type Product = {
   __typename?: 'Product';
@@ -175,26 +24,10 @@ export type Product = {
   image: Scalars['String'];
 };
 
-export type InvalidEmail = Error & {
-  __typename?: 'InvalidEmail';
-  message: Scalars['String'];
-};
-
-export type WorkspaceProjectsListResult = WorkspaceProjectsList | Forbidden | ServerError;
-
-export type WorkspaceProject = {
-  __typename?: 'WorkspaceProject';
-  id: Scalars['Int'];
-  name: Scalars['String'];
-  period?: Maybe<Scalars['String']>;
-};
-
-export type LoginByEmailResult = CheckEmail | InvalidEmail | ServerError;
-
-export type NotFound = Error & {
-  __typename?: 'NotFound';
-  message: Scalars['String'];
-};
+export enum WorkspaceUserRole {
+  Admin = 'ADMIN',
+  User = 'USER'
+}
 
 export type WorkspaceProjects = {
   __typename?: 'WorkspaceProjects';
@@ -202,8 +35,6 @@ export type WorkspaceProjects = {
   list: WorkspaceProjectsListResult;
   total: WorkspaceProjectsTotalResult;
 };
-
-export type WorkspaceProjectsTotalResult = WorkspaceProjectsTotal | Forbidden | ServerError;
 
 export type Project = {
   __typename?: 'Project';
@@ -214,40 +45,47 @@ export type Project = {
   files: ProjectFiles;
 };
 
-export type AlreadyExists = Error & {
-  __typename?: 'AlreadyExists';
+export type WorkspaceProjectsTotal = {
+  __typename?: 'WorkspaceProjectsTotal';
+  total: Scalars['Int'];
+};
+
+export enum ProjectFileType {
+  None = 'NONE',
+  Image = 'IMAGE'
+}
+
+export type ProjectFilesResult = ProjectFiles | Forbidden | ServerError;
+
+export type Id = {
+  __typename?: 'Id';
+  id: Scalars['Int'];
+};
+
+
+export type LoginByEmailResult = CheckEmail | InvalidEmail | ServerError;
+
+/**  Common types  */
+export type Error = {
   message: Scalars['String'];
 };
 
-export type ProjectFilesListResult = ProjectFilesList | Forbidden | ServerError;
+export type FilesScreen = {
+  __typename?: 'FilesScreen';
+  project: ProjectResult;
+  menu: MenuResult;
+};
 
-export type UploadProjectFileResult = ProjectFile | Forbidden | AlreadyExists | ServerError;
+export type WorkspaceUsersResult = WorkspaceUsers | Forbidden | ServerError;
 
 export type WorkspaceUsers = {
   __typename?: 'WorkspaceUsers';
   items: Array<WorkspaceUser>;
 };
 
-export type WorkspaceUserProfile = {
-  __typename?: 'WorkspaceUserProfile';
-  id: Scalars['Int'];
-  email: Scalars['String'];
-  fullName: Scalars['String'];
-  abbr: Scalars['String'];
-  gravatar?: Maybe<Gravatar>;
+export type ProjectFilesListFilter = {
+  type?: Maybe<Array<ProjectFileType>>;
 };
-
-export type UserProfile = {
-  __typename?: 'UserProfile';
-  id: Scalars['Int'];
-  email: Scalars['String'];
-  fullName: Scalars['String'];
-  abbr: Scalars['String'];
-  gravatar?: Maybe<Gravatar>;
-  defaultWorkspace: Workspace;
-};
-
-export type ProjectResult = Project | NotFound | Forbidden | ServerError;
 
 export type Mutation = {
   __typename?: 'Mutation';
@@ -275,17 +113,129 @@ export type MutationCreateProjectArgs = {
 
 
 export type MutationUploadProjectFileArgs = {
-  file: UploadProjectFileInput;
+  input: UploadProjectFileInput;
 };
 
-export type CheckEmail = {
-  __typename?: 'CheckEmail';
+export type SpecScreen = {
+  __typename?: 'SpecScreen';
+  project: ProjectResult;
+  menu: MenuResult;
+};
+
+export type WorkspaceResult = Workspace | NotFound | Forbidden | ServerError;
+
+export type WorkspaceUser = {
+  __typename?: 'WorkspaceUser';
+  id: Scalars['Int'];
+  workspace: Id;
+  role: WorkspaceUserRole;
+  profile: WorkspaceUserProfile;
+};
+
+export type WorkspaceProject = {
+  __typename?: 'WorkspaceProject';
+  id: Scalars['Int'];
+  name: Scalars['String'];
+  period?: Maybe<Scalars['String']>;
+};
+
+export type UserProfile = {
+  __typename?: 'UserProfile';
+  id: Scalars['Int'];
   email: Scalars['String'];
+  fullName: Scalars['String'];
+  abbr: Scalars['String'];
+  gravatar?: Maybe<Gravatar>;
+  defaultWorkspace: Workspace;
 };
 
-export type WorkspaceProjectsTotal = {
-  __typename?: 'WorkspaceProjectsTotal';
-  total: Scalars['Int'];
+export type UploadProjectFileInput = {
+  projectId: Scalars['Int'];
+  file: Scalars['Upload'];
+};
+
+export type Forbidden = Error & {
+  __typename?: 'Forbidden';
+  message: Scalars['String'];
+};
+
+export type CreateProjectInput = {
+  workspaceId: Scalars['Int'];
+  title: Scalars['String'];
+};
+
+export type Workspace = {
+  __typename?: 'Workspace';
+  id: Scalars['Int'];
+  name: Scalars['String'];
+  users: WorkspaceUsersResult;
+  projects: WorkspaceProjects;
+};
+
+export type WorkspaceProjectsListResult = WorkspaceProjectsList | Forbidden | ServerError;
+
+export type ServerError = Error & {
+  __typename?: 'ServerError';
+  message: Scalars['String'];
+};
+
+export type ProjectScreen = {
+  __typename?: 'ProjectScreen';
+  project: ProjectResult;
+  menu: MenuResult;
+};
+
+export type MenuResult = MenuItems | ServerError;
+
+export type MenuItems = {
+  __typename?: 'MenuItems';
+  items: Array<MenuItem>;
+};
+
+export type ShoppinglistQuery = {
+  __typename?: 'ShoppinglistQuery';
+  productOnPage?: Maybe<Product>;
+};
+
+
+export type ShoppinglistQueryProductOnPageArgs = {
+  url: Scalars['String'];
+};
+
+export type WorkspaceProjectsList = {
+  __typename?: 'WorkspaceProjectsList';
+  items: Array<WorkspaceProject>;
+};
+
+export type InvalidToken = Error & {
+  __typename?: 'InvalidToken';
+  message: Scalars['String'];
+};
+
+export type Query = {
+  __typename?: 'Query';
+  version: Scalars['String'];
+  profile: UserProfileResult;
+  screen: ScreenQuery;
+  shoppinglist: ShoppinglistQuery;
+  workspace: WorkspaceResult;
+};
+
+
+export type QueryWorkspaceArgs = {
+  id: Scalars['Int'];
+};
+
+
+export type AlreadyExists = Error & {
+  __typename?: 'AlreadyExists';
+  message: Scalars['String'];
+};
+
+export type MenuItem = {
+  __typename?: 'MenuItem';
+  title: Scalars['String'];
+  url: Scalars['String'];
 };
 
 export type ProjectFiles = {
@@ -301,18 +251,35 @@ export type ProjectFilesListArgs = {
   offset?: Scalars['Int'];
 };
 
-export type ServerError = Error & {
-  __typename?: 'ServerError';
+export type ProjectFilesListResult = ProjectFilesList | Forbidden | ServerError;
+
+export type ProjectFileUploaded = {
+  __typename?: 'ProjectFileUploaded';
+  file: ProjectFile;
+};
+
+export type NotFound = Error & {
+  __typename?: 'NotFound';
   message: Scalars['String'];
 };
 
+export type WorkspaceProjectsTotalResult = WorkspaceProjectsTotal | Forbidden | ServerError;
 
-export type Workspace = {
-  __typename?: 'Workspace';
-  id: Scalars['Int'];
-  name: Scalars['String'];
-  users: WorkspaceUsersResult;
-  projects: WorkspaceProjects;
+export type InvalidEmail = Error & {
+  __typename?: 'InvalidEmail';
+  message: Scalars['String'];
+};
+
+export type ProjectFilesList = {
+  __typename?: 'ProjectFilesList';
+  items: Array<ProjectFile>;
+};
+
+export type CreateProjectResult = Project | Forbidden | ServerError;
+
+export type ExpiredToken = Error & {
+  __typename?: 'ExpiredToken';
+  message: Scalars['String'];
 };
 
 export type ProjectFilesTotal = {
@@ -320,31 +287,68 @@ export type ProjectFilesTotal = {
   total: Scalars['Int'];
 };
 
-export type CreateProjectInput = {
-  workspaceId: Scalars['Int'];
-  title: Scalars['String'];
+export type Gravatar = {
+  __typename?: 'Gravatar';
+  url: Scalars['String'];
 };
 
+export type ProjectResult = Project | NotFound | Forbidden | ServerError;
+
+export type CheckEmail = {
+  __typename?: 'CheckEmail';
+  email: Scalars['String'];
+};
+
+export type ConfirmLoginResult = LoginConfirmed | InvalidToken | ExpiredToken | ServerError;
+
+export type LoginConfirmed = {
+  __typename?: 'LoginConfirmed';
+  token: Scalars['String'];
+};
+
+export type UserProfileResult = UserProfile | Forbidden | ServerError;
 
 export type ProjectFilesTotalResult = ProjectFilesTotal | Forbidden | ServerError;
 
-
-export type MenuItems = {
-  __typename?: 'MenuItems';
-  items: Array<MenuItem>;
+export type ProjectFile = {
+  __typename?: 'ProjectFile';
+  id: Scalars['Int'];
+  name: Scalars['String'];
+  url: Scalars['Url'];
+  type: ProjectFileType;
+  mimeType: Scalars['String'];
 };
 
-export type SpecScreen = {
-  __typename?: 'SpecScreen';
-  project: ProjectResult;
-  menu: MenuResult;
+export type ScreenQuery = {
+  __typename?: 'ScreenQuery';
+  version: Scalars['String'];
+  files: FilesScreen;
+  project: ProjectScreen;
+  spec: SpecScreen;
 };
 
-export type WorkspaceResult = Workspace | NotFound | Forbidden | ServerError;
 
-export type ExpiredToken = Error & {
-  __typename?: 'ExpiredToken';
-  message: Scalars['String'];
+export type ScreenQueryFilesArgs = {
+  projectId: Scalars['Int'];
+};
+
+
+export type ScreenQueryProjectArgs = {
+  id: Scalars['Int'];
+};
+
+
+export type ScreenQuerySpecArgs = {
+  projectId: Scalars['Int'];
+};
+
+export type WorkspaceUserProfile = {
+  __typename?: 'WorkspaceUserProfile';
+  id: Scalars['Int'];
+  email: Scalars['String'];
+  fullName: Scalars['String'];
+  abbr: Scalars['String'];
+  gravatar?: Maybe<Gravatar>;
 };
 
 export type ConfirmLoginMutationVariables = Exact<{
@@ -513,16 +517,25 @@ export type SpecScreenQuery = (
 );
 
 export type UploadProjectFileMutationVariables = Exact<{
-  file: UploadProjectFileInput;
+  input: UploadProjectFileInput;
 }>;
 
 
 export type UploadProjectFileMutation = (
   { __typename?: 'Mutation' }
   & { uploadProjectFile: (
-    { __typename: 'ProjectFile' }
-    & Pick<ProjectFile, 'id' | 'url'>
-  ) | { __typename: 'Forbidden' } | { __typename: 'AlreadyExists' } | (
+    { __typename: 'ProjectFileUploaded' }
+    & { file: (
+      { __typename?: 'ProjectFile' }
+      & Pick<ProjectFile, 'id' | 'url'>
+    ) }
+  ) | (
+    { __typename: 'Forbidden' }
+    & Pick<Forbidden, 'message'>
+  ) | (
+    { __typename: 'AlreadyExists' }
+    & Pick<AlreadyExists, 'message'>
+  ) | (
     { __typename: 'ServerError' }
     & Pick<ServerError, 'message'>
   ) }
@@ -886,14 +899,16 @@ export type SpecScreenQueryHookResult = ReturnType<typeof useSpecScreenQuery>;
 export type SpecScreenLazyQueryHookResult = ReturnType<typeof useSpecScreenLazyQuery>;
 export type SpecScreenQueryResult = Apollo.QueryResult<SpecScreenQuery, SpecScreenQueryVariables>;
 export const UploadProjectFileDocument = gql`
-    mutation uploadProjectFile($file: UploadProjectFileInput!) {
-  uploadProjectFile(file: $file) {
+    mutation uploadProjectFile($input: UploadProjectFileInput!) {
+  uploadProjectFile(input: $input) {
     __typename
-    ... on ProjectFile {
-      id
-      url
+    ... on ProjectFileUploaded {
+      file {
+        id
+        url
+      }
     }
-    ... on ServerError {
+    ... on Error {
       message
     }
   }
@@ -914,7 +929,7 @@ export type UploadProjectFileMutationFn = Apollo.MutationFunction<UploadProjectF
  * @example
  * const [uploadProjectFileMutation, { data, loading, error }] = useUploadProjectFileMutation({
  *   variables: {
- *      file: // value for 'file'
+ *      input: // value for 'input'
  *   },
  * });
  */

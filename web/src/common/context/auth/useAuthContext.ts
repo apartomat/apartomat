@@ -66,6 +66,7 @@ export function useAuthProvider() {
     const [concreteUser, setConcreteUser] = useState<User>(userEmpty);
 
     function check() {
+        console.log("calling check......");
         if (user.status === UserContextStatus.UNDEFINED) {
             setUser({status: UserContextStatus.CHEKING} as UserCheckingContext);
             loadProfile();
@@ -80,8 +81,8 @@ export function useAuthProvider() {
         switch (data?.profile.__typename) {
             case 'UserProfile':
                 setUser({
-                    id: data?.profile.id,
                     status: UserContextStatus.LOGGED,
+                    id: data?.profile.id,
                     email: data?.profile.email,
                     avatar: data?.profile.gravatar?.url,
                     defaultWorkspaceId: data?.profile.defaultWorkspace.id

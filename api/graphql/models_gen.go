@@ -191,7 +191,11 @@ type ProjectFile struct {
 	MimeType string          `json:"mimeType"`
 }
 
-func (ProjectFile) IsUploadProjectFileResult() {}
+type ProjectFileUploaded struct {
+	File *ProjectFile `json:"file"`
+}
+
+func (ProjectFileUploaded) IsUploadProjectFileResult() {}
 
 type ProjectFilesList struct {
 	Items []*ProjectFile `json:"items"`
@@ -251,9 +255,8 @@ type SpecScreen struct {
 }
 
 type UploadProjectFileInput struct {
-	ProjectID int              `json:"projectId"`
-	File      graphql.Upload   `json:"file"`
-	Type      *ProjectFileType `json:"type"`
+	ProjectID int            `json:"projectId"`
+	File      graphql.Upload `json:"file"`
 }
 
 type UserProfile struct {

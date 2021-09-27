@@ -1,7 +1,24 @@
 import React, { useEffect } from "react";
 import {Route, Redirect, RouteProps } from "react-router-dom";
 
+import { Main, Box, Text, SpinnerExtendedProps, Spinner } from "grommet"
+
 import useAuthContext, { UserContextStatus } from "../useAuthContext";
+
+const Loading = (props: SpinnerExtendedProps) => {
+    return (
+        <Spinner
+            border={[
+                { side: 'all', color: 'background-contrast', size: 'medium' },
+                { side: 'right', color: 'brand', size: 'medium' },
+                { side: 'top', color: 'brand', size: 'medium' },
+                { side: 'left', color: 'brand', size: 'medium' },
+            ]}
+            {...props}
+        />
+    )
+}
+
 
 function PrivateRoute({ children, ...rest }: RouteProps) {
     const { user, check, error } = useAuthContext();
@@ -14,10 +31,10 @@ function PrivateRoute({ children, ...rest }: RouteProps) {
 
     if (error !== undefined) {
         return (
-            <div>
+            <Box>
                 <h1>Error</h1>
                 <p>Can't check profile: {error}</p>
-            </div>
+            </Box>
         );
     }
 
@@ -27,9 +44,12 @@ function PrivateRoute({ children, ...rest }: RouteProps) {
                 case UserContextStatus.UNDEFINED:
                 case UserContextStatus.CHEKING:
                     return (
-                        <div>
-                            <p>Checking...</p>
-                        </div>
+                        <Main pad="large">
+                            <Box direction="row" gap="small" align="center">
+                                <Loading message="Авторизация..."/>
+                                <Text>Авторизация...</Text>
+                            </Box>
+                        </Main>
                     );
                 case UserContextStatus.SERVER_ERROR:
                     return (

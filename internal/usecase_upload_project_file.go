@@ -25,11 +25,16 @@ func NewUploadProjectFile(
 	return &UploadProjectFile{projects: projects, files: files, acl: acl, uploader: uploader}
 }
 
+type Upload struct {
+	Name     string
+	MimeType string
+	Data     io.Reader
+}
+
 func (u *UploadProjectFile) Do(
 	ctx context.Context,
 	projectID int,
-	name, contentType string,
-	file io.Reader,
+	upload Upload,
 ) (*store.ProjectFile, error) {
 	projects, err := u.projects.List(ctx, store.ProjectStoreQuery{ID: expr.IntEq(projectID)})
 	if err != nil {
@@ -46,25 +51,25 @@ func (u *UploadProjectFile) Do(
 		return nil, errors.Wrapf(ErrForbidden, "can't upload file to project (id=%d)", project.ID)
 	}
 
-	path := fmt.Sprintf("p/%d/%s", project.ID, name)
+	path := fmt.Sprintf("p/%d/%s", project.ID, upload.Name)
 
-	url, err := u.uploader.Upload(ctx, file, path, contentType)
+	url, err := u.uploader.Upload(ctx, upload.Data, path, upload.MimeType)
 	if err != nil {
 		return nil, err
 	}
 
 	f := &store.ProjectFile{
 		ProjectID: projectID,
-		Name:      name,
+		Name:      upload.Name,
 		URL:       url,
 		Type:      "NONE",
-		MimeType:  contentType,
+		MimeType:  upload.MimeType,
 	}
 
 	f, err = u.files.Save(ctx, f)
 	if err != nil {
 		if errors.Is(err, store.ErrAlreadyExists) {
-			return nil, errors.Wrapf(ErrAlreadyExists, "%s", name)
+			return nil, errors.Wrapf(ErrAlreadyExists, "%s", upload.Name)
 		}
 
 		return nil, err

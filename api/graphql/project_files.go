@@ -76,9 +76,11 @@ func (r *mutationResolver) UploadProjectFile(
 	pf, err := r.useCases.UploadProjectFile.Do(
 		ctx,
 		input.ProjectID,
-		input.File.Filename,
-		input.File.ContentType,
-		input.File.File,
+		apartomat.Upload{
+			Name:     input.File.Filename,
+			MimeType: input.File.ContentType,
+			Data:     input.File.File,
+		},
 	)
 	if err != nil {
 		if errors.Is(err, apartomat.ErrForbidden) {
@@ -94,7 +96,7 @@ func (r *mutationResolver) UploadProjectFile(
 		return serverError()
 	}
 
-	return *projectFileToGraphQL(pf), nil
+	return ProjectFileUploaded{File: projectFileToGraphQL(pf)}, nil
 }
 
 func projectFileTypeToGraphQL(t store.ProjectFileType) ProjectFileType {
