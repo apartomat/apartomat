@@ -1,14 +1,13 @@
-import React from "react"
-import { Main, Box, Header, Heading, Text, Avatar, List, Button, Tip, Paragraph, Spinner, SpinnerExtendedProps, Anchor } from "grommet"
-
+import React, { useState } from "react"
 import { useParams } from "react-router-dom"
 
-import UserAvatar from "./UserAvatar";
 import { useAuthContext } from "../common/context/auth/useAuthContext"
-
 import { useWorkspace, WorkspaceUsersResult, WorkspaceProjectsListResult, WorkspaceProject } from "./useWorkspace"
 import { useCreateProject } from "./useCreateProject"
-import { useState } from "react"
+
+import { Main, Box, Header, Heading, Text, Avatar, List, Button, Tip, Paragraph, Spinner, SpinnerExtendedProps, Anchor } from "grommet"
+import AnchorLink from "../common/AnchorLink"
+import UserAvatar from "./UserAvatar";
 
 interface RouteParams {
     id: string
@@ -142,7 +141,7 @@ function Projects({ projects }: { projects: WorkspaceProjectsListResult }) {
                     margin={{vertical: "medium"}}>
                     {(pr: WorkspaceProject) => (
                         <Box direction="row" justify="between">
-                            <Anchor href={`/p/${pr.id}`}>{pr.name}</Anchor>
+                            <AnchorLink to={`/p/${pr.id}`}>{pr.name}</AnchorLink>
                             <Text>{pr.period}</Text>
                         </Box>
                     )}

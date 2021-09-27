@@ -1,10 +1,12 @@
 import React, { ChangeEvent, Dispatch, SetStateAction, useEffect, useState, useRef } from "react"
-import { useParams, Link, LinkProps } from "react-router-dom"
+import { useParams } from "react-router-dom"
 
 import { Main, Box, Header, Heading, Text,
     Paragraph, Spinner, SpinnerExtendedProps, Anchor, Image,
-FileInput, Button, Layer, Form, FormField, Drop, AnchorExtendedProps } from "grommet"
+FileInput, Button, Layer, Form, FormField, Drop } from "grommet"
 import { FormClose, StatusGood, Add } from "grommet-icons"
+
+import AnchorLink from "../common/AnchorLink"
 
 import UserAvatar from "./UserAvatar"
 
@@ -385,10 +387,3 @@ const Loading = (props: SpinnerExtendedProps) => {
         />
     )
 }
-
-
-const AnchorLink: React.FC<AnchorLinkProps> = (props) => {
-    return <Anchor as={Link} {...props} />;
-  };
-  
-  type AnchorLinkProps = LinkProps & AnchorExtendedProps;
