@@ -4,6 +4,7 @@ extend type Mutation {
 
 input UploadProjectFileInput {
     projectId: Int!
+    type: ProjectFileType!
     file: Upload!
 }
 

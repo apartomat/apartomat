@@ -1046,7 +1046,7 @@ input ProjectFilesListFilter {
 
 enum ProjectFileType {
     NONE
-    IMAGE
+    VISUALIZATION
 }
 
 union ProjectFilesListResult = ProjectFilesList | Forbidden | ServerError
@@ -1086,6 +1086,7 @@ union CreateProjectResult = Project | Forbidden | ServerError`, BuiltIn: false},
 
 input UploadProjectFileInput {
     projectId: Int!
+    type: ProjectFileType!
     file: Upload!
 }
 
@@ -5563,6 +5564,14 @@ func (ec *executionContext) unmarshalInputUploadProjectFileInput(ctx context.Con
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("projectId"))
 			it.ProjectID, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "type":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
+			it.Type, err = ec.unmarshalNProjectFileType2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectFileType(ctx, v)
 			if err != nil {
 				return it, err
 			}

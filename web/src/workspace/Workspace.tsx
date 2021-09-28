@@ -5,7 +5,9 @@ import { useAuthContext } from "../common/context/auth/useAuthContext"
 import { useWorkspace, WorkspaceUsersResult, WorkspaceProjectsListResult, WorkspaceProject } from "./useWorkspace"
 import { useCreateProject } from "./useCreateProject"
 
-import { Main, Box, Header, Heading, Text, Avatar, List, Button, Tip, Paragraph, Spinner, SpinnerExtendedProps, Anchor } from "grommet"
+import { Main, Box, Header, Heading, Text,
+    Avatar, List, Button, Tip, Paragraph, Spinner, SpinnerExtendedProps,
+    Layer, Form, FormField, TextInput } from "grommet"
 import AnchorLink from "../common/AnchorLink"
 import UserAvatar from "./UserAvatar";
 
@@ -31,6 +33,8 @@ export function Workspace () {
     const { user } = useAuthContext()
     let { id } = useParams<RouteParams>()
     const { data, loading, error } = useWorkspace(parseInt(id, 10))
+
+    const [ showCreateProjectLayer, setShowCreateProjectLayer ] = useState(false)
 
     if (loading) {
         return (
@@ -68,15 +72,18 @@ export function Workspace () {
                         <Box direction="row" margin={{vertical: "medium"}} justify="between">
                             <Heading level={2} margin="none">{workspace.name}</Heading>
                             <Box>
-                                <Button color="brand" label="Новый проект"></Button>
+                                <Button color="brand" label="Новый проект" onClick={() => setShowCreateProjectLayer(true)} />
                             </Box>
                         </Box>
+
                         <Projects projects={workspace.projects.list} />
-                        {/* <CreateProject workspaceId={workspace.id}/> */}
+
                         <Box margin={{top: "xlarge"}}>
                             <WorkspaceUsers users={workspace.users} />
                         </Box>
                     </Box>
+
+                    {showCreateProjectLayer && <CreateProject workspaceId={workspace.id} />}
                 </Main>
             );
         case "NotFound":
@@ -172,11 +179,23 @@ function CreateProject({ workspaceId }: { workspaceId: number }) {
     }
 
     return (
-        <form onSubmit={handleSubmit}>
-            {error ? <p>{error.message}</p> : null}
-            <input type="text" onChange={handleChangeTitle} />
-            <input type="submit"/>
-        </form>
+        <Layer>
+            <Box pad="medium" gap="medium" width="medium">
+                <Box direction="row" justify="between"align="center">
+                    <Heading level={3} margin="none">Новый проект</Heading>
+                    {/* <Button icon={ <FormClose/> } onClick={() => setShow(false)}/> */}
+                </Box>
+                <Form onSubmit={handleSubmit}>
+                    {error ? <p>{error.message}</p> : null}
+                    <FormField>
+                        <TextInput onChange={handleChangeTitle} value={title} />
+                    </FormField>
+                    <Box direction="row">
+                        <Button type="submit" primary label="Создать" />
+                    </Box>
+                </Form>
+            </Box>
+        </Layer>
     )
 }
 

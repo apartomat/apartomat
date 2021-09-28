@@ -38,7 +38,7 @@ func (s *projectStore) Save(ctx context.Context, project *store.Project) (*store
 			"name",
 			"is_active",
 			"workspace_id",
-			"start_id",
+			"start_at",
 			"end_at",
 			"created_at",
 			"modified_at",

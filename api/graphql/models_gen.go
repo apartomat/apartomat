@@ -255,8 +255,9 @@ type SpecScreen struct {
 }
 
 type UploadProjectFileInput struct {
-	ProjectID int            `json:"projectId"`
-	File      graphql.Upload `json:"file"`
+	ProjectID int             `json:"projectId"`
+	Type      ProjectFileType `json:"type"`
+	File      graphql.Upload  `json:"file"`
 }
 
 type UserProfile struct {
@@ -327,18 +328,18 @@ func (WorkspaceUsers) IsWorkspaceUsersResult() {}
 type ProjectFileType string
 
 const (
-	ProjectFileTypeNone  ProjectFileType = "NONE"
-	ProjectFileTypeImage ProjectFileType = "IMAGE"
+	ProjectFileTypeNone          ProjectFileType = "NONE"
+	ProjectFileTypeVisualization ProjectFileType = "VISUALIZATION"
 )
 
 var AllProjectFileType = []ProjectFileType{
 	ProjectFileTypeNone,
-	ProjectFileTypeImage,
+	ProjectFileTypeVisualization,
 }
 
 func (e ProjectFileType) IsValid() bool {
 	switch e {
-	case ProjectFileTypeNone, ProjectFileTypeImage:
+	case ProjectFileTypeNone, ProjectFileTypeVisualization:
 		return true
 	}
 	return false

@@ -20,8 +20,8 @@ type ProjectFile struct {
 type ProjectFileType string
 
 const (
-	ProjectFileTypeNone  ProjectFileType = "NONE"
-	ProjectFileTypeImage ProjectFileType = "IMAGE"
+	ProjectFileTypeNone          ProjectFileType = "NONE"
+	ProjectFileTypeVisualization ProjectFileType = "VISUALIZATION"
 )
 
 type ProjectFileStore interface {

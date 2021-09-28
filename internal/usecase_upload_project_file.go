@@ -27,6 +27,7 @@ func NewUploadProjectFile(
 
 type Upload struct {
 	Name     string
+	Type     store.ProjectFileType
 	MimeType string
 	Data     io.Reader
 }
@@ -62,7 +63,7 @@ func (u *UploadProjectFile) Do(
 		ProjectID: projectID,
 		Name:      upload.Name,
 		URL:       url,
-		Type:      "NONE",
+		Type:      upload.Type,
 		MimeType:  upload.MimeType,
 	}
 

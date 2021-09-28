@@ -78,6 +78,7 @@ func (r *mutationResolver) UploadProjectFile(
 		input.ProjectID,
 		apartomat.Upload{
 			Name:     input.File.Filename,
+			Type:     toProjectFileType(input.Type),
 			MimeType: input.File.ContentType,
 			Data:     input.File.File,
 		},
@@ -101,8 +102,8 @@ func (r *mutationResolver) UploadProjectFile(
 
 func projectFileTypeToGraphQL(t store.ProjectFileType) ProjectFileType {
 	switch t {
-	case store.ProjectFileTypeImage:
-		return ProjectFileTypeImage
+	case store.ProjectFileTypeVisualization:
+		return ProjectFileTypeVisualization
 	case store.ProjectFileTypeNone:
 		return ProjectFileTypeNone
 	default:
@@ -112,8 +113,8 @@ func projectFileTypeToGraphQL(t store.ProjectFileType) ProjectFileType {
 
 func toProjectFileType(t ProjectFileType) store.ProjectFileType {
 	switch t {
-	case ProjectFileTypeImage:
-		return store.ProjectFileTypeImage
+	case ProjectFileTypeVisualization:
+		return store.ProjectFileTypeVisualization
 	case ProjectFileTypeNone:
 		return store.ProjectFileTypeNone
 	default:

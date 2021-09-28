@@ -11,7 +11,7 @@ import AnchorLink from "../common/AnchorLink"
 import UserAvatar from "./UserAvatar"
 
 import { useProject, ProjectFiles } from "./useProject"
-import { useUploadProjectFile } from "./useUploadProjectFile"
+import { useUploadProjectFile, ProjectFileType } from "./useUploadProjectFile"
 
 import { useAuthContext } from "../common/context/auth/useAuthContext"
 
@@ -166,6 +166,7 @@ export function Project () {
                     {showUploadFiles ?
                         <UploadFiles
                             projectId={project.id}
+                            type={ProjectFileType.Visualization}
                             setShow={setShowUploadFiles}
                             onUploadComplete={({message}) => notify({ message })}
                         /> : null}
@@ -277,9 +278,10 @@ function Visualizations({ files, showUploadFiles }: { files: ProjectFiles, showU
 }
 
 function UploadFiles(
-    { projectId, setShow, onUploadComplete }:
+    { projectId, type, setShow, onUploadComplete }:
     {
         projectId: number,
+        type: ProjectFileType,
         setShow: Dispatch<SetStateAction<boolean>>,
         onUploadComplete: ({message}: { message: string}) => void
     }
@@ -307,7 +309,7 @@ function UploadFiles(
 
     const handleSubmit = (event: React.FormEvent) => {
         if (files && !loading) {
-            upload({ projectId, file: files[0] })
+            upload({ projectId, file: files[0], type })
         }
 
         event.preventDefault()

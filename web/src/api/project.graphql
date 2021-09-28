@@ -7,7 +7,7 @@ query project($id: Int!) {
                     id
                     title
                     files {
-                        list(filter: {type: [IMAGE]} limit: 10 offset: 0) {
+                        list(filter: {type: [VISUALIZATION]} limit: 10 offset: 0) {
                             __typename
                             ...on ProjectFilesList {
                                 items {

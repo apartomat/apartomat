@@ -45,7 +45,5 @@ func (u *CreateProject) Do(ctx context.Context, workspaceID int, name string) (*
 		WorkspaceID: workspaceID,
 	}
 
-	project, err = u.projects.Save(ctx, project)
-
-	return project, nil
+	return u.projects.Save(ctx, project)
 }

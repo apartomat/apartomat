@@ -1,7 +1,9 @@
-import { FetchResult, useApolloClient } from "@apollo/client";
-import { useUploadProjectFileMutation, UploadProjectFileMutation, UploadProjectFileMutationResult, ProjectFile, Forbidden, AlreadyExists, ServerError } from "../api/types.d";
+import { FetchResult, useApolloClient } from "@apollo/client"
+import { useUploadProjectFileMutation, UploadProjectFileMutation, UploadProjectFileMutationResult, ProjectFile, Forbidden, AlreadyExists, ServerError, ProjectFileType } from "../api/types.d"
 
-export type UploadFn = ({projectId, file}: { projectId: number, file: File}) => Promise<FetchResult<UploadProjectFileMutation>>;
+export type UploadFn = ({projectId, type, file}: { projectId: number, type: ProjectFileType, file: File}) => Promise<FetchResult<UploadProjectFileMutation>>
+
+export { ProjectFileType } from "../api/types.d";
 
 export enum State {
     INITIAL = "INITIAL",
@@ -89,7 +91,7 @@ export function useUploadProjectFile(): [
         }
     })
 
-    return [({ projectId, file }) => upload({ variables: { input: { projectId, file } } }), result, state as Result];
+    return [({ projectId, type, file }) => upload({ variables: { input: { projectId, type, file } } }), result, state as Result];
 }
 
 export default useUploadProjectFile;
