@@ -255,7 +255,14 @@ function Visualizations({ files, showUploadFiles }: { files: ProjectFiles, showU
                     </Box>
                     <Box direction="row" gap="small" overflow={{"horizontal":"auto"}} >
                         {files.list.items.map(file =>
-                            <Box key={file.id} height="small" width="small" margin={{bottom: "small"}} flex={{"shrink":0}}>
+                            <Box
+                                key={file.id}
+                                height="small"
+                                width="small"
+                                margin={{bottom: "small"}}
+                                flex={{"shrink":0}}
+                                background="light-2"
+                            >
                                 <Image
                                     fit="cover"
                                     src={`${file.url}?w=192`}
@@ -264,7 +271,7 @@ function Visualizations({ files, showUploadFiles }: { files: ProjectFiles, showU
                             </Box>
                         )}
                         {files.total.__typename === 'ProjectFilesTotal' && files.total.total > files.list.items.length
-                            ? <Box height="small" width="small" margin={{bottom: "small"}} flex={{"shrink":0}} align="center" justify="center">
+                            ? <Box key={0} height="small" width="small" margin={{bottom: "small"}} flex={{"shrink":0}} align="center" justify="center">
                                 <Text>ещё {files.total.total - files.list.items.length}</Text>
                             </Box>
                             : null
@@ -292,7 +299,6 @@ function UploadFiles(
     console.log("error", { loading, error, data, called });
     
     useEffect(() => {
-
         if (state.state === "DONE") {
             console.log(state.file);
         }

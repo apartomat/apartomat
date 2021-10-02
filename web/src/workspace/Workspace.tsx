@@ -1,13 +1,14 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
 
 import { useAuthContext } from "../common/context/auth/useAuthContext"
 import { useWorkspace, WorkspaceUsersResult, WorkspaceProjectsListResult, WorkspaceProject } from "./useWorkspace"
-import { useCreateProject } from "./useCreateProject"
+import { useCreateProject, State as CreateProjectState } from "./useCreateProject"
 
 import { Main, Box, Header, Heading, Text,
     Avatar, List, Button, Tip, Paragraph, Spinner, SpinnerExtendedProps,
-    Layer, Form, FormField, TextInput } from "grommet"
+    Layer, Form, FormField, TextInput, DateInput, Accordion, AccordionPanel } from "grommet"
+import { FormClose } from "grommet-icons"
 import AnchorLink from "../common/AnchorLink"
 import UserAvatar from "./UserAvatar";
 
@@ -83,7 +84,7 @@ export function Workspace () {
                         </Box>
                     </Box>
 
-                    {showCreateProjectLayer && <CreateProject workspaceId={workspace.id} />}
+                    {showCreateProjectLayer && <CreateProject workspaceId={workspace.id} setShow={setShowCreateProjectLayer} />}
                 </Main>
             );
         case "NotFound":
@@ -159,9 +160,9 @@ function Projects({ projects }: { projects: WorkspaceProjectsListResult }) {
     }
 }
 
-function CreateProject({ workspaceId }: { workspaceId: number }) {
+function CreateProject({ workspaceId, setShow }: { workspaceId: number, setShow: (show: boolean) => void }) {
     const [ title, setTitle ] = useState("")
-    const [ create, { loading, error } ] = useCreateProject()
+    const [ create, , state ] = useCreateProject()
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault()
@@ -172,26 +173,51 @@ function CreateProject({ workspaceId }: { workspaceId: number }) {
         setTitle(event.currentTarget.value)
     }
 
-    if (loading) {
-        return (
-            <div>Createing project...</div>
-        )
-    }
+    useEffect(() => {
+        if (state.state === CreateProjectState.DONE) {
+            setShow(false)
+        }
+    }, [ state.state ])
+
+    const [ dates, setDates ] = useState<string[]>([]);
+
+    const handleChangeDates = ({ value }: { value: string | string[] }) => {
+        console.log(value);
+        if (Array.isArray(value)) {
+            setDates(value);
+        }
+    };
 
     return (
         <Layer>
-            <Box pad="medium" gap="medium" width="medium">
+            <Box pad="medium" gap="medium">
                 <Box direction="row" justify="between"align="center">
-                    <Heading level={3} margin="none">Новый проект</Heading>
-                    {/* <Button icon={ <FormClose/> } onClick={() => setShow(false)}/> */}
+                    <Heading level={2} margin="none">Новый проект</Heading>
+                    <Button icon={ <FormClose/> } onClick={() => setShow(false)}/>
                 </Box>
-                <Form onSubmit={handleSubmit}>
-                    {error ? <p>{error.message}</p> : null}
-                    <FormField>
-                        <TextInput onChange={handleChangeTitle} value={title} />
+                <Form onSubmit={handleSubmit} validate="submit">
+                    {state.state === CreateProjectState.FAILED && <Text>{state.error.message}</Text>}
+                    <FormField label="Название" htmlFor="input">
+                        <TextInput onChange={handleChangeTitle} value={title} required />
                     </FormField>
-                    <Box direction="row">
-                        <Button type="submit" primary label="Создать" />
+                    <Accordion>
+                        <AccordionPanel label="Даты">
+                            <DateInput
+                                inline
+                                calendarProps={{
+                                    daysOfWeek: false,
+                                    firstDayOfWeek: 1, // Monday
+                                    locale: "ru-RU",
+                                }}
+                                value={dates}
+                                onChange={handleChangeDates}
+                            />
+                        </AccordionPanel>
+                        <AccordionPanel label="Контакт">
+                        </AccordionPanel>
+                    </Accordion>
+                    <Box direction="row" margin={{top: "medium"}}>
+                        <Button type="submit" primary label="Создать" disabled={state.state === CreateProjectState.CREATING}/>
                     </Box>
                 </Form>
             </Box>
