@@ -1,0 +1,15 @@
+query files($projectId: Int!) {
+    screen: files(projectId: $projectId) {
+        project {
+            __typename
+            ...on Project {
+                id
+                title
+            }
+            ...on Error {
+                message
+            }
+        }
+    }
+    
+}

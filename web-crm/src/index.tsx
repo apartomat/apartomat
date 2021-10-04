@@ -1,11 +1,11 @@
-import React, { StrictMode } from "react";
-import { Grommet } from "grommet";
-import ReactDOM from "react-dom";
-import {BrowserRouter as Router, Switch, Route} from "react-router-dom";
+import React, { StrictMode } from "react"
+import { Grommet } from "grommet"
+import ReactDOM from "react-dom"
+import {BrowserRouter as Router, Switch, Route} from "react-router-dom"
 
-import AuthProvider from "./common/context/auth/AuthProvider/AuthProvider";
-import PrivateRoute from "./common/context/auth/PrivateRoute/PrivateRoute";
-import RedirectToDefaultWorkspace from "./common/context/auth/RedirectToDefaultWorkspace/RedirectToDefaultWorkspace";
+import AuthProvider from "./common/context/auth/AuthProvider/AuthProvider"
+import PrivateRoute from "./common/context/auth/PrivateRoute/PrivateRoute"
+import RedirectToDefaultWorkspace from "./common/context/auth/RedirectToDefaultWorkspace/RedirectToDefaultWorkspace"
 
 import Login from "./login/Login";
 import Logout from "./logout/Logout";
@@ -38,9 +38,9 @@ const apolloClient = new ApolloClient({ cache: new InMemoryCache(), link });
 const theme = {
     global: {
         font: {
-            family: 'Roboto',
-            size: '18px',
-            height: '20px',
+            family: "Roboto",
+            size: "18px",
+            height: "20px",
         },
     },
 }
