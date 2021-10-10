@@ -1,15 +1,19 @@
 mutation createProject($input: CreateProjectInput!) {
     createProject(input: $input) {
         __typename
+        ...on ProjectCreated {
+            project {
+                id
+                title
+                startAt
+                endAt
+            }
+        }
         ...on ServerError {
             message
         }
         ...on Forbidden {
             message
-        }
-        ...on Project {
-            id
-            title
         }
     }
 }

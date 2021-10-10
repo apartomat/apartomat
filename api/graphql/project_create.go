@@ -8,7 +8,7 @@ import (
 )
 
 func (r *mutationResolver) CreateProject(ctx context.Context, input CreateProjectInput) (CreateProjectResult, error) {
-	project, err := r.useCases.CreateProject.Do(ctx, input.WorkspaceID, input.Title)
+	project, err := r.useCases.CreateProject.Do(ctx, input.WorkspaceID, input.Title, input.StartAt, input.EndAt)
 	if err != nil {
 		if errors.Is(err, apartomat.ErrForbidden) {
 			return forbidden()
@@ -19,5 +19,5 @@ func (r *mutationResolver) CreateProject(ctx context.Context, input CreateProjec
 		return serverError()
 	}
 
-	return projectToGraphQL(project), nil
+	return ProjectCreated{Project: projectToGraphQL(project)}, nil
 }

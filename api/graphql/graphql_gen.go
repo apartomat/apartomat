@@ -130,6 +130,10 @@ type ComplexityRoot struct {
 		Title   func(childComplexity int) int
 	}
 
+	ProjectCreated struct {
+		Project func(childComplexity int) int
+	}
+
 	ProjectFile struct {
 		ID       func(childComplexity int) int
 		MimeType func(childComplexity int) int
@@ -520,6 +524,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Project.Title(childComplexity), true
+
+	case "ProjectCreated.project":
+		if e.complexity.ProjectCreated.Project == nil {
+			break
+		}
+
+		return e.complexity.ProjectCreated.Project(childComplexity), true
 
 	case "ProjectFile.id":
 		if e.complexity.ProjectFile.ID == nil {
@@ -1077,9 +1088,15 @@ type ProjectFile {
 input CreateProjectInput {
     workspaceId: Int!
     title: String!
+    startAt: Time
+    endAt: Time
 }
 
-union CreateProjectResult = Project | Forbidden | ServerError`, BuiltIn: false},
+union CreateProjectResult = ProjectCreated | Forbidden | ServerError
+
+type ProjectCreated {
+    project: Project!
+}`, BuiltIn: false},
 	{Name: "project_upload_file.graphql", Input: `extend type Mutation {
     uploadProjectFile(input: UploadProjectFileInput!): UploadProjectFileResult!
 }
@@ -2463,6 +2480,41 @@ func (ec *executionContext) _Project_files(ctx context.Context, field graphql.Co
 	res := resTmp.(*ProjectFiles)
 	fc.Result = res
 	return ec.marshalNProjectFiles2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectFiles(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ProjectCreated_project(ctx context.Context, field graphql.CollectedField, obj *ProjectCreated) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ProjectCreated",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Project, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*Project)
+	fc.Result = res
+	return ec.marshalNProject2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProject(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ProjectFile_id(ctx context.Context, field graphql.CollectedField, obj *ProjectFile) (ret graphql.Marshaler) {
@@ -5527,6 +5579,22 @@ func (ec *executionContext) unmarshalInputCreateProjectInput(ctx context.Context
 			if err != nil {
 				return it, err
 			}
+		case "startAt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("startAt"))
+			it.StartAt, err = ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "endAt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("endAt"))
+			it.EndAt, err = ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -5634,13 +5702,13 @@ func (ec *executionContext) _CreateProjectResult(ctx context.Context, sel ast.Se
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
-	case Project:
-		return ec._Project(ctx, sel, &obj)
-	case *Project:
+	case ProjectCreated:
+		return ec._ProjectCreated(ctx, sel, &obj)
+	case *ProjectCreated:
 		if obj == nil {
 			return graphql.Null
 		}
-		return ec._Project(ctx, sel, obj)
+		return ec._ProjectCreated(ctx, sel, obj)
 	case Forbidden:
 		return ec._Forbidden(ctx, sel, &obj)
 	case *Forbidden:
@@ -6558,7 +6626,7 @@ func (ec *executionContext) _Product(ctx context.Context, sel ast.SelectionSet, 
 	return out
 }
 
-var projectImplementors = []string{"Project", "ProjectResult", "CreateProjectResult"}
+var projectImplementors = []string{"Project", "ProjectResult"}
 
 func (ec *executionContext) _Project(ctx context.Context, sel ast.SelectionSet, obj *Project) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, projectImplementors)
@@ -6597,6 +6665,33 @@ func (ec *executionContext) _Project(ctx context.Context, sel ast.SelectionSet, 
 				}
 				return res
 			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var projectCreatedImplementors = []string{"ProjectCreated", "CreateProjectResult"}
+
+func (ec *executionContext) _ProjectCreated(ctx context.Context, sel ast.SelectionSet, obj *ProjectCreated) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, projectCreatedImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ProjectCreated")
+		case "project":
+			out.Values[i] = ec._ProjectCreated_project(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -7862,6 +7957,16 @@ func (ec *executionContext) marshalNMenuResult2githubᚗcomᚋapartomatᚋaparto
 		return graphql.Null
 	}
 	return ec._MenuResult(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNProject2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProject(ctx context.Context, sel ast.SelectionSet, v *Project) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._Project(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNProjectFile2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectFileᚄ(ctx context.Context, sel ast.SelectionSet, v []*ProjectFile) graphql.Marshaler {

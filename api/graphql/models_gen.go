@@ -86,8 +86,10 @@ type CheckEmail struct {
 func (CheckEmail) IsLoginByEmailResult() {}
 
 type CreateProjectInput struct {
-	WorkspaceID int    `json:"workspaceId"`
-	Title       string `json:"title"`
+	WorkspaceID int        `json:"workspaceId"`
+	Title       string     `json:"title"`
+	StartAt     *time.Time `json:"startAt"`
+	EndAt       *time.Time `json:"endAt"`
 }
 
 type ExpiredToken struct {
@@ -180,8 +182,13 @@ type Project struct {
 	Files   *ProjectFiles `json:"files"`
 }
 
-func (Project) IsProjectResult()       {}
-func (Project) IsCreateProjectResult() {}
+func (Project) IsProjectResult() {}
+
+type ProjectCreated struct {
+	Project *Project `json:"project"`
+}
+
+func (ProjectCreated) IsCreateProjectResult() {}
 
 type ProjectFile struct {
 	ID       int             `json:"id"`

@@ -1,7 +1,8 @@
 import { FetchResult, useApolloClient } from "@apollo/client";
 import { useCreateProjectMutation, CreateProjectMutation, CreateProjectMutationResult, Project, Forbidden, ServerError } from "../api/types.d";
 
-export type CreateProjectFn = ({workspaceId, title}: {workspaceId: number, title: string }) => Promise<FetchResult<CreateProjectMutation>>;
+export type CreateProjectFn = ({workspaceId, title, startAt, endAt }:{workspaceId: number, title: string, startAt?: Date, endAt?: Date })
+    => Promise<FetchResult<CreateProjectMutation>>;
 
 export enum State {
     INITIAL = "INITIAL",
@@ -58,24 +59,24 @@ export function useCreateProject(): [
                     } else if (result.called && result.loading) {
                         return State.CREATING
                     } else if (result.called && !result.loading &&
-                        (result.error || (result.data && result.data?.createProject.__typename !== "Project"))
+                        (result.error || (result.data && result.data?.createProject.__typename !== "ProjectCreated"))
                     ) {
                         return State.FAILED
-                    } else if (result.called && !result.loading && result.data && result.data?.createProject.__typename === "Project") {
+                    } else if (result.called && !result.loading && result.data && result.data?.createProject.__typename === "ProjectCreated") {
                         return State.DONE
                     }
 
                     return State.INITIAL
 
                 case "project":
-                    if (result.data?.createProject.__typename === "Project") {
+                    if (result.data?.createProject.__typename === "ProjectCreated") {
                         return result.data.createProject
                     }
 
                     return undefined
 
                 case "error":
-                    if (result.data && result.data?.createProject.__typename !== "Project") {
+                    if (result.data && result.data?.createProject.__typename !== "ProjectCreated") {
                         return result.data.createProject
                     }
                     
@@ -87,7 +88,7 @@ export function useCreateProject(): [
         }
     })
 
-    return [({ workspaceId, title }) => create({ variables: { input: { workspaceId, title }} }), result, state as Result]
+    return [({ workspaceId, title, startAt, endAt }) => create({ variables: { input: { workspaceId, title, startAt, endAt }} }), result, state as Result]
 }
 
 export default useCreateProject;

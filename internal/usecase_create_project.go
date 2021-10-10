@@ -5,6 +5,7 @@ import (
 	"github.com/apartomat/apartomat/internal/pkg/expr"
 	"github.com/apartomat/apartomat/internal/store"
 	"github.com/pkg/errors"
+	"time"
 )
 
 type CreateProject struct {
@@ -21,7 +22,12 @@ func NewCreateProject(
 	return &CreateProject{workspaces, projects, acl}
 }
 
-func (u *CreateProject) Do(ctx context.Context, workspaceID int, name string) (*store.Project, error) {
+func (u *CreateProject) Do(
+	ctx context.Context,
+	workspaceID int,
+	name string,
+	startAt, endAt *time.Time,
+) (*store.Project, error) {
 	workspaces, err := u.workspaces.List(ctx, store.WorkspaceStoreQuery{ID: expr.IntEq(workspaceID)})
 	if err != nil {
 		return nil, err
@@ -43,6 +49,8 @@ func (u *CreateProject) Do(ctx context.Context, workspaceID int, name string) (*
 		Name:        name,
 		IsActive:    true,
 		WorkspaceID: workspaceID,
+		StartAt:     startAt,
+		EndAt:       endAt,
 	}
 
 	return u.projects.Save(ctx, project)

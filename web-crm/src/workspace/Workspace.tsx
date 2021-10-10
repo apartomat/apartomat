@@ -163,10 +163,19 @@ function Projects({ projects }: { projects: WorkspaceProjectsListResult }) {
 function CreateProject({ workspaceId, setShow }: { workspaceId: number, setShow: (show: boolean) => void }) {
     const [ title, setTitle ] = useState("")
     const [ create, , state ] = useCreateProject()
+    const [ dates, setDates ] = useState<string[]>([]);
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault()
-        create({ workspaceId, title: title })
+        let startAt = undefined,
+            endAt = undefined;
+
+        if (dates.length > 1) {
+            startAt = new Date(dates[0])
+            endAt = new Date(dates[1])
+        }
+
+        create({ workspaceId, title, startAt, endAt })
     }
 
     const handleChangeTitle = (event: React.FormEvent<HTMLInputElement>) => {
@@ -179,10 +188,7 @@ function CreateProject({ workspaceId, setShow }: { workspaceId: number, setShow:
         }
     }, [ state.state ])
 
-    const [ dates, setDates ] = useState<string[]>([]);
-
     const handleChangeDates = ({ value }: { value: string | string[] }) => {
-        console.log(value);
         if (Array.isArray(value)) {
             setDates(value);
         }
@@ -200,7 +206,7 @@ function CreateProject({ workspaceId, setShow }: { workspaceId: number, setShow:
                     <FormField label="Название" htmlFor="input">
                         <TextInput onChange={handleChangeTitle} value={title} required />
                     </FormField>
-                    <Accordion>
+                    <Accordion width="medium">
                         <AccordionPanel label="Даты">
                             <DateInput
                                 inline
@@ -211,9 +217,8 @@ function CreateProject({ workspaceId, setShow }: { workspaceId: number, setShow:
                                 }}
                                 value={dates}
                                 onChange={handleChangeDates}
+                                width="medium"
                             />
-                        </AccordionPanel>
-                        <AccordionPanel label="Контакт">
                         </AccordionPanel>
                     </Accordion>
                     <Box direction="row" margin={{top: "medium"}}>

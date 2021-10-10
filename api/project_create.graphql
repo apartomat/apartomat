@@ -5,6 +5,12 @@ extend type Mutation {
 input CreateProjectInput {
     workspaceId: Int!
     title: String!
+    startAt: Time
+    endAt: Time
 }
 
-union CreateProjectResult = Project | Forbidden | ServerError
+union CreateProjectResult = ProjectCreated | Forbidden | ServerError
+
+type ProjectCreated {
+    project: Project!
+}
