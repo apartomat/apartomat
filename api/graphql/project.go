@@ -21,7 +21,25 @@ func projectToGraphQL(p *store.Project) *Project {
 	}
 
 	return &Project{
-		ID:    p.ID,
-		Title: p.Name,
+		ID:      p.ID,
+		Title:   p.Name,
+		Status:  projectStatusToGraphQL(p.Status),
+		StartAt: p.StartAt,
+		EndAt:   p.EndAt,
+	}
+}
+
+func projectStatusToGraphQL(s store.ProjectStatus) ProjectStatus {
+	switch s {
+	case store.ProjectStatusNew:
+		return ProjectStatusNew
+	case store.ProjectStatusInProgress:
+		return ProjectStatusInProgress
+	case store.ProjectStatusDone:
+		return ProjectStatusDone
+	case store.ProjectStatusCanceled:
+		return ProjectStatusCanceled
+	default:
+		return ""
 	}
 }

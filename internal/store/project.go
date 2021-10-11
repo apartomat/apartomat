@@ -9,13 +9,22 @@ import (
 type Project struct {
 	ID          int
 	Name        string
-	IsActive    bool
+	Status      ProjectStatus
 	WorkspaceID int
 	StartAt     *time.Time
 	EndAt       *time.Time
 	CreatedAt   time.Time
 	ModifiedAt  time.Time
 }
+
+type ProjectStatus string
+
+const (
+	ProjectStatusNew        ProjectStatus = "NEW"
+	ProjectStatusInProgress ProjectStatus = "IN_PROGRESS"
+	ProjectStatusDone       ProjectStatus = "DONE"
+	ProjectStatusCanceled   ProjectStatus = "CANCELED"
+)
 
 type ProjectStore interface {
 	Save(context.Context, *Project) (*Project, error)

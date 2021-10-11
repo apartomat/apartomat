@@ -35,7 +35,7 @@ CREATE TABLE apartomat.workspace_users (
 CREATE TABLE apartomat.projects (
     id SERIAL PRIMARY KEY,
     name text NOT NULL,
-    is_active boolean NOT NULL,
+    status text NOT NULL,
     created_at timestamp with time zone NOT NULL DEFAULT now(),
     modified_at timestamp with time zone NOT NULL DEFAULT now(),
     workspace_id INT NOT NULL,

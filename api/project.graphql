@@ -3,9 +3,17 @@ union ProjectResult = Project | NotFound | Forbidden | ServerError
 type Project {
     id: Int!
     title: String!
+    status: ProjectStatus!
     startAt: Time
     endAt: Time
     files: ProjectFiles!
+}
+
+enum ProjectStatus {
+    NEW
+    IN_PROGRESS
+    DONE
+    CANCELED
 }
 
 type ProjectFiles {

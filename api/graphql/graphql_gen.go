@@ -127,6 +127,7 @@ type ComplexityRoot struct {
 		Files   func(childComplexity int) int
 		ID      func(childComplexity int) int
 		StartAt func(childComplexity int) int
+		Status  func(childComplexity int) int
 		Title   func(childComplexity int) int
 	}
 
@@ -517,6 +518,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Project.StartAt(childComplexity), true
+
+	case "Project.status":
+		if e.complexity.Project.Status == nil {
+			break
+		}
+
+		return e.complexity.Project.Status(childComplexity), true
 
 	case "Project.title":
 		if e.complexity.Project.Title == nil {
@@ -1041,9 +1049,17 @@ type UserProfile {
 type Project {
     id: Int!
     title: String!
+    status: ProjectStatus!
     startAt: Time
     endAt: Time
     files: ProjectFiles!
+}
+
+enum ProjectStatus {
+    NEW
+    IN_PROGRESS
+    DONE
+    CANCELED
 }
 
 type ProjectFiles {
@@ -2381,6 +2397,41 @@ func (ec *executionContext) _Project_title(ctx context.Context, field graphql.Co
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Project_status(ctx context.Context, field graphql.CollectedField, obj *Project) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Project",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(ProjectStatus)
+	fc.Result = res
+	return ec.marshalNProjectStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectStatus(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Project_startAt(ctx context.Context, field graphql.CollectedField, obj *Project) (ret graphql.Marshaler) {
@@ -6647,6 +6698,11 @@ func (ec *executionContext) _Project(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
+		case "status":
+			out.Values[i] = ec._Project_status(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
 		case "startAt":
 			out.Values[i] = ec._Project_startAt(ctx, field, obj)
 		case "endAt":
@@ -8087,6 +8143,16 @@ func (ec *executionContext) marshalNProjectScreen2ᚖgithubᚗcomᚋapartomatᚋ
 		return graphql.Null
 	}
 	return ec._ProjectScreen(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNProjectStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectStatus(ctx context.Context, v interface{}) (ProjectStatus, error) {
+	var res ProjectStatus
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNProjectStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectStatus(ctx context.Context, sel ast.SelectionSet, v ProjectStatus) graphql.Marshaler {
+	return v
 }
 
 func (ec *executionContext) marshalNScreenQuery2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐScreenQuery(ctx context.Context, sel ast.SelectionSet, v ScreenQuery) graphql.Marshaler {

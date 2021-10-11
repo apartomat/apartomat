@@ -47,8 +47,8 @@ func (u *CreateProject) Do(
 
 	project := &store.Project{
 		Name:        name,
-		IsActive:    true,
 		WorkspaceID: workspaceID,
+		Status:      store.ProjectStatusNew,
 		StartAt:     startAt,
 		EndAt:       endAt,
 	}

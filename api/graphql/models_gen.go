@@ -177,6 +177,7 @@ type Product struct {
 type Project struct {
 	ID      int           `json:"id"`
 	Title   string        `json:"title"`
+	Status  ProjectStatus `json:"status"`
 	StartAt *time.Time    `json:"startAt"`
 	EndAt   *time.Time    `json:"endAt"`
 	Files   *ProjectFiles `json:"files"`
@@ -370,6 +371,51 @@ func (e *ProjectFileType) UnmarshalGQL(v interface{}) error {
 }
 
 func (e ProjectFileType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type ProjectStatus string
+
+const (
+	ProjectStatusNew        ProjectStatus = "NEW"
+	ProjectStatusInProgress ProjectStatus = "IN_PROGRESS"
+	ProjectStatusDone       ProjectStatus = "DONE"
+	ProjectStatusCanceled   ProjectStatus = "CANCELED"
+)
+
+var AllProjectStatus = []ProjectStatus{
+	ProjectStatusNew,
+	ProjectStatusInProgress,
+	ProjectStatusDone,
+	ProjectStatusCanceled,
+}
+
+func (e ProjectStatus) IsValid() bool {
+	switch e {
+	case ProjectStatusNew, ProjectStatusInProgress, ProjectStatusDone, ProjectStatusCanceled:
+		return true
+	}
+	return false
+}
+
+func (e ProjectStatus) String() string {
+	return string(e)
+}
+
+func (e *ProjectStatus) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ProjectStatus(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ProjectStatus", str)
+	}
+	return nil
+}
+
+func (e ProjectStatus) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
