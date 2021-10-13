@@ -146,6 +146,7 @@ export type Project = {
   files: ProjectFiles;
   id: Scalars['Int'];
   startAt?: Maybe<Scalars['Time']>;
+  status: ProjectStatus;
   title: Scalars['String'];
 };
 
@@ -213,6 +214,13 @@ export type ProjectScreen = {
   menu: MenuResult;
   project: ProjectResult;
 };
+
+export enum ProjectStatus {
+  Canceled = 'CANCELED',
+  Done = 'DONE',
+  InProgress = 'IN_PROGRESS',
+  New = 'NEW'
+}
 
 export type Query = {
   __typename?: 'Query';
@@ -305,6 +313,7 @@ export type WorkspaceProject = {
   id: Scalars['Int'];
   name: Scalars['String'];
   period?: Maybe<Scalars['String']>;
+  status: ProjectStatus;
 };
 
 export type WorkspaceProjects = {
@@ -312,6 +321,21 @@ export type WorkspaceProjects = {
   list: WorkspaceProjectsListResult;
   total: WorkspaceProjectsTotalResult;
   workspace?: Maybe<Id>;
+};
+
+
+export type WorkspaceProjectsListArgs = {
+  filter?: WorkspaceProjectsFilter;
+  limit?: Scalars['Int'];
+};
+
+
+export type WorkspaceProjectsTotalArgs = {
+  filter?: WorkspaceProjectsFilter;
+};
+
+export type WorkspaceProjectsFilter = {
+  status?: Maybe<Array<ProjectStatus>>;
 };
 
 export type WorkspaceProjectsList = {
@@ -411,7 +435,7 @@ export type WorkspaceQueryVariables = Exact<{
 }>;
 
 
-export type WorkspaceQuery = { __typename?: 'Query', workspace: { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'ServerError', message: string } | { __typename: 'Workspace', id: number, name: string, users: { __typename: 'Forbidden', message: string } | { __typename: 'ServerError', message: string } | { __typename: 'WorkspaceUsers', items: Array<{ __typename?: 'WorkspaceUser', id: number, role: WorkspaceUserRole, workspace: { __typename?: 'Id', id: number }, profile: { __typename?: 'WorkspaceUserProfile', id: number, email: string, fullName: string, abbr: string, gravatar?: { __typename?: 'Gravatar', url: string } | null | undefined } }> }, projects: { __typename: 'WorkspaceProjects', list: { __typename: 'Forbidden', message: string } | { __typename: 'ServerError', message: string } | { __typename: 'WorkspaceProjectsList', items: Array<{ __typename?: 'WorkspaceProject', id: number, name: string, period?: string | null | undefined }> } } } };
+export type WorkspaceQuery = { __typename?: 'Query', workspace: { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'ServerError', message: string } | { __typename: 'Workspace', id: number, name: string, users: { __typename: 'Forbidden', message: string } | { __typename: 'ServerError', message: string } | { __typename: 'WorkspaceUsers', items: Array<{ __typename?: 'WorkspaceUser', id: number, role: WorkspaceUserRole, workspace: { __typename?: 'Id', id: number }, profile: { __typename?: 'WorkspaceUserProfile', id: number, email: string, fullName: string, abbr: string, gravatar?: { __typename?: 'Gravatar', url: string } | null | undefined } }> }, projects: { __typename: 'WorkspaceProjects', current: { __typename: 'Forbidden', message: string } | { __typename: 'ServerError', message: string } | { __typename: 'WorkspaceProjectsList', items: Array<{ __typename?: 'WorkspaceProject', id: number, name: string, status: ProjectStatus, period?: string | null | undefined }> }, done: { __typename: 'Forbidden', message: string } | { __typename: 'ServerError', message: string } | { __typename: 'WorkspaceProjectsList', items: Array<{ __typename?: 'WorkspaceProject', id: number, name: string, status: ProjectStatus, period?: string | null | undefined }> } } } };
 
 
 export const ConfirmLoginDocument = gql`
@@ -797,12 +821,27 @@ export const WorkspaceDocument = gql`
       }
       projects {
         __typename
-        list {
+        current: list(filter: {status: [NEW, IN_PROGRESS]}, limit: 10) {
           __typename
           ... on WorkspaceProjectsList {
             items {
               id
               name
+              status
+              period
+            }
+          }
+          ... on Error {
+            message
+          }
+        }
+        done: list(filter: {status: [DONE]}, limit: 10) {
+          __typename
+          ... on WorkspaceProjectsList {
+            items {
+              id
+              name
+              status
               period
             }
           }

@@ -30,12 +30,27 @@ query workspace($id: Int!) {
             }
             projects {
                 __typename
-                list {
+                current: list(filter: {status: [NEW, IN_PROGRESS]} limit: 10) {
                     __typename
                     ...on WorkspaceProjectsList{
                         items {
                             id
                             name
+                            status
+                            period
+                        }
+                    }
+                    ...on Error {
+                        message
+                    }
+                }
+                done: list(filter: {status: [DONE]} limit: 10) {
+                    __typename
+                    ...on WorkspaceProjectsList{
+                        items {
+                            id
+                            name
+                            status
                             period
                         }
                     }

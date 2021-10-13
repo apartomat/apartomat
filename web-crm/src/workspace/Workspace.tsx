@@ -70,17 +70,21 @@ export function Workspace () {
                     </Header>
 
                     <Box margin={{horizontal: "large"}}>
-                        <Box direction="row" margin={{vertical: "medium"}} justify="between">
-                            <Heading level={2} margin="none">{workspace.name}</Heading>
-                            <Box>
-                                <Button color="brand" label="Новый проект" onClick={() => setShowCreateProjectLayer(true)} />
+                        <Box margin={{bottom: "medium"}}>
+                            <Box direction="row" margin={{vertical: "medium"}} justify="between">
+                                <Heading level={2} margin="none">{workspace.name}</Heading>
+                                <Box>
+                                    <Button color="brand" label="Новый проект" onClick={() => setShowCreateProjectLayer(true)} />
+                                </Box>
                             </Box>
+
+                            <Projects projects={workspace.projects.current}/>
                         </Box>
 
-                        <Projects projects={workspace.projects.list} />
+                        <ProjectsArchive projects={workspace.projects.done}/>
 
-                        <Box margin={{top: "xlarge"}}>
-                            <WorkspaceUsers users={workspace.users} />
+                        <Box margin={{vertical: "medium"}}>
+                            <WorkspaceUsers users={workspace.users}/>
                         </Box>
                     </Box>
 
@@ -157,6 +161,37 @@ function Projects({ projects }: { projects: WorkspaceProjectsListResult }) {
             )
         default:
             return <div>n/a</div>
+    }
+}
+
+function ProjectsArchive({ projects }: { projects: WorkspaceProjectsListResult }) {
+    switch (projects.__typename) {
+        case "WorkspaceProjectsList":
+            if (projects.items.length === 0) {
+                return null;
+            }
+
+            return (
+                <Box margin={{bottom: "medium"}}>
+                    <Box direction="row" margin={{vertical: "medium"}} justify="between">
+                        <Heading level={3} margin="none">Архив</Heading>
+                    </Box>
+                    <List
+                        primaryKey="name"
+                        data={projects.items}
+                        pad={{vertical:"small"}}
+                        margin={{vertical: "medium"}}>
+                        {(pr: WorkspaceProject) => (
+                            <Box direction="row" justify="between">
+                                <AnchorLink to={`/p/${pr.id}`}>{pr.name}</AnchorLink>
+                                <Text>{pr.period}</Text>
+                            </Box>
+                        )}
+                    </List>
+                </Box>
+            )
+        default:
+            return null
     }
 }
 
