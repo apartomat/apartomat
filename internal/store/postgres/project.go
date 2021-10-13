@@ -146,6 +146,10 @@ func (builder *projectSelectBuilder) Where(q store.ProjectStoreQuery) *projectSe
 		builder.SelectBuilder = builder.SelectBuilder.Where(sq.Eq{"workspace_id": q.WorkspaceID.Eq})
 	}
 
+	if len(q.Status.Eq) > 0 {
+		builder.SelectBuilder = builder.SelectBuilder.Where(sq.Eq{"status": q.Status.Eq})
+	}
+
 	return builder
 }
 

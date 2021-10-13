@@ -18,8 +18,23 @@ type workspaceProjectsResolver struct {
 	*rootResolver
 }
 
-func (r *workspaceProjectsResolver) List(ctx context.Context, obj *WorkspaceProjects) (WorkspaceProjectsListResult, error) {
-	projects, err := r.useCases.GetWorkspaceProjects.Do(ctx, obj.Workspace.ID, 10, 0)
+func (r *workspaceProjectsResolver) List(
+	ctx context.Context,
+	obj *WorkspaceProjects,
+	filter WorkspaceProjectsFilter,
+	limit int,
+) (WorkspaceProjectsListResult, error) {
+	projects, err := r.useCases.GetWorkspaceProjects.Do(
+		ctx,
+		obj.Workspace.ID,
+		apartomat.GetWorkspaceProjectsFilter{
+			Status: store.ProjectStatusExpr{
+				Eq: toProjectStatuses(filter.Status),
+			},
+		},
+		limit,
+		0,
+	)
 	if err != nil {
 		if errors.Is(err, apartomat.ErrForbidden) {
 			return Forbidden{}, nil
@@ -33,14 +48,19 @@ func (r *workspaceProjectsResolver) List(ctx context.Context, obj *WorkspaceProj
 	return WorkspaceProjectsList{Items: projectsToGraphQLWorkspaceProjects(projects)}, nil
 }
 
-func (r *workspaceProjectsResolver) Total(ctx context.Context, obj *WorkspaceProjects) (WorkspaceProjectsTotalResult, error) {
+func (r *workspaceProjectsResolver) Total(
+	ctx context.Context,
+	obj *WorkspaceProjects,
+	filter WorkspaceProjectsFilter,
+) (WorkspaceProjectsTotalResult, error) {
 	return notImplementedYetError() //todo
 }
 
 func projectToGraphQLWorkspaceProject(project *store.Project) *WorkspaceProject {
 	wp := &WorkspaceProject{
-		ID:   project.ID,
-		Name: project.Name,
+		ID:     project.ID,
+		Name:   project.Name,
+		Status: projectStatusToGraphQL(project.Status),
 	}
 
 	if project.StartAt != nil {

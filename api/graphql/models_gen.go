@@ -289,15 +289,20 @@ type Workspace struct {
 func (Workspace) IsWorkspaceResult() {}
 
 type WorkspaceProject struct {
-	ID     int     `json:"id"`
-	Name   string  `json:"name"`
-	Period *string `json:"period"`
+	ID     int           `json:"id"`
+	Name   string        `json:"name"`
+	Period *string       `json:"period"`
+	Status ProjectStatus `json:"status"`
 }
 
 type WorkspaceProjects struct {
 	Workspace *ID                          `json:"workspace"`
 	List      WorkspaceProjectsListResult  `json:"list"`
 	Total     WorkspaceProjectsTotalResult `json:"total"`
+}
+
+type WorkspaceProjectsFilter struct {
+	Status []ProjectStatus `json:"status"`
 }
 
 type WorkspaceProjectsList struct {

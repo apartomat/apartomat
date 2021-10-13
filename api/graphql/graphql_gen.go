@@ -213,11 +213,12 @@ type ComplexityRoot struct {
 		ID     func(childComplexity int) int
 		Name   func(childComplexity int) int
 		Period func(childComplexity int) int
+		Status func(childComplexity int) int
 	}
 
 	WorkspaceProjects struct {
-		List      func(childComplexity int) int
-		Total     func(childComplexity int) int
+		List      func(childComplexity int, filter WorkspaceProjectsFilter, limit int) int
+		Total     func(childComplexity int, filter WorkspaceProjectsFilter) int
 		Workspace func(childComplexity int) int
 	}
 
@@ -295,8 +296,8 @@ type WorkspaceResolver interface {
 	Projects(ctx context.Context, obj *Workspace) (*WorkspaceProjects, error)
 }
 type WorkspaceProjectsResolver interface {
-	List(ctx context.Context, obj *WorkspaceProjects) (WorkspaceProjectsListResult, error)
-	Total(ctx context.Context, obj *WorkspaceProjects) (WorkspaceProjectsTotalResult, error)
+	List(ctx context.Context, obj *WorkspaceProjects, filter WorkspaceProjectsFilter, limit int) (WorkspaceProjectsListResult, error)
+	Total(ctx context.Context, obj *WorkspaceProjects, filter WorkspaceProjectsFilter) (WorkspaceProjectsTotalResult, error)
 }
 type WorkspaceUserResolver interface {
 	Profile(ctx context.Context, obj *WorkspaceUser) (*WorkspaceUserProfile, error)
@@ -836,19 +837,36 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.WorkspaceProject.Period(childComplexity), true
 
+	case "WorkspaceProject.status":
+		if e.complexity.WorkspaceProject.Status == nil {
+			break
+		}
+
+		return e.complexity.WorkspaceProject.Status(childComplexity), true
+
 	case "WorkspaceProjects.list":
 		if e.complexity.WorkspaceProjects.List == nil {
 			break
 		}
 
-		return e.complexity.WorkspaceProjects.List(childComplexity), true
+		args, err := ec.field_WorkspaceProjects_list_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.WorkspaceProjects.List(childComplexity, args["filter"].(WorkspaceProjectsFilter), args["limit"].(int)), true
 
 	case "WorkspaceProjects.total":
 		if e.complexity.WorkspaceProjects.Total == nil {
 			break
 		}
 
-		return e.complexity.WorkspaceProjects.Total(childComplexity), true
+		args, err := ec.field_WorkspaceProjects_total_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.WorkspaceProjects.Total(childComplexity, args["filter"].(WorkspaceProjectsFilter)), true
 
 	case "WorkspaceProjects.workspace":
 		if e.complexity.WorkspaceProjects.Workspace == nil {
@@ -1273,8 +1291,12 @@ type WorkspaceUserProfile {
 
 type WorkspaceProjects {
 	workspace: Id
-	list: WorkspaceProjectsListResult!
-	total: WorkspaceProjectsTotalResult!
+	list(filter: WorkspaceProjectsFilter! = {} limit: Int! = 10): WorkspaceProjectsListResult!
+	total(filter: WorkspaceProjectsFilter! = {}): WorkspaceProjectsTotalResult!
+}
+
+input WorkspaceProjectsFilter {
+	status: [ProjectStatus!]
 }
 
 union WorkspaceProjectsListResult = WorkspaceProjectsList | Forbidden | ServerError
@@ -1293,6 +1315,7 @@ type WorkspaceProject {
 	id: Int!
 	name: String!
 	period: String
+	status: ProjectStatus!
 }`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
@@ -1490,6 +1513,45 @@ func (ec *executionContext) field_ShoppinglistQuery_productOnPage_args(ctx conte
 		}
 	}
 	args["url"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_WorkspaceProjects_list_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 WorkspaceProjectsFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalNWorkspaceProjectsFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceProjectsFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 int
+	if tmp, ok := rawArgs["limit"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+		arg1, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["limit"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_WorkspaceProjects_total_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 WorkspaceProjectsFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalNWorkspaceProjectsFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceProjectsFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
 	return args, nil
 }
 
@@ -4002,6 +4064,41 @@ func (ec *executionContext) _WorkspaceProject_period(ctx context.Context, field 
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _WorkspaceProject_status(ctx context.Context, field graphql.CollectedField, obj *WorkspaceProject) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "WorkspaceProject",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(ProjectStatus)
+	fc.Result = res
+	return ec.marshalNProjectStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectStatus(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _WorkspaceProjects_workspace(ctx context.Context, field graphql.CollectedField, obj *WorkspaceProjects) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -4050,9 +4147,16 @@ func (ec *executionContext) _WorkspaceProjects_list(ctx context.Context, field g
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_WorkspaceProjects_list_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.WorkspaceProjects().List(rctx, obj)
+		return ec.resolvers.WorkspaceProjects().List(rctx, obj, args["filter"].(WorkspaceProjectsFilter), args["limit"].(int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4085,9 +4189,16 @@ func (ec *executionContext) _WorkspaceProjects_total(ctx context.Context, field 
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_WorkspaceProjects_total_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.WorkspaceProjects().Total(rctx, obj)
+		return ec.resolvers.WorkspaceProjects().Total(rctx, obj, args["filter"].(WorkspaceProjectsFilter))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5699,6 +5810,26 @@ func (ec *executionContext) unmarshalInputUploadProjectFileInput(ctx context.Con
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("file"))
 			it.File, err = ec.unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputWorkspaceProjectsFilter(ctx context.Context, obj interface{}) (WorkspaceProjectsFilter, error) {
+	var it WorkspaceProjectsFilter
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "status":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
+			it.Status, err = ec.unmarshalOProjectStatus2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectStatusᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -7389,6 +7520,11 @@ func (ec *executionContext) _WorkspaceProject(ctx context.Context, sel ast.Selec
 			}
 		case "period":
 			out.Values[i] = ec._WorkspaceProject_period(ctx, field, obj)
+		case "status":
+			out.Values[i] = ec._WorkspaceProject_status(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -8338,6 +8474,11 @@ func (ec *executionContext) marshalNWorkspaceProjects2ᚖgithubᚗcomᚋapartoma
 	return ec._WorkspaceProjects(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNWorkspaceProjectsFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceProjectsFilter(ctx context.Context, v interface{}) (WorkspaceProjectsFilter, error) {
+	res, err := ec.unmarshalInputWorkspaceProjectsFilter(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) marshalNWorkspaceProjectsListResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceProjectsListResult(ctx context.Context, sel ast.SelectionSet, v WorkspaceProjectsListResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -8775,6 +8916,70 @@ func (ec *executionContext) marshalOProjectFileType2ᚕgithubᚗcomᚋapartomat�
 				defer wg.Done()
 			}
 			ret[i] = ec.marshalNProjectFileType2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectFileType(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) unmarshalOProjectStatus2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectStatusᚄ(ctx context.Context, v interface{}) ([]ProjectStatus, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]ProjectStatus, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNProjectStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectStatus(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOProjectStatus2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectStatusᚄ(ctx context.Context, sel ast.SelectionSet, v []ProjectStatus) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNProjectStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectStatus(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)

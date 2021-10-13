@@ -39,8 +39,12 @@ type WorkspaceUserProfile {
 
 type WorkspaceProjects {
 	workspace: Id
-	list: WorkspaceProjectsListResult!
-	total: WorkspaceProjectsTotalResult!
+	list(filter: WorkspaceProjectsFilter! = {} limit: Int! = 10): WorkspaceProjectsListResult!
+	total(filter: WorkspaceProjectsFilter! = {}): WorkspaceProjectsTotalResult!
+}
+
+input WorkspaceProjectsFilter {
+	status: [ProjectStatus!]
 }
 
 union WorkspaceProjectsListResult = WorkspaceProjectsList | Forbidden | ServerError
@@ -59,4 +63,5 @@ type WorkspaceProject {
 	id: Int!
 	name: String!
 	period: String
+	status: ProjectStatus!
 }

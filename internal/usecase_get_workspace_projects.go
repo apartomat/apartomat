@@ -21,14 +21,20 @@ func NewGetWorkspaceProjects(
 	return &GetWorkspaceProjects{workspaces, projects, acl}
 }
 
-func (u *GetWorkspaceProjects) Do(ctx context.Context, id, limit, offset int) ([]*store.Project, error) {
-	workspaces, err := u.workspaces.List(ctx, store.WorkspaceStoreQuery{ID: expr.IntEq(id)})
+func (u *GetWorkspaceProjects) Do(
+	ctx context.Context,
+	workspaceID int,
+	filter GetWorkspaceProjectsFilter,
+	limit,
+	offset int,
+) ([]*store.Project, error) {
+	workspaces, err := u.workspaces.List(ctx, store.WorkspaceStoreQuery{ID: expr.IntEq(workspaceID)})
 	if err != nil {
 		return nil, err
 	}
 
 	if len(workspaces) == 0 {
-		return nil, errors.Wrapf(ErrNotFound, "workspace %d", id)
+		return nil, errors.Wrapf(ErrNotFound, "workspace %d", workspaceID)
 	}
 
 	workspace := workspaces[0]
@@ -37,10 +43,22 @@ func (u *GetWorkspaceProjects) Do(ctx context.Context, id, limit, offset int) ([
 		return nil, errors.Wrapf(ErrForbidden, "can't get workspace %d projects", workspace.ID)
 	}
 
-	p, err := u.projects.List(ctx, store.ProjectStoreQuery{WorkspaceID: expr.IntEq(id)})
+	p, err := u.projects.List(
+		ctx,
+		store.ProjectStoreQuery{
+			WorkspaceID: expr.IntEq(workspaceID),
+			Status:      filter.Status,
+			Limit:       limit,
+			Offset:      offset,
+		},
+	)
 	if err != nil {
 		return nil, err
 	}
 
 	return p, nil
+}
+
+type GetWorkspaceProjectsFilter struct {
+	Status store.ProjectStatusExpr
 }

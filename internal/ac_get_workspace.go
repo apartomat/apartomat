@@ -7,6 +7,10 @@ import (
 )
 
 func (acl *Acl) CanGetWorkspace(ctx context.Context, subj *UserCtx, obj *store.Workspace) (bool, error) {
+	if subj == nil {
+		return false, nil
+	}
+
 	wu, err := acl.store.WorkspaceUsers.List(
 		ctx,
 		store.WorkspaceUserStoreQuery{WorkspaceID: expr.IntEq(obj.ID), UserID: expr.IntEq(subj.ID)},

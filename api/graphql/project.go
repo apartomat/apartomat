@@ -43,3 +43,28 @@ func projectStatusToGraphQL(s store.ProjectStatus) ProjectStatus {
 		return ""
 	}
 }
+
+func toProjectStatus(status ProjectStatus) store.ProjectStatus {
+	switch status {
+	case ProjectStatusNew:
+		return store.ProjectStatusNew
+	case ProjectStatusInProgress:
+		return store.ProjectStatusInProgress
+	case ProjectStatusDone:
+		return store.ProjectStatusDone
+	case ProjectStatusCanceled:
+		return store.ProjectStatusCanceled
+	default:
+		return ""
+	}
+}
+
+func toProjectStatuses(l []ProjectStatus) []store.ProjectStatus {
+	res := make([]store.ProjectStatus, len(l))
+
+	for i, status := range l {
+		res[i] = toProjectStatus(status)
+	}
+
+	return res
+}

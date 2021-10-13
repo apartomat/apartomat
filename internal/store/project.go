@@ -34,6 +34,11 @@ type ProjectStore interface {
 type ProjectStoreQuery struct {
 	ID          expr.Int
 	WorkspaceID expr.Int
+	Status      ProjectStatusExpr
 	Limit       int
 	Offset      int
+}
+
+type ProjectStatusExpr struct {
+	Eq []ProjectStatus
 }
