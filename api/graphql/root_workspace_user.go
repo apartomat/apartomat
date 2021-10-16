@@ -3,6 +3,8 @@ package graphql
 import (
 	"context"
 	"github.com/apartomat/apartomat/internal/pkg/gravatar"
+	"github.com/pkg/errors"
+	"log"
 	"strings"
 )
 
@@ -17,11 +19,13 @@ func (r *rootResolver) WorkspaceUser() WorkspaceUserResolver {
 func (r *workspaceUserResolver) Profile(ctx context.Context, obj *WorkspaceUser) (*WorkspaceUserProfile, error) {
 	user, err := r.useCases.GetWorkspaceUserProfile.Do(ctx, obj.Workspace.ID, obj.ID)
 	if err != nil {
-		return nil, err
+		log.Printf("workspaceUserResolver.Profile: %s", err) // TODO: add more context
+		return nil, errors.New("internal server error")
 	}
 
 	if user == nil {
-		return nil, nil
+		log.Print("workspaceUserResolver.Profile: user not found") // TODO: add more context
+		return nil, errors.New("internal server error")
 	}
 
 	var (

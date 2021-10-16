@@ -9,9 +9,10 @@ import (
 	"strings"
 )
 
-func Handler(ch *apartomat.CheckAuthToken, resolver ResolverRoot) http.Handler {
+func Handler(ch *apartomat.CheckAuthToken, loaders *apartomat.DataLoaders, resolver ResolverRoot) http.Handler {
 	return CorsHandler(
 		WithDataLoadersHandler(
+			loaders,
 			WithUserHandler(
 				ch,
 				handler.NewDefaultServer(NewExecutableSchema(Config{Resolvers: resolver})),
@@ -40,9 +41,9 @@ func WithUserHandler(ver *apartomat.CheckAuthToken, next http.Handler) http.Hand
 	})
 }
 
-func WithDataLoadersHandler(next http.Handler) http.Handler {
+func WithDataLoadersHandler(loaders *apartomat.DataLoaders, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		r = r.WithContext(apartomat.WithDataLoadersCtx(r.Context(), &apartomat.DataLoaders{}))
+		r = r.WithContext(apartomat.WithDataLoadersCtx(r.Context(), loaders))
 		next.ServeHTTP(w, r)
 	})
 }

@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"github.com/apartomat/apartomat/api/graphql"
 	"github.com/apartomat/apartomat/internal"
+	"github.com/apartomat/apartomat/internal/dataloader"
 	"github.com/apartomat/apartomat/internal/store"
-	"github.com/apartomat/apartomat/internal/store/dataloader"
 	"github.com/apartomat/apartomat/internal/store/postgres"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"io/ioutil"
@@ -96,12 +96,15 @@ func main() {
 				GetDefaultWorkspace:     apartomat.NewGetDefaultWorkspace(workspaces),
 				GetWorkspace:            apartomat.NewGetWorkspace(workspaces, acl),
 				GetWorkspaceUsers:       apartomat.NewGetWorkspaceUsers(workspaces, workspaceUsers, acl),
-				GetWorkspaceUserProfile: apartomat.NewGetWorkspaceUserProfile(usersLoader, acl),
+				GetWorkspaceUserProfile: apartomat.NewGetWorkspaceUserProfile(acl),
 				GetWorkspaceProjects:    apartomat.NewGetWorkspaceProjects(workspaces, projects, acl),
 				GetProject:              apartomat.NewGetProject(projects, acl),
 				GetProjectFiles:         apartomat.NewGetProjectFiles(projects, projectFiles, acl),
 				UploadProjectFile:       apartomat.NewUploadProjectFile(projects, projectFiles, acl, uploader),
 				CreateProject:           apartomat.NewCreateProject(workspaces, projects, acl),
+			},
+			&apartomat.DataLoaders{
+				Users: usersLoader,
 			},
 		).Run(serverOpts...)
 

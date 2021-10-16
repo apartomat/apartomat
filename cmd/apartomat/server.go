@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/apartomat/apartomat/api/graphql"
+	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/go-chi/chi/v5"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -35,11 +36,13 @@ func (opt addrOpt) Apply(s *http.Server) {
 
 type server struct {
 	useCases *graphql.UseCases
+	loaders  *apartomat.DataLoaders
 }
 
-func NewServer(useCases *graphql.UseCases) *server {
+func NewServer(useCases *graphql.UseCases, loaders *apartomat.DataLoaders) *server {
 	return &server{
 		useCases: useCases,
+		loaders:  loaders,
 	}
 }
 
@@ -53,6 +56,7 @@ func (server *server) Run(opts ...Option) {
 
 	mux.Handle("/graphql", graphql.Handler(
 		server.useCases.CheckAuthToken,
+		server.loaders,
 		graphql.NewRootResolver(server.useCases),
 	))
 

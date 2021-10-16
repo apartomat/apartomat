@@ -3,20 +3,17 @@ package apartomat
 import (
 	"context"
 	"github.com/apartomat/apartomat/internal/store"
-	"github.com/apartomat/apartomat/internal/store/dataloader"
 	"github.com/pkg/errors"
 )
 
 type GetWorkspaceUserProfile struct {
-	users *dataloader.UserLoader
-	acl   *Acl
+	acl *Acl
 }
 
 func NewGetWorkspaceUserProfile(
-	users *dataloader.UserLoader,
 	acl *Acl,
 ) *GetWorkspaceUserProfile {
-	return &GetWorkspaceUserProfile{users, acl}
+	return &GetWorkspaceUserProfile{acl}
 }
 
 func (u *GetWorkspaceUserProfile) Do(ctx context.Context, workspaceID, userID int) (*store.User, error) {
@@ -28,7 +25,12 @@ func (u *GetWorkspaceUserProfile) Do(ctx context.Context, workspaceID, userID in
 		return nil, errors.Wrapf(ErrForbidden, "can't get workspace %d users profile %d", workspaceID, userID)
 	}
 
-	user, err := u.users.Load(userID)
+	loader, err := UserLoaderFromCtx(ctx)
+	if err != nil {
+		return nil, errors.Wrap(err, "can't get workspace user profile")
+	}
+
+	user, err := loader.Load(userID)
 	if err != nil {
 		return nil, err
 	}
