@@ -1,7 +1,6 @@
 package graphql
 
 import (
-	"context"
 	apartomat "github.com/apartomat/apartomat/internal"
 )
 
@@ -29,19 +28,6 @@ func NewRootResolver(useCases *UseCases) ResolverRoot {
 	return &rootResolver{useCases: useCases}
 }
 
-func (r *rootResolver) Query() QueryResolver { return &queryResolver{r} }
-
-func (r *rootResolver) Mutation() MutationResolver { return &mutationResolver{r} }
-
-type queryResolver struct {
-	*rootResolver
-}
-
-func (r *queryResolver) Version(ctx context.Context) (string, error) {
-	return "", nil
-}
-
-//
 func notFound() (NotFound, error) {
 	return NotFound{Message: "not found"}, nil
 }

@@ -6,12 +6,12 @@ import (
 	"strings"
 )
 
-func (r *rootResolver) WorkspaceUser() WorkspaceUserResolver {
-	return &workspaceUserResolver{r}
-}
-
 type workspaceUserResolver struct {
 	*rootResolver
+}
+
+func (r *rootResolver) WorkspaceUser() WorkspaceUserResolver {
+	return &workspaceUserResolver{r}
 }
 
 func (r *workspaceUserResolver) Profile(ctx context.Context, obj *WorkspaceUser) (*WorkspaceUserProfile, error) {

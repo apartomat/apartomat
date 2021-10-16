@@ -69,37 +69,6 @@ func (r *projectFilesResolver) Total(ctx context.Context, obj *ProjectFiles) (Pr
 	return ProjectFilesTotal{Total: 99}, nil // todo
 }
 
-func (r *mutationResolver) UploadProjectFile(
-	ctx context.Context,
-	input UploadProjectFileInput,
-) (UploadProjectFileResult, error) {
-	pf, err := r.useCases.UploadProjectFile.Do(
-		ctx,
-		input.ProjectID,
-		apartomat.Upload{
-			Name:     input.File.Filename,
-			Type:     toProjectFileType(input.Type),
-			MimeType: input.File.ContentType,
-			Data:     input.File.File,
-		},
-	)
-	if err != nil {
-		if errors.Is(err, apartomat.ErrForbidden) {
-			return Forbidden{}, nil
-		}
-
-		if errors.Is(err, apartomat.ErrAlreadyExists) {
-			return AlreadyExists{}, nil
-		}
-
-		log.Printf("can't upload file to project (id=%d): %s", input.ProjectID, err)
-
-		return serverError()
-	}
-
-	return ProjectFileUploaded{File: projectFileToGraphQL(pf)}, nil
-}
-
 func projectFileTypeToGraphQL(t store.ProjectFileType) ProjectFileType {
 	switch t {
 	case store.ProjectFileTypeVisualization:

@@ -10,12 +10,12 @@ import (
 	"time"
 )
 
-func (r *rootResolver) WorkspaceProjects() WorkspaceProjectsResolver {
-	return &workspaceProjectsResolver{r}
-}
-
 type workspaceProjectsResolver struct {
 	*rootResolver
+}
+
+func (r *rootResolver) WorkspaceProjects() WorkspaceProjectsResolver {
+	return &workspaceProjectsResolver{r}
 }
 
 func (r *workspaceProjectsResolver) List(
@@ -53,7 +53,7 @@ func (r *workspaceProjectsResolver) Total(
 	obj *WorkspaceProjects,
 	filter WorkspaceProjectsFilter,
 ) (WorkspaceProjectsTotalResult, error) {
-	return notImplementedYetError() //todo
+	return notImplementedYetError() // TODO
 }
 
 func projectToGraphQLWorkspaceProject(project *store.Project) *WorkspaceProject {
@@ -118,4 +118,8 @@ func period(start, end *time.Time) *string {
 	}
 
 	return pstring(per)
+}
+
+func pstring(str string) *string {
+	return &str
 }

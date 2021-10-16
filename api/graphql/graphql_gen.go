@@ -109,6 +109,7 @@ type ComplexityRoot struct {
 		ConfirmLogin      func(childComplexity int, token string) int
 		CreateProject     func(childComplexity int, input CreateProjectInput) int
 		LoginByEmail      func(childComplexity int, email string, workspaceName string) int
+		Ping              func(childComplexity int) int
 		UploadProjectFile func(childComplexity int, input UploadProjectFileInput) int
 	}
 
@@ -255,9 +256,10 @@ type FilesScreenResolver interface {
 	Menu(ctx context.Context, obj *FilesScreen) (MenuResult, error)
 }
 type MutationResolver interface {
-	LoginByEmail(ctx context.Context, email string, workspaceName string) (LoginByEmailResult, error)
+	Ping(ctx context.Context) (string, error)
 	ConfirmLogin(ctx context.Context, token string) (ConfirmLoginResult, error)
 	CreateProject(ctx context.Context, input CreateProjectInput) (CreateProjectResult, error)
+	LoginByEmail(ctx context.Context, email string, workspaceName string) (LoginByEmailResult, error)
 	UploadProjectFile(ctx context.Context, input UploadProjectFileInput) (UploadProjectFileResult, error)
 }
 type ProjectResolver interface {
@@ -451,6 +453,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.LoginByEmail(childComplexity, args["email"].(string), args["workspaceName"].(string)), true
+
+	case "Mutation.ping":
+		if e.complexity.Mutation.Ping == nil {
+			break
+		}
+
+		return e.complexity.Mutation.Ping(childComplexity), true
 
 	case "Mutation.uploadProjectFile":
 		if e.complexity.Mutation.UploadProjectFile == nil {
@@ -1023,14 +1032,11 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var sources = []*ast.Source{
-	{Name: "mutation.graphql", Input: `union LoginByEmailResult = CheckEmail | InvalidEmail | ServerError
-
-type CheckEmail {
-    email: String!
-}
-
-type InvalidEmail implements Error {
-    message: String!
+	{Name: "graphql/schema/mutation.graphql", Input: `type Mutation {
+    ping: String!
+}`, BuiltIn: false},
+	{Name: "graphql/schema/mutation_confirmLogin.graphql", Input: `extend type Mutation {
+    confirmLogin(token: String!): ConfirmLoginResult!
 }
 
 union ConfirmLoginResult = LoginConfirmed | InvalidToken | ExpiredToken | ServerError
@@ -1046,9 +1052,56 @@ type InvalidToken implements Error {
 type ExpiredToken implements Error {
     message: String!
 }
-
 `, BuiltIn: false},
-	{Name: "profile.graphql", Input: `extend type Query {
+	{Name: "graphql/schema/mutation_create_project.graphql", Input: `extend type Mutation {
+    createProject(input: CreateProjectInput!): CreateProjectResult!
+}
+
+input CreateProjectInput {
+    workspaceId: Int!
+    title: String!
+    startAt: Time
+    endAt: Time
+}
+
+union CreateProjectResult = ProjectCreated | Forbidden | ServerError
+
+type ProjectCreated {
+    project: Project!
+}`, BuiltIn: false},
+	{Name: "graphql/schema/mutation_login_by_email.graphql", Input: `extend type Mutation {
+    loginByEmail(email: String!, workspaceName: String! = "Workspace"): LoginByEmailResult!
+}
+
+union LoginByEmailResult = CheckEmail | InvalidEmail | ServerError
+
+type CheckEmail {
+    email: String!
+}
+
+type InvalidEmail implements Error {
+    message: String!
+}
+`, BuiltIn: false},
+	{Name: "graphql/schema/mutation_upload_project_file.graphql", Input: `extend type Mutation {
+    uploadProjectFile(input: UploadProjectFileInput!): UploadProjectFileResult!
+}
+
+input UploadProjectFileInput {
+    projectId: Int!
+    type: ProjectFileType!
+    file: Upload!
+}
+
+union UploadProjectFileResult = ProjectFileUploaded | Forbidden | AlreadyExists | ServerError
+
+type ProjectFileUploaded {
+    file: ProjectFile!
+}`, BuiltIn: false},
+	{Name: "graphql/schema/query.graphql", Input: `type Query {
+    version: String!
+}`, BuiltIn: false},
+	{Name: "graphql/schema/query_profile.graphql", Input: `extend type Query {
     profile: UserProfileResult!
 }
 
@@ -1062,7 +1115,7 @@ type UserProfile {
     gravatar: Gravatar
     defaultWorkspace: Workspace!
 }`, BuiltIn: false},
-	{Name: "project.graphql", Input: `union ProjectResult = Project | NotFound | Forbidden | ServerError
+	{Name: "graphql/schema/query_project.graphql", Input: `union ProjectResult = Project | NotFound | Forbidden | ServerError
 
 type Project {
     id: Int!
@@ -1115,94 +1168,14 @@ type ProjectFile {
     type: ProjectFileType!
     mimeType: String!
 }`, BuiltIn: false},
-	{Name: "project_create.graphql", Input: `extend type Mutation {
-    createProject(input: CreateProjectInput!): CreateProjectResult!
-}
-
-input CreateProjectInput {
-    workspaceId: Int!
-    title: String!
-    startAt: Time
-    endAt: Time
-}
-
-union CreateProjectResult = ProjectCreated | Forbidden | ServerError
-
-type ProjectCreated {
-    project: Project!
-}`, BuiltIn: false},
-	{Name: "project_upload_file.graphql", Input: `extend type Mutation {
-    uploadProjectFile(input: UploadProjectFileInput!): UploadProjectFileResult!
-}
-
-input UploadProjectFileInput {
-    projectId: Int!
-    type: ProjectFileType!
-    file: Upload!
-}
-
-union UploadProjectFileResult = ProjectFileUploaded | Forbidden | AlreadyExists | ServerError
-
-type ProjectFileUploaded {
-    file: ProjectFile!
-}`, BuiltIn: false},
-	{Name: "root.graphql", Input: `schema {
-    query: Query
-    mutation: Mutation
-}
-
-type Query {
-    version: String!
-}
-
-type Mutation {
-    loginByEmail(email: String!, workspaceName: String! = "Workspace"): LoginByEmailResult!
-    confirmLogin(token: String!): ConfirmLoginResult!
-}
-
-" Common types "
-
-interface Error {
-    message: String!
-}
-
-type ServerError implements Error {
-    message: String!
-}
-
-type Forbidden implements Error {
-    message: String!
-}
-
-type NotFound implements Error {
-    message: String!
-}
-
-type AlreadyExists implements Error {
-    message: String!
-}
-
-type Gravatar {
-    url: String!
-}
-
-type Id {
-	id: Int!
-}
-
-scalar Url
-
-scalar Upload
-
-scalar Time`, BuiltIn: false},
-	{Name: "screen.graphql", Input: `extend type Query {
+	{Name: "graphql/schema/query_screen.graphql", Input: `extend type Query {
     screen: ScreenQuery!
 }
 
 type ScreenQuery {
     version: String!
 }`, BuiltIn: false},
-	{Name: "screen_files.graphql", Input: `extend type ScreenQuery {
+	{Name: "graphql/schema/query_screen_files.graphql", Input: `extend type ScreenQuery {
     files(projectId: Int!): FilesScreen!
 }
 
@@ -1210,7 +1183,7 @@ type FilesScreen {
     project: ProjectResult!
     menu: MenuResult!
 }`, BuiltIn: false},
-	{Name: "screen_project.graphql", Input: `extend type ScreenQuery {
+	{Name: "graphql/schema/query_screen_project.graphql", Input: `extend type ScreenQuery {
     project(id: Int!): ProjectScreen!
 }
 
@@ -1229,7 +1202,7 @@ type MenuItem {
     title: String!
     url: String!
 }`, BuiltIn: false},
-	{Name: "screen_spec.graphql", Input: `extend type ScreenQuery {
+	{Name: "graphql/schema/query_screen_spec.graphql", Input: `extend type ScreenQuery {
     spec(projectId: Int!): SpecScreen!
 }
 
@@ -1237,7 +1210,7 @@ type SpecScreen {
     project: ProjectResult!
     menu: MenuResult!
 }`, BuiltIn: false},
-	{Name: "shoppinglist.graphql", Input: `extend type Query {
+	{Name: "graphql/schema/query_shoppinglist.graphql", Input: `extend type Query {
     shoppinglist: ShoppinglistQuery!
 }
 
@@ -1250,7 +1223,7 @@ type Product {
     description: String!
     image: String!
 }`, BuiltIn: false},
-	{Name: "workspace.graphql", Input: `extend type Query {
+	{Name: "graphql/schema/query_workspace.graphql", Input: `extend type Query {
     workspace(id: Int!): WorkspaceResult!
 }
 
@@ -1317,6 +1290,46 @@ type WorkspaceProject {
 	period: String
 	status: ProjectStatus!
 }`, BuiltIn: false},
+	{Name: "graphql/schema/root.graphql", Input: `schema {
+    query: Query
+    mutation: Mutation
+}
+
+
+interface Error {
+    message: String!
+}
+
+type ServerError implements Error {
+    message: String!
+}
+
+type Forbidden implements Error {
+    message: String!
+}
+
+type NotFound implements Error {
+    message: String!
+}
+
+type AlreadyExists implements Error {
+    message: String!
+}
+
+
+type Gravatar {
+    url: String!
+}
+
+type Id {
+	id: Int!
+}
+
+scalar Url
+
+scalar Upload
+
+scalar Time`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
@@ -2083,7 +2096,7 @@ func (ec *executionContext) _MenuItems_items(ctx context.Context, field graphql.
 	return ec.marshalNMenuItem2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐMenuItemᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Mutation_loginByEmail(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Mutation_ping(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -2099,16 +2112,9 @@ func (ec *executionContext) _Mutation_loginByEmail(ctx context.Context, field gr
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
-	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_loginByEmail_args(ctx, rawArgs)
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().LoginByEmail(rctx, args["email"].(string), args["workspaceName"].(string))
+		return ec.resolvers.Mutation().Ping(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2120,9 +2126,9 @@ func (ec *executionContext) _Mutation_loginByEmail(ctx context.Context, field gr
 		}
 		return graphql.Null
 	}
-	res := resTmp.(LoginByEmailResult)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNLoginByEmailResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐLoginByEmailResult(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_confirmLogin(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -2207,6 +2213,48 @@ func (ec *executionContext) _Mutation_createProject(ctx context.Context, field g
 	res := resTmp.(CreateProjectResult)
 	fc.Result = res
 	return ec.marshalNCreateProjectResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐCreateProjectResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_loginByEmail(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_loginByEmail_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().LoginByEmail(rctx, args["email"].(string), args["workspaceName"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(LoginByEmailResult)
+	fc.Result = res
+	return ec.marshalNLoginByEmailResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐLoginByEmailResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_uploadProjectFile(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -5914,13 +5962,6 @@ func (ec *executionContext) _Error(ctx context.Context, sel ast.SelectionSet, ob
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
-	case InvalidEmail:
-		return ec._InvalidEmail(ctx, sel, &obj)
-	case *InvalidEmail:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._InvalidEmail(ctx, sel, obj)
 	case InvalidToken:
 		return ec._InvalidToken(ctx, sel, &obj)
 	case *InvalidToken:
@@ -5935,6 +5976,13 @@ func (ec *executionContext) _Error(ctx context.Context, sel ast.SelectionSet, ob
 			return graphql.Null
 		}
 		return ec._ExpiredToken(ctx, sel, obj)
+	case InvalidEmail:
+		return ec._InvalidEmail(ctx, sel, &obj)
+	case *InvalidEmail:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._InvalidEmail(ctx, sel, obj)
 	case ServerError:
 		return ec._ServerError(ctx, sel, &obj)
 	case *ServerError:
@@ -6477,7 +6525,7 @@ func (ec *executionContext) _FilesScreen(ctx context.Context, sel ast.SelectionS
 	return out
 }
 
-var forbiddenImplementors = []string{"Forbidden", "UserProfileResult", "ProjectResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectFilesResult", "CreateProjectResult", "UploadProjectFileResult", "Error", "WorkspaceResult", "WorkspaceUsersResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult"}
+var forbiddenImplementors = []string{"Forbidden", "CreateProjectResult", "UploadProjectFileResult", "UserProfileResult", "ProjectResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectFilesResult", "WorkspaceResult", "WorkspaceUsersResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "Error"}
 
 func (ec *executionContext) _Forbidden(ctx context.Context, sel ast.SelectionSet, obj *Forbidden) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, forbiddenImplementors)
@@ -6713,8 +6761,8 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Mutation")
-		case "loginByEmail":
-			out.Values[i] = ec._Mutation_loginByEmail(ctx, field)
+		case "ping":
+			out.Values[i] = ec._Mutation_ping(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -6725,6 +6773,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			}
 		case "createProject":
 			out.Values[i] = ec._Mutation_createProject(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "loginByEmail":
+			out.Values[i] = ec._Mutation_loginByEmail(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -6744,7 +6797,7 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 	return out
 }
 
-var notFoundImplementors = []string{"NotFound", "ProjectResult", "Error", "WorkspaceResult"}
+var notFoundImplementors = []string{"NotFound", "ProjectResult", "WorkspaceResult", "Error"}
 
 func (ec *executionContext) _NotFound(ctx context.Context, sel ast.SelectionSet, obj *NotFound) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, notFoundImplementors)
@@ -7269,7 +7322,7 @@ func (ec *executionContext) _ScreenQuery(ctx context.Context, sel ast.SelectionS
 	return out
 }
 
-var serverErrorImplementors = []string{"ServerError", "LoginByEmailResult", "ConfirmLoginResult", "UserProfileResult", "ProjectResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectFilesResult", "CreateProjectResult", "UploadProjectFileResult", "Error", "MenuResult", "WorkspaceResult", "WorkspaceUsersResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult"}
+var serverErrorImplementors = []string{"ServerError", "ConfirmLoginResult", "CreateProjectResult", "LoginByEmailResult", "UploadProjectFileResult", "UserProfileResult", "ProjectResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectFilesResult", "MenuResult", "WorkspaceResult", "WorkspaceUsersResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "Error"}
 
 func (ec *executionContext) _ServerError(ctx context.Context, sel ast.SelectionSet, obj *ServerError) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, serverErrorImplementors)

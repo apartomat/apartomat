@@ -1,5 +1,5 @@
 schema:
-  - ./*.graphql
+  - ./graphql/schema/*.graphql
 
 exec:
   filename: graphql/graphql_gen.go
@@ -10,9 +10,16 @@ model:
   package: graphql
 
 models:
-  ShoppinglistQuery:
+  Project:
     fields:
-      productOnPage:
+      files:
+        resolver: true
+  ProjectFiles:
+    model: github.com/apartomat/apartomat/api/graphql.ProjectFiles
+    fields:
+      list:
+        resolver: true
+      total:
         resolver: true
   UserProfile:
     fields:
@@ -24,26 +31,20 @@ models:
         resolver: true
       projects:
         resolver: true
-  WorkspaceUser:
-    fields:
-      profile:
-        resolver: true
   WorkspaceProjects:
     fields:
       list:
         resolver: true
       total:
         resolver: true
-  Project:
+  WorkspaceUser:
     fields:
-      files:
+      profile:
         resolver: true
-  ProjectFiles:
-    model: github.com/apartomat/apartomat/api/graphql.ProjectFiles
+
+  ShoppinglistQuery:
     fields:
-      list:
-        resolver: true
-      total:
+      productOnPage:
         resolver: true
   ScreenQuery:
     fields:
@@ -67,4 +68,3 @@ models:
         resolver: true
       menu:
         resolver: true
-

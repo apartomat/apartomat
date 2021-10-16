@@ -15,6 +15,14 @@ func (r *projectResolver) Files(ctx context.Context, obj *Project) (*ProjectFile
 	return &ProjectFiles{Project: &ID{ID: obj.ID}}, nil
 }
 
+type ProjectFiles struct {
+	Project *ID
+	List    ProjectFilesListResult  `json:"list"`
+	Total   ProjectFilesTotalResult `json:"total"`
+}
+
+func (ProjectFiles) IsProjectFilesResult() {}
+
 func projectToGraphQL(p *store.Project) *Project {
 	if p == nil {
 		return nil

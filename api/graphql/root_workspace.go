@@ -2,36 +2,17 @@ package graphql
 
 import (
 	"context"
+	"errors"
 	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/store"
-	"github.com/pkg/errors"
 	"log"
 )
-
-func (r *queryResolver) Workspace(ctx context.Context, id int) (WorkspaceResult, error) {
-	ws, err := r.useCases.GetWorkspace.Do(ctx, id)
-	if err != nil {
-		if errors.Is(err, apartomat.ErrForbidden) {
-			return Forbidden{}, nil
-		}
-
-		if errors.Is(err, apartomat.ErrNotFound) {
-			return NotFound{}, nil
-		}
-
-		log.Printf("can't resolve workspace (id=%d): %s", id, err)
-
-		return ServerError{}, nil
-	}
-
-	return Workspace{ID: ws.ID, Name: ws.Name}, nil
-}
-
-func (r *rootResolver) Workspace() WorkspaceResolver { return &workspaceResolver{r} }
 
 type workspaceResolver struct {
 	*rootResolver
 }
+
+func (r *rootResolver) Workspace() WorkspaceResolver { return &workspaceResolver{r} }
 
 func (r *workspaceResolver) Users(ctx context.Context, obj *Workspace) (WorkspaceUsersResult, error) {
 	users, err := r.useCases.GetWorkspaceUsers.Do(ctx, obj.ID, 5, 0)
@@ -52,14 +33,6 @@ func (r *workspaceResolver) Projects(ctx context.Context, obj *Workspace) (*Work
 	return &WorkspaceProjects{Workspace: &ID{ID: obj.ID}}, nil
 }
 
-func workspaceUserToGraphQL(wu *store.WorkspaceUser) *WorkspaceUser {
-	return &WorkspaceUser{
-		ID:        wu.UserID,
-		Workspace: &ID{ID: wu.WorkspaceID},
-		Role:      workspaceUserRoleToGraphQL(wu.Role),
-	}
-}
-
 func workspaceUsersToGraphQL(users []*store.WorkspaceUser) []*WorkspaceUser {
 	result := make([]*WorkspaceUser, 0, len(users))
 
@@ -68,6 +41,14 @@ func workspaceUsersToGraphQL(users []*store.WorkspaceUser) []*WorkspaceUser {
 	}
 
 	return result
+}
+
+func workspaceUserToGraphQL(wu *store.WorkspaceUser) *WorkspaceUser {
+	return &WorkspaceUser{
+		ID:        wu.UserID,
+		Workspace: &ID{ID: wu.WorkspaceID},
+		Role:      workspaceUserRoleToGraphQL(wu.Role),
+	}
 }
 
 func workspaceUserRoleToGraphQL(role store.WorkspaceUserRole) WorkspaceUserRole {

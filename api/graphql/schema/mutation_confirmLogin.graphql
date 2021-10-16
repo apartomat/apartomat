@@ -1,11 +1,5 @@
-union LoginByEmailResult = CheckEmail | InvalidEmail | ServerError
-
-type CheckEmail {
-    email: String!
-}
-
-type InvalidEmail implements Error {
-    message: String!
+extend type Mutation {
+    confirmLogin(token: String!): ConfirmLoginResult!
 }
 
 union ConfirmLoginResult = LoginConfirmed | InvalidToken | ExpiredToken | ServerError
@@ -21,4 +15,3 @@ type InvalidToken implements Error {
 type ExpiredToken implements Error {
     message: String!
 }
-

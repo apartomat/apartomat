@@ -1,0 +1,13 @@
+extend type Mutation {
+    loginByEmail(email: String!, workspaceName: String! = "Workspace"): LoginByEmailResult!
+}
+
+union LoginByEmailResult = CheckEmail | InvalidEmail | ServerError
+
+type CheckEmail {
+    email: String!
+}
+
+type InvalidEmail implements Error {
+    message: String!
+}

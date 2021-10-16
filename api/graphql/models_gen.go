@@ -19,7 +19,6 @@ type CreateProjectResult interface {
 	IsCreateProjectResult()
 }
 
-//  Common types
 type Error interface {
 	IsError()
 }
@@ -108,18 +107,18 @@ type Forbidden struct {
 	Message string `json:"message"`
 }
 
+func (Forbidden) IsCreateProjectResult()          {}
+func (Forbidden) IsUploadProjectFileResult()      {}
 func (Forbidden) IsUserProfileResult()            {}
 func (Forbidden) IsProjectResult()                {}
 func (Forbidden) IsProjectFilesListResult()       {}
 func (Forbidden) IsProjectFilesTotalResult()      {}
 func (Forbidden) IsProjectFilesResult()           {}
-func (Forbidden) IsCreateProjectResult()          {}
-func (Forbidden) IsUploadProjectFileResult()      {}
-func (Forbidden) IsError()                        {}
 func (Forbidden) IsWorkspaceResult()              {}
 func (Forbidden) IsWorkspaceUsersResult()         {}
 func (Forbidden) IsWorkspaceProjectsListResult()  {}
 func (Forbidden) IsWorkspaceProjectsTotalResult() {}
+func (Forbidden) IsError()                        {}
 
 type Gravatar struct {
 	URL string `json:"url"`
@@ -165,8 +164,8 @@ type NotFound struct {
 }
 
 func (NotFound) IsProjectResult()   {}
-func (NotFound) IsError()           {}
 func (NotFound) IsWorkspaceResult() {}
+func (NotFound) IsError()           {}
 
 type Product struct {
 	Name        string `json:"name"`
@@ -237,21 +236,21 @@ type ServerError struct {
 	Message string `json:"message"`
 }
 
-func (ServerError) IsLoginByEmailResult()           {}
 func (ServerError) IsConfirmLoginResult()           {}
+func (ServerError) IsCreateProjectResult()          {}
+func (ServerError) IsLoginByEmailResult()           {}
+func (ServerError) IsUploadProjectFileResult()      {}
 func (ServerError) IsUserProfileResult()            {}
 func (ServerError) IsProjectResult()                {}
 func (ServerError) IsProjectFilesListResult()       {}
 func (ServerError) IsProjectFilesTotalResult()      {}
 func (ServerError) IsProjectFilesResult()           {}
-func (ServerError) IsCreateProjectResult()          {}
-func (ServerError) IsUploadProjectFileResult()      {}
-func (ServerError) IsError()                        {}
 func (ServerError) IsMenuResult()                   {}
 func (ServerError) IsWorkspaceResult()              {}
 func (ServerError) IsWorkspaceUsersResult()         {}
 func (ServerError) IsWorkspaceProjectsListResult()  {}
 func (ServerError) IsWorkspaceProjectsTotalResult() {}
+func (ServerError) IsError()                        {}
 
 type ShoppinglistQuery struct {
 	ProductOnPage *Product `json:"productOnPage"`
