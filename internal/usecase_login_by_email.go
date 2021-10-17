@@ -4,8 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/apartomat/apartomat/internal/mail"
 	"github.com/apartomat/apartomat/internal/pkg/expr"
 	"github.com/apartomat/apartomat/internal/store"
+	"github.com/apartomat/apartomat/internal/token"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
 )
@@ -20,16 +22,16 @@ type LoginByEmail struct {
 	users          store.UserStore
 	workspaces     store.WorkspaceStore
 	workspaceUsers store.WorkspaceUserStore
-	issuer         EmailConfirmTokenIssuer
-	mailer         MailSender
+	issuer         token.EmailConfirmTokenIssuer
+	mailer         mail.MailSender
 }
 
 func NewLoginByEmail(
 	users store.UserStore,
 	workspaces store.WorkspaceStore,
 	workspaceUsers store.WorkspaceUserStore,
-	issuer EmailConfirmTokenIssuer,
-	mailer MailSender,
+	issuer token.EmailConfirmTokenIssuer,
+	mailer mail.MailSender,
 ) *LoginByEmail {
 	return &LoginByEmail{users, workspaces, workspaceUsers, issuer, mailer}
 }
@@ -44,7 +46,7 @@ func (u *LoginByEmail) Do(ctx context.Context, email string, workspaceName strin
 		return "", err
 	}
 
-	err = u.mailer.Send(NewMailAuth("no-reply@zaibatsu.ru", email, token))
+	err = u.mailer.Send(mail.NewMailAuth("no-reply@zaibatsu.ru", email, token))
 	if err != nil {
 		return "", fmt.Errorf("sent error: %w", ErrSendError)
 	}

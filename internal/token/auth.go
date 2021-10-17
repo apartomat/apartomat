@@ -1,4 +1,4 @@
-package apartomat
+package token
 
 import (
 	"crypto/ed25519"

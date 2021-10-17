@@ -1,4 +1,4 @@
-package apartomat
+package token
 
 import (
 	"github.com/o1egl/paseto"

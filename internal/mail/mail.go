@@ -1,4 +1,4 @@
-package apartomat
+package mail
 
 import (
 	"bytes"

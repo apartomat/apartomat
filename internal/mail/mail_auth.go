@@ -1,6 +1,8 @@
-package apartomat
+package mail
 
-import "fmt"
+import (
+	"fmt"
+)
 
 func NewMailAuth(from, to, token string) *Mail {
 	return &Mail{

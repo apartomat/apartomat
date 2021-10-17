@@ -4,17 +4,18 @@ import (
 	"context"
 	"github.com/apartomat/apartomat/internal/pkg/expr"
 	"github.com/apartomat/apartomat/internal/store"
+	"github.com/apartomat/apartomat/internal/token"
 	"github.com/pkg/errors"
 )
 
 type ConfirmLogin struct {
-	verifier EmailConfirmTokenVerifier
-	issuer   AuthTokenIssuer
+	verifier token.EmailConfirmTokenVerifier
+	issuer   token.AuthTokenIssuer
 	users    store.UserStore
 	acl      *Acl
 }
 
-func NewConfirmLogin(verifier EmailConfirmTokenVerifier, issuer AuthTokenIssuer, users store.UserStore, acl *Acl) *ConfirmLogin {
+func NewConfirmLogin(verifier token.EmailConfirmTokenVerifier, issuer token.AuthTokenIssuer, users store.UserStore, acl *Acl) *ConfirmLogin {
 	return &ConfirmLogin{verifier: verifier, issuer: issuer, users: users, acl: acl}
 }
 

@@ -1,4 +1,4 @@
-package apartomat
+package s3
 
 import (
 	"context"
@@ -8,10 +8,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"io"
 )
-
-type ImageUploader interface {
-	Upload(ctx context.Context, reader io.Reader, path, contentType string) (string, error)
-}
 
 type s3ImageUploader struct {
 	client     *s3.Client

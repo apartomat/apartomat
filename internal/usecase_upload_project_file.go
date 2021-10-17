@@ -3,6 +3,7 @@ package apartomat
 import (
 	"context"
 	"fmt"
+	"github.com/apartomat/apartomat/internal/image"
 	"github.com/apartomat/apartomat/internal/pkg/expr"
 	"github.com/apartomat/apartomat/internal/store"
 	"github.com/pkg/errors"
@@ -13,14 +14,14 @@ type UploadProjectFile struct {
 	projects store.ProjectStore
 	files    store.ProjectFileStore
 	acl      *Acl
-	uploader ImageUploader
+	uploader image.ImageUploader
 }
 
 func NewUploadProjectFile(
 	projects store.ProjectStore,
 	files store.ProjectFileStore,
 	acl *Acl,
-	uploader ImageUploader,
+	uploader image.ImageUploader,
 ) *UploadProjectFile {
 	return &UploadProjectFile{projects: projects, files: files, acl: acl, uploader: uploader}
 }

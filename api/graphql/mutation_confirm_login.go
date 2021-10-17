@@ -3,14 +3,14 @@ package graphql
 import (
 	"context"
 	"errors"
-	apartomat "github.com/apartomat/apartomat/internal"
+	"github.com/apartomat/apartomat/internal/token"
 	"log"
 )
 
-func (r *mutationResolver) ConfirmLogin(ctx context.Context, token string) (ConfirmLoginResult, error) {
-	str, err := r.useCases.ConfirmLogin.Do(ctx, token)
+func (r *mutationResolver) ConfirmLogin(ctx context.Context, str string) (ConfirmLoginResult, error) {
+	str, err := r.useCases.ConfirmLogin.Do(ctx, str)
 	if err != nil {
-		if errors.Is(err, apartomat.ErrTokenValidationError) {
+		if errors.Is(err, token.ErrTokenValidationError) {
 			return InvalidToken{Message: "token expired or not valid"}, nil
 		}
 

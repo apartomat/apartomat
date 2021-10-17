@@ -7,10 +7,13 @@ import (
 	"encoding/pem"
 	"fmt"
 	"github.com/apartomat/apartomat/api/graphql"
-	"github.com/apartomat/apartomat/internal"
+	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/dataloader"
+	"github.com/apartomat/apartomat/internal/image/s3"
+	"github.com/apartomat/apartomat/internal/mail"
 	"github.com/apartomat/apartomat/internal/store"
 	"github.com/apartomat/apartomat/internal/store/postgres"
+	"github.com/apartomat/apartomat/internal/token"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"io/ioutil"
 	"log"
@@ -47,15 +50,15 @@ func main() {
 			log.Fatalf("cant read private key from file: %s", err)
 		}
 
-		mailConfig := apartomat.SmtpServerConfig{
+		mailConfig := mail.SmtpServerConfig{
 			Addr:     os.Getenv("SMTP_ADDR"),
 			User:     os.Getenv("SMTP_USER"),
 			Password: os.Getenv("SMTP_PASSWORD"),
 		}
 
-		confirmLoginIssuerVerifier := apartomat.NewPasetoMailConfirmTokenIssuerVerifier(privateKey)
-		authIssuerVerifier := apartomat.NewPasetoAuthTokenIssuerVerifier(privateKey)
-		mailer := apartomat.NewMailSender(mailConfig)
+		confirmLoginIssuerVerifier := token.NewPasetoMailConfirmTokenIssuerVerifier(privateKey)
+		authIssuerVerifier := token.NewPasetoAuthTokenIssuerVerifier(privateKey)
+		mailer := mail.NewMailSender(mailConfig)
 
 		pool, err := pgxpool.Connect(ctx, os.Getenv("POSTGRES_DSN"))
 		if err != nil {
@@ -76,7 +79,7 @@ func main() {
 
 		usersLoader := dataloader.NewUserLoader(dataloader.NewUserLoaderConfig(ctx, users))
 
-		uploader, err := apartomat.NewS3ImageUploaderWithCred(
+		uploader, err := s3.NewS3ImageUploaderWithCred(
 			ctx,
 			os.Getenv("S3_ACCESS_KEY_ID"),
 			os.Getenv("S3_SECRET_ACCESS_KEY"),
