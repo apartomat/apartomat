@@ -6,6 +6,8 @@ query project($id: Int!) {
                 ...on Project {
                     id
                     title
+                    startAt
+                    endAt
                     files {
                         list(filter: {type: [VISUALIZATION]} limit: 10 offset: 0) {
                             __typename

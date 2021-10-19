@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom"
 
 import { Main, Box, Header, Heading, Text,
     Paragraph, Spinner, SpinnerExtendedProps, Anchor, Image,
-FileInput, Button, Layer, Form, FormField, Drop } from "grommet"
+FileInput, Button, Layer, Form, FormField, Drop, DateInput } from "grommet"
 import { FormClose, StatusGood, Add } from "grommet-icons"
 
 import AnchorLink from "../common/AnchorLink"
@@ -103,22 +103,28 @@ export function Project () {
                     <Box direction="row" justify="between" wrap={true}>
                         <Box width="medium">
                             <Box margin="none">
-                                <Heading level={4} margin={{bottom: "xxsmall"}}>Сроки проекта</Heading>
-                                <Text margin={{top: "xxsmall"}}>2021/08/12&mdash;2021/09/12</Text>
+                                <Heading level={4} margin={{ bottom: "xsmall"}}>Сроки проекта</Heading>
+                                <ProjectDates startAt={project.startAt} endAt={project.endAt}/>
                             </Box>
                             <Box margin={{top: "small"}}>
-                                <Heading level={4} margin={{bottom: "xxsmall"}}>Комплектация</Heading>
-                                <Text margin={{top: "xxsmall"}}>3 комнаты, 2 санузла, коридор</Text>
+                                <Heading level={4} margin={{ bottom: "xsmall"}}>Комплектация</Heading>
+                                <Box height="36px" justify="center">
+                                    <Text>3 комнаты, 2 санузла, коридор</Text>
+                                </Box>
                             </Box>
                         </Box>
                         <Box width="medium">
                             <Box margin="none">
-                                <Heading level={4} margin={{bottom: "xxsmall"}}>Адрес</Heading>
-                                <Text margin={{top: "xxsmall"}}>Москва, ул. Амурская, ЖК LEVEL</Text>
+                                <Heading level={4} margin={{ bottom: "xsmall"}}>Адрес</Heading>
+                                <Box height="36px" justify="center">
+                                    <Text>Москва, ул. Амурская, ЖК LEVEL</Text>
+                                </Box>
                             </Box>
                             <Box margin={{top: "small"}}>
-                                <Heading level={4} margin={{bottom: "xxsmall"}}>Заказчик</Heading>
-                                <Text margin={{top: "xxsmall"}}><Anchor href="">Екатерина</Anchor>, <Anchor href="">Иван</Anchor></Text>
+                                <Heading level={4} margin={{ bottom: "xsmall"}}>Заказчик</Heading>
+                                <Box height="36px" justify="center">
+                                    <Text><Anchor href="">Екатерина</Anchor>, <Anchor href="">Иван</Anchor></Text>
+                                </Box>
                             </Box>
                         </Box>
                     </Box>
@@ -201,8 +207,52 @@ export function Project () {
 
 export default Project;
 
-function AddSomething () {
+function LocaleDate ({ children }: { children: string }) {
+    const date = new Date(children)
 
+    return (
+        <>{date.toLocaleDateString('ru-RU')}</>
+    )
+}
+
+function ProjectDates ({ startAt, endAt }: {startAt?: string, endAt?: string}) {
+    const [ state, setState ] = useState<string[]>(
+        [startAt, endAt].reduce((acc, item) => { if (item) { acc.push(item); } return acc; }, [] as string[])
+    )
+    const [ label, setLabel ] = useState(<>не определены</>)
+
+    const handleDateInputChange = ({ value }: { value: string | string[] }) => {
+        if (Array.isArray(value)) {
+            setState(value)
+        }
+    }
+
+    useEffect(() => {
+        if (state[0] && state[1] && state[0] !== state[1]) {
+            setLabel(<>{new Date(state[0]).toLocaleDateString("ru-RU")}&nbsp;&mdash;&nbsp;{new Date(state[1]).toLocaleDateString("ru-RU")}</>)
+            return
+        }
+
+        if (state[0]) {
+            setLabel(<>{new Date(state[0]).toLocaleDateString("ru-RU")}</>)
+            return
+        }
+
+        setLabel(<>не определены</>)
+    }, [state])
+
+    return (
+        <Box direction="row">
+            <DateInput
+                value={state}
+                onChange={handleDateInputChange}
+                buttonProps={{ label }}
+            />
+        </Box>
+    )
+}
+
+function AddSomething () {
     const [show, setShow] = useState(false)
 
     const targetRef = useRef<HTMLDivElement>(null)
