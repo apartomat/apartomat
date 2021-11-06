@@ -14,6 +14,14 @@ models:
     fields:
       files:
         resolver: true
+      contacts:
+        resolver: true
+  ProjectContacts:
+    fields:
+      list:
+        resolver: true
+      total:
+        resolver: true
   ProjectFiles:
     model: github.com/apartomat/apartomat/api/graphql.ProjectFiles
     fields:

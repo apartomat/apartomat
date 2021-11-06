@@ -11,6 +11,10 @@ type projectResolver struct {
 	*rootResolver
 }
 
+func (r *projectResolver) Contacts(ctx context.Context, obj *Project) (*ProjectContacts, error) {
+	return &ProjectContacts{}, nil
+}
+
 func (r *projectResolver) Files(ctx context.Context, obj *Project) (*ProjectFiles, error) {
 	return &ProjectFiles{Project: &ID{ID: obj.ID}}, nil
 }

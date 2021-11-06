@@ -11,9 +11,11 @@ import (
 	"github.com/apartomat/apartomat/internal/dataloader"
 	"github.com/apartomat/apartomat/internal/image/s3"
 	"github.com/apartomat/apartomat/internal/mail"
+	store2 "github.com/apartomat/apartomat/internal/postgres/store"
 	"github.com/apartomat/apartomat/internal/store"
 	"github.com/apartomat/apartomat/internal/store/postgres"
 	"github.com/apartomat/apartomat/internal/token"
+	"github.com/go-pg/pg/v10"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"io/ioutil"
 	"log"
@@ -65,12 +67,28 @@ func main() {
 			log.Fatalf("can't connect to postgres: %s", err)
 		}
 
+		pgopts, err := pg.ParseURL(os.Getenv("POSTGRES_DSN"))
+		if err != nil {
+			log.Fatalf("can't parse POSTGRES_DSN %s", err)
+		}
+
+		pgdb := pg.Connect(pgopts)
+
+		logger, err := NewLogger("debug")
+		if err != nil {
+			log.Fatal("can't init zap: %s", err)
+		}
+
+		pgdb.AddQueryHook(loggerHook{"postgres", logger})
+
 		users := postgres.NewUserStore(pool)
 		workspaces := postgres.NewWorkspaceStore(pool)
 		workspaceUsers := postgres.NewWorkspaceUserStore(pool)
 		projects := postgres.NewProjectStore(pool)
 		projectFiles := postgres.NewProjectFileStore(pool)
+		contactsStore := store2.NewContactsStore(pgdb)
 
+		//
 		mega := store.Store{
 			WorkspaceUsers: workspaceUsers,
 		}
@@ -105,6 +123,7 @@ func main() {
 				GetProjectFiles:         apartomat.NewGetProjectFiles(projects, projectFiles, acl),
 				UploadProjectFile:       apartomat.NewUploadProjectFile(projects, projectFiles, acl, uploader),
 				CreateProject:           apartomat.NewCreateProject(workspaces, projects, acl),
+				GetContacts:             apartomat.NewGetContacts(projects, contactsStore, acl),
 			},
 			&apartomat.DataLoaders{
 				Users: usersLoader,

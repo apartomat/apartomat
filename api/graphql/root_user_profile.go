@@ -2,6 +2,7 @@ package graphql
 
 import (
 	"context"
+	"errors"
 	"log"
 )
 
@@ -15,7 +16,7 @@ func (r *userProfileResolver) DefaultWorkspace(ctx context.Context, obj *UserPro
 	w, err := r.useCases.GetDefaultWorkspace.Do(ctx, obj.ID)
 	if err != nil {
 		log.Printf("can't get default workspace: %s", err)
-		return nil, nil
+		return nil, errors.New("internal server error")
 	}
 
 	return workspaceToGraphQL(w), nil

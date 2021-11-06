@@ -2,7 +2,7 @@ package apartomat
 
 import (
 	"context"
-	"github.com/apartomat/apartomat/internal/pkg/expr"
+	. "github.com/apartomat/apartomat/internal/pkg/expr"
 	"github.com/apartomat/apartomat/internal/store"
 	"github.com/pkg/errors"
 )
@@ -20,7 +20,7 @@ func NewGetProject(
 }
 
 func (u *GetProject) Do(ctx context.Context, id int) (*store.Project, error) {
-	projects, err := u.projects.List(ctx, store.ProjectStoreQuery{ID: expr.IntEq(id)})
+	projects, err := u.projects.List(ctx, store.ProjectStoreQuery{ID: IntEq(id)})
 	if err != nil {
 		return nil, err
 	}

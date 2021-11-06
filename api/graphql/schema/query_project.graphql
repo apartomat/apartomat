@@ -7,6 +7,7 @@ type Project {
     startAt: Time
     endAt: Time
     files: ProjectFiles!
+    contacts: ProjectContacts!
 }
 
 enum ProjectStatus {
@@ -50,4 +51,47 @@ type ProjectFile {
     url: Url!
     type: ProjectFileType!
     mimeType: String!
+}
+
+type ProjectContacts {
+    list(filter: ProjectContactsFilter! = {} limit: Int! = 10 offset: Int! = 0): ProjectContactsListResult!
+    total(filter: ProjectContactsFilter! = {}): ProjectContactsTotalResult!
+}
+
+input ProjectContactsFilter {
+    type: [ContactType!]!
+}
+
+union ProjectContactsListResult = ProjectContactsList | Forbidden | ServerError
+
+type ProjectContactsList {
+    items: [Contact!]!
+}
+
+union ProjectContactsTotalResult = ProjectContactsTotal | Forbidden | ServerError
+
+type ProjectContactsTotal {
+    total: Int!
+}
+
+enum ContactType {
+    INSTAGRAM
+    PHONE
+    EMAIL
+    WHATSAPP
+    TELEGRAM
+}
+
+type Contact {
+    id: String!
+    fullName: String!
+    photo: String!
+    details:   [ContactDetails!]!
+    createdAt:  Time!
+    modifiedAt: Time!
+}
+
+type ContactDetails {
+    type: ContactType!
+    value: String!
 }

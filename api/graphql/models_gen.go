@@ -31,6 +31,14 @@ type MenuResult interface {
 	IsMenuResult()
 }
 
+type ProjectContactsListResult interface {
+	IsProjectContactsListResult()
+}
+
+type ProjectContactsTotalResult interface {
+	IsProjectContactsTotalResult()
+}
+
 type ProjectFilesListResult interface {
 	IsProjectFilesListResult()
 }
@@ -84,6 +92,20 @@ type CheckEmail struct {
 
 func (CheckEmail) IsLoginByEmailResult() {}
 
+type Contact struct {
+	ID         string            `json:"id"`
+	FullName   string            `json:"fullName"`
+	Photo      string            `json:"photo"`
+	Details    []*ContactDetails `json:"details"`
+	CreatedAt  time.Time         `json:"createdAt"`
+	ModifiedAt time.Time         `json:"modifiedAt"`
+}
+
+type ContactDetails struct {
+	Type  ContactType `json:"type"`
+	Value string      `json:"value"`
+}
+
 type CreateProjectInput struct {
 	WorkspaceID int        `json:"workspaceId"`
 	Title       string     `json:"title"`
@@ -114,6 +136,8 @@ func (Forbidden) IsProjectResult()                {}
 func (Forbidden) IsProjectFilesListResult()       {}
 func (Forbidden) IsProjectFilesTotalResult()      {}
 func (Forbidden) IsProjectFilesResult()           {}
+func (Forbidden) IsProjectContactsListResult()    {}
+func (Forbidden) IsProjectContactsTotalResult()   {}
 func (Forbidden) IsWorkspaceResult()              {}
 func (Forbidden) IsWorkspaceUsersResult()         {}
 func (Forbidden) IsWorkspaceProjectsListResult()  {}
@@ -174,15 +198,37 @@ type Product struct {
 }
 
 type Project struct {
-	ID      int           `json:"id"`
-	Title   string        `json:"title"`
-	Status  ProjectStatus `json:"status"`
-	StartAt *time.Time    `json:"startAt"`
-	EndAt   *time.Time    `json:"endAt"`
-	Files   *ProjectFiles `json:"files"`
+	ID       int              `json:"id"`
+	Title    string           `json:"title"`
+	Status   ProjectStatus    `json:"status"`
+	StartAt  *time.Time       `json:"startAt"`
+	EndAt    *time.Time       `json:"endAt"`
+	Files    *ProjectFiles    `json:"files"`
+	Contacts *ProjectContacts `json:"contacts"`
 }
 
 func (Project) IsProjectResult() {}
+
+type ProjectContacts struct {
+	List  ProjectContactsListResult  `json:"list"`
+	Total ProjectContactsTotalResult `json:"total"`
+}
+
+type ProjectContactsFilter struct {
+	Type []ContactType `json:"type"`
+}
+
+type ProjectContactsList struct {
+	Items []*Contact `json:"items"`
+}
+
+func (ProjectContactsList) IsProjectContactsListResult() {}
+
+type ProjectContactsTotal struct {
+	Total int `json:"total"`
+}
+
+func (ProjectContactsTotal) IsProjectContactsTotalResult() {}
 
 type ProjectCreated struct {
 	Project *Project `json:"project"`
@@ -245,6 +291,8 @@ func (ServerError) IsProjectResult()                {}
 func (ServerError) IsProjectFilesListResult()       {}
 func (ServerError) IsProjectFilesTotalResult()      {}
 func (ServerError) IsProjectFilesResult()           {}
+func (ServerError) IsProjectContactsListResult()    {}
+func (ServerError) IsProjectContactsTotalResult()   {}
 func (ServerError) IsMenuResult()                   {}
 func (ServerError) IsWorkspaceResult()              {}
 func (ServerError) IsWorkspaceUsersResult()         {}
@@ -336,6 +384,53 @@ type WorkspaceUsers struct {
 }
 
 func (WorkspaceUsers) IsWorkspaceUsersResult() {}
+
+type ContactType string
+
+const (
+	ContactTypeInstagram ContactType = "INSTAGRAM"
+	ContactTypePhone     ContactType = "PHONE"
+	ContactTypeEmail     ContactType = "EMAIL"
+	ContactTypeWhatsapp  ContactType = "WHATSAPP"
+	ContactTypeTelegram  ContactType = "TELEGRAM"
+)
+
+var AllContactType = []ContactType{
+	ContactTypeInstagram,
+	ContactTypePhone,
+	ContactTypeEmail,
+	ContactTypeWhatsapp,
+	ContactTypeTelegram,
+}
+
+func (e ContactType) IsValid() bool {
+	switch e {
+	case ContactTypeInstagram, ContactTypePhone, ContactTypeEmail, ContactTypeWhatsapp, ContactTypeTelegram:
+		return true
+	}
+	return false
+}
+
+func (e ContactType) String() string {
+	return string(e)
+}
+
+func (e *ContactType) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = ContactType(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid ContactType", str)
+	}
+	return nil
+}
+
+func (e ContactType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
 
 type ProjectFileType string
 

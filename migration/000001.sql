@@ -38,6 +38,8 @@ CREATE TABLE apartomat.projects (
     status text NOT NULL,
     created_at timestamp with time zone NOT NULL DEFAULT now(),
     modified_at timestamp with time zone NOT NULL DEFAULT now(),
+    start_at timestamp with time zone,
+    end_at timestamp with time zone,
     workspace_id INT NOT NULL,
     CONSTRAINT projects_workspace_id_fkey FOREIGN KEY (workspace_id) REFERENCES apartomat.workspaces ON DELETE CASCADE
 );
@@ -53,4 +55,16 @@ CREATE TABLE apartomat.project_files (
     modified_at timestamp with time zone NOT NULL DEFAULT now(),
     CONSTRAINT project_files_project_id_fkey FOREIGN KEY (project_id) REFERENCES apartomat.projects ON DELETE CASCADE,
     CONSTRAINT project_files_ukey UNIQUE (project_id, name)
+);
+
+CREATE TABLE apartomat.contacts (
+    id text NOT NULL,
+    full_name text NOT NULL,
+    photo text NOT NULL,
+    details jsonb,
+    created_at timestamp with time zone NOT NULL DEFAULT now(),
+    modified_at timestamp with time zone NOT NULL DEFAULT now(),
+    project_id integer NOT NULL,
+    CONSTRAINT contacts_pkey UNIQUE (id),
+    CONSTRAINT contacts_project_id_fkey FOREIGN KEY (project_id) REFERENCES apartomat.projects ON DELETE CASCADE
 );
