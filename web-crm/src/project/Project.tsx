@@ -10,10 +10,11 @@ import AnchorLink from "../common/AnchorLink"
 
 import UserAvatar from "./UserAvatar"
 
-import { useProject, ProjectFiles } from "./useProject"
+import { useProject, ProjectFiles, ProjectContacts } from "./useProject"
 import { useUploadProjectFile, ProjectFileType } from "./useUploadProjectFile"
 
 import { useAuthContext } from "../common/context/auth/useAuthContext"
+import { JsxElement } from "typescript"
 
 interface RouteParams {
     id: string
@@ -60,7 +61,7 @@ export function Project () {
 
     switch (data?.screen.projectScreen.project.__typename) {
         case "Project":
-            const { project, menu } = data?.screen.projectScreen;
+            const { project } = data?.screen.projectScreen;
 
             return (
                 <Main pad={{vertical: "medium", horizontal: "large"}}>
@@ -120,12 +121,7 @@ export function Project () {
                                     <Text>Москва, ул. Амурская, ЖК LEVEL</Text>
                                 </Box>
                             </Box>
-                            <Box margin={{top: "small"}}>
-                                <Heading level={4} margin={{ bottom: "xsmall"}}>Заказчик</Heading>
-                                <Box height="36px" justify="center">
-                                    <Text><Anchor href="">Екатерина</Anchor>, <Anchor href="">Иван</Anchor></Text>
-                                </Box>
-                            </Box>
+                            <Contacts contacts={project.contacts}/>
                         </Box>
                     </Box>
 
@@ -206,6 +202,34 @@ export function Project () {
 }
 
 export default Project;
+
+function Contacts({ contacts }: { contacts: ProjectContacts }) {
+    switch (contacts.list.__typename) {
+        case "ProjectContactsList":
+            return (
+                <Box margin={{top: "small"}}>
+                    <Heading level={4} margin={{ bottom: "xsmall"}}>
+                        {contacts.list.items.length === 1 ? "Заказчик" : "Заказчики"}
+                    </Heading>
+                    <Box height="36px" justify="center">
+                        <Text>{contacts.list.items.map((contact) => {
+                            return (
+                                <Anchor>{contact.fullName}</Anchor>
+                            )
+                        }).reduce<React.ReactNode>((acc, item) => {
+                            return acc === "n/a" ? [item] : [acc, ", ", item]
+                        }, "n/a")}</Text>
+                    </Box>
+                </Box>
+            )
+        default:
+            return (
+                <Box margin={{top: "small"}}>
+                    <Text>n/a</Text>
+                </Box>
+            )
+    }
+}
 
 function LocaleDate ({ children }: { children: string }) {
     const date = new Date(children)

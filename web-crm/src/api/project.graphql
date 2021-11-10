@@ -8,6 +8,26 @@ query project($id: Int!) {
                     title
                     startAt
                     endAt
+                    contacts {
+                        list(filter: {} limit: 10 offset: 0) {
+                            __typename
+                            ...on ProjectContactsList {
+                                items {
+                                    id
+                                    fullName
+                                }
+                            }
+                            ...on Error {
+                                message
+                            }
+                        }
+                        total {
+                            __typename
+                            ...on ProjectContactsTotal {
+                                total
+                            }
+                        }
+                    }
                     files {
                         list(filter: {type: [VISUALIZATION]} limit: 10 offset: 0) {
                             __typename

@@ -32,6 +32,8 @@ func (r *projectContactsResolver) List(
 		contacts, err := r.useCases.GetContacts.Do(
 			ctx,
 			project.ID,
+			limit,
+			offset,
 		)
 		if err != nil {
 			if errors.Is(err, apartomat.ErrForbidden) {
@@ -52,7 +54,7 @@ func (r *projectContactsResolver) Total(
 	obj *ProjectContacts,
 	filter ProjectContactsFilter,
 ) (ProjectContactsTotalResult, error) {
-	panic("implement me")
+	return notImplementedYetError()
 }
 
 func projectContactsToGraphQL(contacts []*contacts.Contact) []*Contact {
@@ -105,14 +107,3 @@ func projectContactTypeToGraphQL(t contacts.Type) ContactType {
 		return ""
 	}
 }
-
-//func projectFileTypeToGraphQL(t store.ProjectFileType) ProjectFileType {
-//	switch t {
-//	case store.ProjectFileTypeVisualization:
-//		return ProjectFileTypeVisualization
-//	case store.ProjectFileTypeNone:
-//		return ProjectFileTypeNone
-//	default:
-//		return ProjectFileTypeNone
-//	}
-//}

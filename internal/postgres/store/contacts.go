@@ -29,7 +29,7 @@ func (s *contactsStore) Save(context.Context, *Contact) (*Contact, error) {
 
 }
 
-func (s *contactsStore) List(ctx context.Context, spec Spec, limit, offset uint) ([]*Contact, error) {
+func (s *contactsStore) List(ctx context.Context, spec Spec, limit, offset int) ([]*Contact, error) {
 	qs, err := toSpecQuery(spec)
 	if err != nil {
 		return nil, err
@@ -40,7 +40,7 @@ func (s *contactsStore) List(ctx context.Context, spec Spec, limit, offset uint)
 		return nil, err
 	}
 
-	sql, args, err := goqu.From(contactsTableName).Where(expr).Limit(limit).Offset(offset).ToSQL()
+	sql, args, err := goqu.From(contactsTableName).Where(expr).Limit(uint(limit)).Offset(uint(offset)).ToSQL()
 	if err != nil {
 		return nil, err
 	}

@@ -15,8 +15,12 @@ func (acl *Acl) CanGetWorkspace(ctx context.Context, subj *UserCtx, obj *store.W
 		ctx,
 		store.WorkspaceUserStoreQuery{WorkspaceID: expr.IntEq(obj.ID), UserID: expr.IntEq(subj.ID)},
 	)
-	if err != nil || len(wu) == 0 {
+	if err != nil {
 		return false, err
+	}
+
+	if len(wu) == 0 {
+		return false, nil
 	}
 
 	return wu[0].UserID == subj.ID, nil

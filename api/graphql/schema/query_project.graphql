@@ -59,7 +59,7 @@ type ProjectContacts {
 }
 
 input ProjectContactsFilter {
-    type: [ContactType!]!
+    type: [ContactType!]
 }
 
 union ProjectContactsListResult = ProjectContactsList | Forbidden | ServerError

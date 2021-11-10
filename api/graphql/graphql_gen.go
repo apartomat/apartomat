@@ -1311,7 +1311,7 @@ type ProjectContacts {
 }
 
 input ProjectContactsFilter {
-    type: [ContactType!]!
+    type: [ContactType!]
 }
 
 union ProjectContactsListResult = ProjectContactsList | Forbidden | ServerError
@@ -6517,7 +6517,7 @@ func (ec *executionContext) unmarshalInputProjectContactsFilter(ctx context.Cont
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
-			it.Type, err = ec.unmarshalNContactType2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐContactTypeᚄ(ctx, v)
+			it.Type, err = ec.unmarshalOContactType2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐContactTypeᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -9169,64 +9169,6 @@ func (ec *executionContext) marshalNContactType2githubᚗcomᚋapartomatᚋapart
 	return v
 }
 
-func (ec *executionContext) unmarshalNContactType2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐContactTypeᚄ(ctx context.Context, v interface{}) ([]ContactType, error) {
-	var vSlice []interface{}
-	if v != nil {
-		if tmp1, ok := v.([]interface{}); ok {
-			vSlice = tmp1
-		} else {
-			vSlice = []interface{}{v}
-		}
-	}
-	var err error
-	res := make([]ContactType, len(vSlice))
-	for i := range vSlice {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNContactType2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐContactType(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
-}
-
-func (ec *executionContext) marshalNContactType2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐContactTypeᚄ(ctx context.Context, sel ast.SelectionSet, v []ContactType) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNContactType2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐContactType(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-	return ret
-}
-
 func (ec *executionContext) unmarshalNCreateProjectInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐCreateProjectInput(ctx context.Context, v interface{}) (CreateProjectInput, error) {
 	res, err := ec.unmarshalInputCreateProjectInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -10088,6 +10030,70 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 		return graphql.Null
 	}
 	return graphql.MarshalBoolean(*v)
+}
+
+func (ec *executionContext) unmarshalOContactType2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐContactTypeᚄ(ctx context.Context, v interface{}) ([]ContactType, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]ContactType, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNContactType2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐContactType(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOContactType2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐContactTypeᚄ(ctx context.Context, sel ast.SelectionSet, v []ContactType) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNContactType2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐContactType(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
 }
 
 func (ec *executionContext) marshalOGravatar2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐGravatar(ctx context.Context, sel ast.SelectionSet, v *Gravatar) graphql.Marshaler {

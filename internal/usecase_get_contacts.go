@@ -22,7 +22,7 @@ func NewGetContacts(
 	return &GetContacts{projects, contacts, acl}
 }
 
-func (u *GetContacts) Do(ctx context.Context, projectID int) ([]*Contact, error) {
+func (u *GetContacts) Do(ctx context.Context, projectID int, limit, offset int) ([]*Contact, error) {
 	projects, err := u.projects.List(ctx, store.ProjectStoreQuery{ID: expr.IntEq(projectID)})
 	if err != nil {
 		return nil, err
@@ -34,9 +34,11 @@ func (u *GetContacts) Do(ctx context.Context, projectID int) ([]*Contact, error)
 
 	project := projects[0]
 
-	if !u.acl.CanGetProjectContacts(ctx, UserFromCtx(ctx), project) {
+	if ok, err := u.acl.CanGetProjectContacts(ctx, UserFromCtx(ctx), project); err != nil {
+		return nil, err
+	} else if !ok {
 		return nil, errors.Wrapf(ErrForbidden, "can't get project (id=%d) contacts", project.ID)
 	}
 
-	return u.contacts.List(ctx, ProjectIDIn(project.ID), 0, 0)
+	return u.contacts.List(ctx, ProjectIDIn(project.ID), limit, offset)
 }

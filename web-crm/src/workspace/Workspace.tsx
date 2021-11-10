@@ -104,7 +104,7 @@ export function Workspace () {
             return (
                 <Main pad="large">
                     <Heading level={2}>Ошибка</Heading>
-                    <Paragraph>Access is denied</Paragraph>
+                    <Paragraph>Доступ запрещен</Paragraph>
                 </Main>
             );
         default:

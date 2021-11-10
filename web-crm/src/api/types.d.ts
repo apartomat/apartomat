@@ -29,6 +29,30 @@ export type CheckEmail = {
 
 export type ConfirmLoginResult = ExpiredToken | InvalidToken | LoginConfirmed | ServerError;
 
+export type Contact = {
+  __typename?: 'Contact';
+  createdAt: Scalars['Time'];
+  details: Array<ContactDetails>;
+  fullName: Scalars['String'];
+  id: Scalars['String'];
+  modifiedAt: Scalars['Time'];
+  photo: Scalars['String'];
+};
+
+export type ContactDetails = {
+  __typename?: 'ContactDetails';
+  type: ContactType;
+  value: Scalars['String'];
+};
+
+export enum ContactType {
+  Email = 'EMAIL',
+  Instagram = 'INSTAGRAM',
+  Phone = 'PHONE',
+  Telegram = 'TELEGRAM',
+  Whatsapp = 'WHATSAPP'
+}
+
 export type CreateProjectInput = {
   endAt?: Maybe<Scalars['Time']>;
   startAt?: Maybe<Scalars['Time']>;
@@ -38,7 +62,6 @@ export type CreateProjectInput = {
 
 export type CreateProjectResult = Forbidden | ProjectCreated | ServerError;
 
-/**  Common types  */
 export type Error = {
   message: Scalars['String'];
 };
@@ -104,6 +127,7 @@ export type Mutation = {
   confirmLogin: ConfirmLoginResult;
   createProject: CreateProjectResult;
   loginByEmail: LoginByEmailResult;
+  ping: Scalars['String'];
   uploadProjectFile: UploadProjectFileResult;
 };
 
@@ -142,6 +166,7 @@ export type Product = {
 
 export type Project = {
   __typename?: 'Project';
+  contacts: ProjectContacts;
   endAt?: Maybe<Scalars['Time']>;
   files: ProjectFiles;
   id: Scalars['Int'];
@@ -149,6 +174,42 @@ export type Project = {
   status: ProjectStatus;
   title: Scalars['String'];
 };
+
+export type ProjectContacts = {
+  __typename?: 'ProjectContacts';
+  list: ProjectContactsListResult;
+  total: ProjectContactsTotalResult;
+};
+
+
+export type ProjectContactsListArgs = {
+  filter?: ProjectContactsFilter;
+  limit?: Scalars['Int'];
+  offset?: Scalars['Int'];
+};
+
+
+export type ProjectContactsTotalArgs = {
+  filter?: ProjectContactsFilter;
+};
+
+export type ProjectContactsFilter = {
+  type?: Maybe<Array<ContactType>>;
+};
+
+export type ProjectContactsList = {
+  __typename?: 'ProjectContactsList';
+  items: Array<Contact>;
+};
+
+export type ProjectContactsListResult = Forbidden | ProjectContactsList | ServerError;
+
+export type ProjectContactsTotal = {
+  __typename?: 'ProjectContactsTotal';
+  total: Scalars['Int'];
+};
+
+export type ProjectContactsTotalResult = Forbidden | ProjectContactsTotal | ServerError;
 
 export type ProjectCreated = {
   __typename?: 'ProjectCreated';
@@ -414,7 +475,7 @@ export type ProjectQueryVariables = Exact<{
 }>;
 
 
-export type ProjectQuery = { __typename?: 'Query', screen: { __typename?: 'ScreenQuery', projectScreen: { __typename?: 'ProjectScreen', project: { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'Project', id: number, title: string, startAt?: any | null | undefined, endAt?: any | null | undefined, files: { __typename?: 'ProjectFiles', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectFilesList', items: Array<{ __typename?: 'ProjectFile', id: number, name: string, url: any, type: ProjectFileType }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectFilesTotal', total: number } | { __typename: 'ServerError' } } } | { __typename: 'ServerError', message: string }, menu: { __typename: 'MenuItems', items: Array<{ __typename?: 'MenuItem', title: string, url: string }> } | { __typename: 'ServerError' } } } };
+export type ProjectQuery = { __typename?: 'Query', screen: { __typename?: 'ScreenQuery', projectScreen: { __typename?: 'ProjectScreen', project: { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'Project', id: number, title: string, startAt?: any | null | undefined, endAt?: any | null | undefined, contacts: { __typename?: 'ProjectContacts', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectContactsList', items: Array<{ __typename?: 'Contact', id: string, fullName: string }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectContactsTotal', total: number } | { __typename: 'ServerError' } }, files: { __typename?: 'ProjectFiles', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectFilesList', items: Array<{ __typename?: 'ProjectFile', id: number, name: string, url: any, type: ProjectFileType }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectFilesTotal', total: number } | { __typename: 'ServerError' } } } | { __typename: 'ServerError', message: string }, menu: { __typename: 'MenuItems', items: Array<{ __typename?: 'MenuItem', title: string, url: string }> } | { __typename: 'ServerError' } } } };
 
 export type SpecScreenQueryVariables = Exact<{
   projectId: Scalars['Int'];
@@ -634,6 +695,26 @@ export const ProjectDocument = gql`
           title
           startAt
           endAt
+          contacts {
+            list(filter: {}, limit: 10, offset: 0) {
+              __typename
+              ... on ProjectContactsList {
+                items {
+                  id
+                  fullName
+                }
+              }
+              ... on Error {
+                message
+              }
+            }
+            total {
+              __typename
+              ... on ProjectContactsTotal {
+                total
+              }
+            }
+          }
           files {
             list(filter: {type: [VISUALIZATION]}, limit: 10, offset: 0) {
               __typename

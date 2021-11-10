@@ -1,9 +1,9 @@
 import React, { useEffect } from "react";
 import {Route, Redirect, RouteProps } from "react-router-dom";
 
-import { Main, Box, Text, SpinnerExtendedProps, Spinner } from "grommet"
+import { Main, Box, Text, SpinnerExtendedProps, Spinner, Heading, Paragraph } from "grommet"
 
-import useAuthContext, { UserContextStatus } from "../useAuthContext";
+import useAuthContext, { UserContextStatus } from "../useAuthContext"
 
 const Loading = (props: SpinnerExtendedProps) => {
     return (
@@ -31,10 +31,10 @@ function PrivateRoute({ children, ...rest }: RouteProps) {
 
     if (error !== undefined) {
         return (
-            <Box>
-                <h1>Error</h1>
-                <p>Can't check profile: {error}</p>
-            </Box>
+            <Main pad="large">
+                <Heading level={2}>Ошибка</Heading>
+                <Paragraph>Не удалось получить профиль пользователя</Paragraph>
+            </Main>
         );
     }
 
@@ -53,10 +53,10 @@ function PrivateRoute({ children, ...rest }: RouteProps) {
                     );
                 case UserContextStatus.SERVER_ERROR:
                     return (
-                        <div>
-                            <h1>Error</h1>
-                            <p>Can't check profile. Please refresh the page</p>
-                        </div>
+                        <Main pad="large">
+                            <Heading level={2}>Ошибка</Heading>
+                            <Paragraph>Не удалось получить профиль пользователя</Paragraph>
+                        </Main>
                     );
                 case UserContextStatus.LOGGED:
                     return children;

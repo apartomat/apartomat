@@ -32,7 +32,7 @@ const (
 
 type Store interface {
 	Save(context.Context, *Contact) (*Contact, error)
-	List(ctx context.Context, spec Spec, limit, offset uint) ([]*Contact, error)
+	List(ctx context.Context, spec Spec, limit, offset int) ([]*Contact, error)
 }
 
 // Spec is a specification for Contact
