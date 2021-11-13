@@ -11,9 +11,7 @@ import (
 	"github.com/apartomat/apartomat/internal/dataloader"
 	"github.com/apartomat/apartomat/internal/image/s3"
 	"github.com/apartomat/apartomat/internal/mail"
-	store2 "github.com/apartomat/apartomat/internal/postgres/store"
-	"github.com/apartomat/apartomat/internal/store"
-	"github.com/apartomat/apartomat/internal/store/postgres"
+	"github.com/apartomat/apartomat/internal/postgres/store"
 	"github.com/apartomat/apartomat/internal/token"
 	"github.com/go-pg/pg/v10"
 	"github.com/jackc/pgx/v4/pgxpool"
@@ -81,19 +79,14 @@ func main() {
 
 		pgdb.AddQueryHook(loggerHook{"postgres", logger})
 
-		users := postgres.NewUserStore(pool)
-		workspaces := postgres.NewWorkspaceStore(pool)
-		workspaceUsers := postgres.NewWorkspaceUserStore(pool)
-		projects := postgres.NewProjectStore(pool)
-		projectFiles := postgres.NewProjectFileStore(pool)
-		contactsStore := store2.NewContactsStore(pgdb)
+		users := store.NewUserStore(pool)
+		workspaces := store.NewWorkspaceStore(pool)
+		workspaceUsers := store.NewWorkspaceUserStore(pool)
+		projects := store.NewProjectStore(pool)
+		projectFiles := store.NewProjectFileStore(pool)
+		contactsStore := store.NewContactsStore(pgdb)
 
-		//
-		mega := store.Store{
-			WorkspaceUsers: workspaceUsers,
-		}
-
-		acl := apartomat.NewAcl(mega)
+		acl := apartomat.NewAcl(workspaceUsers)
 
 		usersLoader := dataloader.NewUserLoader(dataloader.NewUserLoaderConfig(ctx, users))
 

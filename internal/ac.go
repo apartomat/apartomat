@@ -6,11 +6,11 @@ import (
 )
 
 type Acl struct {
-	store store.Store
+	WorkspaceUsers store.WorkspaceUserStore
 }
 
-func NewAcl(st store.Store) *Acl {
-	return &Acl{st}
+func NewAcl(workspaceUsers store.WorkspaceUserStore) *Acl {
+	return &Acl{workspaceUsers}
 }
 
 func (acl *Acl) CanConfirmLogin(ctx context.Context, subj *UserCtx, obj string) bool {

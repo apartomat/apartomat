@@ -6,14 +6,14 @@ import (
 	"github.com/apartomat/apartomat/internal/store"
 )
 
-func (acl *Acl) CanGetWorkspace(ctx context.Context, subj *UserCtx, obj *store.Workspace) (bool, error) {
+func (acl *Acl) CanGetProjectContacts(ctx context.Context, subj *UserCtx, obj *store.Project) (bool, error) {
 	if subj == nil {
 		return false, nil
 	}
 
 	wu, err := acl.WorkspaceUsers.List(
 		ctx,
-		store.WorkspaceUserStoreQuery{WorkspaceID: expr.IntEq(obj.ID), UserID: expr.IntEq(subj.ID)},
+		store.WorkspaceUserStoreQuery{WorkspaceID: expr.IntEq(obj.WorkspaceID), UserID: expr.IntEq(subj.ID)},
 	)
 	if err != nil {
 		return false, err
