@@ -5,6 +5,6 @@ import (
 	"io"
 )
 
-type ImageUploader interface {
+type Uploader interface {
 	Upload(ctx context.Context, reader io.Reader, path, contentType string) (string, error)
 }
