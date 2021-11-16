@@ -9,7 +9,7 @@ import (
 	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/dataloader"
 	"github.com/apartomat/apartomat/internal/image/s3"
-	"github.com/apartomat/apartomat/internal/mail"
+	"github.com/apartomat/apartomat/internal/mail/smtp"
 	"github.com/apartomat/apartomat/internal/postgres/store"
 	"github.com/apartomat/apartomat/internal/token"
 	"github.com/go-pg/pg/v10"
@@ -50,15 +50,14 @@ func main() {
 			log.Fatalf("cant read private key from file: %s", err)
 		}
 
-		mailConfig := mail.SmtpServerConfig{
+		confirmLoginIssuerVerifier := token.NewPasetoMailConfirmTokenIssuerVerifier(privateKey)
+		authIssuerVerifier := token.NewPasetoAuthTokenIssuerVerifier(privateKey)
+
+		mailer := smtp.NewMailSender(smtp.Config{
 			Addr:     os.Getenv("SMTP_ADDR"),
 			User:     os.Getenv("SMTP_USER"),
 			Password: os.Getenv("SMTP_PASSWORD"),
-		}
-
-		confirmLoginIssuerVerifier := token.NewPasetoMailConfirmTokenIssuerVerifier(privateKey)
-		authIssuerVerifier := token.NewPasetoAuthTokenIssuerVerifier(privateKey)
-		mailer := mail.NewMailSender(mailConfig)
+		})
 
 		pool, err := pgxpool.Connect(ctx, os.Getenv("POSTGRES_DSN"))
 		if err != nil {

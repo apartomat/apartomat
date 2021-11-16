@@ -16,7 +16,7 @@ type Apartomat struct {
 	ConfirmTokenByEmailIssuer   token.EmailConfirmTokenIssuer
 	ConfirmTokenByEmailVerifier token.EmailConfirmTokenVerifier
 
-	Mailer   mail.MailSender
+	Mailer   mail.Sender
 	Uploader image.Uploader
 
 	Contacts       contacts.Store
