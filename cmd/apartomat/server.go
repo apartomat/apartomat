@@ -35,11 +35,11 @@ func (opt addrOpt) Apply(s *http.Server) {
 }
 
 type server struct {
-	useCases *graphql.UseCases
+	useCases *apartomat.Apartomat
 	loaders  *apartomat.DataLoaders
 }
 
-func NewServer(useCases *graphql.UseCases, loaders *apartomat.DataLoaders) *server {
+func NewServer(useCases *apartomat.Apartomat, loaders *apartomat.DataLoaders) *server {
 	return &server{
 		useCases: useCases,
 		loaders:  loaders,

@@ -7,28 +7,14 @@ import (
 	"github.com/pkg/errors"
 )
 
-type GetWorkspaceProjects struct {
-	workspaces store.WorkspaceStore
-	projects   store.ProjectStore
-	acl        *Acl
-}
-
-func NewGetWorkspaceProjects(
-	workspaces store.WorkspaceStore,
-	projects store.ProjectStore,
-	acl *Acl,
-) *GetWorkspaceProjects {
-	return &GetWorkspaceProjects{workspaces, projects, acl}
-}
-
-func (u *GetWorkspaceProjects) Do(
+func (u *Apartomat) GetWorkspaceProjects(
 	ctx context.Context,
 	workspaceID int,
 	filter GetWorkspaceProjectsFilter,
 	limit,
 	offset int,
 ) ([]*store.Project, error) {
-	workspaces, err := u.workspaces.List(ctx, store.WorkspaceStoreQuery{ID: expr.IntEq(workspaceID)})
+	workspaces, err := u.Workspaces.List(ctx, store.WorkspaceStoreQuery{ID: expr.IntEq(workspaceID)})
 	if err != nil {
 		return nil, err
 	}
@@ -39,11 +25,11 @@ func (u *GetWorkspaceProjects) Do(
 
 	workspace := workspaces[0]
 
-	if !u.acl.CanGetWorkspaceProjects(ctx, UserFromCtx(ctx), workspace) {
+	if !u.CanGetWorkspaceProjects(ctx, UserFromCtx(ctx), workspace) {
 		return nil, errors.Wrapf(ErrForbidden, "can't get workspace %d projects", workspace.ID)
 	}
 
-	p, err := u.projects.List(
+	p, err := u.Projects.List(
 		ctx,
 		store.ProjectStoreQuery{
 			WorkspaceID: expr.IntEq(workspaceID),
@@ -61,4 +47,9 @@ func (u *GetWorkspaceProjects) Do(
 
 type GetWorkspaceProjectsFilter struct {
 	Status store.ProjectStatusExpr
+}
+
+func (u *Apartomat) CanGetWorkspaceProjects(ctx context.Context, subj *UserCtx, obj *store.Workspace) bool {
+	// todo check subj is workspace owner or admin
+	return true
 }

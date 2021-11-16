@@ -6,7 +6,6 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
-	"github.com/apartomat/apartomat/api/graphql"
 	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/dataloader"
 	"github.com/apartomat/apartomat/internal/image/s3"
@@ -27,6 +26,7 @@ var (
 )
 
 func main() {
+
 	if len(os.Args) == 0 {
 		log.Print("expect command (run or gen-key-pair)")
 		os.Exit(1)
@@ -74,7 +74,7 @@ func main() {
 
 		logger, err := NewLogger("debug")
 		if err != nil {
-			log.Fatal("can't init zap: %s", err)
+			log.Fatalf("can't init zap: %s", err)
 		}
 
 		pgdb.AddQueryHook(loggerHook{"postgres", logger})
@@ -85,8 +85,6 @@ func main() {
 		projects := store.NewProjectStore(pool)
 		projectFiles := store.NewProjectFileStore(pool)
 		contactsStore := store.NewContactsStore(pgdb)
-
-		acl := apartomat.NewAcl(workspaceUsers)
 
 		usersLoader := dataloader.NewUserLoader(dataloader.NewUserLoaderConfig(ctx, users))
 
@@ -101,23 +99,23 @@ func main() {
 			log.Fatalf("can't init s3: %s", err)
 		}
 
+		usecases := &apartomat.Apartomat{
+			AuthTokenIssuer:             authIssuerVerifier,
+			AuthTokenVerifier:           authIssuerVerifier,
+			ConfirmTokenByEmailIssuer:   confirmLoginIssuerVerifier,
+			ConfirmTokenByEmailVerifier: confirmLoginIssuerVerifier,
+			Mailer:                      mailer,
+			Uploader:                    uploader,
+			Contacts:                    contactsStore,
+			Projects:                    projects,
+			ProjectFiles:                projectFiles,
+			Users:                       users,
+			Workspaces:                  workspaces,
+			WorkspaceUsers:              workspaceUsers,
+		}
+
 		NewServer(
-			&graphql.UseCases{
-				CheckAuthToken:          apartomat.NewCheckAuthToken(authIssuerVerifier),
-				LoginByEmail:            apartomat.NewLoginByEmail(users, workspaces, workspaceUsers, confirmLoginIssuerVerifier, mailer),
-				ConfirmLogin:            apartomat.NewConfirmLogin(confirmLoginIssuerVerifier, authIssuerVerifier, users, acl),
-				GetUserProfile:          apartomat.NewGetUserProfile(users),
-				GetDefaultWorkspace:     apartomat.NewGetDefaultWorkspace(workspaces),
-				GetWorkspace:            apartomat.NewGetWorkspace(workspaces, acl),
-				GetWorkspaceUsers:       apartomat.NewGetWorkspaceUsers(workspaces, workspaceUsers, acl),
-				GetWorkspaceUserProfile: apartomat.NewGetWorkspaceUserProfile(acl),
-				GetWorkspaceProjects:    apartomat.NewGetWorkspaceProjects(workspaces, projects, acl),
-				GetProject:              apartomat.NewGetProject(projects, acl),
-				GetProjectFiles:         apartomat.NewGetProjectFiles(projects, projectFiles, acl),
-				UploadProjectFile:       apartomat.NewUploadProjectFile(projects, projectFiles, acl, uploader),
-				CreateProject:           apartomat.NewCreateProject(workspaces, projects, acl),
-				GetContacts:             apartomat.NewGetContacts(projects, contactsStore, acl),
-			},
+			usecases,
 			&apartomat.DataLoaders{
 				Users: usersLoader,
 			},

@@ -7,18 +7,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-type GetDefaultWorkspace struct {
-	workspaces store.WorkspaceStore
-}
-
-func NewGetDefaultWorkspace(
-	workspaces store.WorkspaceStore,
-) *GetDefaultWorkspace {
-	return &GetDefaultWorkspace{workspaces}
-}
-
-func (u *GetDefaultWorkspace) Do(ctx context.Context, userID int) (*store.Workspace, error) {
-	workspaces, err := u.workspaces.List(ctx, store.WorkspaceStoreQuery{UserID: expr.IntEq(userID), Limit: 1})
+func (u *Apartomat) GetDefaultWorkspace(ctx context.Context, userID int) (*store.Workspace, error) {
+	workspaces, err := u.Workspaces.List(ctx, store.WorkspaceStoreQuery{UserID: expr.IntEq(userID), Limit: 1})
 	if err != nil {
 		return nil, err
 	}

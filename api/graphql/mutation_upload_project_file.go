@@ -11,7 +11,7 @@ func (r *mutationResolver) UploadProjectFile(
 	ctx context.Context,
 	input UploadProjectFileInput,
 ) (UploadProjectFileResult, error) {
-	pf, err := r.useCases.UploadProjectFile.Do(
+	pf, err := r.useCases.UploadFile(
 		ctx,
 		input.ProjectID,
 		apartomat.Upload{

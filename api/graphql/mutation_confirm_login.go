@@ -8,7 +8,7 @@ import (
 )
 
 func (r *mutationResolver) ConfirmLogin(ctx context.Context, str string) (ConfirmLoginResult, error) {
-	str, err := r.useCases.ConfirmLogin.Do(ctx, str)
+	str, err := r.useCases.ConfirmLogin(ctx, str)
 	if err != nil {
 		if errors.Is(err, token.ErrTokenValidationError) {
 			return InvalidToken{Message: "token expired or not valid"}, nil

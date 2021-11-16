@@ -7,27 +7,13 @@ import (
 	"github.com/pkg/errors"
 )
 
-type GetProjectFiles struct {
-	projects     store.ProjectStore
-	projectFiles store.ProjectFileStore
-	acl          *Acl
-}
-
-func NewGetProjectFiles(
-	projects store.ProjectStore,
-	projectFiles store.ProjectFileStore,
-	acl *Acl,
-) *GetProjectFiles {
-	return &GetProjectFiles{projects, projectFiles, acl}
-}
-
-func (u *GetProjectFiles) Do(
+func (u *Apartomat) GetProjectFiles(
 	ctx context.Context,
 	projectID int,
 	filter GetProjectFilesFilter,
 	limit, offset int,
 ) ([]*store.ProjectFile, error) {
-	projects, err := u.projects.List(ctx, store.ProjectStoreQuery{ID: expr.IntEq(projectID)})
+	projects, err := u.Projects.List(ctx, store.ProjectStoreQuery{ID: expr.IntEq(projectID)})
 	if err != nil {
 		return nil, err
 	}
@@ -38,11 +24,11 @@ func (u *GetProjectFiles) Do(
 
 	project := projects[0]
 
-	if !u.acl.CanGetProjectFiles(ctx, UserFromCtx(ctx), project) {
+	if !u.CanGetProjectFiles(ctx, UserFromCtx(ctx), project) {
 		return nil, errors.Wrapf(ErrForbidden, "can't get project (id=%d) files", project.ID)
 	}
 
-	p, err := u.projectFiles.List(
+	p, err := u.ProjectFiles.List(
 		ctx,
 		store.ProjectFileStoreQuery{
 			ProjectID: expr.IntEq(projectID),
@@ -60,4 +46,8 @@ func (u *GetProjectFiles) Do(
 
 type GetProjectFilesFilter struct {
 	Type store.ProjectFileTypeExpr
+}
+
+func (u *Apartomat) CanGetProjectFiles(ctx context.Context, subj *UserCtx, obj *store.Project) bool {
+	return true
 }

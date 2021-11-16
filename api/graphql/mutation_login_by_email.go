@@ -8,7 +8,7 @@ import (
 )
 
 func (r *mutationResolver) LoginByEmail(ctx context.Context, email string, workspace string) (LoginByEmailResult, error) {
-	e, err := r.useCases.LoginByEmail.Do(ctx, email, workspace)
+	e, err := r.useCases.LoginByEmail(ctx, email, workspace)
 	if err != nil {
 		if errors.Is(err, apartomat.ErrInvalidEmail) {
 			return InvalidEmail{Message: err.Error()}, nil

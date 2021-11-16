@@ -6,18 +6,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-type GetWorkspaceUserProfile struct {
-	acl *Acl
-}
-
-func NewGetWorkspaceUserProfile(
-	acl *Acl,
-) *GetWorkspaceUserProfile {
-	return &GetWorkspaceUserProfile{acl}
-}
-
-func (u *GetWorkspaceUserProfile) Do(ctx context.Context, workspaceID, userID int) (*store.User, error) {
-	if !u.acl.CanGetWorkspaceUserProfile(
+func (u *Apartomat) GetWorkspaceUserProfile(ctx context.Context, workspaceID, userID int) (*store.User, error) {
+	if !u.CanGetWorkspaceUserProfile(
 		ctx,
 		UserFromCtx(ctx),
 		struct{ WorkspaceID, UserID int }{workspaceID, userID},
@@ -36,4 +26,9 @@ func (u *GetWorkspaceUserProfile) Do(ctx context.Context, workspaceID, userID in
 	}
 
 	return user, nil
+}
+
+func (u *Apartomat) CanGetWorkspaceUserProfile(ctx context.Context, subj *UserCtx, obj struct{ WorkspaceID, UserID int }) bool {
+	// todo check subj has access to workspace
+	return true
 }

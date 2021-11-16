@@ -4,28 +4,11 @@ import (
 	apartomat "github.com/apartomat/apartomat/internal"
 )
 
-type UseCases struct {
-	LoginByEmail            *apartomat.LoginByEmail
-	ConfirmLogin            *apartomat.ConfirmLogin
-	CheckAuthToken          *apartomat.CheckAuthToken
-	GetUserProfile          *apartomat.GetUserProfile
-	GetDefaultWorkspace     *apartomat.GetDefaultWorkspace
-	GetWorkspace            *apartomat.GetWorkspace
-	GetWorkspaceUsers       *apartomat.GetWorkspaceUsers
-	GetWorkspaceUserProfile *apartomat.GetWorkspaceUserProfile
-	GetWorkspaceProjects    *apartomat.GetWorkspaceProjects
-	GetProject              *apartomat.GetProject
-	GetProjectFiles         *apartomat.GetProjectFiles
-	UploadProjectFile       *apartomat.UploadProjectFile
-	CreateProject           *apartomat.CreateProject
-	GetContacts             *apartomat.GetContacts
-}
-
 type rootResolver struct {
-	useCases *UseCases
+	useCases *apartomat.Apartomat
 }
 
-func NewRootResolver(useCases *UseCases) ResolverRoot {
+func NewRootResolver(useCases *apartomat.Apartomat) ResolverRoot {
 	return &rootResolver{useCases: useCases}
 }
 

@@ -7,18 +7,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-type GetUserProfile struct {
-	users store.UserStore
-}
-
-func NewGetUserProfile(
-	users store.UserStore,
-) *GetUserProfile {
-	return &GetUserProfile{users}
-}
-
-func (u *GetUserProfile) Do(ctx context.Context, email string) (*store.User, error) {
-	users, err := u.users.List(ctx, store.UserStoreQuery{Email: expr.StrEq(email)})
+func (u *Apartomat) GetUserProfile(ctx context.Context, email string) (*store.User, error) {
+	users, err := u.Users.List(ctx, store.UserStoreQuery{Email: expr.StrEq(email)})
 	if err != nil {
 		return nil, err
 	}

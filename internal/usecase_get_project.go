@@ -7,20 +7,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-type GetProject struct {
-	projects store.ProjectStore
-	acl      *Acl
-}
-
-func NewGetProject(
-	projects store.ProjectStore,
-	acl *Acl,
-) *GetProject {
-	return &GetProject{projects, acl}
-}
-
-func (u *GetProject) Do(ctx context.Context, id int) (*store.Project, error) {
-	projects, err := u.projects.List(ctx, store.ProjectStoreQuery{ID: IntEq(id)})
+func (u *Apartomat) GetProject(ctx context.Context, id int) (*store.Project, error) {
+	projects, err := u.Projects.List(ctx, store.ProjectStoreQuery{ID: IntEq(id)})
 	if err != nil {
 		return nil, err
 	}
@@ -31,9 +19,14 @@ func (u *GetProject) Do(ctx context.Context, id int) (*store.Project, error) {
 
 	project := projects[0]
 
-	if !u.acl.CanGetProject(ctx, UserFromCtx(ctx), project) {
+	if !u.CanGetProject(ctx, UserFromCtx(ctx), project) {
 		return nil, errors.Wrapf(ErrForbidden, "can't get project %d", id)
 	}
 
 	return project, nil
+}
+
+func (u *Apartomat) CanGetProject(ctx context.Context, subj *UserCtx, obj *store.Project) bool {
+	// todo check subj is workspace owner or admin
+	return true
 }

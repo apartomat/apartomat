@@ -24,7 +24,7 @@ func (r *workspaceProjectsResolver) List(
 	filter WorkspaceProjectsFilter,
 	limit int,
 ) (WorkspaceProjectsListResult, error) {
-	projects, err := r.useCases.GetWorkspaceProjects.Do(
+	projects, err := r.useCases.GetWorkspaceProjects(
 		ctx,
 		obj.Workspace.ID,
 		apartomat.GetWorkspaceProjectsFilter{

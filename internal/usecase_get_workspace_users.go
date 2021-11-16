@@ -7,22 +7,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-type GetWorkspaceUsers struct {
-	workspaces     store.WorkspaceStore
-	workspaceUsers store.WorkspaceUserStore
-	acl            *Acl
-}
-
-func NewGetWorkspaceUsers(
-	workspaces store.WorkspaceStore,
-	workspaceUsers store.WorkspaceUserStore,
-	acl *Acl,
-) *GetWorkspaceUsers {
-	return &GetWorkspaceUsers{workspaces, workspaceUsers, acl}
-}
-
-func (u *GetWorkspaceUsers) Do(ctx context.Context, id, limit, offset int) ([]*store.WorkspaceUser, error) {
-	workspaces, err := u.workspaces.List(ctx, store.WorkspaceStoreQuery{ID: expr.IntEq(id)})
+func (u *Apartomat) GetWorkspaceUsers(ctx context.Context, id, limit, offset int) ([]*store.WorkspaceUser, error) {
+	workspaces, err := u.Workspaces.List(ctx, store.WorkspaceStoreQuery{ID: expr.IntEq(id)})
 	if err != nil {
 		return nil, err
 	}
@@ -33,14 +19,19 @@ func (u *GetWorkspaceUsers) Do(ctx context.Context, id, limit, offset int) ([]*s
 
 	workspace := workspaces[0]
 
-	if !u.acl.CanGetWorkspaceUsers(ctx, UserFromCtx(ctx), workspace) {
+	if !u.CanGetWorkspaceUsers(ctx, UserFromCtx(ctx), workspace) {
 		return nil, errors.Wrapf(ErrForbidden, "can't get workspace %d users", workspace.ID)
 	}
 
-	wu, err := u.workspaceUsers.List(ctx, store.WorkspaceUserStoreQuery{WorkspaceID: expr.IntEq(id)})
+	wu, err := u.WorkspaceUsers.List(ctx, store.WorkspaceUserStoreQuery{WorkspaceID: expr.IntEq(id)})
 	if err != nil {
 		return nil, err
 	}
 
 	return wu, nil
+}
+
+func (u *Apartomat) CanGetWorkspaceUsers(ctx context.Context, subj *UserCtx, obj *store.Workspace) bool {
+	// todo check subj is workspace owner or admin
+	return true
 }

@@ -246,7 +246,7 @@ func main() {
 	}
 
 	if err := pdf.OutputFileAndClose("book.pdf"); err != nil {
-		log.Fatal("can't write pdf file; %s", err)
+		log.Fatalf("can't write pdf file; %s", err)
 	}
 
 	log.Print("Done")

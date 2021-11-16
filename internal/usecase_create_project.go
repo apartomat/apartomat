@@ -8,27 +8,13 @@ import (
 	"time"
 )
 
-type CreateProject struct {
-	workspaces store.WorkspaceStore
-	projects   store.ProjectStore
-	acl        *Acl
-}
-
-func NewCreateProject(
-	workspaces store.WorkspaceStore,
-	projects store.ProjectStore,
-	acl *Acl,
-) *CreateProject {
-	return &CreateProject{workspaces, projects, acl}
-}
-
-func (u *CreateProject) Do(
+func (u *Apartomat) CreateProject(
 	ctx context.Context,
 	workspaceID int,
 	name string,
 	startAt, endAt *time.Time,
 ) (*store.Project, error) {
-	workspaces, err := u.workspaces.List(ctx, store.WorkspaceStoreQuery{ID: expr.IntEq(workspaceID)})
+	workspaces, err := u.Workspaces.List(ctx, store.WorkspaceStoreQuery{ID: expr.IntEq(workspaceID)})
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +27,7 @@ func (u *CreateProject) Do(
 		workspace = workspaces[0]
 	)
 
-	if !u.acl.CanCreateProject(ctx, UserFromCtx(ctx), workspace) {
+	if !u.CanCreateProject(ctx, UserFromCtx(ctx), workspace) {
 		return nil, errors.Wrapf(ErrForbidden, "can't create project in workspace (id=%d)", workspace.ID)
 	}
 
@@ -53,5 +39,9 @@ func (u *CreateProject) Do(
 		EndAt:       endAt,
 	}
 
-	return u.projects.Save(ctx, project)
+	return u.Projects.Save(ctx, project)
+}
+
+func (u *Apartomat) CanCreateProject(ctx context.Context, subj *UserCtx, obj *store.Workspace) bool {
+	return true
 }

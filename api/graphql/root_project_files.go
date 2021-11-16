@@ -23,7 +23,7 @@ func (r *projectFilesResolver) List(
 	limit int,
 	offset int,
 ) (ProjectFilesListResult, error) {
-	files, err := r.useCases.GetProjectFiles.Do(
+	files, err := r.useCases.GetProjectFiles(
 		ctx,
 		obj.Project.ID,
 		apartomat.GetProjectFilesFilter{

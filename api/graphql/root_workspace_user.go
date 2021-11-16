@@ -17,7 +17,7 @@ func (r *rootResolver) WorkspaceUser() WorkspaceUserResolver {
 }
 
 func (r *workspaceUserResolver) Profile(ctx context.Context, obj *WorkspaceUser) (*WorkspaceUserProfile, error) {
-	user, err := r.useCases.GetWorkspaceUserProfile.Do(ctx, obj.Workspace.ID, obj.ID)
+	user, err := r.useCases.GetWorkspaceUserProfile(ctx, obj.Workspace.ID, obj.ID)
 	if err != nil {
 		log.Printf("workspaceUserResolver.Profile: %s", err) // TODO: add more context
 		return nil, errors.New("internal server error")

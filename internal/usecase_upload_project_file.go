@@ -3,28 +3,11 @@ package apartomat
 import (
 	"context"
 	"fmt"
-	"github.com/apartomat/apartomat/internal/image"
 	"github.com/apartomat/apartomat/internal/pkg/expr"
 	"github.com/apartomat/apartomat/internal/store"
 	"github.com/pkg/errors"
 	"io"
 )
-
-type UploadProjectFile struct {
-	projects store.ProjectStore
-	files    store.ProjectFileStore
-	acl      *Acl
-	uploader image.ImageUploader
-}
-
-func NewUploadProjectFile(
-	projects store.ProjectStore,
-	files store.ProjectFileStore,
-	acl *Acl,
-	uploader image.ImageUploader,
-) *UploadProjectFile {
-	return &UploadProjectFile{projects: projects, files: files, acl: acl, uploader: uploader}
-}
 
 type Upload struct {
 	Name     string
@@ -33,12 +16,12 @@ type Upload struct {
 	Data     io.Reader
 }
 
-func (u *UploadProjectFile) Do(
+func (u *Apartomat) UploadFile(
 	ctx context.Context,
 	projectID int,
 	upload Upload,
 ) (*store.ProjectFile, error) {
-	projects, err := u.projects.List(ctx, store.ProjectStoreQuery{ID: expr.IntEq(projectID)})
+	projects, err := u.Projects.List(ctx, store.ProjectStoreQuery{ID: expr.IntEq(projectID)})
 	if err != nil {
 		return nil, err
 	}
@@ -49,13 +32,13 @@ func (u *UploadProjectFile) Do(
 
 	project := projects[0]
 
-	if !u.acl.CanUploadProjectFile(ctx, UserFromCtx(ctx), project) {
+	if !u.CanUploadProjectFile(ctx, UserFromCtx(ctx), project) {
 		return nil, errors.Wrapf(ErrForbidden, "can't upload file to project (id=%d)", project.ID)
 	}
 
 	path := fmt.Sprintf("p/%d/%s", project.ID, upload.Name)
 
-	url, err := u.uploader.Upload(ctx, upload.Data, path, upload.MimeType)
+	url, err := u.Uploader.Upload(ctx, upload.Data, path, upload.MimeType)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +51,7 @@ func (u *UploadProjectFile) Do(
 		MimeType:  upload.MimeType,
 	}
 
-	f, err = u.files.Save(ctx, f)
+	f, err = u.ProjectFiles.Save(ctx, f)
 	if err != nil {
 		if errors.Is(err, store.ErrAlreadyExists) {
 			return nil, errors.Wrapf(ErrAlreadyExists, "%s", upload.Name)
@@ -78,4 +61,8 @@ func (u *UploadProjectFile) Do(
 	}
 
 	return f, nil
+}
+
+func (u *Apartomat) CanUploadProjectFile(ctx context.Context, subj *UserCtx, obj *store.Project) bool {
+	return true
 }

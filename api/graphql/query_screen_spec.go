@@ -24,7 +24,7 @@ type specScreenResolver struct {
 
 func (r *specScreenResolver) Project(ctx context.Context, obj *SpecScreen) (ProjectResult, error) {
 	if p, ok := obj.Project.(Project); ok {
-		project, err := r.useCases.GetProject.Do(ctx, p.ID)
+		project, err := r.useCases.GetProject(ctx, p.ID)
 		if err != nil {
 			if errors.Is(err, apartomat.ErrForbidden) {
 				return forbidden()

@@ -15,7 +15,7 @@ type workspaceResolver struct {
 func (r *rootResolver) Workspace() WorkspaceResolver { return &workspaceResolver{r} }
 
 func (r *workspaceResolver) Users(ctx context.Context, obj *Workspace) (WorkspaceUsersResult, error) {
-	users, err := r.useCases.GetWorkspaceUsers.Do(ctx, obj.ID, 5, 0)
+	users, err := r.useCases.GetWorkspaceUsers(ctx, obj.ID, 5, 0)
 	if err != nil {
 		if errors.Is(err, apartomat.ErrForbidden) {
 			return Forbidden{}, nil
