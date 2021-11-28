@@ -19,14 +19,7 @@ import (
 	"os"
 )
 
-var (
-	serverOpts = []Option{
-		Addr("localhost:8010"),
-	}
-)
-
 func main() {
-
 	if len(os.Args) == 0 {
 		log.Print("expect command (run or gen-key-pair)")
 		os.Exit(1)
@@ -111,6 +104,10 @@ func main() {
 			Users:                       users,
 			Workspaces:                  workspaces,
 			WorkspaceUsers:              workspaceUsers,
+		}
+
+		serverOpts := []Option{
+			Addr(os.Getenv("SERVER_ADDR")),
 		}
 
 		NewServer(
