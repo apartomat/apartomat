@@ -20,7 +20,7 @@ import (
 )
 
 func main() {
-	if len(os.Args) == 0 {
+	if len(os.Args) < 2 {
 		log.Print("expect command (run or gen-key-pair)")
 		os.Exit(1)
 	}
