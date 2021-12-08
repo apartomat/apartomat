@@ -14,6 +14,7 @@ require (
 	github.com/doug-martin/goqu/v9 v9.18.0
 	github.com/go-chi/chi/v5 v5.0.2
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
+	github.com/go-pg/migrations/v8 v8.1.0 // indirect
 	github.com/go-pg/pg/v10 v10.10.6
 	github.com/jackc/pgconn v1.8.0
 	github.com/jackc/pgx/v4 v4.10.0
