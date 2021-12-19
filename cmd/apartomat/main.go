@@ -9,6 +9,7 @@ import (
 	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/dataloader"
 	"github.com/apartomat/apartomat/internal/image/s3"
+	"github.com/apartomat/apartomat/internal/mail"
 	"github.com/apartomat/apartomat/internal/mail/smtp"
 	"github.com/apartomat/apartomat/internal/postgres/store"
 	"github.com/apartomat/apartomat/internal/token"
@@ -97,6 +98,7 @@ func main() {
 			ConfirmTokenByEmailIssuer:   confirmLoginIssuerVerifier,
 			ConfirmTokenByEmailVerifier: confirmLoginIssuerVerifier,
 			Mailer:                      mailer,
+			MailFactory:                 mail.NewFactory("https://crm.apartomat.ru", "apartomat@yandex.ru"),
 			Uploader:                    uploader,
 			Contacts:                    contactsStore,
 			Projects:                    projects,

@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/apartomat/apartomat/internal/mail"
 	"github.com/apartomat/apartomat/internal/pkg/expr"
 	"github.com/apartomat/apartomat/internal/store"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
@@ -26,9 +25,9 @@ func (u *Apartomat) LoginByEmail(ctx context.Context, email string, workspaceNam
 		return "", err
 	}
 
-	err = u.Mailer.Send(mail.NewMailAuth("no-reply@zaibatsu.ru", email, token))
+	err = u.Mailer.Send(u.MailFactory.MailAuth(email, token))
 	if err != nil {
-		return "", fmt.Errorf("sent error: %w", ErrSendError)
+		return "", fmt.Errorf("sent error: %w", err)
 	}
 
 	var (
