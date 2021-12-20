@@ -38,7 +38,7 @@ func main() {
 
 	db := pg.Connect(pgopts)
 
-	migrations.SetTableName("migrations")
+	migrations.SetTableName("public.migrations")
 
 	prev, cur, err := migrations.Run(db, flag.Args()...)
 	if err != nil {
