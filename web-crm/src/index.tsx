@@ -29,7 +29,9 @@ const authLink = setContext((_, { headers }) => {
   }
 });
 
-const httpLink = createUploadLink({ uri: "http://localhost:8010/graphql" });
+const { REACT_APP_APARTOMAT_API_URL: apiUrl } = process.env;
+
+const httpLink = createUploadLink({ uri: process.env.REACT_APP_APARTOMAT_API_URL });
 
 const link = authLink.concat(httpLink);
 

@@ -163,7 +163,7 @@ export function Project () {
                         </Box>
                     </Box> */}
 
-                    <AddSomething/>
+                    <AddSomething showUploadFiles={setShowUploadFiles}/>
 
                     {showUploadFiles ?
                         <UploadFiles
@@ -276,16 +276,18 @@ function ProjectDates ({ startAt, endAt }: {startAt?: string, endAt?: string}) {
     )
 }
 
-function AddSomething () {
+function AddSomething ({ showUploadFiles }: { showUploadFiles: Dispatch<SetStateAction<boolean>> }) {
     const [show, setShow] = useState(false)
 
     const targetRef = useRef<HTMLDivElement>(null)
 
     return (
-        <Box align="center" margin={{top:"medium"}}>
-            <Box round="full" overflow="hidden" background="neutral-1" ref={targetRef}>
-                <Button icon={<Add />} hoverIndicator onClick={() => setShow(true)} />
+        <Box align="center" margin={{top:"xlarge"}}>
+
+            <Box ref={targetRef}>
+                <Button primary label="Добавить" onClick={() => setShow(true)} size="large" />
             </Box>
+
             {show && targetRef.current && (
                 <Drop
                     elevation="small"
@@ -296,16 +298,26 @@ function AddSomething () {
                     onClickOutside={() => setShow(false)}
                     onEsc={() => setShow(false)}
                 >
-                    <Box pad="small"><Text>План</Text></Box>
-                    <Box pad="small">Визуализации</Box>
-                    <Box pad="small"><Text>Спецификация</Text></Box>
-                    <Box pad="small"><Text>Альбом</Text></Box>
-                    <Box pad="small"><Text>Исходники</Text></Box>
+                    <Button plain children={({ hover }: {hover: boolean}) => {
+                        return <Box pad="small" background={hover ? 'light-1': ''}><Text>Визуализации</Text></Box>
+                    }} onClick={() => showUploadFiles}/>
+                    <Button plain>
+                        <Box pad="small"><Text>План</Text></Box>
+                    </Button>
+                    <Button plain>
+                        <Box pad="small"><Text>Исходники</Text></Box>
+                    </Button>
+                    <Button plain>
+                        <Box pad="small"><Text>Альбом</Text></Box>
+                    </Button>
+                    <Button plain>
+                        <Box pad="small"><Text>Спецификация</Text></Box>
+                    </Button>
                 </Drop>
             )}
             
             <Box margin={{top: "medium"}}>
-                <Text size="small">вы можете загрузить планы, визуализации и исходники, создать спецификацию или альбом</Text>
+                <Text>Добавьте визуализации, планы, исходники, создайте альбом и спецификацию.</Text>
             </Box>
         </Box>
     )
@@ -319,6 +331,10 @@ function Visualizations({ files, showUploadFiles }: { files: ProjectFiles, showU
 
     switch (files.list.__typename) {
         case "ProjectFilesList":
+            if (files.list.items.length === 0) {
+                return null
+            }
+
             return (
                 <Box margin={{vertical: "medium"}}>
                     <Box direction="row" justify="between">
