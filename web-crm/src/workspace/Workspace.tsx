@@ -66,7 +66,7 @@ export function Workspace () {
                         <Box>
                             <Text size="xlarge" weight="bold" color="brand">apartomat</Text>
                         </Box>
-                        <Box><UserAvatar user={user} className="header-user" /></Box>
+                        <Box><UserAvatar user={user}/></Box>
                     </Header>
 
                     <Box margin={{horizontal: "large"}}>

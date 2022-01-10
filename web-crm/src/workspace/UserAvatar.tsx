@@ -4,7 +4,7 @@ import { UserContext, UserContextStatus } from "../common/context/auth/useAuthCo
 
 import { Avatar } from "grommet"
 
-export function UserAvatar ({ user, className }: {user: UserContext, className?: string}) {
+export function UserAvatar ({ user }: { user: UserContext }) {
     switch (user.status) {
         case UserContextStatus.LOGGED:
             return (
