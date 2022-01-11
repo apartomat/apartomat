@@ -66,7 +66,6 @@ export function useAuthProvider() {
     const [concreteUser, setConcreteUser] = useState<User>(userEmpty);
 
     function check() {
-        console.log("calling check......");
         if (user.status === UserContextStatus.UNDEFINED) {
             setUser({status: UserContextStatus.CHEKING} as UserCheckingContext);
             loadProfile();

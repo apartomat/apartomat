@@ -1,11 +1,11 @@
 import React from "react";
 
 import { Redirect } from "react-router-dom";
-import Form from "./Form";
+import LoginForm from "./LoginForm";
 import CheckEmail from "./CheckEmail";
 
 import { useLoginByEmail } from "./useLoginByEmail";
-import useAuthContext, { UserContextStatus } from '../common/context/auth/useAuthContext';
+import useAuthContext, { UserContextStatus } from "../../common/context/auth/useAuthContext";
 
 export function Login () {
     const [login, { data, loading, error }] = useLoginByEmail();
@@ -20,7 +20,7 @@ export function Login () {
         );
     case "ServerError":
         return (
-            <Form login={login} loading={loading} error={data?.loginByEmail} />
+            <LoginForm login={login} loading={loading} error={data?.loginByEmail} />
         );
 
     default:
@@ -31,7 +31,7 @@ export function Login () {
         }
 
         return (
-            <Form login={login} loading={loading} error={error} />
+            <LoginForm login={login} loading={loading} error={error} />
         );
     }
 }

@@ -7,7 +7,7 @@ import AuthProvider from "./common/context/auth/AuthProvider/AuthProvider"
 import PrivateRoute from "./common/context/auth/PrivateRoute/PrivateRoute"
 import RedirectToDefaultWorkspace from "./common/context/auth/RedirectToDefaultWorkspace/RedirectToDefaultWorkspace"
 
-import Login from "./login/Login";
+import Login from "./Main/Login/Login";
 import Logout from "./logout/Logout";
 import Confirm from "./confirm/Confirm";
 import Workspace from './workspace/Workspace';
@@ -28,8 +28,6 @@ const authLink = setContext((_, { headers }) => {
     }
   }
 });
-
-const { REACT_APP_APARTOMAT_API_URL: apiUrl } = process.env;
 
 const httpLink = createUploadLink({ uri: process.env.REACT_APP_APARTOMAT_API_URL });
 

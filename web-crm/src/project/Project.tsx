@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom"
 import { Main, Box, Header, Heading, Text,
     Paragraph, Spinner, SpinnerExtendedProps, Anchor, Image,
 FileInput, Button, Layer, Form, FormField, Drop, DateInput } from "grommet"
-import { FormClose, StatusGood, Add } from "grommet-icons"
+import { FormClose, StatusGood } from "grommet-icons"
 
 import AnchorLink from "../common/AnchorLink"
 
@@ -14,7 +14,6 @@ import { useProject, ProjectFiles, ProjectContacts } from "./useProject"
 import { useUploadProjectFile, ProjectFileType } from "./useUploadProjectFile"
 
 import { useAuthContext } from "../common/context/auth/useAuthContext"
-import { JsxElement } from "typescript"
 
 interface RouteParams {
     id: string
@@ -89,7 +88,6 @@ export function Project () {
 
                 <Header background="white" margin={{vertical: "medium"}}>
                     <Box>
-                        
                         <Text size="xlarge" weight="bold" color="brand">
                             <AnchorLink to="/">apartomat</AnchorLink>
                         </Text>
