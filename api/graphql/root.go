@@ -17,7 +17,7 @@ func notFound() (NotFound, error) {
 }
 
 func forbidden() (Forbidden, error) {
-	return Forbidden{Message: "not found"}, nil
+	return Forbidden{Message: "forbidden"}, nil
 }
 
 func serverError() (ServerError, error) {
