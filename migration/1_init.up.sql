@@ -58,7 +58,7 @@ CREATE TABLE apartomat.project_files (
 );
 
 CREATE TABLE apartomat.contacts (
-    id text NOT NULL,
+    id char(21) NOT NULL,
     full_name text NOT NULL,
     photo text NOT NULL,
     details jsonb,
@@ -67,4 +67,16 @@ CREATE TABLE apartomat.contacts (
     project_id integer NOT NULL,
     CONSTRAINT contacts_pkey UNIQUE (id),
     CONSTRAINT contacts_project_id_fkey FOREIGN KEY (project_id) REFERENCES apartomat.projects ON DELETE CASCADE
+);
+
+CREATE TABLE apartomat.houses (
+    id char(21) not null,
+    city text not null,
+    address text not null,
+    housing_complex text not null,
+    created_at timestamp with time zone not null default now(),
+    modified_at timestamp with time zone not null default now(),
+    project_id integer not null,
+    constraint houses_pkey unique (id),
+    constraint houses_project_id_fkey foreign key (project_id) references apartomat.projects on delete cascade
 );

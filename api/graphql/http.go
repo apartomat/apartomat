@@ -26,7 +26,19 @@ func Handler(ch CheckAuthTokenFn, loaders *apartomat.DataLoaders, resolver Resol
 
 func WithUserHandler(checkAuthToken CheckAuthTokenFn, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		t, _ := checkAuthToken(strings.TrimPrefix(r.Header.Get("Authorization"), "Bearer "))
+		for k, v := range r.Header {
+			log.Printf("%s: %#v", k, v)
+		}
+
+		var (
+			header = r.Header.Get("Authorization")
+		)
+
+		if header == "" {
+			header = r.Header.Get("X-Authorization")
+		}
+
+		t, _ := checkAuthToken(strings.TrimPrefix(header, "Bearer "))
 		if t != nil {
 			id, err := strconv.Atoi(t.Get("userId"))
 			if err != nil {

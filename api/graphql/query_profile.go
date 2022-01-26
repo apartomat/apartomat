@@ -26,5 +26,5 @@ func (r *queryResolver) Profile(ctx context.Context) (UserProfileResult, error) 
 		}, nil
 	}
 
-	return Forbidden{}, nil
+	return forbidden()
 }

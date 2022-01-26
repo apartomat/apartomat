@@ -26,7 +26,6 @@ var (
 
 func (s *contactsStore) Save(context.Context, *Contact) (*Contact, error) {
 	return nil, errors.New("ContactsStore.Save not implemented yet")
-
 }
 
 func (s *contactsStore) List(ctx context.Context, spec Spec, limit, offset int) ([]*Contact, error) {

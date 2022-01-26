@@ -16,7 +16,15 @@ models:
         resolver: true
       contacts:
         resolver: true
+      houses:
+        resolver: true
   ProjectContacts:
+    fields:
+      list:
+        resolver: true
+      total:
+        resolver: true
+  ProjectHouses:
     fields:
       list:
         resolver: true

@@ -80,3 +80,7 @@ func toProjectStatuses(l []ProjectStatus) []store.ProjectStatus {
 
 	return res
 }
+
+func (r *projectResolver) Houses(ctx context.Context, obj *Project) (*ProjectHouses, error) {
+	return &ProjectHouses{}, nil
+}

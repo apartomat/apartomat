@@ -41,6 +41,7 @@ type ResolverRoot interface {
 	Project() ProjectResolver
 	ProjectContacts() ProjectContactsResolver
 	ProjectFiles() ProjectFilesResolver
+	ProjectHouses() ProjectHousesResolver
 	ProjectScreen() ProjectScreenResolver
 	Query() QueryResolver
 	ScreenQuery() ScreenQueryResolver
@@ -95,6 +96,15 @@ type ComplexityRoot struct {
 		URL func(childComplexity int) int
 	}
 
+	House struct {
+		Address        func(childComplexity int) int
+		City           func(childComplexity int) int
+		CreatedAt      func(childComplexity int) int
+		HousingComplex func(childComplexity int) int
+		ID             func(childComplexity int) int
+		ModifiedAt     func(childComplexity int) int
+	}
+
 	ID struct {
 		ID func(childComplexity int) int
 	}
@@ -142,6 +152,7 @@ type ComplexityRoot struct {
 		Contacts func(childComplexity int) int
 		EndAt    func(childComplexity int) int
 		Files    func(childComplexity int) int
+		Houses   func(childComplexity int) int
 		ID       func(childComplexity int) int
 		StartAt  func(childComplexity int) int
 		Status   func(childComplexity int) int
@@ -187,6 +198,19 @@ type ComplexityRoot struct {
 	}
 
 	ProjectFilesTotal struct {
+		Total func(childComplexity int) int
+	}
+
+	ProjectHouses struct {
+		List  func(childComplexity int, filter ProjectHousesFilter, limit int, offset int) int
+		Total func(childComplexity int, filter ProjectHousesFilter) int
+	}
+
+	ProjectHousesList struct {
+		Items func(childComplexity int) int
+	}
+
+	ProjectHousesTotal struct {
 		Total func(childComplexity int) int
 	}
 
@@ -294,6 +318,7 @@ type MutationResolver interface {
 type ProjectResolver interface {
 	Files(ctx context.Context, obj *Project) (*ProjectFiles, error)
 	Contacts(ctx context.Context, obj *Project) (*ProjectContacts, error)
+	Houses(ctx context.Context, obj *Project) (*ProjectHouses, error)
 }
 type ProjectContactsResolver interface {
 	List(ctx context.Context, obj *ProjectContacts, filter ProjectContactsFilter, limit int, offset int) (ProjectContactsListResult, error)
@@ -302,6 +327,10 @@ type ProjectContactsResolver interface {
 type ProjectFilesResolver interface {
 	List(ctx context.Context, obj *ProjectFiles, filter ProjectFilesListFilter, limit int, offset int) (ProjectFilesListResult, error)
 	Total(ctx context.Context, obj *ProjectFiles) (ProjectFilesTotalResult, error)
+}
+type ProjectHousesResolver interface {
+	List(ctx context.Context, obj *ProjectHouses, filter ProjectHousesFilter, limit int, offset int) (ProjectHousesListResult, error)
+	Total(ctx context.Context, obj *ProjectHouses, filter ProjectHousesFilter) (ProjectHousesTotalResult, error)
 }
 type ProjectScreenResolver interface {
 	Project(ctx context.Context, obj *ProjectScreen) (ProjectResult, error)
@@ -459,6 +488,48 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Gravatar.URL(childComplexity), true
 
+	case "House.address":
+		if e.complexity.House.Address == nil {
+			break
+		}
+
+		return e.complexity.House.Address(childComplexity), true
+
+	case "House.city":
+		if e.complexity.House.City == nil {
+			break
+		}
+
+		return e.complexity.House.City(childComplexity), true
+
+	case "House.createdAt":
+		if e.complexity.House.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.House.CreatedAt(childComplexity), true
+
+	case "House.housingComplex":
+		if e.complexity.House.HousingComplex == nil {
+			break
+		}
+
+		return e.complexity.House.HousingComplex(childComplexity), true
+
+	case "House.id":
+		if e.complexity.House.ID == nil {
+			break
+		}
+
+		return e.complexity.House.ID(childComplexity), true
+
+	case "House.modifiedAt":
+		if e.complexity.House.ModifiedAt == nil {
+			break
+		}
+
+		return e.complexity.House.ModifiedAt(childComplexity), true
+
 	case "Id.id":
 		if e.complexity.ID.ID == nil {
 			break
@@ -612,6 +683,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Project.Files(childComplexity), true
 
+	case "Project.houses":
+		if e.complexity.Project.Houses == nil {
+			break
+		}
+
+		return e.complexity.Project.Houses(childComplexity), true
+
 	case "Project.id":
 		if e.complexity.Project.ID == nil {
 			break
@@ -759,6 +837,44 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ProjectFilesTotal.Total(childComplexity), true
+
+	case "ProjectHouses.list":
+		if e.complexity.ProjectHouses.List == nil {
+			break
+		}
+
+		args, err := ec.field_ProjectHouses_list_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.ProjectHouses.List(childComplexity, args["filter"].(ProjectHousesFilter), args["limit"].(int), args["offset"].(int)), true
+
+	case "ProjectHouses.total":
+		if e.complexity.ProjectHouses.Total == nil {
+			break
+		}
+
+		args, err := ec.field_ProjectHouses_total_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.ProjectHouses.Total(childComplexity, args["filter"].(ProjectHousesFilter)), true
+
+	case "ProjectHousesList.items":
+		if e.complexity.ProjectHousesList.Items == nil {
+			break
+		}
+
+		return e.complexity.ProjectHousesList.Items(childComplexity), true
+
+	case "ProjectHousesTotal.total":
+		if e.complexity.ProjectHousesTotal.Total == nil {
+			break
+		}
+
+		return e.complexity.ProjectHousesTotal.Total(childComplexity), true
 
 	case "ProjectScreen.menu":
 		if e.complexity.ProjectScreen.Menu == nil {
@@ -1260,6 +1376,7 @@ type Project {
     endAt: Time
     files: ProjectFiles!
     contacts: ProjectContacts!
+    houses: ProjectHouses!
 }
 
 enum ProjectStatus {
@@ -1346,6 +1463,36 @@ type Contact {
 type ContactDetails {
     type: ContactType!
     value: String!
+}
+
+type ProjectHouses {
+    list(filter: ProjectHousesFilter! = {} limit: Int! = 10 offset: Int! = 0): ProjectHousesListResult!
+    total(filter: ProjectHousesFilter! = {}): ProjectHousesTotalResult!
+}
+
+input ProjectHousesFilter {
+    ID: [String!]
+}
+
+union ProjectHousesListResult = ProjectHousesList | Forbidden | ServerError
+
+type ProjectHousesList {
+    items: [House!]!
+}
+
+union ProjectHousesTotalResult = ProjectHousesTotal | Forbidden | ServerError
+
+type ProjectHousesTotal {
+    total: Int!
+}
+
+type House {
+    id: String!
+    city: String!
+    address: String!
+    housingComplex: String!
+    createdAt:  Time!
+    modifiedAt: Time!
 }`, BuiltIn: false},
 	{Name: "graphql/schema/query_screen.graphql", Input: `extend type Query {
     screen: ScreenQuery!
@@ -1663,6 +1810,54 @@ func (ec *executionContext) field_ProjectFiles_list_args(ctx context.Context, ra
 		}
 	}
 	args["offset"] = arg2
+	return args, nil
+}
+
+func (ec *executionContext) field_ProjectHouses_list_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 ProjectHousesFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalNProjectHousesFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectHousesFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 int
+	if tmp, ok := rawArgs["limit"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+		arg1, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["limit"] = arg1
+	var arg2 int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg2, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg2
+	return args, nil
+}
+
+func (ec *executionContext) field_ProjectHouses_total_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 ProjectHousesFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalNProjectHousesFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectHousesFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
 	return args, nil
 }
 
@@ -2356,6 +2551,216 @@ func (ec *executionContext) _Gravatar_url(ctx context.Context, field graphql.Col
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _House_id(ctx context.Context, field graphql.CollectedField, obj *House) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "House",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _House_city(ctx context.Context, field graphql.CollectedField, obj *House) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "House",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.City, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _House_address(ctx context.Context, field graphql.CollectedField, obj *House) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "House",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Address, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _House_housingComplex(ctx context.Context, field graphql.CollectedField, obj *House) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "House",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.HousingComplex, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _House_createdAt(ctx context.Context, field graphql.CollectedField, obj *House) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "House",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreatedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _House_modifiedAt(ctx context.Context, field graphql.CollectedField, obj *House) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "House",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ModifiedAt, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Id_id(ctx context.Context, field graphql.CollectedField, obj *ID) (ret graphql.Marshaler) {
@@ -3185,6 +3590,41 @@ func (ec *executionContext) _Project_contacts(ctx context.Context, field graphql
 	return ec.marshalNProjectContacts2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectContacts(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Project_houses(ctx context.Context, field graphql.CollectedField, obj *Project) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Project",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Project().Houses(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*ProjectHouses)
+	fc.Result = res
+	return ec.marshalNProjectHouses2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectHouses(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _ProjectContacts_list(ctx context.Context, field graphql.CollectedField, obj *ProjectContacts) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -3705,6 +4145,160 @@ func (ec *executionContext) _ProjectFilesTotal_total(ctx context.Context, field 
 	}()
 	fc := &graphql.FieldContext{
 		Object:     "ProjectFilesTotal",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Total, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ProjectHouses_list(ctx context.Context, field graphql.CollectedField, obj *ProjectHouses) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ProjectHouses",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_ProjectHouses_list_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.ProjectHouses().List(rctx, obj, args["filter"].(ProjectHousesFilter), args["limit"].(int), args["offset"].(int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(ProjectHousesListResult)
+	fc.Result = res
+	return ec.marshalNProjectHousesListResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectHousesListResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ProjectHouses_total(ctx context.Context, field graphql.CollectedField, obj *ProjectHouses) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ProjectHouses",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_ProjectHouses_total_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.ProjectHouses().Total(rctx, obj, args["filter"].(ProjectHousesFilter))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(ProjectHousesTotalResult)
+	fc.Result = res
+	return ec.marshalNProjectHousesTotalResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectHousesTotalResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ProjectHousesList_items(ctx context.Context, field graphql.CollectedField, obj *ProjectHousesList) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ProjectHousesList",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Items, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*House)
+	fc.Result = res
+	return ec.marshalNHouse2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐHouseᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ProjectHousesTotal_total(ctx context.Context, field graphql.CollectedField, obj *ProjectHousesTotal) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ProjectHousesTotal",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -6547,6 +7141,26 @@ func (ec *executionContext) unmarshalInputProjectFilesListFilter(ctx context.Con
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputProjectHousesFilter(ctx context.Context, obj interface{}) (ProjectHousesFilter, error) {
+	var it ProjectHousesFilter
+	var asMap = obj.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "ID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ID"))
+			it.ID, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUploadProjectFileInput(ctx context.Context, obj interface{}) (UploadProjectFileInput, error) {
 	var it UploadProjectFileInput
 	var asMap = obj.(map[string]interface{})
@@ -6916,6 +7530,66 @@ func (ec *executionContext) _ProjectFilesTotalResult(ctx context.Context, sel as
 			return graphql.Null
 		}
 		return ec._ProjectFilesTotal(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
+func (ec *executionContext) _ProjectHousesListResult(ctx context.Context, sel ast.SelectionSet, obj ProjectHousesListResult) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case ProjectHousesList:
+		return ec._ProjectHousesList(ctx, sel, &obj)
+	case *ProjectHousesList:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ProjectHousesList(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
+func (ec *executionContext) _ProjectHousesTotalResult(ctx context.Context, sel ast.SelectionSet, obj ProjectHousesTotalResult) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case ProjectHousesTotal:
+		return ec._ProjectHousesTotal(ctx, sel, &obj)
+	case *ProjectHousesTotal:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ProjectHousesTotal(ctx, sel, obj)
 	case Forbidden:
 		return ec._Forbidden(ctx, sel, &obj)
 	case *Forbidden:
@@ -7385,7 +8059,7 @@ func (ec *executionContext) _FilesScreen(ctx context.Context, sel ast.SelectionS
 	return out
 }
 
-var forbiddenImplementors = []string{"Forbidden", "CreateProjectResult", "UploadProjectFileResult", "UserProfileResult", "ProjectResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectFilesResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "WorkspaceResult", "WorkspaceUsersResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "Error"}
+var forbiddenImplementors = []string{"Forbidden", "CreateProjectResult", "UploadProjectFileResult", "UserProfileResult", "ProjectResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectFilesResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "WorkspaceResult", "WorkspaceUsersResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "Error"}
 
 func (ec *executionContext) _Forbidden(ctx context.Context, sel ast.SelectionSet, obj *Forbidden) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, forbiddenImplementors)
@@ -7425,6 +8099,58 @@ func (ec *executionContext) _Gravatar(ctx context.Context, sel ast.SelectionSet,
 			out.Values[i] = graphql.MarshalString("Gravatar")
 		case "url":
 			out.Values[i] = ec._Gravatar_url(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var houseImplementors = []string{"House"}
+
+func (ec *executionContext) _House(ctx context.Context, sel ast.SelectionSet, obj *House) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, houseImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("House")
+		case "id":
+			out.Values[i] = ec._House_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "city":
+			out.Values[i] = ec._House_city(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "address":
+			out.Values[i] = ec._House_address(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "housingComplex":
+			out.Values[i] = ec._House_housingComplex(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "createdAt":
+			out.Values[i] = ec._House_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "modifiedAt":
+			out.Values[i] = ec._House_modifiedAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -7779,6 +8505,20 @@ func (ec *executionContext) _Project(ctx context.Context, sel ast.SelectionSet, 
 				}
 				return res
 			})
+		case "houses":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Project_houses(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -8099,6 +8839,110 @@ func (ec *executionContext) _ProjectFilesTotal(ctx context.Context, sel ast.Sele
 	return out
 }
 
+var projectHousesImplementors = []string{"ProjectHouses"}
+
+func (ec *executionContext) _ProjectHouses(ctx context.Context, sel ast.SelectionSet, obj *ProjectHouses) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, projectHousesImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ProjectHouses")
+		case "list":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._ProjectHouses_list(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		case "total":
+			field := field
+			out.Concurrently(i, func() (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._ProjectHouses_total(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var projectHousesListImplementors = []string{"ProjectHousesList", "ProjectHousesListResult"}
+
+func (ec *executionContext) _ProjectHousesList(ctx context.Context, sel ast.SelectionSet, obj *ProjectHousesList) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, projectHousesListImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ProjectHousesList")
+		case "items":
+			out.Values[i] = ec._ProjectHousesList_items(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var projectHousesTotalImplementors = []string{"ProjectHousesTotal", "ProjectHousesTotalResult"}
+
+func (ec *executionContext) _ProjectHousesTotal(ctx context.Context, sel ast.SelectionSet, obj *ProjectHousesTotal) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, projectHousesTotalImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ProjectHousesTotal")
+		case "total":
+			out.Values[i] = ec._ProjectHousesTotal_total(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var projectScreenImplementors = []string{"ProjectScreen"}
 
 func (ec *executionContext) _ProjectScreen(ctx context.Context, sel ast.SelectionSet, obj *ProjectScreen) graphql.Marshaler {
@@ -8300,7 +9144,7 @@ func (ec *executionContext) _ScreenQuery(ctx context.Context, sel ast.SelectionS
 	return out
 }
 
-var serverErrorImplementors = []string{"ServerError", "ConfirmLoginResult", "CreateProjectResult", "LoginByEmailResult", "UploadProjectFileResult", "UserProfileResult", "ProjectResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectFilesResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "MenuResult", "WorkspaceResult", "WorkspaceUsersResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "Error"}
+var serverErrorImplementors = []string{"ServerError", "ConfirmLoginResult", "CreateProjectResult", "LoginByEmailResult", "UploadProjectFileResult", "UserProfileResult", "ProjectResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectFilesResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "MenuResult", "WorkspaceResult", "WorkspaceUsersResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "Error"}
 
 func (ec *executionContext) _ServerError(ctx context.Context, sel ast.SelectionSet, obj *ServerError) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, serverErrorImplementors)
@@ -9194,6 +10038,53 @@ func (ec *executionContext) marshalNFilesScreen2ᚖgithubᚗcomᚋapartomatᚋap
 	return ec._FilesScreen(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNHouse2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐHouseᚄ(ctx context.Context, sel ast.SelectionSet, v []*House) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNHouse2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐHouse(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+	return ret
+}
+
+func (ec *executionContext) marshalNHouse2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐHouse(ctx context.Context, sel ast.SelectionSet, v *House) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._House(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNId2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐID(ctx context.Context, sel ast.SelectionSet, v *ID) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -9429,6 +10320,45 @@ func (ec *executionContext) marshalNProjectFilesTotalResult2githubᚗcomᚋapart
 		return graphql.Null
 	}
 	return ec._ProjectFilesTotalResult(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNProjectHouses2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectHouses(ctx context.Context, sel ast.SelectionSet, v ProjectHouses) graphql.Marshaler {
+	return ec._ProjectHouses(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNProjectHouses2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectHouses(ctx context.Context, sel ast.SelectionSet, v *ProjectHouses) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._ProjectHouses(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNProjectHousesFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectHousesFilter(ctx context.Context, v interface{}) (ProjectHousesFilter, error) {
+	res, err := ec.unmarshalInputProjectHousesFilter(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNProjectHousesListResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectHousesListResult(ctx context.Context, sel ast.SelectionSet, v ProjectHousesListResult) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._ProjectHousesListResult(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNProjectHousesTotalResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectHousesTotalResult(ctx context.Context, sel ast.SelectionSet, v ProjectHousesTotalResult) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._ProjectHousesTotalResult(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNProjectResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectResult(ctx context.Context, sel ast.SelectionSet, v ProjectResult) graphql.Marshaler {
@@ -10252,6 +11182,42 @@ func (ec *executionContext) unmarshalOString2string(ctx context.Context, v inter
 
 func (ec *executionContext) marshalOString2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
 	return graphql.MarshalString(v)
+}
+
+func (ec *executionContext) unmarshalOString2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		if tmp1, ok := v.([]interface{}); ok {
+			vSlice = tmp1
+		} else {
+			vSlice = []interface{}{v}
+		}
+	}
+	var err error
+	res := make([]string, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNString2string(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOString2ᚕstringᚄ(ctx context.Context, sel ast.SelectionSet, v []string) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNString2string(ctx, sel, v[i])
+	}
+
+	return ret
 }
 
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v interface{}) (*string, error) {

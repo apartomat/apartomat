@@ -51,6 +51,14 @@ type ProjectFilesTotalResult interface {
 	IsProjectFilesTotalResult()
 }
 
+type ProjectHousesListResult interface {
+	IsProjectHousesListResult()
+}
+
+type ProjectHousesTotalResult interface {
+	IsProjectHousesTotalResult()
+}
+
 type ProjectResult interface {
 	IsProjectResult()
 }
@@ -138,6 +146,8 @@ func (Forbidden) IsProjectFilesTotalResult()      {}
 func (Forbidden) IsProjectFilesResult()           {}
 func (Forbidden) IsProjectContactsListResult()    {}
 func (Forbidden) IsProjectContactsTotalResult()   {}
+func (Forbidden) IsProjectHousesListResult()      {}
+func (Forbidden) IsProjectHousesTotalResult()     {}
 func (Forbidden) IsWorkspaceResult()              {}
 func (Forbidden) IsWorkspaceUsersResult()         {}
 func (Forbidden) IsWorkspaceProjectsListResult()  {}
@@ -146,6 +156,15 @@ func (Forbidden) IsError()                        {}
 
 type Gravatar struct {
 	URL string `json:"url"`
+}
+
+type House struct {
+	ID             string    `json:"id"`
+	City           string    `json:"city"`
+	Address        string    `json:"address"`
+	HousingComplex string    `json:"housingComplex"`
+	CreatedAt      time.Time `json:"createdAt"`
+	ModifiedAt     time.Time `json:"modifiedAt"`
 }
 
 type ID struct {
@@ -205,6 +224,7 @@ type Project struct {
 	EndAt    *time.Time       `json:"endAt"`
 	Files    *ProjectFiles    `json:"files"`
 	Contacts *ProjectContacts `json:"contacts"`
+	Houses   *ProjectHouses   `json:"houses"`
 }
 
 func (Project) IsProjectResult() {}
@@ -266,6 +286,27 @@ type ProjectFilesTotal struct {
 
 func (ProjectFilesTotal) IsProjectFilesTotalResult() {}
 
+type ProjectHouses struct {
+	List  ProjectHousesListResult  `json:"list"`
+	Total ProjectHousesTotalResult `json:"total"`
+}
+
+type ProjectHousesFilter struct {
+	ID []string `json:"ID"`
+}
+
+type ProjectHousesList struct {
+	Items []*House `json:"items"`
+}
+
+func (ProjectHousesList) IsProjectHousesListResult() {}
+
+type ProjectHousesTotal struct {
+	Total int `json:"total"`
+}
+
+func (ProjectHousesTotal) IsProjectHousesTotalResult() {}
+
 type ProjectScreen struct {
 	Project ProjectResult `json:"project"`
 	Menu    MenuResult    `json:"menu"`
@@ -293,6 +334,8 @@ func (ServerError) IsProjectFilesTotalResult()      {}
 func (ServerError) IsProjectFilesResult()           {}
 func (ServerError) IsProjectContactsListResult()    {}
 func (ServerError) IsProjectContactsTotalResult()   {}
+func (ServerError) IsProjectHousesListResult()      {}
+func (ServerError) IsProjectHousesTotalResult()     {}
 func (ServerError) IsMenuResult()                   {}
 func (ServerError) IsWorkspaceResult()              {}
 func (ServerError) IsWorkspaceUsersResult()         {}

@@ -78,6 +78,7 @@ func main() {
 		projects := store.NewProjectStore(pool)
 		projectFiles := store.NewProjectFileStore(pool)
 		contactsStore := store.NewContactsStore(pgdb)
+		housesStore := store.NewHousesStore(pgdb)
 
 		usersLoader := dataloader.NewUserLoader(dataloader.NewUserLoaderConfig(ctx, users))
 
@@ -101,6 +102,7 @@ func main() {
 			MailFactory:                 mail.NewFactory("https://crm.apartomat.ru", "apartomat@yandex.ru"),
 			Uploader:                    uploader,
 			Contacts:                    contactsStore,
+			Houses:                      housesStore,
 			Projects:                    projects,
 			ProjectFiles:                projectFiles,
 			Users:                       users,
