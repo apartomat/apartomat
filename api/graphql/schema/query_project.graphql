@@ -125,4 +125,24 @@ type House {
     housingComplex: String!
     createdAt:  Time!
     modifiedAt: Time!
+    rooms: HouseRooms!
+}
+
+type HouseRooms {
+    list(limit: Int! = 10 offset: Int! = 0): HouseRoomsListResult!
+}
+
+union HouseRoomsListResult = HouseRoomsList | Forbidden | ServerError
+
+type HouseRoomsList {
+    items: [Room!]!
+}
+
+type Room {
+    id: String!
+    name: String!
+    square: Float
+    design: Boolean!
+    createdAt:  Time!
+    modifiedAt: Time!
 }

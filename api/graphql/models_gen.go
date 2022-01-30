@@ -23,6 +23,10 @@ type Error interface {
 	IsError()
 }
 
+type HouseRoomsListResult interface {
+	IsHouseRoomsListResult()
+}
+
 type LoginByEmailResult interface {
 	IsLoginByEmailResult()
 }
@@ -148,6 +152,7 @@ func (Forbidden) IsProjectContactsListResult()    {}
 func (Forbidden) IsProjectContactsTotalResult()   {}
 func (Forbidden) IsProjectHousesListResult()      {}
 func (Forbidden) IsProjectHousesTotalResult()     {}
+func (Forbidden) IsHouseRoomsListResult()         {}
 func (Forbidden) IsWorkspaceResult()              {}
 func (Forbidden) IsWorkspaceUsersResult()         {}
 func (Forbidden) IsWorkspaceProjectsListResult()  {}
@@ -159,13 +164,24 @@ type Gravatar struct {
 }
 
 type House struct {
-	ID             string    `json:"id"`
-	City           string    `json:"city"`
-	Address        string    `json:"address"`
-	HousingComplex string    `json:"housingComplex"`
-	CreatedAt      time.Time `json:"createdAt"`
-	ModifiedAt     time.Time `json:"modifiedAt"`
+	ID             string      `json:"id"`
+	City           string      `json:"city"`
+	Address        string      `json:"address"`
+	HousingComplex string      `json:"housingComplex"`
+	CreatedAt      time.Time   `json:"createdAt"`
+	ModifiedAt     time.Time   `json:"modifiedAt"`
+	Rooms          *HouseRooms `json:"rooms"`
 }
+
+type HouseRooms struct {
+	List HouseRoomsListResult `json:"list"`
+}
+
+type HouseRoomsList struct {
+	Items []*Room `json:"items"`
+}
+
+func (HouseRoomsList) IsHouseRoomsListResult() {}
 
 type ID struct {
 	ID int `json:"id"`
@@ -270,6 +286,13 @@ type ProjectFileUploaded struct {
 
 func (ProjectFileUploaded) IsUploadProjectFileResult() {}
 
+type ProjectFiles struct {
+	List  ProjectFilesListResult  `json:"list"`
+	Total ProjectFilesTotalResult `json:"total"`
+}
+
+func (ProjectFiles) IsProjectFilesResult() {}
+
 type ProjectFilesList struct {
 	Items []*ProjectFile `json:"items"`
 }
@@ -312,6 +335,15 @@ type ProjectScreen struct {
 	Menu    MenuResult    `json:"menu"`
 }
 
+type Room struct {
+	ID         string    `json:"id"`
+	Name       string    `json:"name"`
+	Square     *float64  `json:"square"`
+	Design     bool      `json:"design"`
+	CreatedAt  time.Time `json:"createdAt"`
+	ModifiedAt time.Time `json:"modifiedAt"`
+}
+
 type ScreenQuery struct {
 	Version string         `json:"version"`
 	Files   *FilesScreen   `json:"files"`
@@ -336,6 +368,7 @@ func (ServerError) IsProjectContactsListResult()    {}
 func (ServerError) IsProjectContactsTotalResult()   {}
 func (ServerError) IsProjectHousesListResult()      {}
 func (ServerError) IsProjectHousesTotalResult()     {}
+func (ServerError) IsHouseRoomsListResult()         {}
 func (ServerError) IsMenuResult()                   {}
 func (ServerError) IsWorkspaceResult()              {}
 func (ServerError) IsWorkspaceUsersResult()         {}

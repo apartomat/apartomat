@@ -10,6 +10,14 @@ model:
   package: graphql
 
 models:
+  House:
+    fields:
+      rooms:
+        resolver: true
+  HouseRooms:
+    fields:
+      list:
+        resolver: true
   Project:
     fields:
       files:
@@ -31,7 +39,6 @@ models:
       total:
         resolver: true
   ProjectFiles:
-    model: github.com/apartomat/apartomat/api/graphql.ProjectFiles
     fields:
       list:
         resolver: true

@@ -69,14 +69,25 @@ CREATE TABLE apartomat.contacts (
     CONSTRAINT contacts_project_id_fkey FOREIGN KEY (project_id) REFERENCES apartomat.projects ON DELETE CASCADE
 );
 
-CREATE TABLE apartomat.houses (
-    id char(21) not null,
+create table apartomat.houses (
+    id char(21) primary key,
     city text not null,
     address text not null,
     housing_complex text not null,
     created_at timestamp with time zone not null default now(),
     modified_at timestamp with time zone not null default now(),
     project_id integer not null,
-    constraint houses_pkey unique (id),
     constraint houses_project_id_fkey foreign key (project_id) references apartomat.projects on delete cascade
+);
+
+
+create table apartomat.rooms (
+     id char(21) primary key,
+     name text not null,
+     square real,
+     design boolean not null,
+     created_at timestamp with time zone not null default now(),
+     modified_at timestamp with time zone not null default now(),
+     house_id char(21) not null,
+     constraint rooms_house_id_fkey foreign key (house_id) references apartomat.houses on delete cascade
 );

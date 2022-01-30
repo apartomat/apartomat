@@ -6,6 +6,7 @@ import (
 	"github.com/apartomat/apartomat/internal/store"
 	"github.com/apartomat/apartomat/internal/store/contacts"
 	"github.com/apartomat/apartomat/internal/store/houses"
+	"github.com/apartomat/apartomat/internal/store/rooms"
 	"github.com/apartomat/apartomat/internal/token"
 	"github.com/pkg/errors"
 )
@@ -26,6 +27,7 @@ type Apartomat struct {
 	Houses         houses.Store
 	Projects       store.ProjectStore
 	ProjectFiles   store.ProjectFileStore
+	Rooms          rooms.Store
 	Users          store.UserStore
 	Workspaces     store.WorkspaceStore
 	WorkspaceUsers store.WorkspaceUserStore

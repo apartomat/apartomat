@@ -2,6 +2,7 @@ package graphql
 
 import (
 	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/handler/extension"
 	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/token"
 	"log"
@@ -12,24 +13,25 @@ import (
 
 type CheckAuthTokenFn func(str string) (*token.AuthToken, error)
 
-func Handler(ch CheckAuthTokenFn, loaders *apartomat.DataLoaders, resolver ResolverRoot) http.Handler {
+func Handler(
+	ch CheckAuthTokenFn,
+	loaders *apartomat.DataLoaders,
+	resolver ResolverRoot,
+	complexityLimit int,
+) http.Handler {
+	gh := handler.NewDefaultServer(NewExecutableSchema(Config{Resolvers: resolver}))
+	gh.Use(extension.FixedComplexityLimit(complexityLimit))
+
 	return CorsHandler(
 		WithDataLoadersHandler(
 			loaders,
-			WithUserHandler(
-				ch,
-				handler.NewDefaultServer(NewExecutableSchema(Config{Resolvers: resolver})),
-			),
+			WithUserHandler(ch, gh),
 		),
 	)
 }
 
 func WithUserHandler(checkAuthToken CheckAuthTokenFn, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		for k, v := range r.Header {
-			log.Printf("%s: %#v", k, v)
-		}
-
 		var (
 			header = r.Header.Get("Authorization")
 		)

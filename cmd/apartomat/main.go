@@ -79,6 +79,7 @@ func main() {
 		projectFiles := store.NewProjectFileStore(pool)
 		contactsStore := store.NewContactsStore(pgdb)
 		housesStore := store.NewHousesStore(pgdb)
+		roomsStore := store.NewRoomsStore(pgdb)
 
 		usersLoader := dataloader.NewUserLoader(dataloader.NewUserLoaderConfig(ctx, users))
 
@@ -105,6 +106,7 @@ func main() {
 			Houses:                      housesStore,
 			Projects:                    projects,
 			ProjectFiles:                projectFiles,
+			Rooms:                       roomsStore,
 			Users:                       users,
 			Workspaces:                  workspaces,
 			WorkspaceUsers:              workspaceUsers,

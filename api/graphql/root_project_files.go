@@ -3,6 +3,7 @@ package graphql
 import (
 	"context"
 	"errors"
+	"github.com/99designs/gqlgen/graphql"
 	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/store"
 	"log"
@@ -23,26 +24,32 @@ func (r *projectFilesResolver) List(
 	limit int,
 	offset int,
 ) (ProjectFilesListResult, error) {
-	files, err := r.useCases.GetProjectFiles(
-		ctx,
-		obj.Project.ID,
-		apartomat.GetProjectFilesFilter{
-			Type: store.ProjectFileTypeExpr{Eq: toProjectFileTypes(filter.Type)},
-		},
-		limit,
-		offset,
-	)
-	if err != nil {
-		if errors.Is(err, apartomat.ErrForbidden) {
-			return Forbidden{}, nil
+	if project, ok := graphql.GetFieldContext(ctx).Parent.Parent.Result.(*Project); !ok {
+		log.Printf("can't resolve project files: %s", errors.New("unknown project"))
+
+		return serverError()
+	} else {
+		files, err := r.useCases.GetProjectFiles(
+			ctx,
+			project.ID,
+			apartomat.GetProjectFilesFilter{
+				Type: store.ProjectFileTypeExpr{Eq: toProjectFileTypes(filter.Type)},
+			},
+			limit,
+			offset,
+		)
+		if err != nil {
+			if errors.Is(err, apartomat.ErrForbidden) {
+				return Forbidden{}, nil
+			}
+
+			log.Printf("can't resolve project (id=%d) files: %s", project.ID, err)
+
+			return ServerError{Message: "internal server error"}, nil
 		}
 
-		log.Printf("can't resolve project (id=%d) files: %s", obj.Project.ID, err)
-
-		return ServerError{Message: "internal server error"}, nil
+		return ProjectFilesList{Items: projectFilesToGraphQL(files)}, nil
 	}
-
-	return ProjectFilesList{Items: projectFilesToGraphQL(files)}, nil
 }
 
 func projectFilesToGraphQL(projects []*store.ProjectFile) []*ProjectFile {

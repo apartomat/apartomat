@@ -89,4 +89,3 @@ type houseProjectIDInSpecQuery struct {
 func (s houseProjectIDInSpecQuery) Expression() (goqu.Expression, error) {
 	return goqu.Ex{"project_id": s.spec.IDs}, nil
 }
-

@@ -58,6 +58,7 @@ func (server *server) Run(opts ...Option) {
 		server.useCases.CheckAuthToken,
 		server.loaders,
 		graphql.NewRootResolver(server.useCases),
+		100,
 	))
 
 	mux.Handle("/pg", playground.Handler("GraphQL playground", "/graphql"))

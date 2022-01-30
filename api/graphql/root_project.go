@@ -16,16 +16,12 @@ func (r *projectResolver) Contacts(ctx context.Context, obj *Project) (*ProjectC
 }
 
 func (r *projectResolver) Files(ctx context.Context, obj *Project) (*ProjectFiles, error) {
-	return &ProjectFiles{Project: &ID{ID: obj.ID}}, nil
+	return &ProjectFiles{}, nil
 }
 
-type ProjectFiles struct {
-	Project *ID
-	List    ProjectFilesListResult  `json:"list"`
-	Total   ProjectFilesTotalResult `json:"total"`
+func (r *projectResolver) Houses(ctx context.Context, obj *Project) (*ProjectHouses, error) {
+	return &ProjectHouses{}, nil
 }
-
-func (ProjectFiles) IsProjectFilesResult() {}
 
 func projectToGraphQL(p *store.Project) *Project {
 	if p == nil {
@@ -79,8 +75,4 @@ func toProjectStatuses(l []ProjectStatus) []store.ProjectStatus {
 	}
 
 	return res
-}
-
-func (r *projectResolver) Houses(ctx context.Context, obj *Project) (*ProjectHouses, error) {
-	return &ProjectHouses{}, nil
 }
