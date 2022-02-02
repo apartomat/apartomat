@@ -10,7 +10,7 @@ import AnchorLink from "../common/AnchorLink"
 
 import UserAvatar from "./UserAvatar"
 
-import { useProject, ProjectFiles, ProjectContacts } from "./useProject"
+import { useProject, ProjectFiles, ProjectContacts, ProjectHouses, HouseRooms } from "./useProject"
 import { useUploadProjectFile, ProjectFileType } from "./useUploadProjectFile"
 
 import { useAuthContext } from "../common/context/auth/useAuthContext"
@@ -105,21 +105,11 @@ export function Project () {
                                 <Heading level={4} margin={{ bottom: "xsmall"}}>Сроки проекта</Heading>
                                 <ProjectDates startAt={project.startAt} endAt={project.endAt}/>
                             </Box>
-                            <Box margin={{top: "small"}}>
-                                <Heading level={4} margin={{ bottom: "xsmall"}}>Комплектация</Heading>
-                                <Box height="36px" justify="center">
-                                    <Text>3 комнаты, 2 санузла, коридор</Text>
-                                </Box>
-                            </Box>
+                            <Contacts contacts={project.contacts}/>
                         </Box>
                         <Box width="medium">
-                            <Box margin="none">
-                                <Heading level={4} margin={{ bottom: "xsmall"}}>Адрес</Heading>
-                                <Box height="36px" justify="center">
-                                    <Text>Москва, ул. Амурская, ЖК LEVEL</Text>
-                                </Box>
-                            </Box>
-                            <Contacts contacts={project.contacts}/>
+                            <House houses={project.houses}/>
+                            <Rooms houses={project.houses}/>
                         </Box>
                     </Box>
 
@@ -212,7 +202,7 @@ function Contacts({ contacts }: { contacts: ProjectContacts }) {
                     <Box height="36px" justify="center">
                         <Text>{contacts.list.items.map((contact) => {
                             return (
-                                <Anchor>{contact.fullName}</Anchor>
+                                <Anchor key={contact.id}>{contact.fullName}</Anchor>
                             )
                         }).reduce<React.ReactNode>((acc, item) => {
                             return acc === "n/a" ? [item] : [acc, ", ", item]
@@ -226,6 +216,84 @@ function Contacts({ contacts }: { contacts: ProjectContacts }) {
                     <Text>n/a</Text>
                 </Box>
             )
+    }
+}
+
+function HouseText({ houses }: { houses: ProjectHouses }) {
+    switch (houses.list.__typename) {
+        case "ProjectHousesList":
+            const [ house ] =  houses.list.items
+
+            if (!house) {
+                return (
+                    <>n/a</>
+                )
+            }
+
+            return (
+                <>{[house.city, house.address, house.housingComplex].join(', ')}</>
+            )
+        default:
+            return (
+                <>n/a</>
+            )
+    }
+}
+
+function House({ houses }: { houses: ProjectHouses }) {
+    return (
+        <Box margin="none">
+            <Heading level={4} margin={{ bottom: "xsmall"}}>Адрес</Heading>
+            <Box height="36px" justify="center">
+                <Text><HouseText houses={houses}/></Text>
+            </Box>
+        </Box>
+    )
+}
+
+
+function RoomsText({ rooms }: { rooms: HouseRooms }) {
+    switch (rooms.list.__typename) {
+        case "HouseRoomsList":
+            if (rooms.list.items.length === 0) {
+                return (
+                    <Text>n/a</Text>
+                )
+            }
+
+            return (
+                <Text>{rooms.list.items.length} помещений, {rooms.list.items.reduce((acc, room) => {
+                    return acc + (room.square || 0)
+                }, 0)} м<sup>2</sup></Text>
+            )
+        default:
+            return (
+                <Text>n/a</Text>
+            )
+    }
+}
+
+function Rooms({ houses }: { houses: ProjectHouses }) {
+    const house = firstHouse(houses)
+
+    return (
+        <Box margin={{top: "small"}}>
+            <Heading level={4} margin={{ bottom: "xsmall"}}>Комплектация</Heading>
+            <Box height="36px" justify="center">
+                {
+                    (house ? <RoomsText rooms={house.rooms}/> : <Text>n/a</Text>)
+                }
+            </Box>
+        </Box>
+    )
+}
+
+function firstHouse(houses: ProjectHouses) {
+    switch (houses.list.__typename) {
+        case "ProjectHousesList":
+            return houses.list.items[0]
+        default:
+            return undefined
     }
 }
 

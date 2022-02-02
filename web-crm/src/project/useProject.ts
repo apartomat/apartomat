@@ -10,6 +10,8 @@ export function useProject(id: number) {
 
 export default useProject;
 
+export type { ProjectScreenHousesFragment as ProjectHouses, ProjectScreenHouseRoomsFragment as HouseRooms } from "../api/types.d";
+
 export type ProjectFiles = (
   { __typename?: 'ProjectFiles' }
   & { list: (

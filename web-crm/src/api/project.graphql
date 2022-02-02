@@ -1,3 +1,42 @@
+fragment ProjectScreenHouseRooms on HouseRooms {
+    list {
+        ...on HouseRoomsList {
+            items {
+                id
+                name
+                square
+                design
+            }
+        }
+        ...on Error {
+            message
+        }
+    }
+}
+
+fragment ProjectScreenHouses on ProjectHouses {
+    list(filter: {} limit: 1 offset: 0) {
+        __typename
+        ...on ProjectHousesList {
+            items {
+                id
+                city
+                address
+                housingComplex
+                createdAt
+                modifiedAt
+                rooms {
+                    ...ProjectScreenHouseRooms
+                }
+            }
+        }
+        ...on Error {
+            message
+        }
+    }
+}
+
+
 query project($id: Int!) {
     screen {
         projectScreen: project(id: $id) {
@@ -27,6 +66,9 @@ query project($id: Int!) {
                                 total
                             }
                         }
+                    }
+                    houses {
+                        ...ProjectScreenHouses
                     }
                     files {
                         list(filter: {type: [VISUALIZATION]} limit: 10 offset: 0) {
