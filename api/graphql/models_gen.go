@@ -23,6 +23,10 @@ type CreateProjectResult interface {
 	IsCreateProjectResult()
 }
 
+type DeleteContactResult interface {
+	IsDeleteContactResult()
+}
+
 type Error interface {
 	IsError()
 }
@@ -133,6 +137,12 @@ type ContactAdded struct {
 
 func (ContactAdded) IsAddContactResult() {}
 
+type ContactDeleted struct {
+	Contact *Contact `json:"contact"`
+}
+
+func (ContactDeleted) IsDeleteContactResult() {}
+
 type ContactDetails struct {
 	Type  ContactType `json:"type"`
 	Value string      `json:"value"`
@@ -163,6 +173,7 @@ type Forbidden struct {
 
 func (Forbidden) IsAddContactResult()             {}
 func (Forbidden) IsCreateProjectResult()          {}
+func (Forbidden) IsDeleteContactResult()          {}
 func (Forbidden) IsUploadProjectFileResult()      {}
 func (Forbidden) IsUserProfileResult()            {}
 func (Forbidden) IsProjectResult()                {}
@@ -243,9 +254,10 @@ type NotFound struct {
 	Message string `json:"message"`
 }
 
-func (NotFound) IsProjectResult()   {}
-func (NotFound) IsWorkspaceResult() {}
-func (NotFound) IsError()           {}
+func (NotFound) IsDeleteContactResult() {}
+func (NotFound) IsProjectResult()       {}
+func (NotFound) IsWorkspaceResult()     {}
+func (NotFound) IsError()               {}
 
 type Product struct {
 	Name        string `json:"name"`
@@ -379,6 +391,7 @@ type ServerError struct {
 func (ServerError) IsAddContactResult()             {}
 func (ServerError) IsConfirmLoginResult()           {}
 func (ServerError) IsCreateProjectResult()          {}
+func (ServerError) IsDeleteContactResult()          {}
 func (ServerError) IsLoginByEmailResult()           {}
 func (ServerError) IsUploadProjectFileResult()      {}
 func (ServerError) IsUserProfileResult()            {}

@@ -29,7 +29,7 @@ func (r *projectContactsResolver) List(
 
 		return serverError()
 	} else {
-		contacts, err := r.useCases.GetContacts(
+		res, err := r.useCases.GetContacts(
 			ctx,
 			project.ID,
 			limit,
@@ -45,7 +45,7 @@ func (r *projectContactsResolver) List(
 			return ServerError{Message: "internal server error"}, nil
 		}
 
-		return ProjectContactsList{Items: projectContactsToGraphQL(contacts)}, nil
+		return ProjectContactsList{Items: contactsToGraphQL(res)}, nil
 	}
 }
 
@@ -57,33 +57,33 @@ func (r *projectContactsResolver) Total(
 	return notImplementedYetError()
 }
 
-func projectContactsToGraphQL(contacts []*contacts.Contact) []*Contact {
+func contactsToGraphQL(contacts []*contacts.Contact) []*Contact {
 	result := make([]*Contact, 0, len(contacts))
 
 	for _, item := range contacts {
-		result = append(result, projectContactToGraphQL(item))
+		result = append(result, contactToGraphQL(item))
 	}
 
 	return result
 }
 
-func projectContactToGraphQL(contact *contacts.Contact) *Contact {
+func contactToGraphQL(contact *contacts.Contact) *Contact {
 	return &Contact{
 		ID:         contact.ID,
 		FullName:   contact.FullName,
 		Photo:      contact.Photo,
-		Details:    projectContactDetailsToGraphQL(contact.Details),
+		Details:    contactDetailsToGraphQL(contact.Details),
 		CreatedAt:  contact.CreatedAt,
 		ModifiedAt: contact.ModifiedAt,
 	}
 }
 
-func projectContactDetailsToGraphQL(details []contacts.Details) []*ContactDetails {
+func contactDetailsToGraphQL(details []contacts.Details) []*ContactDetails {
 	res := make([]*ContactDetails, len(details))
 
 	for i, item := range details {
 		res[i] = &ContactDetails{
-			Type:  projectContactTypeToGraphQL(item.Type),
+			Type:  contactTypeToGraphQL(item.Type),
 			Value: item.Value,
 		}
 	}
@@ -91,7 +91,7 @@ func projectContactDetailsToGraphQL(details []contacts.Details) []*ContactDetail
 	return res
 }
 
-func projectContactTypeToGraphQL(t contacts.Type) ContactType {
+func contactTypeToGraphQL(t contacts.Type) ContactType {
 	switch t {
 	case contacts.TypeInstagram:
 		return ContactTypeInstagram
@@ -110,7 +110,7 @@ func projectContactTypeToGraphQL(t contacts.Type) ContactType {
 	}
 }
 
-func projectContactTypeFromGraphQL(t ContactType) contacts.Type {
+func contactTypeFromGraphQL(t ContactType) contacts.Type {
 	switch t {
 	case ContactTypeInstagram:
 		return contacts.TypeInstagram

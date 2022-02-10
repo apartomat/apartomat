@@ -1,0 +1,9 @@
+extend type Mutation {
+    deleteContact(contactId: String!): DeleteContactResult!
+}
+
+union DeleteContactResult = ContactDeleted | Forbidden | NotFound | ServerError
+
+type ContactDeleted {
+    contact: Contact!
+}

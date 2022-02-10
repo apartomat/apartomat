@@ -31,7 +31,7 @@ func (r *mutationResolver) AddContact(
 		return ServerError{Message: "can't add contact"}, nil
 	}
 
-	return ContactAdded{Contact: projectContactToGraphQL(contact)}, nil
+	return ContactAdded{Contact: contactToGraphQL(contact)}, nil
 }
 
 func contactsDetailsFromGraphQL(input []*AddContactDetailsInput) []contacts.Details {
@@ -39,7 +39,7 @@ func contactsDetailsFromGraphQL(input []*AddContactDetailsInput) []contacts.Deta
 
 	for i, d := range input {
 		details[i] = contacts.Details{
-			Type:  projectContactTypeFromGraphQL(d.Type),
+			Type:  contactTypeFromGraphQL(d.Type),
 			Value: d.Value,
 		}
 	}

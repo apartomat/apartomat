@@ -74,3 +74,62 @@ func (u *Apartomat) CanAddContact(ctx context.Context, subj *UserCtx, obj *store
 
 	return wu[0].UserID == subj.ID, nil
 }
+
+func (u *Apartomat) DeleteContact(ctx context.Context, contactID string) (*Contact, error) {
+	contacts, err := u.Contacts.List(ctx, IDIn(contactID), 1, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(contacts) == 0 {
+		return nil, errors.Wrapf(ErrNotFound, "contact %s", contactID)
+	}
+
+	var (
+		contact = contacts[0]
+	)
+
+	if ok, err := u.CanDeleteContact(ctx, UserFromCtx(ctx), contact); err != nil {
+		return nil, err
+	} else if !ok {
+		return nil, errors.Wrapf(ErrForbidden, "can't delete contact (id=%s)", contact.ID)
+	}
+
+	err = u.Contacts.Delete(ctx, contact)
+
+	return contact, err
+}
+
+func (u *Apartomat) CanDeleteContact(ctx context.Context, subj *UserCtx, obj *Contact) (bool, error) {
+	if subj == nil {
+		return false, nil
+	}
+
+	projects, err := u.Projects.List(ctx, store.ProjectStoreQuery{ID: expr.IntEq(obj.ProjectID), Limit: 1, Offset: 0})
+
+	if len(projects) == 0 {
+		return false, nil
+	}
+
+	var (
+		project = projects[0]
+	)
+
+	wu, err := u.WorkspaceUsers.List(
+		ctx,
+		store.WorkspaceUserStoreQuery{WorkspaceID: expr.IntEq(project.WorkspaceID), UserID: expr.IntEq(subj.ID)},
+	)
+	if err != nil {
+		return false, err
+	}
+
+	if len(wu) == 0 {
+		return false, nil
+	}
+
+	var (
+		workspace = wu[0]
+	)
+
+	return workspace.UserID == subj.ID, nil
+}

@@ -44,6 +44,15 @@ func (s *contactsStore) Save(ctx context.Context, contact *Contact) (*Contact, e
 	return contact, nil
 }
 
+func (s *contactsStore) Delete(ctx context.Context, contact *Contact) error {
+	_, err := s.db.ModelContext(ctx, (*contactsRecord)(nil)).Where(`id = ?`, contact.ID).Delete()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (s *contactsStore) List(ctx context.Context, spec Spec, limit, offset int) ([]*Contact, error) {
 	qs, err := toSpecQuery(spec)
 	if err != nil {

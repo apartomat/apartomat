@@ -80,6 +80,10 @@ type ComplexityRoot struct {
 		Contact func(childComplexity int) int
 	}
 
+	ContactDeleted struct {
+		Contact func(childComplexity int) int
+	}
+
 	ContactDetails struct {
 		Type  func(childComplexity int) int
 		Value func(childComplexity int) int
@@ -149,6 +153,7 @@ type ComplexityRoot struct {
 		AddContact        func(childComplexity int, projectID string, contact AddContactInput) int
 		ConfirmLogin      func(childComplexity int, token string) int
 		CreateProject     func(childComplexity int, input CreateProjectInput) int
+		DeleteContact     func(childComplexity int, contactID string) int
 		LoginByEmail      func(childComplexity int, email string, workspaceName string) int
 		Ping              func(childComplexity int) int
 		UploadProjectFile func(childComplexity int, input UploadProjectFileInput) int
@@ -344,6 +349,7 @@ type MutationResolver interface {
 	AddContact(ctx context.Context, projectID string, contact AddContactInput) (AddContactResult, error)
 	ConfirmLogin(ctx context.Context, token string) (ConfirmLoginResult, error)
 	CreateProject(ctx context.Context, input CreateProjectInput) (CreateProjectResult, error)
+	DeleteContact(ctx context.Context, contactID string) (DeleteContactResult, error)
 	LoginByEmail(ctx context.Context, email string, workspaceName string) (LoginByEmailResult, error)
 	UploadProjectFile(ctx context.Context, input UploadProjectFileInput) (UploadProjectFileResult, error)
 }
@@ -477,6 +483,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ContactAdded.Contact(childComplexity), true
+
+	case "ContactDeleted.contact":
+		if e.complexity.ContactDeleted.Contact == nil {
+			break
+		}
+
+		return e.complexity.ContactDeleted.Contact(childComplexity), true
 
 	case "ContactDetails.type":
 		if e.complexity.ContactDetails.Type == nil {
@@ -679,6 +692,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.CreateProject(childComplexity, args["input"].(CreateProjectInput)), true
+
+	case "Mutation.deleteContact":
+		if e.complexity.Mutation.DeleteContact == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteContact_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteContact(childComplexity, args["contactId"].(string)), true
 
 	case "Mutation.loginByEmail":
 		if e.complexity.Mutation.LoginByEmail == nil {
@@ -1458,6 +1483,15 @@ union CreateProjectResult = ProjectCreated | Forbidden | ServerError
 type ProjectCreated {
     project: Project!
 }`, BuiltIn: false},
+	{Name: "graphql/schema/mutation_delete_contact.graphql", Input: `extend type Mutation {
+    deleteContact(contactId: String!): DeleteContactResult!
+}
+
+union DeleteContactResult = ContactDeleted | Forbidden | NotFound | ServerError
+
+type ContactDeleted {
+    contact: Contact!
+}`, BuiltIn: false},
 	{Name: "graphql/schema/mutation_login_by_email.graphql", Input: `extend type Mutation {
     loginByEmail(email: String!, workspaceName: String! = "Workspace"): LoginByEmailResult!
 }
@@ -1897,6 +1931,21 @@ func (ec *executionContext) field_Mutation_createProject_args(ctx context.Contex
 		}
 	}
 	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteContact_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["contactId"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contactId"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["contactId"] = arg0
 	return args, nil
 }
 
@@ -2524,6 +2573,41 @@ func (ec *executionContext) _ContactAdded_contact(ctx context.Context, field gra
 	}()
 	fc := &graphql.FieldContext{
 		Object:     "ContactAdded",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Contact, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*Contact)
+	fc.Result = res
+	return ec.marshalNContact2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐContact(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ContactDeleted_contact(ctx context.Context, field graphql.CollectedField, obj *ContactDeleted) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ContactDeleted",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -3521,6 +3605,48 @@ func (ec *executionContext) _Mutation_createProject(ctx context.Context, field g
 	res := resTmp.(CreateProjectResult)
 	fc.Result = res
 	return ec.marshalNCreateProjectResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐCreateProjectResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_deleteContact(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_deleteContact_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteContact(rctx, args["contactId"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(DeleteContactResult)
+	fc.Result = res
+	return ec.marshalNDeleteContactResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐDeleteContactResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_loginByEmail(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -8036,6 +8162,43 @@ func (ec *executionContext) _CreateProjectResult(ctx context.Context, sel ast.Se
 	}
 }
 
+func (ec *executionContext) _DeleteContactResult(ctx context.Context, sel ast.SelectionSet, obj DeleteContactResult) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case ContactDeleted:
+		return ec._ContactDeleted(ctx, sel, &obj)
+	case *ContactDeleted:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ContactDeleted(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
+	case NotFound:
+		return ec._NotFound(ctx, sel, &obj)
+	case *NotFound:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._NotFound(ctx, sel, obj)
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
 func (ec *executionContext) _Error(ctx context.Context, sel ast.SelectionSet, obj Error) graphql.Marshaler {
 	switch obj := (obj).(type) {
 	case nil:
@@ -8796,6 +8959,37 @@ func (ec *executionContext) _ContactAdded(ctx context.Context, sel ast.Selection
 	return out
 }
 
+var contactDeletedImplementors = []string{"ContactDeleted", "DeleteContactResult"}
+
+func (ec *executionContext) _ContactDeleted(ctx context.Context, sel ast.SelectionSet, obj *ContactDeleted) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, contactDeletedImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ContactDeleted")
+		case "contact":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ContactDeleted_contact(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var contactDetailsImplementors = []string{"ContactDetails"}
 
 func (ec *executionContext) _ContactDetails(ctx context.Context, sel ast.SelectionSet, obj *ContactDetails) graphql.Marshaler {
@@ -8929,7 +9123,7 @@ func (ec *executionContext) _FilesScreen(ctx context.Context, sel ast.SelectionS
 	return out
 }
 
-var forbiddenImplementors = []string{"Forbidden", "AddContactResult", "CreateProjectResult", "UploadProjectFileResult", "UserProfileResult", "ProjectResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectFilesResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "WorkspaceResult", "WorkspaceUsersResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "Error"}
+var forbiddenImplementors = []string{"Forbidden", "AddContactResult", "CreateProjectResult", "DeleteContactResult", "UploadProjectFileResult", "UserProfileResult", "ProjectResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectFilesResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "WorkspaceResult", "WorkspaceUsersResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "Error"}
 
 func (ec *executionContext) _Forbidden(ctx context.Context, sel ast.SelectionSet, obj *Forbidden) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, forbiddenImplementors)
@@ -9419,6 +9613,16 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "deleteContact":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteContact(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "loginByEmail":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_loginByEmail(ctx, field)
@@ -9450,7 +9654,7 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 	return out
 }
 
-var notFoundImplementors = []string{"NotFound", "ProjectResult", "WorkspaceResult", "Error"}
+var notFoundImplementors = []string{"NotFound", "DeleteContactResult", "ProjectResult", "WorkspaceResult", "Error"}
 
 func (ec *executionContext) _NotFound(ctx context.Context, sel ast.SelectionSet, obj *NotFound) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, notFoundImplementors)
@@ -10528,7 +10732,7 @@ func (ec *executionContext) _ScreenQuery(ctx context.Context, sel ast.SelectionS
 	return out
 }
 
-var serverErrorImplementors = []string{"ServerError", "AddContactResult", "ConfirmLoginResult", "CreateProjectResult", "LoginByEmailResult", "UploadProjectFileResult", "UserProfileResult", "ProjectResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectFilesResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "MenuResult", "WorkspaceResult", "WorkspaceUsersResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "Error"}
+var serverErrorImplementors = []string{"ServerError", "AddContactResult", "ConfirmLoginResult", "CreateProjectResult", "DeleteContactResult", "LoginByEmailResult", "UploadProjectFileResult", "UserProfileResult", "ProjectResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectFilesResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "MenuResult", "WorkspaceResult", "WorkspaceUsersResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "Error"}
 
 func (ec *executionContext) _ServerError(ctx context.Context, sel ast.SelectionSet, obj *ServerError) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, serverErrorImplementors)
@@ -11787,6 +11991,16 @@ func (ec *executionContext) marshalNCreateProjectResult2githubᚗcomᚋapartomat
 		return graphql.Null
 	}
 	return ec._CreateProjectResult(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNDeleteContactResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐDeleteContactResult(ctx context.Context, sel ast.SelectionSet, v DeleteContactResult) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._DeleteContactResult(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNFilesScreen2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐFilesScreen(ctx context.Context, sel ast.SelectionSet, v *FilesScreen) graphql.Marshaler {

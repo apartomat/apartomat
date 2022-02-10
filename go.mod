@@ -19,7 +19,7 @@ require (
 	github.com/jackc/pgconn v1.8.0
 	github.com/jackc/pgx/v4 v4.10.0
 	github.com/jung-kurt/gofpdf v1.4.2
-	github.com/matoous/go-nanoid/v2 v2.0.0 // indirect
+	github.com/matoous/go-nanoid/v2 v2.0.0
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	github.com/o1egl/paseto v1.0.0
 	github.com/pkg/errors v0.9.1
