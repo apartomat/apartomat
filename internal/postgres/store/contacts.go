@@ -6,6 +6,7 @@ import (
 	. "github.com/apartomat/apartomat/internal/store/contacts"
 	"github.com/doug-martin/goqu/v9"
 	"github.com/go-pg/pg/v10"
+	"time"
 )
 
 const (
@@ -24,8 +25,23 @@ var (
 	_ Store = (*contactsStore)(nil)
 )
 
-func (s *contactsStore) Save(context.Context, *Contact) (*Contact, error) {
-	return nil, errors.New("ContactsStore.Save not implemented yet")
+func (s *contactsStore) Save(ctx context.Context, contact *Contact) (*Contact, error) {
+	if contact.CreatedAt.IsZero() {
+		contact.CreatedAt = time.Now()
+	}
+
+	if contact.ModifiedAt.IsZero() {
+		contact.ModifiedAt = contact.CreatedAt
+	}
+
+	rec := toContactsRecord(contact)
+
+	_, err := s.db.ModelContext(ctx, rec).Returning("NULL").Insert()
+	if err != nil {
+		return nil, err
+	}
+
+	return contact, nil
 }
 
 func (s *contactsStore) List(ctx context.Context, spec Spec, limit, offset int) ([]*Contact, error) {
@@ -44,14 +60,86 @@ func (s *contactsStore) List(ctx context.Context, spec Spec, limit, offset int) 
 		return nil, err
 	}
 
-	contacts := make([]*Contact, 0)
+	contacts := make([]*contactsRecord, 0)
 
 	_, err = s.db.QueryContext(ctx, &contacts, sql, args...)
 	if err != nil {
 		return nil, err
 	}
 
-	return contacts, nil
+	return fromContactsRecords(contacts), nil
+}
+
+type contactsRecord struct {
+	tableName  struct{}              `pg:"apartomat.contacts,alias:contacts"`
+	ID         string                `pg:"id,pk"`
+	FullName   string                `pg:"full_name"`
+	Photo      string                `pg:"photo"`
+	Details    []contactRecordDetail `pg:"details"`
+	CreatedAt  time.Time             `pg:"created_at"`
+	ModifiedAt time.Time             `pg:"modified_at"`
+	ProjectID  int                   `pg:"project_id"`
+}
+
+func toContactsRecord(contact *Contact) *contactsRecord {
+	return &contactsRecord{
+		ID:         contact.ID,
+		FullName:   contact.FullName,
+		Photo:      contact.Photo,
+		Details:    toContactRecordDetails(contact.Details),
+		CreatedAt:  contact.CreatedAt,
+		ModifiedAt: contact.ModifiedAt,
+		ProjectID:  contact.ProjectID,
+	}
+}
+
+func fromContactsRecords(records []*contactsRecord) []*Contact {
+	contacts := make([]*Contact, len(records))
+
+	for i, r := range records {
+		contacts[i] = &Contact{
+			ID:         r.ID,
+			FullName:   r.FullName,
+			Photo:      r.Photo,
+			Details:    fromContactRecordsDetails(r.Details),
+			CreatedAt:  r.CreatedAt,
+			ModifiedAt: r.ModifiedAt,
+			ProjectID:  r.ProjectID,
+		}
+	}
+
+	return contacts
+}
+
+type contactRecordDetail struct {
+	Type  Type   `json:"type"`
+	Value string `json:"value"`
+}
+
+func toContactRecordDetails(details []Details) []contactRecordDetail {
+	res := make([]contactRecordDetail, len(details))
+
+	for i, d := range details {
+		res[i] = contactRecordDetail{
+			Type:  d.Type,
+			Value: d.Value,
+		}
+	}
+
+	return res
+}
+
+func fromContactRecordsDetails(records []contactRecordDetail) []Details {
+	res := make([]Details, len(records))
+
+	for i, r := range records {
+		res[i] = Details{
+			Type:  r.Type,
+			Value: r.Value,
+		}
+	}
+
+	return res
 }
 
 //

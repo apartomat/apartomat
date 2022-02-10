@@ -1,0 +1,19 @@
+extend type Mutation {
+    addContact(projectId: String! contact: AddContactInput!): AddContactResult!
+}
+
+input AddContactInput {
+    fullName: String!
+    details:   [AddContactDetailsInput!]!
+}
+
+input AddContactDetailsInput {
+    type: ContactType!
+    value: String!
+}
+
+union AddContactResult = ContactAdded | Forbidden | ServerError
+
+type ContactAdded {
+    contact: Contact!
+}

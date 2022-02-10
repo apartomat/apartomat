@@ -76,6 +76,10 @@ type ComplexityRoot struct {
 		Photo      func(childComplexity int) int
 	}
 
+	ContactAdded struct {
+		Contact func(childComplexity int) int
+	}
+
 	ContactDetails struct {
 		Type  func(childComplexity int) int
 		Value func(childComplexity int) int
@@ -142,6 +146,7 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
+		AddContact        func(childComplexity int, projectID string, contact AddContactInput) int
 		ConfirmLogin      func(childComplexity int, token string) int
 		CreateProject     func(childComplexity int, input CreateProjectInput) int
 		LoginByEmail      func(childComplexity int, email string, workspaceName string) int
@@ -336,6 +341,7 @@ type HouseRoomsResolver interface {
 }
 type MutationResolver interface {
 	Ping(ctx context.Context) (string, error)
+	AddContact(ctx context.Context, projectID string, contact AddContactInput) (AddContactResult, error)
 	ConfirmLogin(ctx context.Context, token string) (ConfirmLoginResult, error)
 	CreateProject(ctx context.Context, input CreateProjectInput) (CreateProjectResult, error)
 	LoginByEmail(ctx context.Context, email string, workspaceName string) (LoginByEmailResult, error)
@@ -464,6 +470,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Contact.Photo(childComplexity), true
+
+	case "ContactAdded.contact":
+		if e.complexity.ContactAdded.Contact == nil {
+			break
+		}
+
+		return e.complexity.ContactAdded.Contact(childComplexity), true
 
 	case "ContactDetails.type":
 		if e.complexity.ContactDetails.Type == nil {
@@ -630,6 +643,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.MenuItems.Items(childComplexity), true
+
+	case "Mutation.addContact":
+		if e.complexity.Mutation.AddContact == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_addContact_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AddContact(childComplexity, args["projectId"].(string), args["contact"].(AddContactInput)), true
 
 	case "Mutation.confirmLogin":
 		if e.complexity.Mutation.ConfirmLogin == nil {
@@ -1380,6 +1405,25 @@ var sources = []*ast.Source{
 	{Name: "graphql/schema/mutation.graphql", Input: `type Mutation {
     ping: String!
 }`, BuiltIn: false},
+	{Name: "graphql/schema/mutation_add_contact.graphql", Input: `extend type Mutation {
+    addContact(projectId: String! contact: AddContactInput!): AddContactResult!
+}
+
+input AddContactInput {
+    fullName: String!
+    details:   [AddContactDetailsInput!]!
+}
+
+input AddContactDetailsInput {
+    type: ContactType!
+    value: String!
+}
+
+union AddContactResult = ContactAdded | Forbidden | ServerError
+
+type ContactAdded {
+    contact: Contact!
+}`, BuiltIn: false},
 	{Name: "graphql/schema/mutation_confirmLogin.graphql", Input: `extend type Mutation {
     confirmLogin(token: String!): ConfirmLoginResult!
 }
@@ -1543,6 +1587,7 @@ enum ContactType {
     EMAIL
     WHATSAPP
     TELEGRAM
+    UNKNOWN
 }
 
 type Contact {
@@ -1798,6 +1843,30 @@ func (ec *executionContext) field_HouseRooms_list_args(ctx context.Context, rawA
 		}
 	}
 	args["offset"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_addContact_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["projectId"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("projectId"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["projectId"] = arg0
+	var arg1 AddContactInput
+	if tmp, ok := rawArgs["contact"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contact"))
+		arg1, err = ec.unmarshalNAddContactInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAddContactInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["contact"] = arg1
 	return args, nil
 }
 
@@ -2444,6 +2513,41 @@ func (ec *executionContext) _Contact_modifiedAt(ctx context.Context, field graph
 	res := resTmp.(time.Time)
 	fc.Result = res
 	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ContactAdded_contact(ctx context.Context, field graphql.CollectedField, obj *ContactAdded) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ContactAdded",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Contact, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*Contact)
+	fc.Result = res
+	return ec.marshalNContact2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐContact(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ContactDetails_type(ctx context.Context, field graphql.CollectedField, obj *ContactDetails) (ret graphql.Marshaler) {
@@ -3291,6 +3395,48 @@ func (ec *executionContext) _Mutation_ping(ctx context.Context, field graphql.Co
 	res := resTmp.(string)
 	fc.Result = res
 	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_addContact(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_addContact_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().AddContact(rctx, args["projectId"].(string), args["contact"].(AddContactInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(AddContactResult)
+	fc.Result = res
+	return ec.marshalNAddContactResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAddContactResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_confirmLogin(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -7549,6 +7695,68 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputAddContactDetailsInput(ctx context.Context, obj interface{}) (AddContactDetailsInput, error) {
+	var it AddContactDetailsInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "type":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
+			it.Type, err = ec.unmarshalNContactType2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐContactType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "value":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("value"))
+			it.Value, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputAddContactInput(ctx context.Context, obj interface{}) (AddContactInput, error) {
+	var it AddContactInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "fullName":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("fullName"))
+			it.FullName, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "details":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("details"))
+			it.Details, err = ec.unmarshalNAddContactDetailsInput2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAddContactDetailsInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputCreateProjectInput(ctx context.Context, obj interface{}) (CreateProjectInput, error) {
 	var it CreateProjectInput
 	asMap := map[string]interface{}{}
@@ -7730,6 +7938,36 @@ func (ec *executionContext) unmarshalInputWorkspaceProjectsFilter(ctx context.Co
 // endregion **************************** input.gotpl *****************************
 
 // region    ************************** interface.gotpl ***************************
+
+func (ec *executionContext) _AddContactResult(ctx context.Context, sel ast.SelectionSet, obj AddContactResult) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case ContactAdded:
+		return ec._ContactAdded(ctx, sel, &obj)
+	case *ContactAdded:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ContactAdded(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
 
 func (ec *executionContext) _ConfirmLoginResult(ctx context.Context, sel ast.SelectionSet, obj ConfirmLoginResult) graphql.Marshaler {
 	switch obj := (obj).(type) {
@@ -8527,6 +8765,37 @@ func (ec *executionContext) _Contact(ctx context.Context, sel ast.SelectionSet, 
 	return out
 }
 
+var contactAddedImplementors = []string{"ContactAdded", "AddContactResult"}
+
+func (ec *executionContext) _ContactAdded(ctx context.Context, sel ast.SelectionSet, obj *ContactAdded) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, contactAddedImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ContactAdded")
+		case "contact":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ContactAdded_contact(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var contactDetailsImplementors = []string{"ContactDetails"}
 
 func (ec *executionContext) _ContactDetails(ctx context.Context, sel ast.SelectionSet, obj *ContactDetails) graphql.Marshaler {
@@ -8660,7 +8929,7 @@ func (ec *executionContext) _FilesScreen(ctx context.Context, sel ast.SelectionS
 	return out
 }
 
-var forbiddenImplementors = []string{"Forbidden", "CreateProjectResult", "UploadProjectFileResult", "UserProfileResult", "ProjectResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectFilesResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "WorkspaceResult", "WorkspaceUsersResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "Error"}
+var forbiddenImplementors = []string{"Forbidden", "AddContactResult", "CreateProjectResult", "UploadProjectFileResult", "UserProfileResult", "ProjectResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectFilesResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "WorkspaceResult", "WorkspaceUsersResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "Error"}
 
 func (ec *executionContext) _Forbidden(ctx context.Context, sel ast.SelectionSet, obj *Forbidden) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, forbiddenImplementors)
@@ -9113,6 +9382,16 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "ping":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_ping(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "addContact":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_addContact(ctx, field)
 			}
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
@@ -10249,7 +10528,7 @@ func (ec *executionContext) _ScreenQuery(ctx context.Context, sel ast.SelectionS
 	return out
 }
 
-var serverErrorImplementors = []string{"ServerError", "ConfirmLoginResult", "CreateProjectResult", "LoginByEmailResult", "UploadProjectFileResult", "UserProfileResult", "ProjectResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectFilesResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "MenuResult", "WorkspaceResult", "WorkspaceUsersResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "Error"}
+var serverErrorImplementors = []string{"ServerError", "AddContactResult", "ConfirmLoginResult", "CreateProjectResult", "LoginByEmailResult", "UploadProjectFileResult", "UserProfileResult", "ProjectResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectFilesResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "MenuResult", "WorkspaceResult", "WorkspaceUsersResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "Error"}
 
 func (ec *executionContext) _ServerError(ctx context.Context, sel ast.SelectionSet, obj *ServerError) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, serverErrorImplementors)
@@ -11314,6 +11593,43 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 // endregion **************************** object.gotpl ****************************
 
 // region    ***************************** type.gotpl *****************************
+
+func (ec *executionContext) unmarshalNAddContactDetailsInput2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAddContactDetailsInputᚄ(ctx context.Context, v interface{}) ([]*AddContactDetailsInput, error) {
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*AddContactDetailsInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNAddContactDetailsInput2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAddContactDetailsInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalNAddContactDetailsInput2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAddContactDetailsInput(ctx context.Context, v interface{}) (*AddContactDetailsInput, error) {
+	res, err := ec.unmarshalInputAddContactDetailsInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNAddContactInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAddContactInput(ctx context.Context, v interface{}) (AddContactInput, error) {
+	res, err := ec.unmarshalInputAddContactInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNAddContactResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAddContactResult(ctx context.Context, sel ast.SelectionSet, v AddContactResult) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._AddContactResult(ctx, sel, v)
+}
 
 func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
 	res, err := graphql.UnmarshalBoolean(v)

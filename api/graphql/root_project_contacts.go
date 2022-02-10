@@ -103,6 +103,27 @@ func projectContactTypeToGraphQL(t contacts.Type) ContactType {
 		return ContactTypeWhatsapp
 	case contacts.TypeTelegram:
 		return ContactTypeTelegram
+	case contacts.TypeUnknown:
+		return ContactTypeUnknown
+	default:
+		return ""
+	}
+}
+
+func projectContactTypeFromGraphQL(t ContactType) contacts.Type {
+	switch t {
+	case ContactTypeInstagram:
+		return contacts.TypeInstagram
+	case ContactTypePhone:
+		return contacts.TypePhone
+	case ContactTypeEmail:
+		return contacts.TypeEmail
+	case ContactTypeWhatsapp:
+		return contacts.TypeWhatsApp
+	case ContactTypeTelegram:
+		return contacts.TypeTelegram
+	case ContactTypeUnknown:
+		return contacts.TypeUnknown
 	default:
 		return ""
 	}

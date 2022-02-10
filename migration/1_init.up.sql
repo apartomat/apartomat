@@ -58,14 +58,13 @@ CREATE TABLE apartomat.project_files (
 );
 
 CREATE TABLE apartomat.contacts (
-    id char(21) NOT NULL,
+    id char(21) primary key,
     full_name text NOT NULL,
-    photo text NOT NULL,
+    photo text not null default '',
     details jsonb,
     created_at timestamp with time zone NOT NULL DEFAULT now(),
     modified_at timestamp with time zone NOT NULL DEFAULT now(),
     project_id integer NOT NULL,
-    CONSTRAINT contacts_pkey UNIQUE (id),
     CONSTRAINT contacts_project_id_fkey FOREIGN KEY (project_id) REFERENCES apartomat.projects ON DELETE CASCADE
 );
 

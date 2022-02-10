@@ -11,6 +11,10 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 )
 
+type AddContactResult interface {
+	IsAddContactResult()
+}
+
 type ConfirmLoginResult interface {
 	IsConfirmLoginResult()
 }
@@ -91,6 +95,16 @@ type WorkspaceUsersResult interface {
 	IsWorkspaceUsersResult()
 }
 
+type AddContactDetailsInput struct {
+	Type  ContactType `json:"type"`
+	Value string      `json:"value"`
+}
+
+type AddContactInput struct {
+	FullName string                    `json:"fullName"`
+	Details  []*AddContactDetailsInput `json:"details"`
+}
+
 type AlreadyExists struct {
 	Message string `json:"message"`
 }
@@ -112,6 +126,12 @@ type Contact struct {
 	CreatedAt  time.Time         `json:"createdAt"`
 	ModifiedAt time.Time         `json:"modifiedAt"`
 }
+
+type ContactAdded struct {
+	Contact *Contact `json:"contact"`
+}
+
+func (ContactAdded) IsAddContactResult() {}
 
 type ContactDetails struct {
 	Type  ContactType `json:"type"`
@@ -141,6 +161,7 @@ type Forbidden struct {
 	Message string `json:"message"`
 }
 
+func (Forbidden) IsAddContactResult()             {}
 func (Forbidden) IsCreateProjectResult()          {}
 func (Forbidden) IsUploadProjectFileResult()      {}
 func (Forbidden) IsUserProfileResult()            {}
@@ -355,6 +376,7 @@ type ServerError struct {
 	Message string `json:"message"`
 }
 
+func (ServerError) IsAddContactResult()             {}
 func (ServerError) IsConfirmLoginResult()           {}
 func (ServerError) IsCreateProjectResult()          {}
 func (ServerError) IsLoginByEmailResult()           {}
@@ -469,6 +491,7 @@ const (
 	ContactTypeEmail     ContactType = "EMAIL"
 	ContactTypeWhatsapp  ContactType = "WHATSAPP"
 	ContactTypeTelegram  ContactType = "TELEGRAM"
+	ContactTypeUnknown   ContactType = "UNKNOWN"
 )
 
 var AllContactType = []ContactType{
@@ -477,11 +500,12 @@ var AllContactType = []ContactType{
 	ContactTypeEmail,
 	ContactTypeWhatsapp,
 	ContactTypeTelegram,
+	ContactTypeUnknown,
 }
 
 func (e ContactType) IsValid() bool {
 	switch e {
-	case ContactTypeInstagram, ContactTypePhone, ContactTypeEmail, ContactTypeWhatsapp, ContactTypeTelegram:
+	case ContactTypeInstagram, ContactTypePhone, ContactTypeEmail, ContactTypeWhatsapp, ContactTypeTelegram, ContactTypeUnknown:
 		return true
 	}
 	return false

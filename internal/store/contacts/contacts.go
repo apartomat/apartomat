@@ -28,6 +28,7 @@ const (
 	TypeEmail     Type = "EMAIL"
 	TypeWhatsApp  Type = "WHATSAPP"
 	TypeTelegram  Type = "TELEGRAM"
+	TypeUnknown   Type = "UNKNOWN"
 )
 
 type Store interface {
