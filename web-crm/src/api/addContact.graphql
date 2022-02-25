@@ -1,0 +1,17 @@
+mutation addContact($projectId: String! $contact: AddContactInput!) {
+    addContact(projectId: $projectId contact: $contact) {
+        __typename
+        ...on ContactAdded {
+            contact {
+                id
+                fullName
+            }
+        }
+        ...on Forbidden {
+            message
+        }
+        ...on ServerError {
+            message
+        }
+    }
+}

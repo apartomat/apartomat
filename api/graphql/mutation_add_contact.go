@@ -34,7 +34,7 @@ func (r *mutationResolver) AddContact(
 	return ContactAdded{Contact: contactToGraphQL(contact)}, nil
 }
 
-func contactsDetailsFromGraphQL(input []*AddContactDetailsInput) []contacts.Details {
+func contactsDetailsFromGraphQL(input []*ContactDetailsInput) []contacts.Details {
 	details := make([]contacts.Details, len(input))
 
 	for i, d := range input {

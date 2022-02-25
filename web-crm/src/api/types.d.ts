@@ -17,6 +17,13 @@ export type Scalars = {
   Url: any;
 };
 
+export type AddContactInput = {
+  details: Array<ContactDetailsInput>;
+  fullName: Scalars['String'];
+};
+
+export type AddContactResult = ContactAdded | Forbidden | ServerError;
+
 export type AlreadyExists = Error & {
   __typename?: 'AlreadyExists';
   message: Scalars['String'];
@@ -39,8 +46,23 @@ export type Contact = {
   photo: Scalars['String'];
 };
 
+export type ContactAdded = {
+  __typename?: 'ContactAdded';
+  contact: Contact;
+};
+
+export type ContactDeleted = {
+  __typename?: 'ContactDeleted';
+  contact: Contact;
+};
+
 export type ContactDetails = {
   __typename?: 'ContactDetails';
+  type: ContactType;
+  value: Scalars['String'];
+};
+
+export type ContactDetailsInput = {
   type: ContactType;
   value: Scalars['String'];
 };
@@ -50,6 +72,7 @@ export enum ContactType {
   Instagram = 'INSTAGRAM',
   Phone = 'PHONE',
   Telegram = 'TELEGRAM',
+  Unknown = 'UNKNOWN',
   Whatsapp = 'WHATSAPP'
 }
 
@@ -153,11 +176,18 @@ export type MenuResult = MenuItems | ServerError;
 
 export type Mutation = {
   __typename?: 'Mutation';
+  addContact: AddContactResult;
   confirmLogin: ConfirmLoginResult;
   createProject: CreateProjectResult;
   loginByEmail: LoginByEmailResult;
   ping: Scalars['String'];
   uploadProjectFile: UploadProjectFileResult;
+};
+
+
+export type MutationAddContactArgs = {
+  contact: AddContactInput;
+  projectId: Scalars['String'];
 };
 
 
@@ -520,6 +550,14 @@ export type WorkspaceUsers = {
 
 export type WorkspaceUsersResult = Forbidden | ServerError | WorkspaceUsers;
 
+export type AddContactMutationVariables = Exact<{
+  projectId: Scalars['String'];
+  contact: AddContactInput;
+}>;
+
+
+export type AddContactMutation = { __typename?: 'Mutation', addContact: { __typename: 'ContactAdded', contact: { __typename?: 'Contact', id: string, fullName: string } } | { __typename: 'Forbidden', message: string } | { __typename: 'ServerError', message: string } };
+
 export type ConfirmLoginMutationVariables = Exact<{
   token: Scalars['String'];
 }>;
@@ -618,6 +656,52 @@ export const ProjectScreenHousesFragmentDoc = gql`
   }
 }
     ${ProjectScreenHouseRoomsFragmentDoc}`;
+export const AddContactDocument = gql`
+    mutation addContact($projectId: String!, $contact: AddContactInput!) {
+  addContact(projectId: $projectId, contact: $contact) {
+    __typename
+    ... on ContactAdded {
+      contact {
+        id
+        fullName
+      }
+    }
+    ... on Forbidden {
+      message
+    }
+    ... on ServerError {
+      message
+    }
+  }
+}
+    `;
+export type AddContactMutationFn = Apollo.MutationFunction<AddContactMutation, AddContactMutationVariables>;
+
+/**
+ * __useAddContactMutation__
+ *
+ * To run a mutation, you first call `useAddContactMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddContactMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addContactMutation, { data, loading, error }] = useAddContactMutation({
+ *   variables: {
+ *      projectId: // value for 'projectId'
+ *      contact: // value for 'contact'
+ *   },
+ * });
+ */
+export function useAddContactMutation(baseOptions?: Apollo.MutationHookOptions<AddContactMutation, AddContactMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AddContactMutation, AddContactMutationVariables>(AddContactDocument, options);
+      }
+export type AddContactMutationHookResult = ReturnType<typeof useAddContactMutation>;
+export type AddContactMutationResult = Apollo.MutationResult<AddContactMutation>;
+export type AddContactMutationOptions = Apollo.BaseMutationOptions<AddContactMutation, AddContactMutationVariables>;
 export const ConfirmLoginDocument = gql`
     mutation confirmLogin($token: String!) {
   confirmLogin(token: $token) {

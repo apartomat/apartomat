@@ -2,9 +2,9 @@ import React, { ChangeEvent, Dispatch, SetStateAction, useEffect, useState, useR
 import { useParams } from "react-router-dom"
 
 import { Main, Box, Header, Heading, Text,
-    Paragraph, Spinner, SpinnerExtendedProps, Anchor, Image,
-FileInput, Button, Layer, Form, FormField, Drop, DateInput } from "grommet"
-import { FormClose, StatusGood } from "grommet-icons"
+    Paragraph, Spinner, SpinnerExtendedProps, Image,
+FileInput, Button, Layer, Form, FormField, Drop, MaskedInput, Tip } from "grommet"
+import { FormClose, StatusGood, Add } from "grommet-icons"
 
 import AnchorLink from "../common/AnchorLink"
 
@@ -12,6 +12,7 @@ import UserAvatar from "./UserAvatar"
 
 import { useProject, ProjectFiles, ProjectContacts, ProjectHouses, HouseRooms } from "./useProject"
 import { useUploadProjectFile, ProjectFileType } from "./useUploadProjectFile"
+import { useAddContact, ContactType } from "./useAddContact"
 
 import { useAuthContext } from "../common/context/auth/useAuthContext"
 
@@ -37,6 +38,8 @@ export function Project () {
     }
 
     const [showUploadFiles, setShowUploadFiles] = useState(false);
+
+    const [showAddContact, setShowAddContact] = useState(false);
 
     if (loading) {
         return (
@@ -99,15 +102,15 @@ export function Project () {
                     <Box margin={{vertical: "medium"}}>
                         <Heading level={2} margin="none">{project.title}</Heading>
                     </Box>
-                    <Box direction="row" justify="between" wrap={true}>
-                        <Box width="medium">
+                    <Box direction="row" justify="between" wrap>
+                        <Box width={{min: "35%"}}>
                             <Box margin="none">
                                 <Heading level={4} margin={{ bottom: "xsmall"}}>Сроки проекта</Heading>
                                 <ProjectDates startAt={project.startAt} endAt={project.endAt}/>
                             </Box>
-                            <Contacts contacts={project.contacts}/>
+                            <Contacts contacts={project.contacts} showAddContact={setShowAddContact}/>
                         </Box>
-                        <Box width="medium">
+                        <Box width={{min: "35%"}}>
                             <House houses={project.houses}/>
                             <Rooms houses={project.houses}/>
                         </Box>
@@ -160,6 +163,13 @@ export function Project () {
                             setShow={setShowUploadFiles}
                             onUploadComplete={({message}) => notify({ message })}
                         /> : null}
+
+                    {showAddContact ?
+                        <AddContact
+                            projectId={project.id.toString()}
+                            setShow={setShowAddContact}
+                            onAdded={({ message }) => notify({ message })}
+                        /> : null}
                 </Box>
                 </Main>
             );
@@ -191,7 +201,7 @@ export function Project () {
 
 export default Project;
 
-function Contacts({ contacts }: { contacts: ProjectContacts }) {
+function Contacts({ contacts, showAddContact }: { contacts: ProjectContacts, showAddContact: Dispatch<SetStateAction<boolean>> }) {
     switch (contacts.list.__typename) {
         case "ProjectContactsList":
             return (
@@ -199,14 +209,12 @@ function Contacts({ contacts }: { contacts: ProjectContacts }) {
                     <Heading level={4} margin={{ bottom: "xsmall"}}>
                         {contacts.list.items.length === 1 ? "Заказчик" : "Заказчики"}
                     </Heading>
-                    <Box height="36px" justify="center">
-                        <Text>{contacts.list.items.map((contact) => {
+                    <Box direction="row" gap="small" wrap>
+                        {[...contacts.list.items.map((contact) => {
                             return (
-                                <Anchor key={contact.id}>{contact.fullName}</Anchor>
+                                <Button key={contact.id} primary color="light-2" label={contact.fullName} style={{whiteSpace: "nowrap"}}/>
                             )
-                        }).reduce<React.ReactNode>((acc, item) => {
-                            return acc === "n/a" ? [item] : [acc, ", ", item]
-                        }, "n/a")}</Text>
+                        }), <Button icon={<Add/>} label="Добавить" onClick={() => showAddContact(true) }/>]}
                     </Box>
                 </Box>
             )
@@ -311,12 +319,6 @@ function ProjectDates ({ startAt, endAt }: {startAt?: string, endAt?: string}) {
     )
     const [ label, setLabel ] = useState(<>не определены</>)
 
-    const handleDateInputChange = ({ value }: { value: string | string[] }) => {
-        if (Array.isArray(value)) {
-            setState(value)
-        }
-    }
-
     useEffect(() => {
         if (state[0] && state[1] && state[0] !== state[1]) {
             setLabel(<>{new Date(state[0]).toLocaleDateString("ru-RU")}&nbsp;&mdash;&nbsp;{new Date(state[1]).toLocaleDateString("ru-RU")}</>)
@@ -333,11 +335,7 @@ function ProjectDates ({ startAt, endAt }: {startAt?: string, endAt?: string}) {
 
     return (
         <Box direction="row">
-            <DateInput
-                value={state}
-                onChange={handleDateInputChange}
-                buttonProps={{ label }}
-            />
+            <Button primary color="light-2" label={label}/>
         </Box>
     )
 }
@@ -366,7 +364,10 @@ function AddSomething ({ showUploadFiles }: { showUploadFiles: Dispatch<SetState
                 >
                     <Button plain children={({ hover }: {hover: boolean}) => {
                         return <Box pad="small" background={hover ? 'light-1': ''}><Text>Визуализации</Text></Box>
-                    }} onClick={() => showUploadFiles}/>
+                    }} onClick={() => {
+                        showUploadFiles(true)
+                        setShow(false)
+                    }}/>
                     <Button plain>
                         <Box pad="small"><Text>План</Text></Box>
                     </Button>
@@ -451,8 +452,6 @@ function UploadFiles(
 ) {
     const [ files, setFiles ] = useState<FileList | null>(null)
     const [ upload, { loading, error, data, called }, state ] = useUploadProjectFile()
-
-    console.log("error", { loading, error, data, called });
     
     useEffect(() => {
         if (state.state === "DONE") {
@@ -550,4 +549,159 @@ const Loading = (props: SpinnerExtendedProps) => {
             {...props}
         />
     )
+}
+
+function AddContact(
+    { projectId, setShow, onAdded }:
+    {
+        projectId: string,
+        setShow: Dispatch<SetStateAction<boolean>>,
+        onAdded: ({ message }: { message: string }) => void
+    }) {
+
+    const [ value, setValue ] = useState({fullName: "", phone: "", email: "", instagram: ""})
+
+    const [ add, { data, loading, error } ] = useAddContact()
+
+    const handleSubmit = (event: React.FormEvent) => {
+        const { fullName } = value;
+
+        const details = [];
+
+        if (value.phone) {
+            details.push({type: ContactType.Phone, value: value.phone});
+        }
+
+        if (value.email) {
+            details.push({type: ContactType.Email, value: value.email});
+        }
+
+        if (value.instagram) {
+            details.push({type: ContactType.Instagram, value: value.instagram});
+        }
+
+        add(projectId, { fullName, details })
+
+        event.preventDefault()
+    }
+
+    useEffect(() => {
+        switch (data?.addContact.__typename) {
+            case "ContactAdded":
+                setShow(false)
+                onAdded({ message: "Контакт добавлен" })
+        }
+    }, [ data, setShow, onAdded ])
+
+    return (
+        <Layer
+            onClickOutside={() => setShow(false)}
+            onEsc={() => setShow(false)}
+        >
+            <Form
+                validate="submit"
+                value={value}
+                onChange={val => setValue(val)}
+                onSubmit={handleSubmit}
+                messages={{required: 'обязательное поле'}}
+            >
+                {error && <Box><Text>{error.message}</Text></Box>}
+
+                <Box pad="medium" gap="medium" width={{min: "500px"}}>
+                    <Box direction="row"justify="between"align="center">
+                        <Heading level={3} margin="none">Добавить контакт</Heading>
+                        <Button icon={ <FormClose/> } onClick={() => setShow(false)}/>
+                    </Box>
+                    <FormField
+                        label="Имя"
+                        name="fullName"
+                        validate={{
+                            regexp: /^.+$/,
+                            message: "обязательно для заполнения",
+                            status: "error"
+                        }}
+                    >
+                        <MaskedInput
+                            name="fullName"
+                            mask={[
+                                { regexp: /^.*$/, placeholder: "Имя" },
+                                { fixed: ' ' },
+                                { regexp: /^.*$/, placeholder: "Фамилия" },
+                            ]}
+                        />
+                    </FormField>
+                    <FormField label="Телефон" name="phone">
+                        <MaskedInput
+                            name="phone"
+                            mask={[
+                                { fixed: '+7 (' },
+                                {
+                                    length: 3,
+                                    regexp: /^[0-9]{1,3}$/,
+                                    placeholder: 'xxx',
+                                },
+                                { fixed: ')' },
+                                { fixed: ' ' },
+                                {
+                                    length: 3,
+                                    regexp: /^[0-9]{1,3}$/,
+                                    placeholder: 'xxx',
+                                },
+                                { fixed: '-' },
+                                {
+                                    length: 2,
+                                    regexp: /^[0-9]{1,4}$/,
+                                    placeholder: 'xx',
+                                },
+                                { fixed: '-' },
+                                {
+                                    length: 2,
+                                    regexp: /^[0-9]{1,4}$/,
+                                    placeholder: 'xx',
+                                },
+                            ]}
+                        />
+                    </FormField>
+                    <FormField label="Электронная почта" name="email">
+                        <MaskedInput
+                            name="email"
+                            mask={[
+                                { regexp: /^[\w\-_.]+$/, placeholder: "example" },
+                                { fixed: '@' },
+                                { regexp: /^[\w\-_.]+$/, placeholder: "test" },
+                                { fixed: '.' },
+                                { regexp: /^[\w]+$/, placeholder: 'org' },
+                            ]}
+                        />
+                    </FormField>
+                    <FormField label="Instagram" name="instagram">
+                        <MaskedInput
+                            name="instagram"
+                            mask={[{ fixed: 'https://www.instagram.com/' }, { regexp: /^.*$/ }]}
+                        />
+                    </FormField>
+                    <Box direction="row" justify="between" margin={{top: "small"}}>
+                        <Box><Text color="status-critical"><ErrorMessage res={data?.addContact}/></Text></Box>
+                        <Button
+                            type="submit"
+                            primary
+                            label={loading ? 'Сохранение...' : 'Сохранить' }
+                            disabled={loading}
+                        />
+                    </Box>
+                </Box>
+            </Form>
+        </Layer>
+    )
+}
+
+function ErrorMessage({res}: { res: { __typename: "Forbidden", message: string } | { __typename: "ServerError", message: string } | any}) {
+    switch (res?.__typename) {
+        case "Forbidden":
+            return <>Доступ запрещен</>
+        case "ServerError":
+            return <>Ошибка сервера</>
+    }
+
+    return null
 }

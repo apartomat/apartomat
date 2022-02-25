@@ -4,10 +4,10 @@ extend type Mutation {
 
 input AddContactInput {
     fullName: String!
-    details:   [AddContactDetailsInput!]!
+    details:   [ContactDetailsInput!]!
 }
 
-input AddContactDetailsInput {
+input ContactDetailsInput {
     type: ContactType!
     value: String!
 }
