@@ -99,14 +99,9 @@ type WorkspaceUsersResult interface {
 	IsWorkspaceUsersResult()
 }
 
-type AddContactDetailsInput struct {
-	Type  ContactType `json:"type"`
-	Value string      `json:"value"`
-}
-
 type AddContactInput struct {
-	FullName string                    `json:"fullName"`
-	Details  []*AddContactDetailsInput `json:"details"`
+	FullName string                 `json:"fullName"`
+	Details  []*ContactDetailsInput `json:"details"`
 }
 
 type AlreadyExists struct {
@@ -144,6 +139,11 @@ type ContactDeleted struct {
 func (ContactDeleted) IsDeleteContactResult() {}
 
 type ContactDetails struct {
+	Type  ContactType `json:"type"`
+	Value string      `json:"value"`
+}
+
+type ContactDetailsInput struct {
 	Type  ContactType `json:"type"`
 	Value string      `json:"value"`
 }

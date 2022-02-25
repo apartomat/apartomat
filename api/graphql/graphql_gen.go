@@ -153,7 +153,7 @@ type ComplexityRoot struct {
 		AddContact        func(childComplexity int, projectID string, contact AddContactInput) int
 		ConfirmLogin      func(childComplexity int, token string) int
 		CreateProject     func(childComplexity int, input CreateProjectInput) int
-		DeleteContact     func(childComplexity int, contactID string) int
+		DeleteContact     func(childComplexity int, id string) int
 		LoginByEmail      func(childComplexity int, email string, workspaceName string) int
 		Ping              func(childComplexity int) int
 		UploadProjectFile func(childComplexity int, input UploadProjectFileInput) int
@@ -349,7 +349,7 @@ type MutationResolver interface {
 	AddContact(ctx context.Context, projectID string, contact AddContactInput) (AddContactResult, error)
 	ConfirmLogin(ctx context.Context, token string) (ConfirmLoginResult, error)
 	CreateProject(ctx context.Context, input CreateProjectInput) (CreateProjectResult, error)
-	DeleteContact(ctx context.Context, contactID string) (DeleteContactResult, error)
+	DeleteContact(ctx context.Context, id string) (DeleteContactResult, error)
 	LoginByEmail(ctx context.Context, email string, workspaceName string) (LoginByEmailResult, error)
 	UploadProjectFile(ctx context.Context, input UploadProjectFileInput) (UploadProjectFileResult, error)
 }
@@ -703,7 +703,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.DeleteContact(childComplexity, args["contactId"].(string)), true
+		return e.complexity.Mutation.DeleteContact(childComplexity, args["id"].(string)), true
 
 	case "Mutation.loginByEmail":
 		if e.complexity.Mutation.LoginByEmail == nil {
@@ -1436,10 +1436,10 @@ var sources = []*ast.Source{
 
 input AddContactInput {
     fullName: String!
-    details:   [AddContactDetailsInput!]!
+    details:   [ContactDetailsInput!]!
 }
 
-input AddContactDetailsInput {
+input ContactDetailsInput {
     type: ContactType!
     value: String!
 }
@@ -1484,7 +1484,7 @@ type ProjectCreated {
     project: Project!
 }`, BuiltIn: false},
 	{Name: "graphql/schema/mutation_delete_contact.graphql", Input: `extend type Mutation {
-    deleteContact(contactId: String!): DeleteContactResult!
+    deleteContact(id: String!): DeleteContactResult!
 }
 
 union DeleteContactResult = ContactDeleted | Forbidden | NotFound | ServerError
@@ -1938,14 +1938,14 @@ func (ec *executionContext) field_Mutation_deleteContact_args(ctx context.Contex
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
-	if tmp, ok := rawArgs["contactId"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contactId"))
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
 		arg0, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["contactId"] = arg0
+	args["id"] = arg0
 	return args, nil
 }
 
@@ -3632,7 +3632,7 @@ func (ec *executionContext) _Mutation_deleteContact(ctx context.Context, field g
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().DeleteContact(rctx, args["contactId"].(string))
+		return ec.resolvers.Mutation().DeleteContact(rctx, args["id"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -7821,37 +7821,6 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 
 // region    **************************** input.gotpl *****************************
 
-func (ec *executionContext) unmarshalInputAddContactDetailsInput(ctx context.Context, obj interface{}) (AddContactDetailsInput, error) {
-	var it AddContactDetailsInput
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
-		asMap[k] = v
-	}
-
-	for k, v := range asMap {
-		switch k {
-		case "type":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
-			it.Type, err = ec.unmarshalNContactType2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐContactType(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "value":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("value"))
-			it.Value, err = ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		}
-	}
-
-	return it, nil
-}
-
 func (ec *executionContext) unmarshalInputAddContactInput(ctx context.Context, obj interface{}) (AddContactInput, error) {
 	var it AddContactInput
 	asMap := map[string]interface{}{}
@@ -7873,7 +7842,38 @@ func (ec *executionContext) unmarshalInputAddContactInput(ctx context.Context, o
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("details"))
-			it.Details, err = ec.unmarshalNAddContactDetailsInput2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAddContactDetailsInputᚄ(ctx, v)
+			it.Details, err = ec.unmarshalNContactDetailsInput2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐContactDetailsInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputContactDetailsInput(ctx context.Context, obj interface{}) (ContactDetailsInput, error) {
+	var it ContactDetailsInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "type":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
+			it.Type, err = ec.unmarshalNContactType2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐContactType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "value":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("value"))
+			it.Value, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -11798,28 +11798,6 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 
 // region    ***************************** type.gotpl *****************************
 
-func (ec *executionContext) unmarshalNAddContactDetailsInput2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAddContactDetailsInputᚄ(ctx context.Context, v interface{}) ([]*AddContactDetailsInput, error) {
-	var vSlice []interface{}
-	if v != nil {
-		vSlice = graphql.CoerceList(v)
-	}
-	var err error
-	res := make([]*AddContactDetailsInput, len(vSlice))
-	for i := range vSlice {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNAddContactDetailsInput2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAddContactDetailsInput(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
-}
-
-func (ec *executionContext) unmarshalNAddContactDetailsInput2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAddContactDetailsInput(ctx context.Context, v interface{}) (*AddContactDetailsInput, error) {
-	res, err := ec.unmarshalInputAddContactDetailsInput(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
 func (ec *executionContext) unmarshalNAddContactInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAddContactInput(ctx context.Context, v interface{}) (AddContactInput, error) {
 	res, err := ec.unmarshalInputAddContactInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -11966,6 +11944,28 @@ func (ec *executionContext) marshalNContactDetails2ᚖgithubᚗcomᚋapartomat�
 		return graphql.Null
 	}
 	return ec._ContactDetails(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNContactDetailsInput2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐContactDetailsInputᚄ(ctx context.Context, v interface{}) ([]*ContactDetailsInput, error) {
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*ContactDetailsInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNContactDetailsInput2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐContactDetailsInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalNContactDetailsInput2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐContactDetailsInput(ctx context.Context, v interface{}) (*ContactDetailsInput, error) {
+	res, err := ec.unmarshalInputContactDetailsInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNContactType2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐContactType(ctx context.Context, v interface{}) (ContactType, error) {

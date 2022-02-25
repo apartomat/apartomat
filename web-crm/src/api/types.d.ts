@@ -85,6 +85,8 @@ export type CreateProjectInput = {
 
 export type CreateProjectResult = Forbidden | ProjectCreated | ServerError;
 
+export type DeleteContactResult = ContactDeleted | Forbidden | NotFound | ServerError;
+
 export type Error = {
   message: Scalars['String'];
 };
@@ -179,6 +181,7 @@ export type Mutation = {
   addContact: AddContactResult;
   confirmLogin: ConfirmLoginResult;
   createProject: CreateProjectResult;
+  deleteContact: DeleteContactResult;
   loginByEmail: LoginByEmailResult;
   ping: Scalars['String'];
   uploadProjectFile: UploadProjectFileResult;
@@ -198,6 +201,11 @@ export type MutationConfirmLoginArgs = {
 
 export type MutationCreateProjectArgs = {
   input: CreateProjectInput;
+};
+
+
+export type MutationDeleteContactArgs = {
+  id: Scalars['String'];
 };
 
 
