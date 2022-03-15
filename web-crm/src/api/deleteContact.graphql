@@ -1,0 +1,19 @@
+mutation deleteContact($id: String!) {
+    deleteContact(id: $id) {
+        __typename
+        ...on ContactDeleted {
+            contact {
+                id
+            }
+        }
+        ...on Forbidden {
+            message
+        }
+        ...on NotFound {
+            message
+        }
+        ...on ServerError {
+            message
+        }
+    }
+}

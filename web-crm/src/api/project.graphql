@@ -54,6 +54,11 @@ query project($id: Int!) {
                                 items {
                                     id
                                     fullName
+                                    photo
+                                    details {
+                                        type
+                                        value
+                                    }
                                 }
                             }
                             ...on Error {

@@ -5,6 +5,11 @@ mutation addContact($projectId: String! $contact: AddContactInput!) {
             contact {
                 id
                 fullName
+                photo
+                details {
+                    type
+                    value
+                }
             }
         }
         ...on Forbidden {

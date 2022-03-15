@@ -564,7 +564,7 @@ export type AddContactMutationVariables = Exact<{
 }>;
 
 
-export type AddContactMutation = { __typename?: 'Mutation', addContact: { __typename: 'ContactAdded', contact: { __typename?: 'Contact', id: string, fullName: string } } | { __typename: 'Forbidden', message: string } | { __typename: 'ServerError', message: string } };
+export type AddContactMutation = { __typename?: 'Mutation', addContact: { __typename: 'ContactAdded', contact: { __typename?: 'Contact', id: string, fullName: string, photo: string, details: Array<{ __typename?: 'ContactDetails', type: ContactType, value: string }> } } | { __typename: 'Forbidden', message: string } | { __typename: 'ServerError', message: string } };
 
 export type ConfirmLoginMutationVariables = Exact<{
   token: Scalars['String'];
@@ -579,6 +579,13 @@ export type CreateProjectMutationVariables = Exact<{
 
 
 export type CreateProjectMutation = { __typename?: 'Mutation', createProject: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectCreated', project: { __typename?: 'Project', id: number, title: string, startAt?: any | null | undefined, endAt?: any | null | undefined } } | { __typename: 'ServerError', message: string } };
+
+export type DeleteContactMutationVariables = Exact<{
+  id: Scalars['String'];
+}>;
+
+
+export type DeleteContactMutation = { __typename?: 'Mutation', deleteContact: { __typename: 'ContactDeleted', contact: { __typename?: 'Contact', id: string } } | { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'ServerError', message: string } };
 
 export type LoginByEmailMutationVariables = Exact<{
   email: Scalars['String'];
@@ -601,7 +608,7 @@ export type ProjectQueryVariables = Exact<{
 }>;
 
 
-export type ProjectQuery = { __typename?: 'Query', screen: { __typename?: 'ScreenQuery', projectScreen: { __typename?: 'ProjectScreen', project: { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'Project', id: number, title: string, startAt?: any | null | undefined, endAt?: any | null | undefined, contacts: { __typename?: 'ProjectContacts', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectContactsList', items: Array<{ __typename?: 'Contact', id: string, fullName: string }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectContactsTotal', total: number } | { __typename: 'ServerError' } }, houses: { __typename?: 'ProjectHouses', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectHousesList', items: Array<{ __typename?: 'House', id: string, city: string, address: string, housingComplex: string, createdAt: any, modifiedAt: any, rooms: { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null | undefined, design: boolean }> } | { __typename?: 'ServerError', message: string } } }> } | { __typename: 'ServerError', message: string } }, files: { __typename?: 'ProjectFiles', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectFilesList', items: Array<{ __typename?: 'ProjectFile', id: number, name: string, url: any, type: ProjectFileType }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectFilesTotal', total: number } | { __typename: 'ServerError' } } } | { __typename: 'ServerError', message: string }, menu: { __typename: 'MenuItems', items: Array<{ __typename?: 'MenuItem', title: string, url: string }> } | { __typename: 'ServerError' } } } };
+export type ProjectQuery = { __typename?: 'Query', screen: { __typename?: 'ScreenQuery', projectScreen: { __typename?: 'ProjectScreen', project: { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'Project', id: number, title: string, startAt?: any | null | undefined, endAt?: any | null | undefined, contacts: { __typename?: 'ProjectContacts', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectContactsList', items: Array<{ __typename?: 'Contact', id: string, fullName: string, photo: string, details: Array<{ __typename?: 'ContactDetails', type: ContactType, value: string }> }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectContactsTotal', total: number } | { __typename: 'ServerError' } }, houses: { __typename?: 'ProjectHouses', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectHousesList', items: Array<{ __typename?: 'House', id: string, city: string, address: string, housingComplex: string, createdAt: any, modifiedAt: any, rooms: { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null | undefined, design: boolean }> } | { __typename?: 'ServerError', message: string } } }> } | { __typename: 'ServerError', message: string } }, files: { __typename?: 'ProjectFiles', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectFilesList', items: Array<{ __typename?: 'ProjectFile', id: number, name: string, url: any, type: ProjectFileType }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectFilesTotal', total: number } | { __typename: 'ServerError' } } } | { __typename: 'ServerError', message: string }, menu: { __typename: 'MenuItems', items: Array<{ __typename?: 'MenuItem', title: string, url: string }> } | { __typename: 'ServerError' } } } };
 
 export type SpecScreenQueryVariables = Exact<{
   projectId: Scalars['Int'];
@@ -672,6 +679,11 @@ export const AddContactDocument = gql`
       contact {
         id
         fullName
+        photo
+        details {
+          type
+          value
+        }
       }
     }
     ... on Forbidden {
@@ -802,6 +814,53 @@ export function useCreateProjectMutation(baseOptions?: Apollo.MutationHookOption
 export type CreateProjectMutationHookResult = ReturnType<typeof useCreateProjectMutation>;
 export type CreateProjectMutationResult = Apollo.MutationResult<CreateProjectMutation>;
 export type CreateProjectMutationOptions = Apollo.BaseMutationOptions<CreateProjectMutation, CreateProjectMutationVariables>;
+export const DeleteContactDocument = gql`
+    mutation deleteContact($id: String!) {
+  deleteContact(id: $id) {
+    __typename
+    ... on ContactDeleted {
+      contact {
+        id
+      }
+    }
+    ... on Forbidden {
+      message
+    }
+    ... on NotFound {
+      message
+    }
+    ... on ServerError {
+      message
+    }
+  }
+}
+    `;
+export type DeleteContactMutationFn = Apollo.MutationFunction<DeleteContactMutation, DeleteContactMutationVariables>;
+
+/**
+ * __useDeleteContactMutation__
+ *
+ * To run a mutation, you first call `useDeleteContactMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteContactMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteContactMutation, { data, loading, error }] = useDeleteContactMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useDeleteContactMutation(baseOptions?: Apollo.MutationHookOptions<DeleteContactMutation, DeleteContactMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteContactMutation, DeleteContactMutationVariables>(DeleteContactDocument, options);
+      }
+export type DeleteContactMutationHookResult = ReturnType<typeof useDeleteContactMutation>;
+export type DeleteContactMutationResult = Apollo.MutationResult<DeleteContactMutation>;
+export type DeleteContactMutationOptions = Apollo.BaseMutationOptions<DeleteContactMutation, DeleteContactMutationVariables>;
 export const LoginByEmailDocument = gql`
     mutation loginByEmail($email: String!) {
   loginByEmail(email: $email) {
@@ -913,6 +972,11 @@ export const ProjectDocument = gql`
                 items {
                   id
                   fullName
+                  photo
+                  details {
+                    type
+                    value
+                  }
                 }
               }
               ... on Error {

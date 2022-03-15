@@ -3,21 +3,48 @@ import { useParams } from "react-router-dom"
 
 import { Main, Box, Header, Heading, Text,
     Paragraph, Spinner, SpinnerExtendedProps, Image,
-FileInput, Button, Layer, Form, FormField, Drop, MaskedInput, Tip } from "grommet"
-import { FormClose, StatusGood, Add } from "grommet-icons"
+FileInput, Button, Layer, Form, FormField, Drop, MaskedInput, Tip, Card, CardHeader, CardBody, CardFooter } from "grommet"
+import { FormClose, StatusGood, Add, Trash, Instagram } from "grommet-icons"
 
 import AnchorLink from "../common/AnchorLink"
-
 import UserAvatar from "./UserAvatar"
 
-import { useProject, ProjectFiles, ProjectContacts, ProjectHouses, HouseRooms } from "./useProject"
-import { useUploadProjectFile, ProjectFileType } from "./useUploadProjectFile"
-import { useAddContact, ContactType } from "./useAddContact"
 
 import { useAuthContext } from "../common/context/auth/useAuthContext"
 
+import { useProject, ProjectFiles, ProjectContacts, ProjectHouses, HouseRooms } from "./useProject"
+import { useUploadProjectFile, ProjectFileType } from "./useUploadProjectFile"
+import { useAddContact, ContactType, Contact } from "./useAddContact"
+import useDeleteContact from "./useDeleteContact"
+
 interface RouteParams {
     id: string
+};
+
+
+const spec = {
+    items: [
+        {
+            name: "PAX ПАКС / TYSSEDAL ТИССЕДАЛЬ Гардероб, комбинация",
+            image: "https://www.ikea.com/ru/ru/images/products/pax-paks-tyssedal-tissedal-garderob-kombinaciya-belyy__1024717_pe833642_s5.jpg?f=xl",
+            url: "https://www.ikea.com/ru/ru/p/pax-paks-tyssedal-tissedal-garderob-kombinaciya-belyy-s19429737/",
+        },
+        {
+            name: "MOALISA МОАЛИЗА Гардины, 2 шт. × 3",
+            image: "https://www.ikea.com/ru/ru/images/products/moalisa-moaliza-gardiny-2-sht-belyy-chernyy__0950019_pe801219_s5.jpg?f=xl",
+            url: "https://www.ikea.com/ru/ru/p/moalisa-moaliza-gardiny-2-sht-belyy-chernyy-50499515/",
+        },
+        {
+            name: "TYSSEDAL ТИССЕДАЛЬ Каркас кровати",
+            image: "https://www.ikea.com/ru/ru/images/products/tyssedal-tissedal-karkas-krovati-belyy-luroy__0637608_pe698420_s5.jpg?f=xl",
+            url: "https://www.ikea.com/ru/ru/p/tyssedal-tissedal-karkas-krovati-belyy-luroy-s79211165/"
+        },
+        {
+            name: "TYBBLE ТИБЛ Подвесной светильник/5 светодиодов",
+            image: "https://www.ikea.com/ru/ru/images/products/tybble-tibl-podvesnoy-svetilnik-5-svetodiodov-nikelirovannyy-molochnyy-steklo__0794591_pe765659_s5.jpg?f=xl",
+            url: "https://www.ikea.com/ru/ru/p/tybble-tibl-podvesnoy-svetilnik-5-svetodiodov-nikelirovannyy-molochnyy-steklo-90398251/",
+        }
+    ]
 };
 
 export function Project () {
@@ -38,8 +65,6 @@ export function Project () {
     }
 
     const [showUploadFiles, setShowUploadFiles] = useState(false);
-
-    const [showAddContact, setShowAddContact] = useState(false);
 
     if (loading) {
         return (
@@ -108,7 +133,7 @@ export function Project () {
                                 <Heading level={4} margin={{ bottom: "xsmall"}}>Сроки проекта</Heading>
                                 <ProjectDates startAt={project.startAt} endAt={project.endAt}/>
                             </Box>
-                            <Contacts contacts={project.contacts} showAddContact={setShowAddContact}/>
+                            <Contacts contacts={project.contacts} projectId={project.id.toString()} notify={notify}/>
                         </Box>
                         <Box width={{min: "35%"}}>
                             <House houses={project.houses}/>
@@ -117,6 +142,42 @@ export function Project () {
                     </Box>
 
                     <Visualizations files={project.files} showUploadFiles={setShowUploadFiles}/>
+
+                    <Box margin={{vertical: "medium"}}>
+                        <Heading level={3}>
+                            <Box gap="small">
+                                <strong>Спецификация</strong>
+                                <Text weight="normal">
+                                    {spec.items.length} позиций
+                                </Text>
+                            </Box>
+                        </Heading>
+                        <Box direction="row" gap="small" overflow={{"horizontal":"auto"}} >
+                            {spec.items.map(item => {
+                                return (
+                                    <Box
+                                        key={item.name}
+                                        height="xsmall"
+                                        width="xsmall"
+                                        margin={{bottom: "small"}}
+                                        flex={{"shrink":0}}
+                                        background="light-0"
+                                    >
+                                        <Tip
+                                            content={
+                                                <Text>{item.name}</Text>
+                                            }
+                                        >
+                                            <Image
+                                                fit="cover"
+                                                src={`${item.image}`}
+                                            />
+                                        </Tip>
+                                    </Box>
+                                )
+                            })}
+                        </Box>
+                    </Box>
 
                     {/* <Box margin={{vertical: "medium"}}>
                         <Box direction="row" justify="between">
@@ -163,14 +224,7 @@ export function Project () {
                             setShow={setShowUploadFiles}
                             onUploadComplete={({message}) => notify({ message })}
                         /> : null}
-
-                    {showAddContact ?
-                        <AddContact
-                            projectId={project.id.toString()}
-                            setShow={setShowAddContact}
-                            onAdded={({ message }) => notify({ message })}
-                        /> : null}
-                </Box>
+                    </Box>
                 </Main>
             );
         case "NotFound":
@@ -201,22 +255,138 @@ export function Project () {
 
 export default Project;
 
-function Contacts({ contacts, showAddContact }: { contacts: ProjectContacts, showAddContact: Dispatch<SetStateAction<boolean>> }) {
+function ContactCard(
+    { contact, onDelete }:
+    { contact: Contact , onDelete: (contact: Contact) => void }
+) {
+    const ref = useRef(null)
+
+    const [showCard, setShowCard] = useState(false)
+
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+
+    const [deleteContact, { data, loading, error } ] = useDeleteContact()
+
+    const handleDelete = () => {
+        setShowDeleteConfirm(true)
+    }
+
+    const handleDeleteConfirm = () => {
+        deleteContact(contact.id)
+    }
+
+    const handleDeleteCancel = () => {
+        setShowDeleteConfirm(false)
+        setShowCard(false)
+    }
+
+    useEffect(() => {
+        switch (data?.deleteContact.__typename) {
+            case "ContactDeleted":
+                setShowCard(false)
+                onDelete(contact)
+        }
+    }, [data])
+
+    return (
+        <Box>
+            <Button
+                key={contact.id}
+                ref={ref}
+                primary
+                color="light-2"
+                label={contact.fullName}
+                style={{whiteSpace: "nowrap"}}
+                onClick={() => setShowCard(true) }
+            />
+            {ref.current && showCard &&
+                <Drop
+                    target={ref.current}
+                    align={{left: "right"}}
+                    plain
+                    onEsc={() => setShowCard(false) }
+                    onClickOutside={() => setShowCard(false) }
+                >
+                    <Card width="medium" background="white" margin="small">
+                        <CardHeader pad={{horizontal: "medium", top: "medium"}} style={{fontWeight: "bold"}}>{contact.fullName}</CardHeader>
+                        <CardBody pad="medium">
+                            {contact.details.filter(c => !["INSTAGRAM"].includes(c.type)).map(c => {
+                                return <Box pad={{vertical: "small"}}>{c.value}</Box>
+                            })}
+                            {contact.details.filter(c => ["INSTAGRAM"].includes(c.type)).length > 0
+                                ? <Box pad={{vertical: "small"}} direction="row">
+                                {contact.details.filter(c => ["INSTAGRAM"].includes(c.type)).map(c => {
+                                    switch (c.type) {
+                                        case "INSTAGRAM":
+                                            return <Button icon={<Instagram color="primary"/>} plain href={c.value}/>
+                                    }
+
+                                    return null
+                                })}
+                                </Box>
+                                : null
+                            }
+
+                        </CardBody>
+                        <CardFooter pad={{horizontal: "small"}} background="light-1" height="xxsmall">
+                            {showDeleteConfirm
+                                ?
+                                    <Box direction="row" gap="small">
+                                        <Button primary label="Удалить" size="small" onClick={handleDeleteConfirm}/>
+                                        <Button label="Отмена" size="small" onClick={handleDeleteCancel}/>
+                                    </Box>
+                                : <Button icon={<Trash/>} onClick={handleDelete}/>
+                            }
+
+                        </CardFooter>
+                    </Card>
+                </Drop>
+            }
+        </Box>
+    )
+}
+
+function Contacts({ contacts, projectId, notify }: { contacts: ProjectContacts, projectId: string, notify: (val: { message: string }) => void }) {
+    const [showAddContact, setShowAddContact] = useState(false)
+
+    const [justAdded, setJustAdded] = useState([] as Contact[])
+
+    const [justDeleted, setJustDeleted] = useState([] as string[])
+
     switch (contacts.list.__typename) {
         case "ProjectContactsList":
+
+            const list = [...contacts.list.items, ...justAdded].filter(contact => !justDeleted.includes(contact.id))
+
             return (
-                <Box margin={{top: "small"}}>
-                    <Heading level={4} margin={{ bottom: "xsmall"}}>
-                        {contacts.list.items.length === 1 ? "Заказчик" : "Заказчики"}
-                    </Heading>
-                    <Box direction="row" gap="small" wrap>
-                        {[...contacts.list.items.map((contact) => {
-                            return (
-                                <Button key={contact.id} primary color="light-2" label={contact.fullName} style={{whiteSpace: "nowrap"}}/>
-                            )
-                        }), <Button icon={<Add/>} label="Добавить" onClick={() => showAddContact(true) }/>]}
+                <>
+                    <Box margin={{top: "small"}}>
+                        <Heading level={4} margin={{ bottom: "xsmall"}}>
+                            {list.length === 1 ? "Заказчик" : "Заказчики"}
+                        </Heading>
+                        <Box direction="row" gap="small" wrap>
+                            {[...list.map((contact) => {
+                                return <ContactCard
+                                        contact={contact}
+                                        onDelete={(contact: Contact) => {
+                                            setJustDeleted([...justDeleted, contact.id])
+                                            notify({ message: "Контакт удален"})
+                                        }}
+                                />
+                            }), <Button icon={<Add/>} label="Добавить" onClick={() => setShowAddContact(true) }/>]}
+                        </Box>
                     </Box>
-                </Box>
+
+                    {showAddContact ?
+                        <AddContact
+                            projectId={projectId}
+                            setShow={setShowAddContact}
+                            onAdd={(contact: Contact) => {
+                                setJustAdded([...justAdded, contact])
+                                notify({ message: "Контакт добавлен"})
+                            }}
+                        /> : null}
+                </>
             )
         default:
             return (
@@ -552,11 +722,11 @@ const Loading = (props: SpinnerExtendedProps) => {
 }
 
 function AddContact(
-    { projectId, setShow, onAdded }:
+    { projectId, setShow, onAdd }:
     {
         projectId: string,
         setShow: Dispatch<SetStateAction<boolean>>,
-        onAdded: ({ message }: { message: string }) => void
+        onAdd: (contact: Contact) => void
     }) {
 
     const [ value, setValue ] = useState({fullName: "", phone: "", email: "", instagram: ""})
@@ -589,9 +759,9 @@ function AddContact(
         switch (data?.addContact.__typename) {
             case "ContactAdded":
                 setShow(false)
-                onAdded({ message: "Контакт добавлен" })
+                onAdd(data.addContact.contact)
         }
-    }, [ data, setShow, onAdded ])
+    }, [ data, setShow, onAdd ])
 
     return (
         <Layer

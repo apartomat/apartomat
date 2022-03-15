@@ -38,7 +38,7 @@ export type ProjectContacts = (
     { __typename: 'ProjectContactsList' }
     & { items: Array<(
       { __typename?: 'Contact' }
-      & Pick<Contact, 'id' | 'fullName'>
+      & Pick<Contact, 'id' | 'fullName' | 'photo' | 'details'>
     )> }
   ) | (
     { __typename: 'Forbidden' }
