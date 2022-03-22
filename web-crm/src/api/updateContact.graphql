@@ -1,0 +1,25 @@
+mutation updateContact($contactId: String! $data: UpdateContactInput!) {
+    updateContact(contactId: $contactId data: $data) {
+        __typename
+        ...on ContactUpdated {
+            contact {
+                id
+                fullName
+                photo
+                details {
+                    type
+                    value
+                }
+            }
+        }
+        ...on NotFound {
+            message
+        }
+        ...on Forbidden {
+            message
+        }
+        ...on ServerError {
+            message
+        }
+    }
+}

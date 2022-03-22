@@ -15,6 +15,7 @@ import { useAuthContext } from "../common/context/auth/useAuthContext"
 import { useProject, ProjectFiles, ProjectContacts, ProjectHouses, HouseRooms } from "./useProject"
 import { useUploadProjectFile, ProjectFileType } from "./useUploadProjectFile"
 import { useAddContact, ContactType, Contact } from "./useAddContact"
+import { useUpdateContact } from "./useUpdateContact"
 import useDeleteContact from "./useDeleteContact"
 
 interface RouteParams {
@@ -256,8 +257,8 @@ export function Project () {
 export default Project;
 
 function ContactCard(
-    { contact, onDelete }:
-    { contact: Contact , onDelete: (contact: Contact) => void }
+    { contact, onDelete, onClickUpdate }:
+    { contact: Contact , onDelete: (contact: Contact) => void, onClickUpdate: (contact: Contact) => void }
 ) {
     const ref = useRef(null)
 
@@ -310,14 +311,14 @@ function ContactCard(
                     <Card width="medium" background="white" margin="small">
                         <CardHeader pad={{horizontal: "medium", top: "medium"}} style={{fontWeight: "bold"}}>{contact.fullName}</CardHeader>
                         <CardBody pad="medium">
-                            {contact.details.filter(c => !["INSTAGRAM"].includes(c.type)).map(c => {
+                            {contact.details.filter(c => ![ContactType.Instagram].includes(c.type)).map(c => {
                                 return <Box pad={{vertical: "small"}}>{c.value}</Box>
                             })}
-                            {contact.details.filter(c => ["INSTAGRAM"].includes(c.type)).length > 0
+                            {contact.details.filter(c => [ContactType.Instagram].includes(c.type)).length > 0
                                 ? <Box pad={{vertical: "small"}} direction="row">
-                                {contact.details.filter(c => ["INSTAGRAM"].includes(c.type)).map(c => {
+                                {contact.details.filter(c => [ContactType.Instagram].includes(c.type)).map(c => {
                                     switch (c.type) {
-                                        case "INSTAGRAM":
+                                        case ContactType.Instagram:
                                             return <Button icon={<Instagram color="primary"/>} plain href={c.value}/>
                                     }
 
@@ -338,6 +339,13 @@ function ContactCard(
                                 : <Button icon={<Trash/>} onClick={handleDelete}/>
                             }
 
+                            {!showDeleteConfirm &&
+                                <Button label="Редактировать" size="small" primary onClick={() => {
+                                    setShowCard(false)
+                                    onClickUpdate(contact)
+                                }}/>
+                            }
+
                         </CardFooter>
                     </Card>
                 </Drop>
@@ -348,6 +356,8 @@ function ContactCard(
 
 function Contacts({ contacts, projectId, notify }: { contacts: ProjectContacts, projectId: string, notify: (val: { message: string }) => void }) {
     const [showAddContact, setShowAddContact] = useState(false)
+
+    const [updateContact, setUpdateContact] = useState<Contact | undefined>(undefined)
 
     const [justAdded, setJustAdded] = useState([] as Contact[])
 
@@ -372,6 +382,9 @@ function Contacts({ contacts, projectId, notify }: { contacts: ProjectContacts, 
                                             setJustDeleted([...justDeleted, contact.id])
                                             notify({ message: "Контакт удален"})
                                         }}
+                                        onClickUpdate={(contact: Contact) => {
+                                            setUpdateContact(contact)
+                                        }}
                                 />
                             }), <Button icon={<Add/>} label="Добавить" onClick={() => setShowAddContact(true) }/>]}
                         </Box>
@@ -384,6 +397,15 @@ function Contacts({ contacts, projectId, notify }: { contacts: ProjectContacts, 
                             onAdd={(contact: Contact) => {
                                 setJustAdded([...justAdded, contact])
                                 notify({ message: "Контакт добавлен"})
+                            }}
+                        /> : null}
+
+                    {updateContact ?
+                        <UpdateContact
+                            contact={updateContact}
+                            hide={() => { setUpdateContact(undefined) }}
+                            onUpdate={(contact: Contact) => {
+                                notify({ message: "Контакт сохранен"})
                             }}
                         /> : null}
                 </>
@@ -729,7 +751,7 @@ function AddContact(
         onAdd: (contact: Contact) => void
     }) {
 
-    const [ value, setValue ] = useState({fullName: "", phone: "", email: "", instagram: ""})
+    const [ value, setValue ] = useState({} as ContactFormData)
 
     const [ add, { data, loading, error } ] = useAddContact()
 
@@ -768,13 +790,6 @@ function AddContact(
             onClickOutside={() => setShow(false)}
             onEsc={() => setShow(false)}
         >
-            <Form
-                validate="submit"
-                value={value}
-                onChange={val => setValue(val)}
-                onSubmit={handleSubmit}
-                messages={{required: 'обязательное поле'}}
-            >
                 {error && <Box><Text>{error.message}</Text></Box>}
 
                 <Box pad="medium" gap="medium" width={{min: "500px"}}>
@@ -782,85 +797,193 @@ function AddContact(
                         <Heading level={3} margin="none">Добавить контакт</Heading>
                         <Button icon={ <FormClose/> } onClick={() => setShow(false)}/>
                     </Box>
-                    <FormField
-                        label="Имя"
-                        name="fullName"
-                        validate={{
-                            regexp: /^.+$/,
-                            message: "обязательно для заполнения",
-                            status: "error"
-                        }}
-                    >
-                        <MaskedInput
-                            name="fullName"
-                            mask={[
-                                { regexp: /^.*$/, placeholder: "Имя" },
-                                { fixed: ' ' },
-                                { regexp: /^.*$/, placeholder: "Фамилия" },
-                            ]}
-                        />
-                    </FormField>
-                    <FormField label="Телефон" name="phone">
-                        <MaskedInput
-                            name="phone"
-                            mask={[
-                                { fixed: '+7 (' },
-                                {
-                                    length: 3,
-                                    regexp: /^[0-9]{1,3}$/,
-                                    placeholder: 'xxx',
-                                },
-                                { fixed: ')' },
-                                { fixed: ' ' },
-                                {
-                                    length: 3,
-                                    regexp: /^[0-9]{1,3}$/,
-                                    placeholder: 'xxx',
-                                },
-                                { fixed: '-' },
-                                {
-                                    length: 2,
-                                    regexp: /^[0-9]{1,4}$/,
-                                    placeholder: 'xx',
-                                },
-                                { fixed: '-' },
-                                {
-                                    length: 2,
-                                    regexp: /^[0-9]{1,4}$/,
-                                    placeholder: 'xx',
-                                },
-                            ]}
-                        />
-                    </FormField>
-                    <FormField label="Электронная почта" name="email">
-                        <MaskedInput
-                            name="email"
-                            mask={[
-                                { regexp: /^[\w\-_.]+$/, placeholder: "example" },
-                                { fixed: '@' },
-                                { regexp: /^[\w\-_.]+$/, placeholder: "test" },
-                                { fixed: '.' },
-                                { regexp: /^[\w]+$/, placeholder: 'org' },
-                            ]}
-                        />
-                    </FormField>
-                    <FormField label="Instagram" name="instagram">
-                        <MaskedInput
-                            name="instagram"
-                            mask={[{ fixed: 'https://www.instagram.com/' }, { regexp: /^.*$/ }]}
-                        />
-                    </FormField>
-                    <Box direction="row" justify="between" margin={{top: "small"}}>
-                        <Box><Text color="status-critical"><ErrorMessage res={data?.addContact}/></Text></Box>
-                        <Button
-                            type="submit"
-                            primary
-                            label={loading ? 'Сохранение...' : 'Сохранить' }
-                            disabled={loading}
-                        />
-                    </Box>
+                    <ContactForm
+                        contact={value}
+                        onSet={setValue}
+                        onSubmit={handleSubmit}
+                        submit={
+                            <Box direction="row" justify="between" margin={{top: "large"}}>
+                                <Button
+                                    type="submit"
+                                    primary
+                                    label={loading ? 'Сохранение...' : 'Сохранить' }
+                                    disabled={loading}
+                                />
+                                <Box><Text color="status-critical"><ErrorMessage res={data?.addContact}/></Text></Box>
+                            </Box>
+                        }
+                    />
                 </Box>
-            </Form>
+        </Layer>
+    )
+}
+
+type ContactFormData = { fullName: string, phone: string, email: string, instagram: string }
+
+function ContactForm({ contact, onSet, onSubmit, submit }:
+    {
+        contact: ContactFormData,
+        onSet: React.Dispatch<ContactFormData>,
+        onSubmit: (event: React.FormEvent) => void,
+        submit: JSX.Element
+    }) {
+    return (
+        <Form
+            validate="submit"
+            value={contact}
+            onChange={val => onSet(val)}
+            onSubmit={onSubmit}
+            messages={{required: 'обязательное поле'}}
+        >
+            <FormField
+                label="Имя"
+                name="fullName"
+                validate={{
+                    regexp: /^.+$/,
+                    message: "обязательно для заполнения",
+                    status: "error"
+                }}
+            >
+                <MaskedInput
+                    name="fullName"
+                    mask={[
+                        { regexp: /^.*$/, placeholder: "Имя" },
+                        { fixed: ' ' },
+                        { regexp: /^.*$/, placeholder: "Фамилия" },
+                    ]}
+                />
+            </FormField>
+            <FormField label="Телефон" name="phone">
+                <MaskedInput
+                    name="phone"
+                    mask={[
+                        { fixed: '+7 (' },
+                        {
+                            length: 3,
+                            regexp: /^[0-9]{1,3}$/,
+                            placeholder: 'xxx',
+                        },
+                        { fixed: ')' },
+                        { fixed: ' ' },
+                        {
+                            length: 3,
+                            regexp: /^[0-9]{1,3}$/,
+                            placeholder: 'xxx',
+                        },
+                        { fixed: '-' },
+                        {
+                            length: 2,
+                            regexp: /^[0-9]{1,4}$/,
+                            placeholder: 'xx',
+                        },
+                        { fixed: '-' },
+                        {
+                            length: 2,
+                            regexp: /^[0-9]{1,4}$/,
+                            placeholder: 'xx',
+                        },
+                    ]}
+                />
+            </FormField>
+            <FormField label="Электронная почта" name="email">
+                <MaskedInput
+                    name="email"
+                    mask={[
+                        { regexp: /^[\w\-_.]+$/, placeholder: "example" },
+                        { fixed: '@' },
+                        { regexp: /^[\w\-_.]+$/, placeholder: "test" },
+                        { fixed: '.' },
+                        { regexp: /^[\w]+$/, placeholder: 'org' },
+                    ]}
+                />
+            </FormField>
+            <FormField label="Instagram" name="instagram">
+                <MaskedInput
+                    name="instagram"
+                    mask={[{ fixed: 'https://www.instagram.com/' }, { regexp: /^.*$/ }]}
+                />
+            </FormField>
+            {submit}
+        </Form>
+    )
+}
+
+function UpdateContact(
+    { contact, hide, onUpdate }:
+    {
+        contact: Contact,
+        hide: () => void,
+        onUpdate: (contact: Contact) => void
+    }) {
+
+    const [ value, setValue ] = useState({
+        fullName: contact.fullName,
+        phone: contact.details.filter(val => val.type == ContactType.Phone)[0]?.value,
+        email: contact.details.filter(val => val.type == ContactType.Email)[0]?.value,
+        instagram: contact.details.filter(val => val.type == ContactType.Instagram)[0]?.value
+    } as ContactFormData)
+
+    const [ update, { data, loading, error } ] = useUpdateContact()
+
+    const handleSubmit = (event: React.FormEvent) => {
+        const { fullName } = value;
+
+        const details = [];
+
+        if (value.phone) {
+            details.push({type: ContactType.Phone, value: value.phone});
+        }
+
+        if (value.email) {
+            details.push({type: ContactType.Email, value: value.email});
+        }
+
+        if (value.instagram) {
+            details.push({type: ContactType.Instagram, value: value.instagram});
+        }
+
+        update(contact.id, { fullName, details })
+
+        event.preventDefault()
+    }
+
+    useEffect(() => {
+        switch (data?.updateContact.__typename) {
+            case "ContactUpdated":
+                hide()
+                onUpdate(data.updateContact.contact)
+        }
+    }, [ data ])
+
+    return (
+        <Layer
+            onClickOutside={hide}
+            onEsc={hide}
+        >
+                {error && <Box><Text>{error.message}</Text></Box>}
+
+                <Box pad="medium" gap="medium" width={{min: "500px"}}>
+                    <Box direction="row"justify="between"align="center">
+                        <Heading level={3} margin="none">Изменить контакт</Heading>
+                        <Button icon={ <FormClose/> } onClick={hide}/>
+                    </Box>
+                    <ContactForm
+                        contact={value}
+                        onSet={setValue}
+                        onSubmit={handleSubmit}
+                        submit={
+                            <Box direction="row" justify="between" margin={{top: "large"}}>
+                                <Button
+                                    type="submit"
+                                    primary
+                                    label={loading ? 'Сохранение...' : 'Сохранить' }
+                                    disabled={loading}
+                                />
+                                <Box><Text color="status-critical"><ErrorMessage res={data?.updateContact}/></Text></Box>
+                            </Box>
+                        }
+                    />
+                </Box>
         </Layer>
     )
 }

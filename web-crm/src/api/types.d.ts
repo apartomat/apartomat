@@ -76,6 +76,11 @@ export enum ContactType {
   Whatsapp = 'WHATSAPP'
 }
 
+export type ContactUpdated = {
+  __typename?: 'ContactUpdated';
+  contact: Contact;
+};
+
 export type CreateProjectInput = {
   endAt?: Maybe<Scalars['Time']>;
   startAt?: Maybe<Scalars['Time']>;
@@ -184,6 +189,7 @@ export type Mutation = {
   deleteContact: DeleteContactResult;
   loginByEmail: LoginByEmailResult;
   ping: Scalars['String'];
+  updateContact: UpdateContactResult;
   uploadProjectFile: UploadProjectFileResult;
 };
 
@@ -212,6 +218,12 @@ export type MutationDeleteContactArgs = {
 export type MutationLoginByEmailArgs = {
   email: Scalars['String'];
   workspaceName?: Scalars['String'];
+};
+
+
+export type MutationUpdateContactArgs = {
+  contactId: Scalars['String'];
+  data: UpdateContactInput;
 };
 
 
@@ -455,6 +467,13 @@ export type SpecScreen = {
   project: ProjectResult;
 };
 
+export type UpdateContactInput = {
+  details: Array<ContactDetailsInput>;
+  fullName: Scalars['String'];
+};
+
+export type UpdateContactResult = ContactUpdated | Forbidden | NotFound | ServerError;
+
 export type UploadProjectFileInput = {
   file: Scalars['Upload'];
   projectId: Scalars['Int'];
@@ -616,6 +635,14 @@ export type SpecScreenQueryVariables = Exact<{
 
 
 export type SpecScreenQuery = { __typename?: 'Query', screen: { __typename?: 'ScreenQuery', screen: { __typename?: 'SpecScreen', project: { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'Project', id: number, title: string } | { __typename: 'ServerError', message: string } } } };
+
+export type UpdateContactMutationVariables = Exact<{
+  contactId: Scalars['String'];
+  data: UpdateContactInput;
+}>;
+
+
+export type UpdateContactMutation = { __typename?: 'Mutation', updateContact: { __typename: 'ContactUpdated', contact: { __typename?: 'Contact', id: string, fullName: string, photo: string, details: Array<{ __typename?: 'ContactDetails', type: ContactType, value: string }> } } | { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'ServerError', message: string } };
 
 export type UploadProjectFileMutationVariables = Exact<{
   input: UploadProjectFileInput;
@@ -1107,6 +1134,60 @@ export function useSpecScreenLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions
 export type SpecScreenQueryHookResult = ReturnType<typeof useSpecScreenQuery>;
 export type SpecScreenLazyQueryHookResult = ReturnType<typeof useSpecScreenLazyQuery>;
 export type SpecScreenQueryResult = Apollo.QueryResult<SpecScreenQuery, SpecScreenQueryVariables>;
+export const UpdateContactDocument = gql`
+    mutation updateContact($contactId: String!, $data: UpdateContactInput!) {
+  updateContact(contactId: $contactId, data: $data) {
+    __typename
+    ... on ContactUpdated {
+      contact {
+        id
+        fullName
+        photo
+        details {
+          type
+          value
+        }
+      }
+    }
+    ... on NotFound {
+      message
+    }
+    ... on Forbidden {
+      message
+    }
+    ... on ServerError {
+      message
+    }
+  }
+}
+    `;
+export type UpdateContactMutationFn = Apollo.MutationFunction<UpdateContactMutation, UpdateContactMutationVariables>;
+
+/**
+ * __useUpdateContactMutation__
+ *
+ * To run a mutation, you first call `useUpdateContactMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateContactMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateContactMutation, { data, loading, error }] = useUpdateContactMutation({
+ *   variables: {
+ *      contactId: // value for 'contactId'
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useUpdateContactMutation(baseOptions?: Apollo.MutationHookOptions<UpdateContactMutation, UpdateContactMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateContactMutation, UpdateContactMutationVariables>(UpdateContactDocument, options);
+      }
+export type UpdateContactMutationHookResult = ReturnType<typeof useUpdateContactMutation>;
+export type UpdateContactMutationResult = Apollo.MutationResult<UpdateContactMutation>;
+export type UpdateContactMutationOptions = Apollo.BaseMutationOptions<UpdateContactMutation, UpdateContactMutationVariables>;
 export const UploadProjectFileDocument = gql`
     mutation uploadProjectFile($input: UploadProjectFileInput!) {
   uploadProjectFile(input: $input) {

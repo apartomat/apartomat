@@ -36,7 +36,7 @@ func (s *contactsStore) Save(ctx context.Context, contact *Contact) (*Contact, e
 
 	rec := toContactsRecord(contact)
 
-	_, err := s.db.ModelContext(ctx, rec).Returning("NULL").Insert()
+	_, err := s.db.ModelContext(ctx, rec).Returning("NULL").OnConflict("(id) DO UPDATE").Insert()
 	if err != nil {
 		return nil, err
 	}

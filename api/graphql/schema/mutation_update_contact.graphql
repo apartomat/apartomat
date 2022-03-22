@@ -1,0 +1,14 @@
+extend type Mutation {
+    updateContact(contactId: String! data: UpdateContactInput!): UpdateContactResult!
+}
+
+input UpdateContactInput {
+    fullName: String!
+    details:   [ContactDetailsInput!]!
+}
+
+union UpdateContactResult = ContactUpdated | NotFound | Forbidden | ServerError
+
+type ContactUpdated {
+    contact: Contact!
+}

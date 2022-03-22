@@ -1,11 +1,10 @@
 import { FetchResult, useApolloClient } from "@apollo/client"
-import { Contact } from "grommet-icons"
 import { useAddContactMutation, AddContactMutation, AddContactInput, AddContactMutationResult, Contact as ContactType } from "../api/types.d"
 
-export type AddContactFn = (email: string, contact: AddContactInput) => Promise<FetchResult<AddContactMutation>>
+export type AddContact = (projectId: string, contact: AddContactInput) => Promise<FetchResult<AddContactMutation>>
 
 export function useAddContact(): [
-    AddContactFn,
+    AddContact,
     AddContactMutationResult
 ] {
     const client = useApolloClient()

@@ -75,6 +75,10 @@ type ProjectResult interface {
 	IsProjectResult()
 }
 
+type UpdateContactResult interface {
+	IsUpdateContactResult()
+}
+
 type UploadProjectFileResult interface {
 	IsUploadProjectFileResult()
 }
@@ -148,6 +152,12 @@ type ContactDetailsInput struct {
 	Value string      `json:"value"`
 }
 
+type ContactUpdated struct {
+	Contact *Contact `json:"contact"`
+}
+
+func (ContactUpdated) IsUpdateContactResult() {}
+
 type CreateProjectInput struct {
 	WorkspaceID int        `json:"workspaceId"`
 	Title       string     `json:"title"`
@@ -174,6 +184,7 @@ type Forbidden struct {
 func (Forbidden) IsAddContactResult()             {}
 func (Forbidden) IsCreateProjectResult()          {}
 func (Forbidden) IsDeleteContactResult()          {}
+func (Forbidden) IsUpdateContactResult()          {}
 func (Forbidden) IsUploadProjectFileResult()      {}
 func (Forbidden) IsUserProfileResult()            {}
 func (Forbidden) IsProjectResult()                {}
@@ -255,6 +266,7 @@ type NotFound struct {
 }
 
 func (NotFound) IsDeleteContactResult() {}
+func (NotFound) IsUpdateContactResult() {}
 func (NotFound) IsProjectResult()       {}
 func (NotFound) IsWorkspaceResult()     {}
 func (NotFound) IsError()               {}
@@ -393,6 +405,7 @@ func (ServerError) IsConfirmLoginResult()           {}
 func (ServerError) IsCreateProjectResult()          {}
 func (ServerError) IsDeleteContactResult()          {}
 func (ServerError) IsLoginByEmailResult()           {}
+func (ServerError) IsUpdateContactResult()          {}
 func (ServerError) IsUploadProjectFileResult()      {}
 func (ServerError) IsUserProfileResult()            {}
 func (ServerError) IsProjectResult()                {}
@@ -418,6 +431,11 @@ type ShoppinglistQuery struct {
 type SpecScreen struct {
 	Project ProjectResult `json:"project"`
 	Menu    MenuResult    `json:"menu"`
+}
+
+type UpdateContactInput struct {
+	FullName string                 `json:"fullName"`
+	Details  []*ContactDetailsInput `json:"details"`
 }
 
 type UploadProjectFileInput struct {
