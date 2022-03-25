@@ -16,7 +16,7 @@ func (r *mutationResolver) LoginByEmail(ctx context.Context, email string, works
 
 		log.Printf("can't send email with token: %s", err)
 
-		return ServerError{Message: "can't send auth token via email"}, nil
+		return serverError()
 	}
 
 	return CheckEmail{Email: e}, nil

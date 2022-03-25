@@ -3,7 +3,7 @@ extend type Mutation {
 }
 
 input UploadProjectFileInput {
-    projectId: Int!
+    projectId: String!
     type: ProjectFileType!
     file: Upload!
 }

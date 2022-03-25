@@ -52,7 +52,7 @@ export function Project () {
     let { id } = useParams<RouteParams>()
 
     const { user } = useAuthContext()
-    const { data, loading, error } = useProject(parseInt(id, 10))
+    const { data, loading, error } = useProject(id)
 
     const [ notification, setNotification ] = useState('')
     const [ showNotification, setShowNotification ] = useState(false)
@@ -636,7 +636,7 @@ function Visualizations({ files, showUploadFiles }: { files: ProjectFiles, showU
 function UploadFiles(
     { projectId, type, setShow, onUploadComplete }:
     {
-        projectId: number,
+        projectId: string,
         type: ProjectFileType,
         setShow: Dispatch<SetStateAction<boolean>>,
         onUploadComplete: ({message}: { message: string}) => void

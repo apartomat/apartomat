@@ -34,8 +34,8 @@ func (s *userStore) Save(ctx context.Context, user *store.User) (*store.User, er
 	}
 
 	q, args, err := InsertIntoUsers().
-		Columns("email", "full_name", "is_active", "use_gravatar", "created_at", "modified_at").
-		Values(user.Email, user.FullName, user.IsActive, user.UseGravatar, user.CreatedAt, user.ModifiedAt).
+		Columns("id", "email", "full_name", "is_active", "use_gravatar", "created_at", "modified_at").
+		Values(user.ID, user.Email, user.FullName, user.IsActive, user.UseGravatar, user.CreatedAt, user.ModifiedAt).
 		ToSql()
 	if err != nil {
 		return nil, err

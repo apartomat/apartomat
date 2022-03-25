@@ -8,16 +8,16 @@ import (
 
 func NewUserLoaderConfig(ctx context.Context, userStore store.UserStore) UserLoaderConfig {
 	return UserLoaderConfig{
-		Fetch: func(keys []int) ([]*store.User, []error) {
+		Fetch: func(keys []string) ([]*store.User, []error) {
 			result := make([]*store.User, len(keys))
 			errors := make([]error, len(keys))
 
-			users, err := userStore.List(ctx, store.UserStoreQuery{ID: expr.Int{Eq: keys}})
+			users, err := userStore.List(ctx, store.UserStoreQuery{ID: expr.Str{Eq: keys}})
 			if err != nil {
 				return nil, []error{err}
 			}
 
-			usersByID := make(map[int]*store.User)
+			usersByID := make(map[string]*store.User)
 			for _, u := range users {
 				usersByID[u.ID] = u
 			}

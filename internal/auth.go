@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/apartomat/apartomat/internal/pkg/expr"
 	"github.com/apartomat/apartomat/internal/store"
+	"github.com/apartomat/apartomat/internal/token"
 	"github.com/pkg/errors"
 )
 
@@ -14,10 +15,6 @@ func (u *Apartomat) ConfirmLogin(ctx context.Context, str string) (string, error
 	}
 
 	email := confirmToken.Subject
-
-	if !u.CanConfirmLogin(ctx, nil, email) {
-		return "", errors.Wrapf(ErrForbidden, "can't confirm login")
-	}
 
 	users, err := u.Users.List(ctx, store.UserStoreQuery{Email: expr.StrEq(email)})
 	if err != nil {
@@ -31,6 +28,12 @@ func (u *Apartomat) ConfirmLogin(ctx context.Context, str string) (string, error
 	return u.AuthTokenIssuer.Issue(users[0].ID, confirmToken.Subject)
 }
 
-func (u *Apartomat) CanConfirmLogin(ctx context.Context, subj *UserCtx, obj string) bool {
-	return true
+func (u *Apartomat) CheckAuthToken(str string) (*token.AuthToken, error) {
+	authToken, _, err := u.AuthTokenVerifier.Verify(str)
+	println("CheckAuthToken", authToken)
+	if err != nil {
+		println("=========", err.Error())
+	}
+
+	return authToken, err
 }

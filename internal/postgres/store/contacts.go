@@ -91,7 +91,7 @@ type contactsRecord struct {
 	Details    []contactRecordDetail `pg:"details"`
 	CreatedAt  time.Time             `pg:"created_at"`
 	ModifiedAt time.Time             `pg:"modified_at"`
-	ProjectID  int                   `pg:"project_id"`
+	ProjectID  string                `pg:"project_id"`
 }
 
 func toContactsRecord(contact *Contact) *contactsRecord {

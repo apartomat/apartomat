@@ -12,7 +12,7 @@ type House struct {
 	HousingComplex string
 	CreatedAt      time.Time
 	ModifiedAt     time.Time
-	ProjectID      int
+	ProjectID      string
 }
 
 type Store interface {
@@ -45,7 +45,7 @@ func IDIn(ids ...string) Spec {
 
 // ProjectIDInSpec is specification that point House belongs specified Project
 type ProjectIDInSpec struct {
-	IDs []int
+	IDs []string
 }
 
 func (s ProjectIDInSpec) Is(c *House) bool {
@@ -58,6 +58,6 @@ func (s ProjectIDInSpec) Is(c *House) bool {
 	return false
 }
 
-func ProjectIDIn(ids ...int) Spec {
+func ProjectIDIn(ids ...string) Spec {
 	return ProjectIDInSpec{IDs: ids}
 }

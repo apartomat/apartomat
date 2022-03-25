@@ -1,11 +1,11 @@
 extend type Query {
-    workspace(id: Int!): WorkspaceResult!
+    workspace(id: String!): WorkspaceResult!
 }
 
 union WorkspaceResult = Workspace | NotFound | Forbidden | ServerError
 
 type Workspace {
-    id: Int!
+    id: String!
     name: String!
     users: WorkspaceUsersResult!
     projects: WorkspaceProjects!
@@ -18,7 +18,7 @@ type WorkspaceUsers {
 }
 
 type WorkspaceUser {
-	id: Int!
+	id: String!
 	workspace: Id!
 	role: WorkspaceUserRole!
 	profile: WorkspaceUserProfile!
@@ -30,7 +30,7 @@ enum WorkspaceUserRole {
 }
 
 type WorkspaceUserProfile {
-    id: Int!
+    id: String!
     email: String!
 	fullName: String!
 	abbr: String!
@@ -60,7 +60,7 @@ type WorkspaceProjectsTotal {
 }
 
 type WorkspaceProject {
-	id: Int!
+	id: String!
 	name: String!
 	period: String
 	status: ProjectStatus!

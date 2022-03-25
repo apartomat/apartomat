@@ -8,6 +8,7 @@ import (
 	"github.com/apartomat/apartomat/internal/store/houses"
 	"github.com/apartomat/apartomat/internal/store/rooms"
 	"github.com/apartomat/apartomat/internal/token"
+	nanoid "github.com/matoous/go-nanoid/v2"
 	"github.com/pkg/errors"
 )
 
@@ -38,3 +39,9 @@ var (
 	ErrNotFound      = errors.New("not found")
 	ErrAlreadyExists = errors.New("already exists")
 )
+
+const nanoidAlphabet = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+func NewNanoID() (string, error) {
+	return nanoid.Generate(nanoidAlphabet, 21)
+}

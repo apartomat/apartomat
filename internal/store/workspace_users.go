@@ -14,9 +14,9 @@ const (
 )
 
 type WorkspaceUser struct {
-	ID          int
-	WorkspaceID int
-	UserID      int
+	ID          string
+	WorkspaceID string
+	UserID      string
 	Role        WorkspaceUserRole
 	CreatedAt   time.Time
 	ModifiedAt  time.Time
@@ -28,8 +28,8 @@ type WorkspaceUserStore interface {
 }
 
 type WorkspaceUserStoreQuery struct {
-	WorkspaceID expr.Int
-	UserID      expr.Int
+	WorkspaceID expr.Str
+	UserID      expr.Str
 	Limit       int
 	Offset      int
 }

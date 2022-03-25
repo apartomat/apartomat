@@ -5,9 +5,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler/extension"
 	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/token"
-	"log"
 	"net/http"
-	"strconv"
 	"strings"
 )
 
@@ -42,15 +40,7 @@ func WithUserHandler(checkAuthToken CheckAuthTokenFn, next http.Handler) http.Ha
 
 		t, _ := checkAuthToken(strings.TrimPrefix(header, "Bearer "))
 		if t != nil {
-			id, err := strconv.Atoi(t.Get("userId"))
-			if err != nil {
-				log.Printf("token has not user id: %s", err)
-
-				w.WriteHeader(http.StatusBadRequest)
-				return
-			}
-
-			userCtx := &apartomat.UserCtx{ID: id, Email: t.Subject}
+			userCtx := &apartomat.UserCtx{ID: t.Get("userId"), Email: t.Subject}
 			r = r.WithContext(apartomat.WithUserCtx(r.Context(), userCtx))
 		}
 

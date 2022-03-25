@@ -33,7 +33,7 @@ const Loading = (props: SpinnerExtendedProps) => {
 export function Workspace () {
     const { user } = useAuthContext()
     let { id } = useParams<RouteParams>()
-    const { data, loading, error } = useWorkspace(parseInt(id, 10))
+    const { data, loading, error } = useWorkspace(id)
 
     const [ showCreateProjectLayer, setShowCreateProjectLayer ] = useState(false)
 
@@ -195,7 +195,7 @@ function ProjectsArchive({ projects }: { projects: WorkspaceProjectsListResult }
     }
 }
 
-function CreateProject({ workspaceId, setShow }: { workspaceId: number, setShow: (show: boolean) => void }) {
+function CreateProject({ workspaceId, setShow }: { workspaceId: string, setShow: (show: boolean) => void }) {
     const [ title, setTitle ] = useState("")
     const [ create, , state ] = useCreateProject()
     const [ dates, setDates ] = useState<string[]>([]);

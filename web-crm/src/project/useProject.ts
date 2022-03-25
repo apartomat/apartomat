@@ -3,7 +3,7 @@ import { useProjectQuery } from "../api/types.d";
 
 import type { ProjectFile, ProjectFilesTotal, Contact, ProjectContactsTotal, Forbidden, ServerError, MenuItem } from "../api/types.d";
 
-export function useProject(id: number) {
+export function useProject(id: string) {
     const client = useApolloClient(); 
     return useProjectQuery({client, errorPolicy: "all", variables: { id }});
 }

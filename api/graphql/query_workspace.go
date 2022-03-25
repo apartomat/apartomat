@@ -8,7 +8,7 @@ import (
 	"log"
 )
 
-func (r *queryResolver) Workspace(ctx context.Context, id int) (WorkspaceResult, error) {
+func (r *queryResolver) Workspace(ctx context.Context, id string) (WorkspaceResult, error) {
 	ws, err := r.useCases.GetWorkspace(ctx, id)
 	if err != nil {
 		if errors.Is(err, apartomat.ErrForbidden) {

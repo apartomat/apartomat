@@ -1,4 +1,4 @@
-query workspace($id: Int!) {
+query workspace($id: String!) {
     workspace(id: $id) {
         __typename
         ...on Workspace {

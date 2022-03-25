@@ -8,7 +8,7 @@ import (
 	"log"
 )
 
-func (r *queryResolver) Files(ctx context.Context, id int) (*FilesScreen, error) {
+func (r *queryResolver) Files(ctx context.Context, id string) (*FilesScreen, error) {
 	return &FilesScreen{
 		Project: Project{ID: id},
 	}, nil

@@ -7,7 +7,7 @@ import (
 )
 
 type User struct {
-	ID          int
+	ID          string
 	Email       string
 	FullName    string
 	IsActive    bool
@@ -22,9 +22,9 @@ type UserStore interface {
 }
 
 type UserStoreQuery struct {
-	ID          expr.Int
+	ID          expr.Str
 	Email       expr.Str
-	WorkspaceID expr.Int
+	WorkspaceID expr.Str
 	Sort        []UserStoreQuerySort
 	Limit       int
 	Offset      int

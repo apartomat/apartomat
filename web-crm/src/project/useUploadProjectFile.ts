@@ -1,7 +1,7 @@
 import { FetchResult, useApolloClient } from "@apollo/client"
 import { useUploadProjectFileMutation, UploadProjectFileMutation, UploadProjectFileMutationResult, ProjectFile, Forbidden, AlreadyExists, ServerError, ProjectFileType } from "../api/types.d"
 
-export type UploadFn = ({projectId, type, file}: { projectId: number, type: ProjectFileType, file: File}) => Promise<FetchResult<UploadProjectFileMutation>>
+export type UploadFn = ({projectId, type, file}: { projectId: string, type: ProjectFileType, file: File}) => Promise<FetchResult<UploadProjectFileMutation>>
 
 export { ProjectFileType } from "../api/types.d";
 

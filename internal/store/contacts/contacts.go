@@ -12,7 +12,7 @@ type Contact struct {
 	Details    []Details
 	CreatedAt  time.Time
 	ModifiedAt time.Time
-	ProjectID  int
+	ProjectID  string
 }
 
 type Details struct {
@@ -101,7 +101,7 @@ func IDIn(ids ...string) Spec {
 
 // ProjectIDInSpec is specification that point Contact belongs specified Project
 type ProjectIDInSpec struct {
-	IDs []int
+	IDs []string
 }
 
 func (s ProjectIDInSpec) Is(c *Contact) bool {
@@ -114,6 +114,6 @@ func (s ProjectIDInSpec) Is(c *Contact) bool {
 	return false
 }
 
-func ProjectIDIn(ids ...int) Spec {
+func ProjectIDIn(ids ...string) Spec {
 	return ProjectIDInSpec{IDs: ids}
 }

@@ -7,8 +7,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (u *Apartomat) GetProject(ctx context.Context, id int) (*store.Project, error) {
-	projects, err := u.Projects.List(ctx, store.ProjectStoreQuery{ID: IntEq(id)})
+func (u *Apartomat) GetProject(ctx context.Context, id string) (*store.Project, error) {
+	projects, err := u.Projects.List(ctx, store.ProjectStoreQuery{ID: StrEq(id)})
 	if err != nil {
 		return nil, err
 	}

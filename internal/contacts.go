@@ -5,9 +5,7 @@ import (
 	"github.com/apartomat/apartomat/internal/pkg/expr"
 	"github.com/apartomat/apartomat/internal/store"
 	. "github.com/apartomat/apartomat/internal/store/contacts"
-	gonanoid "github.com/matoous/go-nanoid/v2"
 	"github.com/pkg/errors"
-	"strconv"
 )
 
 type AddContactParams struct {
@@ -17,12 +15,7 @@ type AddContactParams struct {
 }
 
 func (u *Apartomat) AddContact(ctx context.Context, projectID string, params AddContactParams) (*Contact, error) {
-	prid, err := strconv.Atoi(projectID)
-	if err != nil {
-		return nil, err
-	}
-
-	projects, err := u.Projects.List(ctx, store.ProjectStoreQuery{ID: expr.IntEq(prid)})
+	projects, err := u.Projects.List(ctx, store.ProjectStoreQuery{ID: expr.StrEq(projectID)})
 	if err != nil {
 		return nil, err
 	}
@@ -39,7 +32,7 @@ func (u *Apartomat) AddContact(ctx context.Context, projectID string, params Add
 		return nil, errors.Wrapf(ErrForbidden, "can't add contact to project (id=%d)", project.ID)
 	}
 
-	id, err := gonanoid.New(21)
+	id, err := NewNanoID()
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +42,7 @@ func (u *Apartomat) AddContact(ctx context.Context, projectID string, params Add
 		FullName:  params.FullName,
 		Photo:     params.Photo,
 		Details:   params.Details,
-		ProjectID: prid,
+		ProjectID: projectID,
 	}
 
 	return u.Contacts.Save(ctx, contact)
@@ -62,7 +55,7 @@ func (u *Apartomat) CanAddContact(ctx context.Context, subj *UserCtx, obj *store
 
 	wu, err := u.WorkspaceUsers.List(
 		ctx,
-		store.WorkspaceUserStoreQuery{WorkspaceID: expr.IntEq(obj.WorkspaceID), UserID: expr.IntEq(subj.ID)},
+		store.WorkspaceUserStoreQuery{WorkspaceID: expr.StrEq(obj.WorkspaceID), UserID: expr.StrEq(subj.ID)},
 	)
 	if err != nil {
 		return false, err
@@ -117,7 +110,7 @@ func (u *Apartomat) CanUpdateContact(ctx context.Context, subj *UserCtx, obj *Co
 		return false, nil
 	}
 
-	projects, err := u.Projects.List(ctx, store.ProjectStoreQuery{ID: expr.IntEq(obj.ProjectID)})
+	projects, err := u.Projects.List(ctx, store.ProjectStoreQuery{ID: expr.StrEq(obj.ProjectID)})
 	if err != nil {
 		return false, err
 	}
@@ -132,7 +125,7 @@ func (u *Apartomat) CanUpdateContact(ctx context.Context, subj *UserCtx, obj *Co
 
 	wu, err := u.WorkspaceUsers.List(
 		ctx,
-		store.WorkspaceUserStoreQuery{WorkspaceID: expr.IntEq(project.WorkspaceID), UserID: expr.IntEq(subj.ID)},
+		store.WorkspaceUserStoreQuery{WorkspaceID: expr.StrEq(project.WorkspaceID), UserID: expr.StrEq(subj.ID)},
 	)
 	if err != nil {
 		return false, err
@@ -175,7 +168,7 @@ func (u *Apartomat) CanDeleteContact(ctx context.Context, subj *UserCtx, obj *Co
 		return false, nil
 	}
 
-	projects, err := u.Projects.List(ctx, store.ProjectStoreQuery{ID: expr.IntEq(obj.ProjectID), Limit: 1, Offset: 0})
+	projects, err := u.Projects.List(ctx, store.ProjectStoreQuery{ID: expr.StrEq(obj.ProjectID), Limit: 1, Offset: 0})
 
 	if len(projects) == 0 {
 		return false, nil
@@ -187,7 +180,7 @@ func (u *Apartomat) CanDeleteContact(ctx context.Context, subj *UserCtx, obj *Co
 
 	wu, err := u.WorkspaceUsers.List(
 		ctx,
-		store.WorkspaceUserStoreQuery{WorkspaceID: expr.IntEq(project.WorkspaceID), UserID: expr.IntEq(subj.ID)},
+		store.WorkspaceUserStoreQuery{WorkspaceID: expr.StrEq(project.WorkspaceID), UserID: expr.StrEq(subj.ID)},
 	)
 	if err != nil {
 		return false, err

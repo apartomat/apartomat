@@ -7,14 +7,14 @@ import (
 )
 
 type ProjectFile struct {
-	ID         int
-	ProjectID  int
+	ID         string
 	Name       string
 	URL        string
 	Type       ProjectFileType
 	MimeType   string
 	CreatedAt  time.Time
 	ModifiedAt time.Time
+	ProjectID  string
 }
 
 type ProjectFileType string
@@ -30,8 +30,8 @@ type ProjectFileStore interface {
 }
 
 type ProjectFileStoreQuery struct {
-	ID        expr.Int
-	ProjectID expr.Int
+	ID        expr.Str
+	ProjectID expr.Str
 	Type      ProjectFileTypeExpr
 	Limit     int
 	Offset    int

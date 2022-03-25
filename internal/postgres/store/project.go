@@ -35,6 +35,7 @@ func (s *projectStore) Save(ctx context.Context, project *store.Project) (*store
 
 	q, args, err := InsertIntoProjects().
 		Columns(
+			"id",
 			"name",
 			"status",
 			"workspace_id",
@@ -44,6 +45,7 @@ func (s *projectStore) Save(ctx context.Context, project *store.Project) (*store
 			"modified_at",
 		).
 		Values(
+			project.ID,
 			project.Name,
 			project.Status,
 			project.WorkspaceID,

@@ -1,7 +1,7 @@
 union ProjectResult = Project | NotFound | Forbidden | ServerError
 
 type Project {
-    id: Int!
+    id: String!
     title: String!
     status: ProjectStatus!
     startAt: Time
@@ -47,7 +47,7 @@ type ProjectFilesTotal {
 union ProjectFilesResult = ProjectFiles | Forbidden | ServerError
 
 type ProjectFile {
-    id: Int!
+    id: String!
     name: String!
     url: Url!
     type: ProjectFileType!

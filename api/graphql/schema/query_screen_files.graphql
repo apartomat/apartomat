@@ -1,5 +1,5 @@
 extend type ScreenQuery {
-    files(projectId: Int!): FilesScreen!
+    files(projectId: String!): FilesScreen!
 }
 
 type FilesScreen {

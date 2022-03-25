@@ -1,4 +1,4 @@
-query specScreen($projectId: Int!) {
+query specScreen($projectId: String!) {
     screen {
         screen: spec(projectId: $projectId) {
             project {

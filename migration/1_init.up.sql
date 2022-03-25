@@ -1,71 +1,71 @@
-CREATE SCHEMA apartomat;
+create schema apartomat;
 
-CREATE TABLE apartomat.users (
-    id SERIAL PRIMARY KEY,
-    email text NOT NULL,
-    full_name text NOT NULL,
-    is_active boolean NOT NULL,
-    use_gravatar boolean NOT NULL,
-    created_at timestamp with time zone NOT NULL DEFAULT now(),
-    modified_at timestamp with time zone NOT NULL DEFAULT now(),
-    CONSTRAINT users_email_ukey UNIQUE (email)
+create table apartomat.users (
+    id char(21) primary key,
+    email text not null,
+    full_name text not null,
+    is_active boolean not null,
+    use_gravatar boolean not null,
+    created_at timestamp with time zone not null default now(),
+    modified_at timestamp with time zone not null default now(),
+    constraint users_email_ukey unique (email)
 );
 
-CREATE TABLE apartomat.workspaces (
-    id SERIAL PRIMARY KEY,
-    name text NOT NULL,
-    is_active boolean NOT NULL,
-    user_id INT NOT NULL,
-    created_at timestamp with time zone NOT NULL DEFAULT now(),
-    modified_at timestamp with time zone NOT NULL DEFAULT now(),
-    CONSTRAINT workspaces_user_id_fkey FOREIGN KEY (user_id) REFERENCES apartomat.users ON DELETE CASCADE
+create table apartomat.workspaces (
+    id char(21) primary key,
+    name text not null,
+    is_active boolean not null,
+    created_at timestamp with time zone not null default now(),
+    modified_at timestamp with time zone not null default now(),
+    user_id char(21) not null,
+    constraint workspaces_user_id_fkey foreign key (user_id) references apartomat.users on delete cascade
 );
 
-CREATE TABLE apartomat.workspace_users (
-    id SERIAL PRIMARY KEY,
-    workspace_id integer NOT NULL,
-    user_id integer NOT NULL,
-    role text NOT NULL,
-    created_at timestamp with time zone NOT NULL DEFAULT now(),
-    modified_at timestamp with time zone NOT NULL DEFAULT now(),
-    CONSTRAINT workspace_users_workspace_id_fkey FOREIGN KEY (workspace_id) REFERENCES apartomat.workspaces ON DELETE CASCADE,
-    CONSTRAINT workspace_users_user_id_fkey FOREIGN KEY (user_id) REFERENCES apartomat.users ON DELETE CASCADE
+create table apartomat.workspace_users (
+    id char(21) primary key,
+    user_id char(21) not null,
+    role text not null,
+    created_at timestamp with time zone not null default now(),
+    modified_at timestamp with time zone not null default now(),
+    workspace_id char(21) not null,
+    constraint workspace_users_workspace_id_fkey foreign key (workspace_id) references apartomat.workspaces on delete cascade,
+    constraint workspace_users_user_id_fkey foreign key (user_id) references apartomat.users on delete cascade
 );
 
-CREATE TABLE apartomat.projects (
-    id SERIAL PRIMARY KEY,
-    name text NOT NULL,
-    status text NOT NULL,
-    created_at timestamp with time zone NOT NULL DEFAULT now(),
-    modified_at timestamp with time zone NOT NULL DEFAULT now(),
+create table apartomat.projects (
+    id char(21) primary key,
+    name text not null,
+    status text not null,
     start_at timestamp with time zone,
     end_at timestamp with time zone,
-    workspace_id INT NOT NULL,
-    CONSTRAINT projects_workspace_id_fkey FOREIGN KEY (workspace_id) REFERENCES apartomat.workspaces ON DELETE CASCADE
+    created_at timestamp with time zone not null default now(),
+    modified_at timestamp with time zone not null default now(),
+    workspace_id char(21) not null,
+    constraint projects_workspace_id_fkey foreign key (workspace_id) references apartomat.workspaces on delete cascade
 );
 
-CREATE TABLE apartomat.project_files (
-    id SERIAL PRIMARY KEY,
-    project_id integer NOT NULL,
-    name text NOT NULL,
-    type text NOT NULL,
-    mime_type text NOT NULL,
-    url text NOT NULL,
-    created_at timestamp with time zone NOT NULL DEFAULT now(),
-    modified_at timestamp with time zone NOT NULL DEFAULT now(),
-    CONSTRAINT project_files_project_id_fkey FOREIGN KEY (project_id) REFERENCES apartomat.projects ON DELETE CASCADE,
-    CONSTRAINT project_files_ukey UNIQUE (project_id, name)
-);
-
-CREATE TABLE apartomat.contacts (
+create table apartomat.project_files (
     id char(21) primary key,
-    full_name text NOT NULL,
+    name text not null,
+    type text not null,
+    mime_type text not null,
+    url text not null,
+    created_at timestamp with time zone not null default now(),
+    modified_at timestamp with time zone not null default now(),
+    project_id char(21) not null,
+    constraint project_files_project_id_fkey foreign key (project_id) references apartomat.projects on delete cascade,
+    constraint project_files_ukey unique (project_id, name)
+);
+
+create table apartomat.contacts (
+    id char(21) primary key,
+    full_name text not null,
     photo text not null default '',
     details jsonb,
-    created_at timestamp with time zone NOT NULL DEFAULT now(),
-    modified_at timestamp with time zone NOT NULL DEFAULT now(),
-    project_id integer NOT NULL,
-    CONSTRAINT contacts_project_id_fkey FOREIGN KEY (project_id) REFERENCES apartomat.projects ON DELETE CASCADE
+    created_at timestamp with time zone not null default now(),
+    modified_at timestamp with time zone not null default now(),
+    project_id char(21) not null,
+    constraint contacts_project_id_fkey foreign key (project_id) references apartomat.projects on delete cascade
 );
 
 create table apartomat.houses (
@@ -75,10 +75,9 @@ create table apartomat.houses (
     housing_complex text not null,
     created_at timestamp with time zone not null default now(),
     modified_at timestamp with time zone not null default now(),
-    project_id integer not null,
+    project_id char(21) not null,
     constraint houses_project_id_fkey foreign key (project_id) references apartomat.projects on delete cascade
 );
-
 
 create table apartomat.rooms (
      id char(21) primary key,

@@ -41,7 +41,13 @@ func (u *Apartomat) LoginByEmail(ctx context.Context, email string, workspaceNam
 	}
 
 	if len(users) == 0 {
+		id, err := NewNanoID()
+		if err != nil {
+			return "", err
+		}
+
 		user = &store.User{
+			ID:       id,
 			Email:    email,
 			IsActive: true,
 		}
@@ -54,13 +60,19 @@ func (u *Apartomat) LoginByEmail(ctx context.Context, email string, workspaceNam
 		user = users[0]
 	}
 
-	workspaces, err := u.Workspaces.List(ctx, store.WorkspaceStoreQuery{UserID: expr.IntEq(user.ID)})
+	workspaces, err := u.Workspaces.List(ctx, store.WorkspaceStoreQuery{UserID: expr.StrEq(user.ID)})
 	if err != nil {
 		return "", err
 	}
 
 	if len(workspaces) == 0 {
+		id, err := NewNanoID()
+		if err != nil {
+			return "", err
+		}
+
 		workspace = &store.Workspace{
+			ID:       id,
 			Name:     workspaceName,
 			IsActive: true,
 			UserID:   user.ID,
@@ -71,7 +83,13 @@ func (u *Apartomat) LoginByEmail(ctx context.Context, email string, workspaceNam
 			return "", err
 		}
 
+		wid, err := NewNanoID()
+		if err != nil {
+			return "", err
+		}
+
 		wu := &store.WorkspaceUser{
+			ID:          wid,
 			WorkspaceID: workspace.ID,
 			UserID:      user.ID,
 			Role:        store.WorkspaceUserRoleAdmin,

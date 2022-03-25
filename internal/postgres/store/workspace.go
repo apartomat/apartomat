@@ -34,8 +34,8 @@ func (s *workspaceStore) Save(ctx context.Context, workspace *store.Workspace) (
 	}
 
 	q, args, err := InsertIntoWorkspaces().
-		Columns("name", "is_active", "user_id", "created_at", "modified_at").
-		Values(workspace.Name, workspace.IsActive, workspace.UserID, workspace.CreatedAt, workspace.ModifiedAt).
+		Columns("id", "name", "is_active", "user_id", "created_at", "modified_at").
+		Values(workspace.ID, workspace.Name, workspace.IsActive, workspace.UserID, workspace.CreatedAt, workspace.ModifiedAt).
 		ToSql()
 	if err != nil {
 		return nil, err

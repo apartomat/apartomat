@@ -8,7 +8,7 @@ import (
 	"log"
 )
 
-func (r *screenQueryResolver) Project(ctx context.Context, obj *ScreenQuery, id int) (*ProjectScreen, error) {
+func (r *screenQueryResolver) Project(ctx context.Context, obj *ScreenQuery, id string) (*ProjectScreen, error) {
 	return &ProjectScreen{
 		Project: Project{ID: id},
 	}, nil

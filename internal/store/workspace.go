@@ -7,12 +7,12 @@ import (
 )
 
 type Workspace struct {
-	ID         int
+	ID         string
 	Name       string
 	IsActive   bool
-	UserID     int
 	CreatedAt  time.Time
 	ModifiedAt time.Time
+	UserID     string
 }
 
 type WorkspaceStore interface {
@@ -21,8 +21,8 @@ type WorkspaceStore interface {
 }
 
 type WorkspaceStoreQuery struct {
-	ID     expr.Int
-	UserID expr.Int
+	ID     expr.Str
+	UserID expr.Str
 	Limit  int
 	Offset int
 }

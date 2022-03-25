@@ -1,5 +1,5 @@
 extend type ScreenQuery {
-    spec(projectId: Int!): SpecScreen!
+    spec(projectId: String!): SpecScreen!
 }
 
 type SpecScreen {

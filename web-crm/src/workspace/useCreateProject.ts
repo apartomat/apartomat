@@ -1,7 +1,7 @@
 import { FetchResult, useApolloClient } from "@apollo/client";
 import { useCreateProjectMutation, CreateProjectMutation, CreateProjectMutationResult, Project, Forbidden, ServerError } from "../api/types.d";
 
-export type CreateProjectFn = ({workspaceId, title, startAt, endAt }:{workspaceId: number, title: string, startAt?: Date, endAt?: Date })
+export type CreateProjectFn = ({workspaceId, title, startAt, endAt }:{workspaceId: string, title: string, startAt?: Date, endAt?: Date })
     => Promise<FetchResult<CreateProjectMutation>>;
 
 export enum State {

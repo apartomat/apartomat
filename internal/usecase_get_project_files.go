@@ -9,11 +9,11 @@ import (
 
 func (u *Apartomat) GetProjectFiles(
 	ctx context.Context,
-	projectID int,
+	projectID string,
 	filter GetProjectFilesFilter,
 	limit, offset int,
 ) ([]*store.ProjectFile, error) {
-	projects, err := u.Projects.List(ctx, store.ProjectStoreQuery{ID: expr.IntEq(projectID)})
+	projects, err := u.Projects.List(ctx, store.ProjectStoreQuery{ID: expr.StrEq(projectID)})
 	if err != nil {
 		return nil, err
 	}
@@ -31,7 +31,7 @@ func (u *Apartomat) GetProjectFiles(
 	p, err := u.ProjectFiles.List(
 		ctx,
 		store.ProjectFileStoreQuery{
-			ProjectID: expr.IntEq(projectID),
+			ProjectID: expr.StrEq(projectID),
 			Type:      filter.Type,
 			Limit:     limit,
 			Offset:    offset,

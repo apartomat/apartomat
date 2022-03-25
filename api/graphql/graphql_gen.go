@@ -250,7 +250,7 @@ type ComplexityRoot struct {
 		Screen       func(childComplexity int) int
 		Shoppinglist func(childComplexity int) int
 		Version      func(childComplexity int) int
-		Workspace    func(childComplexity int, id int) int
+		Workspace    func(childComplexity int, id string) int
 	}
 
 	Room struct {
@@ -263,9 +263,9 @@ type ComplexityRoot struct {
 	}
 
 	ScreenQuery struct {
-		Files   func(childComplexity int, projectID int) int
-		Project func(childComplexity int, id int) int
-		Spec    func(childComplexity int, projectID int) int
+		Files   func(childComplexity int, projectID string) int
+		Project func(childComplexity int, id string) int
+		Spec    func(childComplexity int, projectID string) int
 		Version func(childComplexity int) int
 	}
 
@@ -385,10 +385,10 @@ type QueryResolver interface {
 	Profile(ctx context.Context) (UserProfileResult, error)
 	Screen(ctx context.Context) (*ScreenQuery, error)
 	Shoppinglist(ctx context.Context) (*ShoppinglistQuery, error)
-	Workspace(ctx context.Context, id int) (WorkspaceResult, error)
+	Workspace(ctx context.Context, id string) (WorkspaceResult, error)
 }
 type ScreenQueryResolver interface {
-	Project(ctx context.Context, obj *ScreenQuery, id int) (*ProjectScreen, error)
+	Project(ctx context.Context, obj *ScreenQuery, id string) (*ProjectScreen, error)
 }
 type ShoppinglistQueryResolver interface {
 	ProductOnPage(ctx context.Context, obj *ShoppinglistQuery, url string) (*Product, error)
@@ -1055,7 +1055,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Workspace(childComplexity, args["id"].(int)), true
+		return e.complexity.Query.Workspace(childComplexity, args["id"].(string)), true
 
 	case "Room.createdAt":
 		if e.complexity.Room.CreatedAt == nil {
@@ -1109,7 +1109,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.ScreenQuery.Files(childComplexity, args["projectId"].(int)), true
+		return e.complexity.ScreenQuery.Files(childComplexity, args["projectId"].(string)), true
 
 	case "ScreenQuery.project":
 		if e.complexity.ScreenQuery.Project == nil {
@@ -1121,7 +1121,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.ScreenQuery.Project(childComplexity, args["id"].(int)), true
+		return e.complexity.ScreenQuery.Project(childComplexity, args["id"].(string)), true
 
 	case "ScreenQuery.spec":
 		if e.complexity.ScreenQuery.Spec == nil {
@@ -1133,7 +1133,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.ScreenQuery.Spec(childComplexity, args["projectId"].(int)), true
+		return e.complexity.ScreenQuery.Spec(childComplexity, args["projectId"].(string)), true
 
 	case "ScreenQuery.version":
 		if e.complexity.ScreenQuery.Version == nil {
@@ -1497,7 +1497,7 @@ type ExpiredToken implements Error {
 }
 
 input CreateProjectInput {
-    workspaceId: Int!
+    workspaceId: String!
     title: String!
     startAt: Time
     endAt: Time
@@ -1550,7 +1550,7 @@ type ContactUpdated {
 }
 
 input UploadProjectFileInput {
-    projectId: Int!
+    projectId: String!
     type: ProjectFileType!
     file: Upload!
 }
@@ -1570,7 +1570,7 @@ type ProjectFileUploaded {
 union UserProfileResult = UserProfile | Forbidden | ServerError
 
 type UserProfile {
-    id: Int!
+    id: String!
     email: String!
     fullName: String!
     abbr: String!
@@ -1580,7 +1580,7 @@ type UserProfile {
 	{Name: "graphql/schema/query_project.graphql", Input: `union ProjectResult = Project | NotFound | Forbidden | ServerError
 
 type Project {
-    id: Int!
+    id: String!
     title: String!
     status: ProjectStatus!
     startAt: Time
@@ -1626,7 +1626,7 @@ type ProjectFilesTotal {
 union ProjectFilesResult = ProjectFiles | Forbidden | ServerError
 
 type ProjectFile {
-    id: Int!
+    id: String!
     name: String!
     url: Url!
     type: ProjectFileType!
@@ -1734,7 +1734,7 @@ type ScreenQuery {
     version: String!
 }`, BuiltIn: false},
 	{Name: "graphql/schema/query_screen_files.graphql", Input: `extend type ScreenQuery {
-    files(projectId: Int!): FilesScreen!
+    files(projectId: String!): FilesScreen!
 }
 
 type FilesScreen {
@@ -1742,7 +1742,7 @@ type FilesScreen {
     menu: MenuResult!
 }`, BuiltIn: false},
 	{Name: "graphql/schema/query_screen_project.graphql", Input: `extend type ScreenQuery {
-    project(id: Int!): ProjectScreen!
+    project(id: String!): ProjectScreen!
 }
 
 type ProjectScreen {
@@ -1761,7 +1761,7 @@ type MenuItem {
     url: String!
 }`, BuiltIn: false},
 	{Name: "graphql/schema/query_screen_spec.graphql", Input: `extend type ScreenQuery {
-    spec(projectId: Int!): SpecScreen!
+    spec(projectId: String!): SpecScreen!
 }
 
 type SpecScreen {
@@ -1782,13 +1782,13 @@ type Product {
     image: String!
 }`, BuiltIn: false},
 	{Name: "graphql/schema/query_workspace.graphql", Input: `extend type Query {
-    workspace(id: Int!): WorkspaceResult!
+    workspace(id: String!): WorkspaceResult!
 }
 
 union WorkspaceResult = Workspace | NotFound | Forbidden | ServerError
 
 type Workspace {
-    id: Int!
+    id: String!
     name: String!
     users: WorkspaceUsersResult!
     projects: WorkspaceProjects!
@@ -1801,7 +1801,7 @@ type WorkspaceUsers {
 }
 
 type WorkspaceUser {
-	id: Int!
+	id: String!
 	workspace: Id!
 	role: WorkspaceUserRole!
 	profile: WorkspaceUserProfile!
@@ -1813,7 +1813,7 @@ enum WorkspaceUserRole {
 }
 
 type WorkspaceUserProfile {
-    id: Int!
+    id: String!
     email: String!
 	fullName: String!
 	abbr: String!
@@ -1843,7 +1843,7 @@ type WorkspaceProjectsTotal {
 }
 
 type WorkspaceProject {
-	id: Int!
+	id: String!
 	name: String!
 	period: String
 	status: ProjectStatus!
@@ -1880,7 +1880,7 @@ type Gravatar {
 }
 
 type Id {
-	id: Int!
+	id: String!
 }
 
 scalar Url
@@ -2198,10 +2198,10 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 func (ec *executionContext) field_Query_workspace_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 int
+	var arg0 string
 	if tmp, ok := rawArgs["id"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2213,10 +2213,10 @@ func (ec *executionContext) field_Query_workspace_args(ctx context.Context, rawA
 func (ec *executionContext) field_ScreenQuery_files_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 int
+	var arg0 string
 	if tmp, ok := rawArgs["projectId"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("projectId"))
-		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2228,10 +2228,10 @@ func (ec *executionContext) field_ScreenQuery_files_args(ctx context.Context, ra
 func (ec *executionContext) field_ScreenQuery_project_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 int
+	var arg0 string
 	if tmp, ok := rawArgs["id"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2243,10 +2243,10 @@ func (ec *executionContext) field_ScreenQuery_project_args(ctx context.Context, 
 func (ec *executionContext) field_ScreenQuery_spec_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 int
+	var arg0 string
 	if tmp, ok := rawArgs["projectId"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("projectId"))
-		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -3329,9 +3329,9 @@ func (ec *executionContext) _Id_id(ctx context.Context, field graphql.CollectedF
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _InvalidEmail_message(ctx context.Context, field graphql.CollectedField, obj *InvalidEmail) (ret graphql.Marshaler) {
@@ -4043,9 +4043,9 @@ func (ec *executionContext) _Project_id(ctx context.Context, field graphql.Colle
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Project_title(ctx context.Context, field graphql.CollectedField, obj *Project) (ret graphql.Marshaler) {
@@ -4506,9 +4506,9 @@ func (ec *executionContext) _ProjectFile_id(ctx context.Context, field graphql.C
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _ProjectFile_name(ctx context.Context, field graphql.CollectedField, obj *ProjectFile) (ret graphql.Marshaler) {
@@ -5222,7 +5222,7 @@ func (ec *executionContext) _Query_workspace(ctx context.Context, field graphql.
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Workspace(rctx, args["id"].(int))
+		return ec.resolvers.Query().Workspace(rctx, args["id"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5619,7 +5619,7 @@ func (ec *executionContext) _ScreenQuery_project(ctx context.Context, field grap
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.ScreenQuery().Project(rctx, obj, args["id"].(int))
+		return ec.resolvers.ScreenQuery().Project(rctx, obj, args["id"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5852,9 +5852,9 @@ func (ec *executionContext) _UserProfile_id(ctx context.Context, field graphql.C
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _UserProfile_email(ctx context.Context, field graphql.CollectedField, obj *UserProfile) (ret graphql.Marshaler) {
@@ -6059,9 +6059,9 @@ func (ec *executionContext) _Workspace_id(ctx context.Context, field graphql.Col
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Workspace_name(ctx context.Context, field graphql.CollectedField, obj *Workspace) (ret graphql.Marshaler) {
@@ -6199,9 +6199,9 @@ func (ec *executionContext) _WorkspaceProject_id(ctx context.Context, field grap
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _WorkspaceProject_name(ctx context.Context, field graphql.CollectedField, obj *WorkspaceProject) (ret graphql.Marshaler) {
@@ -6522,9 +6522,9 @@ func (ec *executionContext) _WorkspaceUser_id(ctx context.Context, field graphql
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _WorkspaceUser_workspace(ctx context.Context, field graphql.CollectedField, obj *WorkspaceUser) (ret graphql.Marshaler) {
@@ -6662,9 +6662,9 @@ func (ec *executionContext) _WorkspaceUserProfile_id(ctx context.Context, field 
 		}
 		return graphql.Null
 	}
-	res := resTmp.(int)
+	res := resTmp.(string)
 	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _WorkspaceUserProfile_email(ctx context.Context, field graphql.CollectedField, obj *WorkspaceUserProfile) (ret graphql.Marshaler) {
@@ -8100,7 +8100,7 @@ func (ec *executionContext) unmarshalInputCreateProjectInput(ctx context.Context
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("workspaceId"))
-			it.WorkspaceID, err = ec.unmarshalNInt2int(ctx, v)
+			it.WorkspaceID, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -8247,7 +8247,7 @@ func (ec *executionContext) unmarshalInputUploadProjectFileInput(ctx context.Con
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("projectId"))
-			it.ProjectID, err = ec.unmarshalNInt2int(ctx, v)
+			it.ProjectID, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}

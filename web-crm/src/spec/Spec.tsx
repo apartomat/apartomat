@@ -12,7 +12,7 @@ type RouteParams = {
 export default function Spec() {
     let { projectId } = useParams<RouteParams>();
 
-    const { data, loading, error } = useSpecScreen(parseInt(projectId, 10));
+    const { data, loading, error } = useSpecScreen(projectId);
 
     if (loading) {
         return (

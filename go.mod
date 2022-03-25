@@ -24,6 +24,7 @@ require (
 	github.com/o1egl/paseto v1.0.0
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.10.0
+	github.com/vektah/dataloaden v0.3.0
 	github.com/vektah/gqlparser/v2 v2.4.0
 	go.uber.org/zap v1.19.1
 )

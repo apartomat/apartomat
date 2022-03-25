@@ -12,7 +12,7 @@ import (
 // UserLoaderConfig captures the config to create a new UserLoader
 type UserLoaderConfig struct {
 	// Fetch is a method that provides the data for the loader
-	Fetch func(keys []int) ([]*store.User, []error)
+	Fetch func(keys []string) ([]*store.User, []error)
 
 	// Wait is how long wait before sending a batch
 	Wait time.Duration
@@ -33,7 +33,7 @@ func NewUserLoader(config UserLoaderConfig) *UserLoader {
 // UserLoader batches and caches requests
 type UserLoader struct {
 	// this method provides the data for the loader
-	fetch func(keys []int) ([]*store.User, []error)
+	fetch func(keys []string) ([]*store.User, []error)
 
 	// how long to done before sending a batch
 	wait time.Duration
@@ -44,7 +44,7 @@ type UserLoader struct {
 	// INTERNAL
 
 	// lazily created cache
-	cache map[int]*store.User
+	cache map[string]*store.User
 
 	// the current batch. keys will continue to be collected until timeout is hit,
 	// then everything will be sent to the fetch method and out to the listeners
@@ -55,7 +55,7 @@ type UserLoader struct {
 }
 
 type userLoaderBatch struct {
-	keys    []int
+	keys    []string
 	data    []*store.User
 	error   []error
 	closing bool
@@ -63,14 +63,14 @@ type userLoaderBatch struct {
 }
 
 // Load a User by key, batching and caching will be applied automatically
-func (l *UserLoader) Load(key int) (*store.User, error) {
+func (l *UserLoader) Load(key string) (*store.User, error) {
 	return l.LoadThunk(key)()
 }
 
 // LoadThunk returns a function that when called will block waiting for a User.
 // This method should be used if you want one goroutine to make requests to many
 // different data loaders without blocking until the thunk is called.
-func (l *UserLoader) LoadThunk(key int) func() (*store.User, error) {
+func (l *UserLoader) LoadThunk(key string) func() (*store.User, error) {
 	l.mu.Lock()
 	if it, ok := l.cache[key]; ok {
 		l.mu.Unlock()
@@ -113,7 +113,7 @@ func (l *UserLoader) LoadThunk(key int) func() (*store.User, error) {
 
 // LoadAll fetches many keys at once. It will be broken into appropriate sized
 // sub batches depending on how the loader is configured
-func (l *UserLoader) LoadAll(keys []int) ([]*store.User, []error) {
+func (l *UserLoader) LoadAll(keys []string) ([]*store.User, []error) {
 	results := make([]func() (*store.User, error), len(keys))
 
 	for i, key := range keys {
@@ -131,7 +131,7 @@ func (l *UserLoader) LoadAll(keys []int) ([]*store.User, []error) {
 // LoadAllThunk returns a function that when called will block waiting for a Users.
 // This method should be used if you want one goroutine to make requests to many
 // different data loaders without blocking until the thunk is called.
-func (l *UserLoader) LoadAllThunk(keys []int) func() ([]*store.User, []error) {
+func (l *UserLoader) LoadAllThunk(keys []string) func() ([]*store.User, []error) {
 	results := make([]func() (*store.User, error), len(keys))
 	for i, key := range keys {
 		results[i] = l.LoadThunk(key)
@@ -149,7 +149,7 @@ func (l *UserLoader) LoadAllThunk(keys []int) func() ([]*store.User, []error) {
 // Prime the cache with the provided key and value. If the key already exists, no change is made
 // and false is returned.
 // (To forcefully prime the cache, clear the key first with loader.clear(key).prime(key, value).)
-func (l *UserLoader) Prime(key int, value *store.User) bool {
+func (l *UserLoader) Prime(key string, value *store.User) bool {
 	l.mu.Lock()
 	var found bool
 	if _, found = l.cache[key]; !found {
@@ -163,22 +163,22 @@ func (l *UserLoader) Prime(key int, value *store.User) bool {
 }
 
 // Clear the value at key from the cache, if it exists
-func (l *UserLoader) Clear(key int) {
+func (l *UserLoader) Clear(key string) {
 	l.mu.Lock()
 	delete(l.cache, key)
 	l.mu.Unlock()
 }
 
-func (l *UserLoader) unsafeSet(key int, value *store.User) {
+func (l *UserLoader) unsafeSet(key string, value *store.User) {
 	if l.cache == nil {
-		l.cache = map[int]*store.User{}
+		l.cache = map[string]*store.User{}
 	}
 	l.cache[key] = value
 }
 
 // keyIndex will return the location of the key in the batch, if its not found
 // it will add the key to the batch
-func (b *userLoaderBatch) keyIndex(l *UserLoader, key int) int {
+func (b *userLoaderBatch) keyIndex(l *UserLoader, key string) int {
 	for i, existingKey := range b.keys {
 		if key == existingKey {
 			return i

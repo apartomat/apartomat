@@ -18,10 +18,10 @@ type Upload struct {
 
 func (u *Apartomat) UploadFile(
 	ctx context.Context,
-	projectID int,
+	projectID string,
 	upload Upload,
 ) (*store.ProjectFile, error) {
-	projects, err := u.Projects.List(ctx, store.ProjectStoreQuery{ID: expr.IntEq(projectID)})
+	projects, err := u.Projects.List(ctx, store.ProjectStoreQuery{ID: expr.StrEq(projectID)})
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +43,13 @@ func (u *Apartomat) UploadFile(
 		return nil, err
 	}
 
+	id, err := NewNanoID()
+	if err != nil {
+		return nil, err
+	}
+
 	f := &store.ProjectFile{
+		ID:        id,
 		ProjectID: projectID,
 		Name:      upload.Name,
 		URL:       url,

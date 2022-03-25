@@ -34,10 +34,10 @@ type UserServerErrorContext = {
 }
 
 type User = {
-    id: number
+    id: string
     email: string
     avatar: string
-    defaultWorkspaceId: number
+    defaultWorkspaceId: string
 };
 
 type UserUndefinedContext = {
@@ -46,7 +46,7 @@ type UserUndefinedContext = {
 
 const userContextUndefined: UserUndefinedContext = {status: UserContextStatus.UNDEFINED};
 
-const userEmpty: User = { id: 0, email: "", avatar: "", defaultWorkspaceId: 0};
+const userEmpty: User = { id: "", email: "", avatar: "", defaultWorkspaceId: ""};
 
 export const authContext = createContext<{
     user: UserContext,

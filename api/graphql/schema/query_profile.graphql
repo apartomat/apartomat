@@ -5,7 +5,7 @@ extend type Query {
 union UserProfileResult = UserProfile | Forbidden | ServerError
 
 type UserProfile {
-    id: Int!
+    id: String!
     email: String!
     fullName: String!
     abbr: String!

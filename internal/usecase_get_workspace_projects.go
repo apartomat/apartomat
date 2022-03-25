@@ -9,12 +9,12 @@ import (
 
 func (u *Apartomat) GetWorkspaceProjects(
 	ctx context.Context,
-	workspaceID int,
+	workspaceID string,
 	filter GetWorkspaceProjectsFilter,
 	limit,
 	offset int,
 ) ([]*store.Project, error) {
-	workspaces, err := u.Workspaces.List(ctx, store.WorkspaceStoreQuery{ID: expr.IntEq(workspaceID)})
+	workspaces, err := u.Workspaces.List(ctx, store.WorkspaceStoreQuery{ID: expr.StrEq(workspaceID)})
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +32,7 @@ func (u *Apartomat) GetWorkspaceProjects(
 	p, err := u.Projects.List(
 		ctx,
 		store.ProjectStoreQuery{
-			WorkspaceID: expr.IntEq(workspaceID),
+			WorkspaceID: expr.StrEq(workspaceID),
 			Status:      filter.Status,
 			Limit:       limit,
 			Offset:      offset,

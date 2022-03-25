@@ -37,7 +37,7 @@ fragment ProjectScreenHouses on ProjectHouses {
 }
 
 
-query project($id: Int!) {
+query project($id: String!) {
     screen {
         projectScreen: project(id: $id) {
             project {

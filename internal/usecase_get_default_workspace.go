@@ -7,8 +7,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (u *Apartomat) GetDefaultWorkspace(ctx context.Context, userID int) (*store.Workspace, error) {
-	workspaces, err := u.Workspaces.List(ctx, store.WorkspaceStoreQuery{UserID: expr.IntEq(userID), Limit: 1})
+func (u *Apartomat) GetDefaultWorkspace(ctx context.Context, userID string) (*store.Workspace, error) {
+	workspaces, err := u.Workspaces.List(ctx, store.WorkspaceStoreQuery{UserID: expr.StrEq(userID), Limit: 1})
 	if err != nil {
 		return nil, err
 	}

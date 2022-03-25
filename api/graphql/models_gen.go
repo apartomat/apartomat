@@ -159,7 +159,7 @@ type ContactUpdated struct {
 func (ContactUpdated) IsUpdateContactResult() {}
 
 type CreateProjectInput struct {
-	WorkspaceID int        `json:"workspaceId"`
+	WorkspaceID string     `json:"workspaceId"`
 	Title       string     `json:"title"`
 	StartAt     *time.Time `json:"startAt"`
 	EndAt       *time.Time `json:"endAt"`
@@ -227,7 +227,7 @@ type HouseRoomsList struct {
 func (HouseRoomsList) IsHouseRoomsListResult() {}
 
 type ID struct {
-	ID int `json:"id"`
+	ID string `json:"id"`
 }
 
 type InvalidEmail struct {
@@ -278,7 +278,7 @@ type Product struct {
 }
 
 type Project struct {
-	ID       int              `json:"id"`
+	ID       string           `json:"id"`
 	Title    string           `json:"title"`
 	Status   ProjectStatus    `json:"status"`
 	StartAt  *time.Time       `json:"startAt"`
@@ -318,7 +318,7 @@ type ProjectCreated struct {
 func (ProjectCreated) IsCreateProjectResult() {}
 
 type ProjectFile struct {
-	ID       int             `json:"id"`
+	ID       string          `json:"id"`
 	Name     string          `json:"name"`
 	URL      string          `json:"url"`
 	Type     ProjectFileType `json:"type"`
@@ -439,13 +439,13 @@ type UpdateContactInput struct {
 }
 
 type UploadProjectFileInput struct {
-	ProjectID int             `json:"projectId"`
+	ProjectID string          `json:"projectId"`
 	Type      ProjectFileType `json:"type"`
 	File      graphql.Upload  `json:"file"`
 }
 
 type UserProfile struct {
-	ID               int        `json:"id"`
+	ID               string     `json:"id"`
 	Email            string     `json:"email"`
 	FullName         string     `json:"fullName"`
 	Abbr             string     `json:"abbr"`
@@ -456,7 +456,7 @@ type UserProfile struct {
 func (UserProfile) IsUserProfileResult() {}
 
 type Workspace struct {
-	ID       int                  `json:"id"`
+	ID       string               `json:"id"`
 	Name     string               `json:"name"`
 	Users    WorkspaceUsersResult `json:"users"`
 	Projects *WorkspaceProjects   `json:"projects"`
@@ -465,7 +465,7 @@ type Workspace struct {
 func (Workspace) IsWorkspaceResult() {}
 
 type WorkspaceProject struct {
-	ID     int           `json:"id"`
+	ID     string        `json:"id"`
 	Name   string        `json:"name"`
 	Period *string       `json:"period"`
 	Status ProjectStatus `json:"status"`
@@ -494,14 +494,14 @@ type WorkspaceProjectsTotal struct {
 func (WorkspaceProjectsTotal) IsWorkspaceProjectsTotalResult() {}
 
 type WorkspaceUser struct {
-	ID        int                   `json:"id"`
+	ID        string                `json:"id"`
 	Workspace *ID                   `json:"workspace"`
 	Role      WorkspaceUserRole     `json:"role"`
 	Profile   *WorkspaceUserProfile `json:"profile"`
 }
 
 type WorkspaceUserProfile struct {
-	ID       int       `json:"id"`
+	ID       string    `json:"id"`
 	Email    string    `json:"email"`
 	FullName string    `json:"fullName"`
 	Abbr     string    `json:"abbr"`

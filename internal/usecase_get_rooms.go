@@ -21,7 +21,7 @@ func (u *Apartomat) GetRooms(ctx context.Context, houseID string, limit, offset 
 
 	house := hh[0]
 
-	projects, err := u.Projects.List(ctx, store.ProjectStoreQuery{ID: expr.IntEq(house.ProjectID)})
+	projects, err := u.Projects.List(ctx, store.ProjectStoreQuery{ID: expr.StrEq(house.ProjectID)})
 	if err != nil {
 		return nil, err
 	}

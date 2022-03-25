@@ -7,14 +7,14 @@ import (
 )
 
 type Project struct {
-	ID          int
+	ID          string
 	Name        string
 	Status      ProjectStatus
-	WorkspaceID int
 	StartAt     *time.Time
 	EndAt       *time.Time
 	CreatedAt   time.Time
 	ModifiedAt  time.Time
+	WorkspaceID string
 }
 
 type ProjectStatus string
@@ -32,8 +32,8 @@ type ProjectStore interface {
 }
 
 type ProjectStoreQuery struct {
-	ID          expr.Int
-	WorkspaceID expr.Int
+	ID          expr.Str
+	WorkspaceID expr.Str
 	Status      ProjectStatusExpr
 	Limit       int
 	Offset      int

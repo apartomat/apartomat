@@ -7,8 +7,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (u *Apartomat) GetWorkspaceUsers(ctx context.Context, id, limit, offset int) ([]*store.WorkspaceUser, error) {
-	workspaces, err := u.Workspaces.List(ctx, store.WorkspaceStoreQuery{ID: expr.IntEq(id)})
+func (u *Apartomat) GetWorkspaceUsers(ctx context.Context, id string, limit, offset int) ([]*store.WorkspaceUser, error) {
+	workspaces, err := u.Workspaces.List(ctx, store.WorkspaceStoreQuery{ID: expr.StrEq(id)})
 	if err != nil {
 		return nil, err
 	}
@@ -23,7 +23,7 @@ func (u *Apartomat) GetWorkspaceUsers(ctx context.Context, id, limit, offset int
 		return nil, errors.Wrapf(ErrForbidden, "can't get workspace %d users", workspace.ID)
 	}
 
-	wu, err := u.WorkspaceUsers.List(ctx, store.WorkspaceUserStoreQuery{WorkspaceID: expr.IntEq(id)})
+	wu, err := u.WorkspaceUsers.List(ctx, store.WorkspaceUserStoreQuery{WorkspaceID: expr.StrEq(id)})
 	if err != nil {
 		return nil, err
 	}

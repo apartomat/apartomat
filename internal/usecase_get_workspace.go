@@ -7,8 +7,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (u *Apartomat) GetWorkspace(ctx context.Context, id int) (*store.Workspace, error) {
-	workspaces, err := u.Workspaces.List(ctx, store.WorkspaceStoreQuery{ID: expr.IntEq(id)})
+func (u *Apartomat) GetWorkspace(ctx context.Context, id string) (*store.Workspace, error) {
+	workspaces, err := u.Workspaces.List(ctx, store.WorkspaceStoreQuery{ID: expr.StrEq(id)})
 	if err != nil {
 		return nil, err
 	}
@@ -35,7 +35,7 @@ func (u *Apartomat) CanGetWorkspace(ctx context.Context, subj *UserCtx, obj *sto
 
 	wu, err := u.WorkspaceUsers.List(
 		ctx,
-		store.WorkspaceUserStoreQuery{WorkspaceID: expr.IntEq(obj.ID), UserID: expr.IntEq(subj.ID)},
+		store.WorkspaceUserStoreQuery{WorkspaceID: expr.StrEq(obj.ID), UserID: expr.StrEq(subj.ID)},
 	)
 	if err != nil {
 		return false, err

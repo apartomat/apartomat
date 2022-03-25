@@ -8,8 +8,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (u *Apartomat) GetHouses(ctx context.Context, projectID int, limit, offset int) ([]*House, error) {
-	projects, err := u.Projects.List(ctx, store.ProjectStoreQuery{ID: expr.IntEq(projectID)})
+func (u *Apartomat) GetHouses(ctx context.Context, projectID string, limit, offset int) ([]*House, error) {
+	projects, err := u.Projects.List(ctx, store.ProjectStoreQuery{ID: expr.StrEq(projectID)})
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +36,7 @@ func (u *Apartomat) CanGetHouses(ctx context.Context, subj *UserCtx, obj *store.
 
 	wu, err := u.WorkspaceUsers.List(
 		ctx,
-		store.WorkspaceUserStoreQuery{WorkspaceID: expr.IntEq(obj.WorkspaceID), UserID: expr.IntEq(subj.ID)},
+		store.WorkspaceUserStoreQuery{WorkspaceID: expr.StrEq(obj.WorkspaceID), UserID: expr.StrEq(subj.ID)},
 	)
 	if err != nil {
 		return false, err
