@@ -7,7 +7,7 @@ import (
 const userCtxKey = "user"
 
 type UserCtx struct {
-	ID    int
+	ID    string
 	Email string
 }
 
