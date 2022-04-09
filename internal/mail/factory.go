@@ -25,3 +25,16 @@ Please, open %s/confirm?token=%s
 `, f.Hostname, token),
 	}
 }
+
+func (f *Factory) MailPIN(to, pin string) *Mail {
+	return &Mail{
+		From:    f.From,
+		To:      to,
+		Subject: "Login to Apartomat...",
+		Body: fmt.Sprintf(`
+Hello!
+
+Your PIN is: %s
+`, pin),
+	}
+}

@@ -2,6 +2,7 @@ package graphql
 
 import (
 	"context"
+	"errors"
 	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/pkg/gravatar"
 	"log"
@@ -9,10 +10,15 @@ import (
 
 func (r *queryResolver) Profile(ctx context.Context) (UserProfileResult, error) {
 	if userCtx := apartomat.UserFromCtx(ctx); userCtx != nil {
-		user, err := r.useCases.GetUserProfile(ctx, userCtx.Email)
+		user, err := r.useCases.GetUserProfile(ctx, userCtx.ID)
 		if err != nil {
-			log.Printf("can't get profile for email=%s: %s", userCtx.Email, err)
-			return ServerError{Message: "can't get profile"}, nil
+			if errors.Is(err, apartomat.ErrForbidden) {
+				return Forbidden{}, nil
+			}
+
+			log.Printf("can't get profile (id=%d): %s", userCtx.ID, err)
+
+			return ServerError{}, nil
 		}
 
 		return UserProfile{

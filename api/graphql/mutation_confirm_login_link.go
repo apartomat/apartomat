@@ -7,8 +7,8 @@ import (
 	"log"
 )
 
-func (r *mutationResolver) ConfirmLogin(ctx context.Context, str string) (ConfirmLoginResult, error) {
-	str, err := r.useCases.ConfirmLogin(ctx, str)
+func (r *mutationResolver) ConfirmLoginLink(ctx context.Context, str string) (ConfirmLoginLinkResult, error) {
+	str, err := r.useCases.ConfirmEmailByToken(ctx, str)
 	if err != nil {
 		if errors.Is(err, token.ErrTokenValidationError) {
 			return InvalidToken{Message: "token expired or not valid"}, nil

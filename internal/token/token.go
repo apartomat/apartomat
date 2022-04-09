@@ -10,9 +10,14 @@ var (
 	ErrTokenValidationError   = errors.New("token expired or not valid")
 )
 
+const (
+	ClaimKeyPurpose = "pur"
+	ClaimKeyPIN     = "pin"
+)
+
 var (
 	hasPurpose = func(purpose string) paseto.Validator {
-		return hasClaim("purpose", purpose)
+		return hasClaim(ClaimKeyPurpose, purpose)
 	}
 )
 
@@ -24,4 +29,8 @@ func hasClaim(key, value string) paseto.Validator {
 
 		return nil
 	}
+}
+
+func hasPIN(pin string) paseto.Validator {
+	return hasClaim(ClaimKeyPIN, pin)
 }

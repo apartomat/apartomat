@@ -2,10 +2,15 @@ extend type Mutation {
     loginByEmail(email: String!, workspaceName: String! = "Workspace"): LoginByEmailResult!
 }
 
-union LoginByEmailResult = CheckEmail | InvalidEmail | ServerError
+union LoginByEmailResult = LinkSentByEmail | PinSentByEmail | InvalidEmail | ServerError
 
-type CheckEmail {
+type LinkSentByEmail {
     email: String!
+}
+
+type PinSentByEmail {
+    email: String!
+    token: String!
 }
 
 type InvalidEmail implements Error {

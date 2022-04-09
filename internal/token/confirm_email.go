@@ -3,18 +3,11 @@ package token
 import (
 	"crypto/ed25519"
 	"fmt"
+	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/o1egl/paseto"
 	"github.com/pkg/errors"
 	"time"
 )
-
-type EmailConfirmTokenIssuer interface {
-	Issue(email string) (string, error)
-}
-
-type EmailConfirmTokenVerifier interface {
-	Verify(str string) (*EmailConfirmToken, string, error)
-}
 
 const (
 	emailConfirmPurpose = "email-confirm"
@@ -24,16 +17,20 @@ type EmailConfirmToken struct {
 	paseto.JSONToken
 }
 
-func NewEmailConfirmToken(login string) EmailConfirmToken {
+func (token EmailConfirmToken) Email() string {
+	return token.Subject
+}
+
+func NewEmailConfirmToken(email string) EmailConfirmToken {
 	token := EmailConfirmToken{
 		JSONToken: paseto.JSONToken{
-			Subject:    login,
+			Subject:    email,
 			IssuedAt:   time.Now(),
 			Expiration: time.Now().Add(10 * time.Minute),
 		},
 	}
 
-	token.Set("purpose", emailConfirmPurpose)
+	token.Set(ClaimKeyPurpose, emailConfirmPurpose)
 
 	return token
 }
@@ -65,7 +62,7 @@ func (p *pasetoMailConfirmTokenIssuerVerifier) Issue(email string) (string, erro
 	return str, nil
 }
 
-func (p *pasetoMailConfirmTokenIssuerVerifier) Verify(str string) (*EmailConfirmToken, string, error) {
+func (p *pasetoMailConfirmTokenIssuerVerifier) Verify(str string) (apartomat.EmailConfirmToken, error) {
 	var (
 		token  EmailConfirmToken
 		footer string
@@ -73,13 +70,13 @@ func (p *pasetoMailConfirmTokenIssuerVerifier) Verify(str string) (*EmailConfirm
 
 	err := paseto.NewV2().Verify(str, p.privateKey.Public(), &token, &footer)
 	if err != nil {
-		return nil, "", errors.Wrapf(ErrTokenVerificationError, "%s", err)
+		return nil, errors.Wrapf(ErrTokenVerificationError, "%s", err)
 	}
 
 	err = token.Validate()
 	if err != nil {
-		return nil, "", errors.Wrapf(ErrTokenValidationError, "%s", err)
+		return nil, errors.Wrapf(ErrTokenValidationError, "%s", err)
 	}
 
-	return &token, footer, nil
+	return &token, nil
 }

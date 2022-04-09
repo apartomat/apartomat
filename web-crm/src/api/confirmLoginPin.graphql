@@ -1,8 +1,11 @@
-mutation confirmLoginLink($token: String!) {
-    confirmLoginLink(token: $token) {
+mutation confirmLoginPin($token: String! $pin: String!) {
+    confirmLoginPin(token: $token pin: $pin) {
         __typename
         ...on LoginConfirmed {
             token
+        }
+        ...on InvalidPin {
+            message
         }
         ...on InvalidToken {
             message

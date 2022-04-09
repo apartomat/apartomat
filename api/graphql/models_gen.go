@@ -15,8 +15,12 @@ type AddContactResult interface {
 	IsAddContactResult()
 }
 
-type ConfirmLoginResult interface {
-	IsConfirmLoginResult()
+type ConfirmLoginLinkResult interface {
+	IsConfirmLoginLinkResult()
+}
+
+type ConfirmLoginPinResult interface {
+	IsConfirmLoginPinResult()
 }
 
 type CreateProjectResult interface {
@@ -115,12 +119,6 @@ type AlreadyExists struct {
 func (AlreadyExists) IsUploadProjectFileResult() {}
 func (AlreadyExists) IsError()                   {}
 
-type CheckEmail struct {
-	Email string `json:"email"`
-}
-
-func (CheckEmail) IsLoginByEmailResult() {}
-
 type Contact struct {
 	ID         string            `json:"id"`
 	FullName   string            `json:"fullName"`
@@ -169,8 +167,9 @@ type ExpiredToken struct {
 	Message string `json:"message"`
 }
 
-func (ExpiredToken) IsConfirmLoginResult() {}
-func (ExpiredToken) IsError()              {}
+func (ExpiredToken) IsConfirmLoginLinkResult() {}
+func (ExpiredToken) IsError()                  {}
+func (ExpiredToken) IsConfirmLoginPinResult()  {}
 
 type FilesScreen struct {
 	Project ProjectResult `json:"project"`
@@ -237,18 +236,33 @@ type InvalidEmail struct {
 func (InvalidEmail) IsLoginByEmailResult() {}
 func (InvalidEmail) IsError()              {}
 
+type InvalidPin struct {
+	Message string `json:"message"`
+}
+
+func (InvalidPin) IsConfirmLoginPinResult() {}
+func (InvalidPin) IsError()                 {}
+
 type InvalidToken struct {
 	Message string `json:"message"`
 }
 
-func (InvalidToken) IsConfirmLoginResult() {}
-func (InvalidToken) IsError()              {}
+func (InvalidToken) IsConfirmLoginLinkResult() {}
+func (InvalidToken) IsError()                  {}
+func (InvalidToken) IsConfirmLoginPinResult()  {}
+
+type LinkSentByEmail struct {
+	Email string `json:"email"`
+}
+
+func (LinkSentByEmail) IsLoginByEmailResult() {}
 
 type LoginConfirmed struct {
 	Token string `json:"token"`
 }
 
-func (LoginConfirmed) IsConfirmLoginResult() {}
+func (LoginConfirmed) IsConfirmLoginLinkResult() {}
+func (LoginConfirmed) IsConfirmLoginPinResult()  {}
 
 type MenuItem struct {
 	Title string `json:"title"`
@@ -270,6 +284,13 @@ func (NotFound) IsUpdateContactResult() {}
 func (NotFound) IsProjectResult()       {}
 func (NotFound) IsWorkspaceResult()     {}
 func (NotFound) IsError()               {}
+
+type PinSentByEmail struct {
+	Email string `json:"email"`
+	Token string `json:"token"`
+}
+
+func (PinSentByEmail) IsLoginByEmailResult() {}
 
 type Product struct {
 	Name        string `json:"name"`
@@ -401,7 +422,8 @@ type ServerError struct {
 }
 
 func (ServerError) IsAddContactResult()             {}
-func (ServerError) IsConfirmLoginResult()           {}
+func (ServerError) IsConfirmLoginLinkResult()       {}
+func (ServerError) IsConfirmLoginPinResult()        {}
 func (ServerError) IsCreateProjectResult()          {}
 func (ServerError) IsDeleteContactResult()          {}
 func (ServerError) IsLoginByEmailResult()           {}

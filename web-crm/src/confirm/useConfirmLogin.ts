@@ -1,12 +1,12 @@
 import { FetchResult, useApolloClient } from "@apollo/client";
-import { useConfirmLoginMutation, ConfirmLoginMutation, ConfirmLoginMutationResult } from "../api/types.d";
+import { useConfirmLoginLinkMutation, ConfirmLoginLinkMutation, ConfirmLoginLinkMutationResult } from "../api/types.d";
 
 export function useConfirmLogin(): [
-    (email: string) => Promise<FetchResult<ConfirmLoginMutation>>,
-    ConfirmLoginMutationResult
+    (email: string) => Promise<FetchResult<ConfirmLoginLinkMutation>>,
+    ConfirmLoginLinkMutationResult
 ] {
     const client = useApolloClient();
-    const [confirmLogin, result ] = useConfirmLoginMutation({ client, errorPolicy: 'all' });
+    const [confirmLogin, result ] = useConfirmLoginLinkMutation({ client, errorPolicy: 'all' });
 
     return [(token: string) => confirmLogin({ variables: { token } }), result];
 }

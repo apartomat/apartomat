@@ -24,15 +24,15 @@ export function Confirm({ redrectTo = "/"}) {
     }, [location, sent, setSent, confirmLogin, confirmLoginResult, loading]);
 
     useEffect(() => {
-        if (confirmLoginResult?.confirmLogin.__typename === "LoginConfirmed") {
-            saveToken(confirmLoginResult?.confirmLogin.token);
+        if (confirmLoginResult?.confirmLoginLink.__typename === "LoginConfirmed") {
+            saveToken(confirmLoginResult?.confirmLoginLink.token);
             check();
             history.push(redrectTo);
         }
     }, [confirmLoginResult, history, redrectTo, check, saveToken, loading])
 
 
-    switch (confirmLoginResult?.confirmLogin.__typename) {
+    switch (confirmLoginResult?.confirmLoginLink.__typename) {
         case "InvalidToken":
             return (
                 <div>

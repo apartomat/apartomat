@@ -63,10 +63,6 @@ type ComplexityRoot struct {
 		Message func(childComplexity int) int
 	}
 
-	CheckEmail struct {
-		Email func(childComplexity int) int
-	}
-
 	Contact struct {
 		CreatedAt  func(childComplexity int) int
 		Details    func(childComplexity int) int
@@ -136,8 +132,16 @@ type ComplexityRoot struct {
 		Message func(childComplexity int) int
 	}
 
+	InvalidPin struct {
+		Message func(childComplexity int) int
+	}
+
 	InvalidToken struct {
 		Message func(childComplexity int) int
+	}
+
+	LinkSentByEmail struct {
+		Email func(childComplexity int) int
 	}
 
 	LoginConfirmed struct {
@@ -155,7 +159,8 @@ type ComplexityRoot struct {
 
 	Mutation struct {
 		AddContact        func(childComplexity int, projectID string, contact AddContactInput) int
-		ConfirmLogin      func(childComplexity int, token string) int
+		ConfirmLoginLink  func(childComplexity int, token string) int
+		ConfirmLoginPin   func(childComplexity int, token string, pin string) int
 		CreateProject     func(childComplexity int, input CreateProjectInput) int
 		DeleteContact     func(childComplexity int, id string) int
 		LoginByEmail      func(childComplexity int, email string, workspaceName string) int
@@ -166,6 +171,11 @@ type ComplexityRoot struct {
 
 	NotFound struct {
 		Message func(childComplexity int) int
+	}
+
+	PinSentByEmail struct {
+		Email func(childComplexity int) int
+		Token func(childComplexity int) int
 	}
 
 	Product struct {
@@ -352,7 +362,8 @@ type HouseRoomsResolver interface {
 type MutationResolver interface {
 	Ping(ctx context.Context) (string, error)
 	AddContact(ctx context.Context, projectID string, contact AddContactInput) (AddContactResult, error)
-	ConfirmLogin(ctx context.Context, token string) (ConfirmLoginResult, error)
+	ConfirmLoginLink(ctx context.Context, token string) (ConfirmLoginLinkResult, error)
+	ConfirmLoginPin(ctx context.Context, token string, pin string) (ConfirmLoginPinResult, error)
 	CreateProject(ctx context.Context, input CreateProjectInput) (CreateProjectResult, error)
 	DeleteContact(ctx context.Context, id string) (DeleteContactResult, error)
 	LoginByEmail(ctx context.Context, email string, workspaceName string) (LoginByEmailResult, error)
@@ -433,13 +444,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.AlreadyExists.Message(childComplexity), true
-
-	case "CheckEmail.email":
-		if e.complexity.CheckEmail.Email == nil {
-			break
-		}
-
-		return e.complexity.CheckEmail.Email(childComplexity), true
 
 	case "Contact.createdAt":
 		if e.complexity.Contact.CreatedAt == nil {
@@ -635,12 +639,26 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.InvalidEmail.Message(childComplexity), true
 
+	case "InvalidPin.message":
+		if e.complexity.InvalidPin.Message == nil {
+			break
+		}
+
+		return e.complexity.InvalidPin.Message(childComplexity), true
+
 	case "InvalidToken.message":
 		if e.complexity.InvalidToken.Message == nil {
 			break
 		}
 
 		return e.complexity.InvalidToken.Message(childComplexity), true
+
+	case "LinkSentByEmail.email":
+		if e.complexity.LinkSentByEmail.Email == nil {
+			break
+		}
+
+		return e.complexity.LinkSentByEmail.Email(childComplexity), true
 
 	case "LoginConfirmed.token":
 		if e.complexity.LoginConfirmed.Token == nil {
@@ -682,17 +700,29 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.AddContact(childComplexity, args["projectId"].(string), args["contact"].(AddContactInput)), true
 
-	case "Mutation.confirmLogin":
-		if e.complexity.Mutation.ConfirmLogin == nil {
+	case "Mutation.confirmLoginLink":
+		if e.complexity.Mutation.ConfirmLoginLink == nil {
 			break
 		}
 
-		args, err := ec.field_Mutation_confirmLogin_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_confirmLoginLink_args(context.TODO(), rawArgs)
 		if err != nil {
 			return 0, false
 		}
 
-		return e.complexity.Mutation.ConfirmLogin(childComplexity, args["token"].(string)), true
+		return e.complexity.Mutation.ConfirmLoginLink(childComplexity, args["token"].(string)), true
+
+	case "Mutation.confirmLoginPin":
+		if e.complexity.Mutation.ConfirmLoginPin == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_confirmLoginPin_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.ConfirmLoginPin(childComplexity, args["token"].(string), args["pin"].(string)), true
 
 	case "Mutation.createProject":
 		if e.complexity.Mutation.CreateProject == nil {
@@ -767,6 +797,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.NotFound.Message(childComplexity), true
+
+	case "PinSentByEmail.email":
+		if e.complexity.PinSentByEmail.Email == nil {
+			break
+		}
+
+		return e.complexity.PinSentByEmail.Email(childComplexity), true
+
+	case "PinSentByEmail.token":
+		if e.complexity.PinSentByEmail.Token == nil {
+			break
+		}
+
+		return e.complexity.PinSentByEmail.Token(childComplexity), true
 
 	case "Product.description":
 		if e.complexity.Product.Description == nil {
@@ -1474,11 +1518,11 @@ union AddContactResult = ContactAdded | Forbidden | ServerError
 type ContactAdded {
     contact: Contact!
 }`, BuiltIn: false},
-	{Name: "graphql/schema/mutation_confirmLogin.graphql", Input: `extend type Mutation {
-    confirmLogin(token: String!): ConfirmLoginResult!
+	{Name: "graphql/schema/mutation_confirm_login.graphql", Input: `extend type Mutation {
+    confirmLoginLink(token: String!): ConfirmLoginLinkResult!
 }
 
-union ConfirmLoginResult = LoginConfirmed | InvalidToken | ExpiredToken | ServerError
+union ConfirmLoginLinkResult = LoginConfirmed | InvalidToken | ExpiredToken | ServerError
 
 type LoginConfirmed {
     token: String!
@@ -1491,7 +1535,17 @@ type InvalidToken implements Error {
 type ExpiredToken implements Error {
     message: String!
 }
-`, BuiltIn: false},
+
+
+extend type Mutation {
+    confirmLoginPin(token: String! pin: String!): ConfirmLoginPinResult!
+}
+
+union ConfirmLoginPinResult = LoginConfirmed | InvalidPin | InvalidToken | ExpiredToken | ServerError
+
+type InvalidPin implements Error {
+    message: String!
+}`, BuiltIn: false},
 	{Name: "graphql/schema/mutation_create_project.graphql", Input: `extend type Mutation {
     createProject(input: CreateProjectInput!): CreateProjectResult!
 }
@@ -1521,10 +1575,15 @@ type ContactDeleted {
     loginByEmail(email: String!, workspaceName: String! = "Workspace"): LoginByEmailResult!
 }
 
-union LoginByEmailResult = CheckEmail | InvalidEmail | ServerError
+union LoginByEmailResult = LinkSentByEmail | PinSentByEmail | InvalidEmail | ServerError
 
-type CheckEmail {
+type LinkSentByEmail {
     email: String!
+}
+
+type PinSentByEmail {
+    email: String!
+    token: String!
 }
 
 type InvalidEmail implements Error {
@@ -1943,7 +2002,7 @@ func (ec *executionContext) field_Mutation_addContact_args(ctx context.Context, 
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_confirmLogin_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Mutation_confirmLoginLink_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
@@ -1955,6 +2014,30 @@ func (ec *executionContext) field_Mutation_confirmLogin_args(ctx context.Context
 		}
 	}
 	args["token"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_confirmLoginPin_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["token"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("token"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["token"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["pin"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pin"))
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["pin"] = arg1
 	return args, nil
 }
 
@@ -2366,41 +2449,6 @@ func (ec *executionContext) _AlreadyExists_message(ctx context.Context, field gr
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Message, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) _CheckEmail_email(ctx context.Context, field graphql.CollectedField, obj *CheckEmail) (ret graphql.Marshaler) {
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	fc := &graphql.FieldContext{
-		Object:     "CheckEmail",
-		Field:      field,
-		Args:       nil,
-		IsMethod:   false,
-		IsResolver: false,
-	}
-
-	ctx = graphql.WithFieldContext(ctx, fc)
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Email, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3369,6 +3417,41 @@ func (ec *executionContext) _InvalidEmail_message(ctx context.Context, field gra
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _InvalidPin_message(ctx context.Context, field graphql.CollectedField, obj *InvalidPin) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "InvalidPin",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Message, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _InvalidToken_message(ctx context.Context, field graphql.CollectedField, obj *InvalidToken) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -3388,6 +3471,41 @@ func (ec *executionContext) _InvalidToken_message(ctx context.Context, field gra
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Message, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _LinkSentByEmail_email(ctx context.Context, field graphql.CollectedField, obj *LinkSentByEmail) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "LinkSentByEmail",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Email, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3621,7 +3739,7 @@ func (ec *executionContext) _Mutation_addContact(ctx context.Context, field grap
 	return ec.marshalNAddContactResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAddContactResult(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _Mutation_confirmLogin(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Mutation_confirmLoginLink(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -3638,7 +3756,7 @@ func (ec *executionContext) _Mutation_confirmLogin(ctx context.Context, field gr
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	rawArgs := field.ArgumentMap(ec.Variables)
-	args, err := ec.field_Mutation_confirmLogin_args(ctx, rawArgs)
+	args, err := ec.field_Mutation_confirmLoginLink_args(ctx, rawArgs)
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
@@ -3646,7 +3764,7 @@ func (ec *executionContext) _Mutation_confirmLogin(ctx context.Context, field gr
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().ConfirmLogin(rctx, args["token"].(string))
+		return ec.resolvers.Mutation().ConfirmLoginLink(rctx, args["token"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3658,9 +3776,51 @@ func (ec *executionContext) _Mutation_confirmLogin(ctx context.Context, field gr
 		}
 		return graphql.Null
 	}
-	res := resTmp.(ConfirmLoginResult)
+	res := resTmp.(ConfirmLoginLinkResult)
 	fc.Result = res
-	return ec.marshalNConfirmLoginResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐConfirmLoginResult(ctx, field.Selections, res)
+	return ec.marshalNConfirmLoginLinkResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐConfirmLoginLinkResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_confirmLoginPin(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_confirmLoginPin_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().ConfirmLoginPin(rctx, args["token"].(string), args["pin"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(ConfirmLoginPinResult)
+	fc.Result = res
+	return ec.marshalNConfirmLoginPinResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐConfirmLoginPinResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Mutation_createProject(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
@@ -3892,6 +4052,76 @@ func (ec *executionContext) _NotFound_message(ctx context.Context, field graphql
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Message, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PinSentByEmail_email(ctx context.Context, field graphql.CollectedField, obj *PinSentByEmail) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PinSentByEmail",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Email, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _PinSentByEmail_token(ctx context.Context, field graphql.CollectedField, obj *PinSentByEmail) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "PinSentByEmail",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Token, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8330,7 +8560,7 @@ func (ec *executionContext) _AddContactResult(ctx context.Context, sel ast.Selec
 	}
 }
 
-func (ec *executionContext) _ConfirmLoginResult(ctx context.Context, sel ast.SelectionSet, obj ConfirmLoginResult) graphql.Marshaler {
+func (ec *executionContext) _ConfirmLoginLinkResult(ctx context.Context, sel ast.SelectionSet, obj ConfirmLoginLinkResult) graphql.Marshaler {
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
@@ -8341,6 +8571,50 @@ func (ec *executionContext) _ConfirmLoginResult(ctx context.Context, sel ast.Sel
 			return graphql.Null
 		}
 		return ec._LoginConfirmed(ctx, sel, obj)
+	case InvalidToken:
+		return ec._InvalidToken(ctx, sel, &obj)
+	case *InvalidToken:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._InvalidToken(ctx, sel, obj)
+	case ExpiredToken:
+		return ec._ExpiredToken(ctx, sel, &obj)
+	case *ExpiredToken:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ExpiredToken(ctx, sel, obj)
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
+func (ec *executionContext) _ConfirmLoginPinResult(ctx context.Context, sel ast.SelectionSet, obj ConfirmLoginPinResult) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case LoginConfirmed:
+		return ec._LoginConfirmed(ctx, sel, &obj)
+	case *LoginConfirmed:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._LoginConfirmed(ctx, sel, obj)
+	case InvalidPin:
+		return ec._InvalidPin(ctx, sel, &obj)
+	case *InvalidPin:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._InvalidPin(ctx, sel, obj)
 	case InvalidToken:
 		return ec._InvalidToken(ctx, sel, &obj)
 	case *InvalidToken:
@@ -8452,6 +8726,13 @@ func (ec *executionContext) _Error(ctx context.Context, sel ast.SelectionSet, ob
 			return graphql.Null
 		}
 		return ec._ExpiredToken(ctx, sel, obj)
+	case InvalidPin:
+		return ec._InvalidPin(ctx, sel, &obj)
+	case *InvalidPin:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._InvalidPin(ctx, sel, obj)
 	case InvalidEmail:
 		return ec._InvalidEmail(ctx, sel, &obj)
 	case *InvalidEmail:
@@ -8526,13 +8807,20 @@ func (ec *executionContext) _LoginByEmailResult(ctx context.Context, sel ast.Sel
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
-	case CheckEmail:
-		return ec._CheckEmail(ctx, sel, &obj)
-	case *CheckEmail:
+	case LinkSentByEmail:
+		return ec._LinkSentByEmail(ctx, sel, &obj)
+	case *LinkSentByEmail:
 		if obj == nil {
 			return graphql.Null
 		}
-		return ec._CheckEmail(ctx, sel, obj)
+		return ec._LinkSentByEmail(ctx, sel, obj)
+	case PinSentByEmail:
+		return ec._PinSentByEmail(ctx, sel, &obj)
+	case *PinSentByEmail:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._PinSentByEmail(ctx, sel, obj)
 	case InvalidEmail:
 		return ec._InvalidEmail(ctx, sel, &obj)
 	case *InvalidEmail:
@@ -9088,37 +9376,6 @@ func (ec *executionContext) _AlreadyExists(ctx context.Context, sel ast.Selectio
 	return out
 }
 
-var checkEmailImplementors = []string{"CheckEmail", "LoginByEmailResult"}
-
-func (ec *executionContext) _CheckEmail(ctx context.Context, sel ast.SelectionSet, obj *CheckEmail) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, checkEmailImplementors)
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("CheckEmail")
-		case "email":
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._CheckEmail_email(ctx, field, obj)
-			}
-
-			out.Values[i] = innerFunc(ctx)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
 var contactImplementors = []string{"Contact"}
 
 func (ec *executionContext) _Contact(ctx context.Context, sel ast.SelectionSet, obj *Contact) graphql.Marshaler {
@@ -9334,7 +9591,7 @@ func (ec *executionContext) _ContactUpdated(ctx context.Context, sel ast.Selecti
 	return out
 }
 
-var expiredTokenImplementors = []string{"ExpiredToken", "ConfirmLoginResult", "Error"}
+var expiredTokenImplementors = []string{"ExpiredToken", "ConfirmLoginLinkResult", "Error", "ConfirmLoginPinResult"}
 
 func (ec *executionContext) _ExpiredToken(ctx context.Context, sel ast.SelectionSet, obj *ExpiredToken) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, expiredTokenImplementors)
@@ -9723,7 +9980,38 @@ func (ec *executionContext) _InvalidEmail(ctx context.Context, sel ast.Selection
 	return out
 }
 
-var invalidTokenImplementors = []string{"InvalidToken", "ConfirmLoginResult", "Error"}
+var invalidPinImplementors = []string{"InvalidPin", "ConfirmLoginPinResult", "Error"}
+
+func (ec *executionContext) _InvalidPin(ctx context.Context, sel ast.SelectionSet, obj *InvalidPin) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, invalidPinImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("InvalidPin")
+		case "message":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._InvalidPin_message(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var invalidTokenImplementors = []string{"InvalidToken", "ConfirmLoginLinkResult", "Error", "ConfirmLoginPinResult"}
 
 func (ec *executionContext) _InvalidToken(ctx context.Context, sel ast.SelectionSet, obj *InvalidToken) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, invalidTokenImplementors)
@@ -9754,7 +10042,38 @@ func (ec *executionContext) _InvalidToken(ctx context.Context, sel ast.Selection
 	return out
 }
 
-var loginConfirmedImplementors = []string{"LoginConfirmed", "ConfirmLoginResult"}
+var linkSentByEmailImplementors = []string{"LinkSentByEmail", "LoginByEmailResult"}
+
+func (ec *executionContext) _LinkSentByEmail(ctx context.Context, sel ast.SelectionSet, obj *LinkSentByEmail) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, linkSentByEmailImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("LinkSentByEmail")
+		case "email":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._LinkSentByEmail_email(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var loginConfirmedImplementors = []string{"LoginConfirmed", "ConfirmLoginLinkResult", "ConfirmLoginPinResult"}
 
 func (ec *executionContext) _LoginConfirmed(ctx context.Context, sel ast.SelectionSet, obj *LoginConfirmed) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, loginConfirmedImplementors)
@@ -9896,9 +10215,19 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "confirmLogin":
+		case "confirmLoginLink":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_confirmLogin(ctx, field)
+				return ec._Mutation_confirmLoginLink(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "confirmLoginPin":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_confirmLoginPin(ctx, field)
 			}
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
@@ -9980,6 +10309,47 @@ func (ec *executionContext) _NotFound(ctx context.Context, sel ast.SelectionSet,
 		case "message":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._NotFound_message(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var pinSentByEmailImplementors = []string{"PinSentByEmail", "LoginByEmailResult"}
+
+func (ec *executionContext) _PinSentByEmail(ctx context.Context, sel ast.SelectionSet, obj *PinSentByEmail) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, pinSentByEmailImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("PinSentByEmail")
+		case "email":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PinSentByEmail_email(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "token":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._PinSentByEmail_token(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
@@ -11045,7 +11415,7 @@ func (ec *executionContext) _ScreenQuery(ctx context.Context, sel ast.SelectionS
 	return out
 }
 
-var serverErrorImplementors = []string{"ServerError", "AddContactResult", "ConfirmLoginResult", "CreateProjectResult", "DeleteContactResult", "LoginByEmailResult", "UpdateContactResult", "UploadProjectFileResult", "UserProfileResult", "ProjectResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectFilesResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "MenuResult", "WorkspaceResult", "WorkspaceUsersResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "Error"}
+var serverErrorImplementors = []string{"ServerError", "AddContactResult", "ConfirmLoginLinkResult", "ConfirmLoginPinResult", "CreateProjectResult", "DeleteContactResult", "LoginByEmailResult", "UpdateContactResult", "UploadProjectFileResult", "UserProfileResult", "ProjectResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectFilesResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "MenuResult", "WorkspaceResult", "WorkspaceUsersResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "Error"}
 
 func (ec *executionContext) _ServerError(ctx context.Context, sel ast.SelectionSet, obj *ServerError) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, serverErrorImplementors)
@@ -12155,14 +12525,24 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) marshalNConfirmLoginResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐConfirmLoginResult(ctx context.Context, sel ast.SelectionSet, v ConfirmLoginResult) graphql.Marshaler {
+func (ec *executionContext) marshalNConfirmLoginLinkResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐConfirmLoginLinkResult(ctx context.Context, sel ast.SelectionSet, v ConfirmLoginLinkResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")
 		}
 		return graphql.Null
 	}
-	return ec._ConfirmLoginResult(ctx, sel, v)
+	return ec._ConfirmLoginLinkResult(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNConfirmLoginPinResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐConfirmLoginPinResult(ctx context.Context, sel ast.SelectionSet, v ConfirmLoginPinResult) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._ConfirmLoginPinResult(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNContact2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐContactᚄ(ctx context.Context, sel ast.SelectionSet, v []*Contact) graphql.Marshaler {

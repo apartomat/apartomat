@@ -29,12 +29,9 @@ export type AlreadyExists = Error & {
   message: Scalars['String'];
 };
 
-export type CheckEmail = {
-  __typename?: 'CheckEmail';
-  email: Scalars['String'];
-};
+export type ConfirmLoginLinkResult = ExpiredToken | InvalidToken | LoginConfirmed | ServerError;
 
-export type ConfirmLoginResult = ExpiredToken | InvalidToken | LoginConfirmed | ServerError;
+export type ConfirmLoginPinResult = ExpiredToken | InvalidPin | InvalidToken | LoginConfirmed | ServerError;
 
 export type Contact = {
   __typename?: 'Contact';
@@ -156,12 +153,22 @@ export type InvalidEmail = Error & {
   message: Scalars['String'];
 };
 
+export type InvalidPin = Error & {
+  __typename?: 'InvalidPin';
+  message: Scalars['String'];
+};
+
 export type InvalidToken = Error & {
   __typename?: 'InvalidToken';
   message: Scalars['String'];
 };
 
-export type LoginByEmailResult = CheckEmail | InvalidEmail | ServerError;
+export type LinkSentByEmail = {
+  __typename?: 'LinkSentByEmail';
+  email: Scalars['String'];
+};
+
+export type LoginByEmailResult = InvalidEmail | LinkSentByEmail | PinSentByEmail | ServerError;
 
 export type LoginConfirmed = {
   __typename?: 'LoginConfirmed';
@@ -184,7 +191,8 @@ export type MenuResult = MenuItems | ServerError;
 export type Mutation = {
   __typename?: 'Mutation';
   addContact: AddContactResult;
-  confirmLogin: ConfirmLoginResult;
+  confirmLoginLink: ConfirmLoginLinkResult;
+  confirmLoginPin: ConfirmLoginPinResult;
   createProject: CreateProjectResult;
   deleteContact: DeleteContactResult;
   loginByEmail: LoginByEmailResult;
@@ -200,7 +208,13 @@ export type MutationAddContactArgs = {
 };
 
 
-export type MutationConfirmLoginArgs = {
+export type MutationConfirmLoginLinkArgs = {
+  token: Scalars['String'];
+};
+
+
+export type MutationConfirmLoginPinArgs = {
+  pin: Scalars['String'];
   token: Scalars['String'];
 };
 
@@ -234,6 +248,12 @@ export type MutationUploadProjectFileArgs = {
 export type NotFound = Error & {
   __typename?: 'NotFound';
   message: Scalars['String'];
+};
+
+export type PinSentByEmail = {
+  __typename?: 'PinSentByEmail';
+  email: Scalars['String'];
+  token: Scalars['String'];
 };
 
 export type Product = {
@@ -585,12 +605,20 @@ export type AddContactMutationVariables = Exact<{
 
 export type AddContactMutation = { __typename?: 'Mutation', addContact: { __typename: 'ContactAdded', contact: { __typename?: 'Contact', id: string, fullName: string, photo: string, details: Array<{ __typename?: 'ContactDetails', type: ContactType, value: string }> } } | { __typename: 'Forbidden', message: string } | { __typename: 'ServerError', message: string } };
 
-export type ConfirmLoginMutationVariables = Exact<{
+export type ConfirmLoginLinkMutationVariables = Exact<{
   token: Scalars['String'];
 }>;
 
 
-export type ConfirmLoginMutation = { __typename?: 'Mutation', confirmLogin: { __typename: 'ExpiredToken', message: string } | { __typename: 'InvalidToken', message: string } | { __typename: 'LoginConfirmed', token: string } | { __typename: 'ServerError', message: string } };
+export type ConfirmLoginLinkMutation = { __typename?: 'Mutation', confirmLoginLink: { __typename: 'ExpiredToken', message: string } | { __typename: 'InvalidToken', message: string } | { __typename: 'LoginConfirmed', token: string } | { __typename: 'ServerError', message: string } };
+
+export type ConfirmLoginPinMutationVariables = Exact<{
+  token: Scalars['String'];
+  pin: Scalars['String'];
+}>;
+
+
+export type ConfirmLoginPinMutation = { __typename?: 'Mutation', confirmLoginPin: { __typename: 'ExpiredToken', message: string } | { __typename: 'InvalidPin', message: string } | { __typename: 'InvalidToken', message: string } | { __typename: 'LoginConfirmed', token: string } | { __typename: 'ServerError', message: string } };
 
 export type CreateProjectMutationVariables = Exact<{
   input: CreateProjectInput;
@@ -611,7 +639,7 @@ export type LoginByEmailMutationVariables = Exact<{
 }>;
 
 
-export type LoginByEmailMutation = { __typename?: 'Mutation', loginByEmail: { __typename: 'CheckEmail', email: string } | { __typename: 'InvalidEmail', message: string } | { __typename: 'ServerError', message: string } };
+export type LoginByEmailMutation = { __typename?: 'Mutation', loginByEmail: { __typename: 'InvalidEmail', message: string } | { __typename: 'LinkSentByEmail', email: string } | { __typename: 'PinSentByEmail', email: string, token: string } | { __typename: 'ServerError', message: string } };
 
 export type ProfileQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -749,9 +777,9 @@ export function useAddContactMutation(baseOptions?: Apollo.MutationHookOptions<A
 export type AddContactMutationHookResult = ReturnType<typeof useAddContactMutation>;
 export type AddContactMutationResult = Apollo.MutationResult<AddContactMutation>;
 export type AddContactMutationOptions = Apollo.BaseMutationOptions<AddContactMutation, AddContactMutationVariables>;
-export const ConfirmLoginDocument = gql`
-    mutation confirmLogin($token: String!) {
-  confirmLogin(token: $token) {
+export const ConfirmLoginLinkDocument = gql`
+    mutation confirmLoginLink($token: String!) {
+  confirmLoginLink(token: $token) {
     __typename
     ... on LoginConfirmed {
       token
@@ -768,32 +796,81 @@ export const ConfirmLoginDocument = gql`
   }
 }
     `;
-export type ConfirmLoginMutationFn = Apollo.MutationFunction<ConfirmLoginMutation, ConfirmLoginMutationVariables>;
+export type ConfirmLoginLinkMutationFn = Apollo.MutationFunction<ConfirmLoginLinkMutation, ConfirmLoginLinkMutationVariables>;
 
 /**
- * __useConfirmLoginMutation__
+ * __useConfirmLoginLinkMutation__
  *
- * To run a mutation, you first call `useConfirmLoginMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useConfirmLoginMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useConfirmLoginLinkMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useConfirmLoginLinkMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [confirmLoginMutation, { data, loading, error }] = useConfirmLoginMutation({
+ * const [confirmLoginLinkMutation, { data, loading, error }] = useConfirmLoginLinkMutation({
  *   variables: {
  *      token: // value for 'token'
  *   },
  * });
  */
-export function useConfirmLoginMutation(baseOptions?: Apollo.MutationHookOptions<ConfirmLoginMutation, ConfirmLoginMutationVariables>) {
+export function useConfirmLoginLinkMutation(baseOptions?: Apollo.MutationHookOptions<ConfirmLoginLinkMutation, ConfirmLoginLinkMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<ConfirmLoginMutation, ConfirmLoginMutationVariables>(ConfirmLoginDocument, options);
+        return Apollo.useMutation<ConfirmLoginLinkMutation, ConfirmLoginLinkMutationVariables>(ConfirmLoginLinkDocument, options);
       }
-export type ConfirmLoginMutationHookResult = ReturnType<typeof useConfirmLoginMutation>;
-export type ConfirmLoginMutationResult = Apollo.MutationResult<ConfirmLoginMutation>;
-export type ConfirmLoginMutationOptions = Apollo.BaseMutationOptions<ConfirmLoginMutation, ConfirmLoginMutationVariables>;
+export type ConfirmLoginLinkMutationHookResult = ReturnType<typeof useConfirmLoginLinkMutation>;
+export type ConfirmLoginLinkMutationResult = Apollo.MutationResult<ConfirmLoginLinkMutation>;
+export type ConfirmLoginLinkMutationOptions = Apollo.BaseMutationOptions<ConfirmLoginLinkMutation, ConfirmLoginLinkMutationVariables>;
+export const ConfirmLoginPinDocument = gql`
+    mutation confirmLoginPin($token: String!, $pin: String!) {
+  confirmLoginPin(token: $token, pin: $pin) {
+    __typename
+    ... on LoginConfirmed {
+      token
+    }
+    ... on InvalidPin {
+      message
+    }
+    ... on InvalidToken {
+      message
+    }
+    ... on ExpiredToken {
+      message
+    }
+    ... on ServerError {
+      message
+    }
+  }
+}
+    `;
+export type ConfirmLoginPinMutationFn = Apollo.MutationFunction<ConfirmLoginPinMutation, ConfirmLoginPinMutationVariables>;
+
+/**
+ * __useConfirmLoginPinMutation__
+ *
+ * To run a mutation, you first call `useConfirmLoginPinMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useConfirmLoginPinMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [confirmLoginPinMutation, { data, loading, error }] = useConfirmLoginPinMutation({
+ *   variables: {
+ *      token: // value for 'token'
+ *      pin: // value for 'pin'
+ *   },
+ * });
+ */
+export function useConfirmLoginPinMutation(baseOptions?: Apollo.MutationHookOptions<ConfirmLoginPinMutation, ConfirmLoginPinMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ConfirmLoginPinMutation, ConfirmLoginPinMutationVariables>(ConfirmLoginPinDocument, options);
+      }
+export type ConfirmLoginPinMutationHookResult = ReturnType<typeof useConfirmLoginPinMutation>;
+export type ConfirmLoginPinMutationResult = Apollo.MutationResult<ConfirmLoginPinMutation>;
+export type ConfirmLoginPinMutationOptions = Apollo.BaseMutationOptions<ConfirmLoginPinMutation, ConfirmLoginPinMutationVariables>;
 export const CreateProjectDocument = gql`
     mutation createProject($input: CreateProjectInput!) {
   createProject(input: $input) {
@@ -892,8 +969,12 @@ export const LoginByEmailDocument = gql`
     mutation loginByEmail($email: String!) {
   loginByEmail(email: $email) {
     __typename
-    ... on CheckEmail {
+    ... on LinkSentByEmail {
       email
+    }
+    ... on PinSentByEmail {
+      email
+      token
     }
     ... on InvalidEmail {
       message

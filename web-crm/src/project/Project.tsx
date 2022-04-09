@@ -256,6 +256,41 @@ export function Project () {
 
 export default Project;
 
+function ContactLayer(
+    { contact, hide }:
+    { contact: Contact, hide: () => void }
+) {
+    return (
+        <Layer onClickOutside={hide} onEsc={hide} full>
+            <Box pad="medium">
+                <Heading level={3}>{contact.fullName}</Heading>
+            </Box>
+            <Box pad="medium">
+                {contact.details.filter(c => ![ContactType.Instagram].includes(c.type)).map(c => {
+                    return <Box pad={{vertical: "small"}}>{c.value}</Box>
+                })}
+                {contact.details.filter(c => [ContactType.Instagram].includes(c.type)).length > 0
+                    ? <Box pad={{vertical: "small"}} direction="row">
+                    {contact.details.filter(c => [ContactType.Instagram].includes(c.type)).map(c => {
+                        switch (c.type) {
+                            case ContactType.Instagram:
+                                return <Button icon={<Instagram color="primary"/>} plain href={c.value}/>
+                        }
+
+                        return null
+                    })}
+                    </Box>
+                    : null
+                }
+            </Box>
+            <Box direction="row" align="stretch">
+                <Button icon={<Trash/>}/>
+                <Button label="Редактировать"/>
+            </Box>
+        </Layer>
+    )
+}
+
 function ContactCard(
     { contact, onDelete, onClickUpdate }:
     { contact: Contact , onDelete: (contact: Contact) => void, onClickUpdate: (contact: Contact) => void }
@@ -289,6 +324,8 @@ function ContactCard(
         }
     }, [data])
 
+    // const [ viewContact, setViewContact ] = useState<Contact | undefined>()
+
     return (
         <Box>
             <Button
@@ -298,8 +335,13 @@ function ContactCard(
                 color="light-2"
                 label={contact.fullName}
                 style={{whiteSpace: "nowrap"}}
-                onClick={() => setShowCard(true) }
+                onClick={() => setShowCard(!showCard) }
             />
+            {/* {viewContact ? 
+                <ContactLayer
+                    contact={viewContact}
+                    hide={() => { setViewContact(undefined) }}
+                /> : null} */}
             {ref.current && showCard &&
                 <Drop
                     target={ref.current}
@@ -327,7 +369,6 @@ function ContactCard(
                                 </Box>
                                 : null
                             }
-
                         </CardBody>
                         <CardFooter pad={{horizontal: "small"}} background="light-1" height="xxsmall">
                             {showDeleteConfirm
@@ -336,7 +377,9 @@ function ContactCard(
                                         <Button primary label="Удалить" size="small" onClick={handleDeleteConfirm}/>
                                         <Button label="Отмена" size="small" onClick={handleDeleteCancel}/>
                                     </Box>
-                                : <Button icon={<Trash/>} onClick={handleDelete}/>
+                                : (
+                                    <Button icon={<Trash/>} onClick={handleDelete}/>
+                                )
                             }
 
                             {!showDeleteConfirm &&
@@ -376,7 +419,8 @@ function Contacts({ contacts, projectId, notify }: { contacts: ProjectContacts, 
                         </Heading>
                         <Box direction="row" gap="small" wrap>
                             {[...list.map((contact) => {
-                                return <ContactCard
+                                return (
+                                    <ContactCard
                                         contact={contact}
                                         onDelete={(contact: Contact) => {
                                             setJustDeleted([...justDeleted, contact.id])
@@ -385,7 +429,8 @@ function Contacts({ contacts, projectId, notify }: { contacts: ProjectContacts, 
                                         onClickUpdate={(contact: Contact) => {
                                             setUpdateContact(contact)
                                         }}
-                                />
+                                    />
+                                )
                             }), <Button icon={<Add/>} label="Добавить" onClick={() => setShowAddContact(true) }/>]}
                         </Box>
                     </Box>

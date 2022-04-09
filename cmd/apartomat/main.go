@@ -46,6 +46,7 @@ func main() {
 
 		confirmLoginIssuerVerifier := token.NewPasetoMailConfirmTokenIssuerVerifier(privateKey)
 		authIssuerVerifier := token.NewPasetoAuthTokenIssuerVerifier(privateKey)
+		confirmEmailPin := token.NewPasetoConfirmEmailPINTokenIssuerVerifier(privateKey)
 
 		mailer := smtp.NewMailSender(smtp.Config{
 			Addr:     os.Getenv("SMTP_ADDR"),
@@ -95,21 +96,23 @@ func main() {
 		}
 
 		usecases := &apartomat.Apartomat{
-			AuthTokenIssuer:             authIssuerVerifier,
-			AuthTokenVerifier:           authIssuerVerifier,
-			ConfirmTokenByEmailIssuer:   confirmLoginIssuerVerifier,
-			ConfirmTokenByEmailVerifier: confirmLoginIssuerVerifier,
-			Mailer:                      mailer,
-			MailFactory:                 mail.NewFactory("https://crm.apartomat.ru", "apartomat@yandex.ru"),
-			Uploader:                    uploader,
-			Contacts:                    contactsStore,
-			Houses:                      housesStore,
-			Projects:                    projects,
-			ProjectFiles:                projectFiles,
-			Rooms:                       roomsStore,
-			Users:                       users,
-			Workspaces:                  workspaces,
-			WorkspaceUsers:              workspaceUsers,
+			AuthTokenIssuer:              authIssuerVerifier,
+			AuthTokenVerifier:            authIssuerVerifier,
+			ConfirmTokenByEmailIssuer:    confirmLoginIssuerVerifier,
+			ConfirmTokenByEmailVerifier:  confirmLoginIssuerVerifier,
+			ConfirmEmailPINTokenIssuer:   confirmEmailPin,
+			ConfirmEmailPINTokenVerifier: confirmEmailPin,
+			Mailer:                       mailer,
+			MailFactory:                  mail.NewFactory("https://crm.apartomat.ru", "apartomat@yandex.ru"),
+			Uploader:                     uploader,
+			Contacts:                     contactsStore,
+			Houses:                       housesStore,
+			Projects:                     projects,
+			ProjectFiles:                 projectFiles,
+			Rooms:                        roomsStore,
+			Users:                        users,
+			Workspaces:                   workspaces,
+			WorkspaceUsers:               workspaceUsers,
 		}
 
 		serverOpts := []Option{
