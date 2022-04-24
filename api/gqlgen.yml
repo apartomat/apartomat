@@ -54,6 +54,10 @@ models:
         resolver: true
       projects:
         resolver: true
+  WorkspaceProject:
+    fields:
+      period:
+        resolver: true
   WorkspaceProjects:
     fields:
       list:

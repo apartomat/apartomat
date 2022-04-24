@@ -505,10 +505,12 @@ type Workspace struct {
 func (Workspace) IsWorkspaceResult() {}
 
 type WorkspaceProject struct {
-	ID     string        `json:"id"`
-	Name   string        `json:"name"`
-	Period *string       `json:"period"`
-	Status ProjectStatus `json:"status"`
+	ID      string        `json:"id"`
+	Name    string        `json:"name"`
+	Status  ProjectStatus `json:"status"`
+	StartAt *time.Time    `json:"startAt"`
+	EndAt   *time.Time    `json:"endAt"`
+	Period  *string       `json:"period"`
 }
 
 type WorkspaceProjects struct {

@@ -33,7 +33,7 @@ const Loading = (props: SpinnerExtendedProps) => {
 export function Workspace () {
     const { user } = useAuthContext()
     let { id } = useParams<RouteParams>()
-    const { data, loading, error } = useWorkspace(id)
+    const { data, loading, error } = useWorkspace({ id, timezone: Intl.DateTimeFormat().resolvedOptions().timeZone })
 
     const [ showCreateProjectLayer, setShowCreateProjectLayer ] = useState(false)
 

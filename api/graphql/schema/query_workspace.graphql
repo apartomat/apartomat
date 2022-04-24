@@ -62,6 +62,8 @@ type WorkspaceProjectsTotal {
 type WorkspaceProject {
 	id: String!
 	name: String!
-	period: String
 	status: ProjectStatus!
+	startAt: Time
+	endAt: Time
+	period(timezone: String): String
 }

@@ -543,10 +543,17 @@ export type Workspace = {
 
 export type WorkspaceProject = {
   __typename?: 'WorkspaceProject';
+  endAt?: Maybe<Scalars['Time']>;
   id: Scalars['String'];
   name: Scalars['String'];
   period?: Maybe<Scalars['String']>;
+  startAt?: Maybe<Scalars['Time']>;
   status: ProjectStatus;
+};
+
+
+export type WorkspaceProjectPeriodArgs = {
+  timezone?: Maybe<Scalars['String']>;
 };
 
 export type WorkspaceProjects = {
@@ -710,10 +717,11 @@ export type UploadProjectFileMutation = { __typename?: 'Mutation', uploadProject
 
 export type WorkspaceQueryVariables = Exact<{
   id: Scalars['String'];
+  timezone?: Maybe<Scalars['String']>;
 }>;
 
 
-export type WorkspaceQuery = { __typename?: 'Query', workspace: { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'ServerError', message: string } | { __typename: 'Workspace', id: string, name: string, users: { __typename: 'Forbidden', message: string } | { __typename: 'ServerError', message: string } | { __typename: 'WorkspaceUsers', items: Array<{ __typename?: 'WorkspaceUser', id: string, role: WorkspaceUserRole, workspace: { __typename?: 'Id', id: string }, profile: { __typename?: 'WorkspaceUserProfile', id: string, email: string, fullName: string, abbr: string, gravatar?: { __typename?: 'Gravatar', url: string } | null | undefined } }> }, projects: { __typename: 'WorkspaceProjects', current: { __typename: 'Forbidden', message: string } | { __typename: 'ServerError', message: string } | { __typename: 'WorkspaceProjectsList', items: Array<{ __typename?: 'WorkspaceProject', id: string, name: string, status: ProjectStatus, period?: string | null | undefined }> }, done: { __typename: 'Forbidden', message: string } | { __typename: 'ServerError', message: string } | { __typename: 'WorkspaceProjectsList', items: Array<{ __typename?: 'WorkspaceProject', id: string, name: string, status: ProjectStatus, period?: string | null | undefined }> } } } };
+export type WorkspaceQuery = { __typename?: 'Query', workspace: { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'ServerError', message: string } | { __typename: 'Workspace', id: string, name: string, users: { __typename: 'Forbidden', message: string } | { __typename: 'ServerError', message: string } | { __typename: 'WorkspaceUsers', items: Array<{ __typename?: 'WorkspaceUser', id: string, role: WorkspaceUserRole, workspace: { __typename?: 'Id', id: string }, profile: { __typename?: 'WorkspaceUserProfile', id: string, email: string, fullName: string, abbr: string, gravatar?: { __typename?: 'Gravatar', url: string } | null | undefined } }> }, projects: { __typename: 'WorkspaceProjects', current: { __typename: 'Forbidden', message: string } | { __typename: 'ServerError', message: string } | { __typename: 'WorkspaceProjectsList', items: Array<{ __typename?: 'WorkspaceProject', id: string, name: string, status: ProjectStatus, startAt?: any | null | undefined, endAt?: any | null | undefined, period?: string | null | undefined }> }, done: { __typename: 'Forbidden', message: string } | { __typename: 'ServerError', message: string } | { __typename: 'WorkspaceProjectsList', items: Array<{ __typename?: 'WorkspaceProject', id: string, name: string, status: ProjectStatus, startAt?: any | null | undefined, endAt?: any | null | undefined, period?: string | null | undefined }> } } } };
 
 export const ProjectScreenHouseRoomsFragmentDoc = gql`
     fragment ProjectScreenHouseRooms on HouseRooms {
@@ -1395,7 +1403,7 @@ export type UploadProjectFileMutationHookResult = ReturnType<typeof useUploadPro
 export type UploadProjectFileMutationResult = Apollo.MutationResult<UploadProjectFileMutation>;
 export type UploadProjectFileMutationOptions = Apollo.BaseMutationOptions<UploadProjectFileMutation, UploadProjectFileMutationVariables>;
 export const WorkspaceDocument = gql`
-    query workspace($id: String!) {
+    query workspace($id: String!, $timezone: String) {
   workspace(id: $id) {
     __typename
     ... on Workspace {
@@ -1434,21 +1442,25 @@ export const WorkspaceDocument = gql`
               id
               name
               status
-              period
+              startAt
+              endAt
+              period(timezone: $timezone)
             }
           }
           ... on Error {
             message
           }
         }
-        done: list(filter: {status: [DONE]}, limit: 10) {
+        done: list(filter: {status: [DONE, CANCELED]}, limit: 10) {
           __typename
           ... on WorkspaceProjectsList {
             items {
               id
               name
               status
-              period
+              startAt
+              endAt
+              period(timezone: $timezone)
             }
           }
           ... on Error {
@@ -1477,6 +1489,7 @@ export const WorkspaceDocument = gql`
  * const { data, loading, error } = useWorkspaceQuery({
  *   variables: {
  *      id: // value for 'id'
+ *      timezone: // value for 'timezone'
  *   },
  * });
  */

@@ -1,4 +1,4 @@
-query workspace($id: String!) {
+query workspace($id: String! $timezone: String) {
     workspace(id: $id) {
         __typename
         ...on Workspace {
@@ -37,21 +37,25 @@ query workspace($id: String!) {
                             id
                             name
                             status
-                            period
+                            startAt
+                            endAt
+                            period(timezone: $timezone)
                         }
                     }
                     ...on Error {
                         message
                     }
                 }
-                done: list(filter: {status: [DONE]} limit: 10) {
+                done: list(filter: {status: [DONE, CANCELED]} limit: 10) {
                     __typename
                     ...on WorkspaceProjectsList{
                         items {
                             id
                             name
                             status
-                            period
+                            startAt
+                            endAt
+                            period(timezone: $timezone)
                         }
                     }
                     ...on Error {
