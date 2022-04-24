@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom"
 
 import { Main, Box, Header, Heading, Text,
     Paragraph, Spinner, SpinnerExtendedProps, Image,
-FileInput, Button, Layer, Form, FormField, Drop, MaskedInput, Tip, Card, CardHeader, CardBody, CardFooter } from "grommet"
+FileInput, Button, Layer, Form, FormField, Drop, MaskedInput, Card, CardHeader, CardBody, CardFooter, Calendar } from "grommet"
 import { FormClose, StatusGood, Add, Trash, Instagram } from "grommet-icons"
 
 import AnchorLink from "../common/AnchorLink"
@@ -12,41 +12,43 @@ import UserAvatar from "./UserAvatar"
 
 import { useAuthContext } from "../common/context/auth/useAuthContext"
 
-import { useProject, ProjectFiles, ProjectContacts, ProjectHouses, HouseRooms } from "./useProject"
+import { useProject, Project  as ProjectType, ProjectFiles, ProjectContacts, ProjectHouses, HouseRooms } from "./useProject"
 import { useUploadProjectFile, ProjectFileType } from "./useUploadProjectFile"
 import { useAddContact, ContactType, Contact } from "./useAddContact"
 import { useUpdateContact } from "./useUpdateContact"
-import useDeleteContact from "./useDeleteContact"
+import { useDeleteContact } from "./useDeleteContact"
+import { useChangeDates } from "./useChangeDates"
+import { KeyboardType } from "grommet/utils"
 
 interface RouteParams {
     id: string
 };
 
 
-const spec = {
-    items: [
-        {
-            name: "PAX ПАКС / TYSSEDAL ТИССЕДАЛЬ Гардероб, комбинация",
-            image: "https://www.ikea.com/ru/ru/images/products/pax-paks-tyssedal-tissedal-garderob-kombinaciya-belyy__1024717_pe833642_s5.jpg?f=xl",
-            url: "https://www.ikea.com/ru/ru/p/pax-paks-tyssedal-tissedal-garderob-kombinaciya-belyy-s19429737/",
-        },
-        {
-            name: "MOALISA МОАЛИЗА Гардины, 2 шт. × 3",
-            image: "https://www.ikea.com/ru/ru/images/products/moalisa-moaliza-gardiny-2-sht-belyy-chernyy__0950019_pe801219_s5.jpg?f=xl",
-            url: "https://www.ikea.com/ru/ru/p/moalisa-moaliza-gardiny-2-sht-belyy-chernyy-50499515/",
-        },
-        {
-            name: "TYSSEDAL ТИССЕДАЛЬ Каркас кровати",
-            image: "https://www.ikea.com/ru/ru/images/products/tyssedal-tissedal-karkas-krovati-belyy-luroy__0637608_pe698420_s5.jpg?f=xl",
-            url: "https://www.ikea.com/ru/ru/p/tyssedal-tissedal-karkas-krovati-belyy-luroy-s79211165/"
-        },
-        {
-            name: "TYBBLE ТИБЛ Подвесной светильник/5 светодиодов",
-            image: "https://www.ikea.com/ru/ru/images/products/tybble-tibl-podvesnoy-svetilnik-5-svetodiodov-nikelirovannyy-molochnyy-steklo__0794591_pe765659_s5.jpg?f=xl",
-            url: "https://www.ikea.com/ru/ru/p/tybble-tibl-podvesnoy-svetilnik-5-svetodiodov-nikelirovannyy-molochnyy-steklo-90398251/",
-        }
-    ]
-};
+// const spec = {
+//     items: [
+//         {
+//             name: "PAX ПАКС / TYSSEDAL ТИССЕДАЛЬ Гардероб, комбинация",
+//             image: "https://www.ikea.com/ru/ru/images/products/pax-paks-tyssedal-tissedal-garderob-kombinaciya-belyy__1024717_pe833642_s5.jpg?f=xl",
+//             url: "https://www.ikea.com/ru/ru/p/pax-paks-tyssedal-tissedal-garderob-kombinaciya-belyy-s19429737/",
+//         },
+//         {
+//             name: "MOALISA МОАЛИЗА Гардины, 2 шт. × 3",
+//             image: "https://www.ikea.com/ru/ru/images/products/moalisa-moaliza-gardiny-2-sht-belyy-chernyy__0950019_pe801219_s5.jpg?f=xl",
+//             url: "https://www.ikea.com/ru/ru/p/moalisa-moaliza-gardiny-2-sht-belyy-chernyy-50499515/",
+//         },
+//         {
+//             name: "TYSSEDAL ТИССЕДАЛЬ Каркас кровати",
+//             image: "https://www.ikea.com/ru/ru/images/products/tyssedal-tissedal-karkas-krovati-belyy-luroy__0637608_pe698420_s5.jpg?f=xl",
+//             url: "https://www.ikea.com/ru/ru/p/tyssedal-tissedal-karkas-krovati-belyy-luroy-s79211165/"
+//         },
+//         {
+//             name: "TYBBLE ТИБЛ Подвесной светильник/5 светодиодов",
+//             image: "https://www.ikea.com/ru/ru/images/products/tybble-tibl-podvesnoy-svetilnik-5-svetodiodov-nikelirovannyy-molochnyy-steklo__0794591_pe765659_s5.jpg?f=xl",
+//             url: "https://www.ikea.com/ru/ru/p/tybble-tibl-podvesnoy-svetilnik-5-svetodiodov-nikelirovannyy-molochnyy-steklo-90398251/",
+//         }
+//     ]
+// };
 
 export function Project () {
     let { id } = useParams<RouteParams>()
@@ -54,16 +56,30 @@ export function Project () {
     const { user } = useAuthContext()
     const { data, loading, error } = useProject(id)
 
-    const [ notification, setNotification ] = useState('')
+    const [ notification, setNotification ] = useState("")
     const [ showNotification, setShowNotification ] = useState(false)
 
-    const notify = ({ message }: { message: string }) => {
+    const notify = ({ message, timeout = 250, duration = 1500 }: { message: string, timeout?: number, duration?: number }) => {
         setNotification(message)
-        setShowNotification(true)
+        
         setTimeout(() => {
-            setShowNotification(false)
-        }, 3000)
+            setShowNotification(true)
+
+            setTimeout(() => {
+                setShowNotification(false)
+            }, duration)
+        }, timeout)
     }
+
+    const [ project, setProject ] = useState<ProjectType | undefined>(undefined)
+
+    useEffect(() => {
+        switch (data?.screen.projectScreen.project.__typename) {
+            case "Project":
+                setProject(data?.screen.projectScreen.project)
+                return
+        }
+    }, [ data ])
 
     const [showUploadFiles, setShowUploadFiles] = useState(false);
 
@@ -88,146 +104,6 @@ export function Project () {
     }
 
     switch (data?.screen.projectScreen.project.__typename) {
-        case "Project":
-            const { project } = data?.screen.projectScreen;
-
-            return (
-                <Main pad={{vertical: "medium", horizontal: "large"}}>
-
-                {showNotification ? <Layer
-                    position="top"
-                    modal={false}
-                    responsive={false}
-                    margin={{ vertical: "small", horizontal: "small"}}
-                >
-                    <Box
-                        align="center"
-                        direction="row"
-                        gap="xsmall"
-                        justify="between"
-                        elevation="small"
-                        background="status-ok"
-                        round="medium"
-                        pad={{ vertical: "xsmall", horizontal: "small"}}
-                    >
-                        <StatusGood/>
-                        <Text>{notification}</Text>
-                    </Box>
-                </Layer> : null}
-
-                <Header background="white" margin={{vertical: "medium"}}>
-                    <Box>
-                        <Text size="xlarge" weight="bold" color="brand">
-                            <AnchorLink to="/">apartomat</AnchorLink>
-                        </Text>
-                    </Box>
-                    <Box><UserAvatar user={user} className="header-user" /></Box>
-                </Header>
-
-                <Box>
-                    <Box margin={{vertical: "medium"}}>
-                        <Heading level={2} margin="none">{project.title}</Heading>
-                    </Box>
-                    <Box direction="row" justify="between" wrap>
-                        <Box width={{min: "35%"}}>
-                            <Box margin="none">
-                                <Heading level={4} margin={{ bottom: "xsmall"}}>Сроки проекта</Heading>
-                                <ProjectDates startAt={project.startAt} endAt={project.endAt}/>
-                            </Box>
-                            <Contacts contacts={project.contacts} projectId={project.id.toString()} notify={notify}/>
-                        </Box>
-                        <Box width={{min: "35%"}}>
-                            <House houses={project.houses}/>
-                            <Rooms houses={project.houses}/>
-                        </Box>
-                    </Box>
-
-                    <Visualizations files={project.files} showUploadFiles={setShowUploadFiles}/>
-
-                    <Box margin={{vertical: "medium"}}>
-                        <Heading level={3}>
-                            <Box gap="small">
-                                <strong>Спецификация</strong>
-                                <Text weight="normal">
-                                    {spec.items.length} позиций
-                                </Text>
-                            </Box>
-                        </Heading>
-                        <Box direction="row" gap="small" overflow={{"horizontal":"auto"}} >
-                            {spec.items.map(item => {
-                                return (
-                                    <Box
-                                        key={item.name}
-                                        height="xsmall"
-                                        width="xsmall"
-                                        margin={{bottom: "small"}}
-                                        flex={{"shrink":0}}
-                                        background="light-0"
-                                    >
-                                        <Tip
-                                            content={
-                                                <Text>{item.name}</Text>
-                                            }
-                                        >
-                                            <Image
-                                                fit="cover"
-                                                src={`${item.image}`}
-                                            />
-                                        </Tip>
-                                    </Box>
-                                )
-                            })}
-                        </Box>
-                    </Box>
-
-                    {/* <Box margin={{vertical: "medium"}}>
-                        <Box direction="row" justify="between">
-                            <Heading level={3}>Планы</Heading>
-                            <Box justify="center">
-                                <Button color="brand" label="Загрузить" />
-                            </Box>
-                        </Box>
-                    </Box>
-
-                    <Box margin={{vertical: "medium"}}>
-                        <Box direction="row" justify="between">
-                            <Heading level={3}>Спецификация</Heading>
-                            <Box justify="center">
-                                <Button color="brand" label="Создать" />
-                            </Box>
-                        </Box>
-                    </Box>
-
-                    <Box margin={{vertical: "medium"}}>
-                        <Box direction="row" justify="between">
-                            <Heading level={3}>Альбом</Heading>
-                            <Box justify="center">
-                                <Button color="brand" label="Создать" />
-                            </Box>
-                        </Box>
-                    </Box>
-
-                    <Box margin={{vertical: "medium"}}>
-                        <Box direction="row" justify="between">
-                            <Heading level={3}>Исходники</Heading>
-                            <Box justify="center">
-                                <Button color="brand" label="Загрузить" />
-                            </Box>
-                        </Box>
-                    </Box> */}
-
-                    <AddSomething showUploadFiles={setShowUploadFiles}/>
-
-                    {showUploadFiles ?
-                        <UploadFiles
-                            projectId={project.id}
-                            type={ProjectFileType.Visualization}
-                            setShow={setShowUploadFiles}
-                            onUploadComplete={({message}) => notify({ message })}
-                        /> : null}
-                    </Box>
-                </Main>
-            );
         case "NotFound":
             return (
                 <Main pad="large">
@@ -244,13 +120,163 @@ export function Project () {
                     <Paragraph>Доступ запрещен</Paragraph>
                 </Main>
             );
-        default:
-            return (
-                <Main pad="large">
-                    <Heading>Ошибка</Heading>
-                    <Paragraph>Неизвестная ошибка</Paragraph>
-                </Main>
-            );
+        // default:
+        //     return (
+        //         <Main pad="large">
+        //             <Heading>Ошибка</Heading>
+        //             <Paragraph>Неизвестная ошибка</Paragraph>
+        //         </Main>
+        //     );
+    }
+
+    if (project ) {
+        return (
+            <Main pad={{vertical: "medium", horizontal: "large"}}>
+
+            {showNotification ? <Layer
+                position="top"
+                modal={false}
+                responsive={false}
+                margin={{ vertical: "small", horizontal: "small"}}
+            >
+                <Box
+                    align="center"
+                    direction="row"
+                    gap="xsmall"
+                    justify="between"
+                    elevation="small"
+                    background="status-ok"
+                    round="medium"
+                    pad={{ vertical: "xsmall", horizontal: "small"}}
+                >
+                    <StatusGood/>
+                    <Text>{notification}</Text>
+                </Box>
+            </Layer> : null}
+
+            <Header background="white" margin={{vertical: "medium"}}>
+                <Box>
+                    <Text size="xlarge" weight="bold" color="brand">
+                        <AnchorLink to="/">apartomat</AnchorLink>
+                    </Text>
+                </Box>
+                <Box><UserAvatar user={user} className="header-user" /></Box>
+            </Header>
+
+            <Box>
+                <Box margin={{vertical: "medium"}}>
+                    <Heading level={2} margin="none">{project.title}</Heading>
+                </Box>
+                <Box direction="row" justify="between" wrap>
+                    <Box width={{min: "35%"}}>
+                        <Box margin="none">
+                            <Heading level={4} margin={{ bottom: "xsmall"}}>Сроки проекта</Heading>
+                            <ProjectDates
+                                projectId={project.id}
+                                startAt={project.startAt}
+                                endAt={project.endAt}
+                                onChangeDates={({ startAt, endAt }) => {
+                                    notify({ message: "Даты изменены" })
+                                    setProject({ ...project, startAt, endAt })
+                                }}
+                            />
+                        </Box>
+                        <Contacts contacts={project.contacts} projectId={project.id.toString()} notify={notify}/>
+                    </Box>
+                    <Box width={{min: "35%"}}>
+                        <House houses={project.houses}/>
+                        <Rooms houses={project.houses}/>
+                    </Box>
+                </Box>
+
+                <Visualizations files={project.files} showUploadFiles={setShowUploadFiles}/>
+
+                {/* <Box margin={{vertical: "medium"}}>
+                    <Heading level={3}>
+                        <Box gap="small">
+                            <strong>Спецификация</strong>
+                            <Text weight="normal">
+                                {spec.items.length} позиций
+                            </Text>
+                        </Box>
+                    </Heading>
+                    <Box direction="row" gap="small" overflow={{"horizontal":"auto"}} >
+                        {spec.items.map(item => {
+                            return (
+                                <Box
+                                    key={item.name}
+                                    height="xsmall"
+                                    width="xsmall"
+                                    margin={{bottom: "small"}}
+                                    flex={{"shrink":0}}
+                                    background="light-0"
+                                >
+                                    <Tip
+                                        content={
+                                            <Text>{item.name}</Text>
+                                        }
+                                    >
+                                        <Image
+                                            fit="cover"
+                                            src={`${item.image}`}
+                                        />
+                                    </Tip>
+                                </Box>
+                            )
+                        })}
+                    </Box>
+                </Box> */}
+
+                {/* <Box margin={{vertical: "medium"}}>
+                    <Box direction="row" justify="between">
+                        <Heading level={3}>Планы</Heading>
+                        <Box justify="center">
+                            <Button color="brand" label="Загрузить" />
+                        </Box>
+                    </Box>
+                </Box>
+
+                <Box margin={{vertical: "medium"}}>
+                    <Box direction="row" justify="between">
+                        <Heading level={3}>Спецификация</Heading>
+                        <Box justify="center">
+                            <Button color="brand" label="Создать" />
+                        </Box>
+                    </Box>
+                </Box>
+
+                <Box margin={{vertical: "medium"}}>
+                    <Box direction="row" justify="between">
+                        <Heading level={3}>Альбом</Heading>
+                        <Box justify="center">
+                            <Button color="brand" label="Создать" />
+                        </Box>
+                    </Box>
+                </Box>
+
+                <Box margin={{vertical: "medium"}}>
+                    <Box direction="row" justify="between">
+                        <Heading level={3}>Исходники</Heading>
+                        <Box justify="center">
+                            <Button color="brand" label="Загрузить" />
+                        </Box>
+                    </Box>
+                </Box> */}
+
+                <AddSomething showUploadFiles={setShowUploadFiles}/>
+
+                {showUploadFiles ?
+                    <UploadFiles
+                        projectId={project.id}
+                        type={ProjectFileType.Visualization}
+                        setShow={setShowUploadFiles}
+                        onUploadComplete={({message}) => notify({ message })}
+                    /> : null}
+                </Box>
+            </Main>
+        );
+    } else {
+        return <></>
     }
 }
 
@@ -550,30 +576,62 @@ function LocaleDate ({ children }: { children: string }) {
     )
 }
 
-function ProjectDates ({ startAt, endAt }: {startAt?: string, endAt?: string}) {
-    const [ state, setState ] = useState<string[]>(
-        [startAt, endAt].reduce((acc, item) => { if (item) { acc.push(item); } return acc; }, [] as string[])
-    )
+function ProjectDates ({
+    projectId,
+    startAt,
+    endAt,
+    onChangeDates
+}: {
+    projectId: string,
+    startAt?: string,
+    endAt?: string,
+    onChangeDates?: (dates: { startAt?: string, endAt?: string }) => void,
+}) {
+    const [ showChangeDates, setShowChangeDates ] = useState(false)
+
     const [ label, setLabel ] = useState(<>не определены</>)
 
     useEffect(() => {
-        if (state[0] && state[1] && state[0] !== state[1]) {
-            setLabel(<>{new Date(state[0]).toLocaleDateString("ru-RU")}&nbsp;&mdash;&nbsp;{new Date(state[1]).toLocaleDateString("ru-RU")}</>)
-            return
+        if (startAt && endAt) {
+            return setLabel(
+                <>
+                    {new Date(startAt).toLocaleDateString("ru-RU")}&nbsp;&mdash;&nbsp;{new Date(endAt).toLocaleDateString("ru-RU")}
+                </>
+            )
         }
 
-        if (state[0]) {
-            setLabel(<>{new Date(state[0]).toLocaleDateString("ru-RU")}</>)
-            return
+        if (startAt) {
+            return setLabel(<>new Date(startAt).toLocaleDateString("ru-RU")</>)
         }
 
-        setLabel(<>не определены</>)
-    }, [state])
+        return setLabel(<>не определены</>)
+    }, [ startAt, endAt ])
 
     return (
-        <Box direction="row">
-            <Button primary color="light-2" label={label}/>
-        </Box>
+        <>
+            <Box direction="row">
+                <Button
+                    primary
+                    color="light-2"
+                    label={label}
+                    onClick={() => setShowChangeDates(!showChangeDates)}
+                />
+            </Box>
+            {showChangeDates &&
+                <ChangeDates
+                    projectId={projectId}
+                    startAt={startAt}
+                    endAt={endAt}
+                    onEsc={() => setShowChangeDates(false) }
+                    onClickOutside={() => setShowChangeDates(false) }
+                    onClickClose={() => setShowChangeDates(false) }
+                    onChangeDates={({ startAt, endAt }) => {
+                        onChangeDates && onChangeDates({ startAt, endAt })
+                        setShowChangeDates(false)
+                    }}
+                />
+            }
+        </>
     )
 }
 
@@ -950,6 +1008,66 @@ function ContactForm({ contact, onSet, onSubmit, submit }:
             </FormField>
             {submit}
         </Form>
+    )
+}
+
+function ChangeDates({ projectId, startAt, endAt, onChangeDates, onEsc, onClickOutside, onClickClose }: {
+    projectId: string,
+    startAt?: string,
+    endAt?: string,
+    onChangeDates?: (dates: { startAt?: string, endAt?: string }) => void,
+    onEsc?: () => void,
+    onClickOutside?: () => void,
+    onClickClose?: () => void
+}) {
+    const [ dates, setDates ] = useState(startAt && endAt ? [[startAt, endAt]] : undefined)
+
+    const [ change, { loading, data, error } ] = useChangeDates()
+
+    useEffect(() => {
+        switch (data?.changeProjectDates.__typename) {
+            case "ProjectDatesChanged":
+                onChangeDates && onChangeDates({ startAt: dates && dates[0] && dates[0][0], endAt: dates && dates[0] && dates[0][1] })
+        }
+    }, [ data ])
+
+
+    const handleSelect = (value: any) => {
+        setDates(value)
+    }
+
+    const handleSubmit = (event: React.FormEvent) => {
+        change(projectId, { startAt: dates && dates[0] && dates[0][0], endAt: dates && dates[0] && dates[0][1] })
+        event.preventDefault()
+    }
+
+    return (
+        <Layer
+            onClickOutside={onClickOutside}
+            onEsc={onEsc}
+        >
+                {/* {error && <Box><Text>{error.message}</Text></Box>} */}
+
+                <Box pad="medium" gap="medium">
+                    <Box direction="row" justify="between" align="center">
+                        <Heading level={2} margin="none">Сроки проекта</Heading>
+                        <Button icon={ <FormClose/> } onClick={onClickClose}/>
+                    </Box>
+                    <Box>
+                        <Calendar
+                            firstDayOfWeek={1}
+                            locale="ru-RU"
+                            range="array"
+                            activeDate={undefined}
+                            dates={dates}
+                            onSelect={handleSelect}
+                        />
+                    </Box>
+                    <Box direction="row" margin={{top: "medium"}}>
+                        <Button type="submit" primary label="Сохранить" onClick={handleSubmit} disabled={loading}/>
+                    </Box>
+                </Box>
+        </Layer>
     )
 }
 

@@ -36,6 +36,63 @@ fragment ProjectScreenHouses on ProjectHouses {
     }
 }
 
+fragment ProjectScreenProject on Project {
+    id
+    title
+    startAt
+    endAt
+    contacts {
+        list(filter: {} limit: 10 offset: 0) {
+            __typename
+            ...on ProjectContactsList {
+                items {
+                    id
+                    fullName
+                    photo
+                    details {
+                        type
+                        value
+                    }
+                }
+            }
+            ...on Error {
+                message
+            }
+        }
+        total {
+            __typename
+            ...on ProjectContactsTotal {
+                total
+            }
+        }
+    }
+    houses {
+        ...ProjectScreenHouses
+    }
+    files {
+        list(filter: {type: [VISUALIZATION]} limit: 10 offset: 0) {
+            __typename
+            ...on ProjectFilesList {
+                items {
+                    id
+                    name
+                    url
+                    type
+                }
+            }
+            ...on Error {
+                message
+            }
+        }
+        total {
+            __typename
+            ...on ProjectFilesTotal {
+                total
+            }
+        }
+    }
+}
+
 
 query project($id: String!) {
     screen {
@@ -43,60 +100,7 @@ query project($id: String!) {
             project {
                 __typename
                 ...on Project {
-                    id
-                    title
-                    startAt
-                    endAt
-                    contacts {
-                        list(filter: {} limit: 10 offset: 0) {
-                            __typename
-                            ...on ProjectContactsList {
-                                items {
-                                    id
-                                    fullName
-                                    photo
-                                    details {
-                                        type
-                                        value
-                                    }
-                                }
-                            }
-                            ...on Error {
-                                message
-                            }
-                        }
-                        total {
-                            __typename
-                            ...on ProjectContactsTotal {
-                                total
-                            }
-                        }
-                    }
-                    houses {
-                        ...ProjectScreenHouses
-                    }
-                    files {
-                        list(filter: {type: [VISUALIZATION]} limit: 10 offset: 0) {
-                            __typename
-                            ...on ProjectFilesList {
-                                items {
-                                    id
-                                    name
-                                    url
-                                    type
-                                }
-                            }
-                            ...on Error {
-                                message
-                            }
-                        }
-                        total {
-                            __typename
-                            ...on ProjectFilesTotal {
-                                total
-                            }
-                        }
-                    }
+                    ...ProjectScreenProject
                 }
                 ...on Error {
                     message

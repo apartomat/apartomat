@@ -1,0 +1,14 @@
+extend type Mutation {
+    changeProjectDates(projectId: String! dates: ChangeProjectDatesInput!): ChangeProjectDatesResult!
+}
+
+input ChangeProjectDatesInput {
+    startAt: Time
+    endAt: Time
+}
+
+union ChangeProjectDatesResult = ProjectDatesChanged | NotFound | Forbidden | ServerError
+
+type ProjectDatesChanged {
+    project: Project!
+}

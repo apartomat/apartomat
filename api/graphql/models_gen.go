@@ -15,6 +15,10 @@ type AddContactResult interface {
 	IsAddContactResult()
 }
 
+type ChangeProjectDatesResult interface {
+	IsChangeProjectDatesResult()
+}
+
 type ConfirmLoginLinkResult interface {
 	IsConfirmLoginLinkResult()
 }
@@ -119,6 +123,11 @@ type AlreadyExists struct {
 func (AlreadyExists) IsUploadProjectFileResult() {}
 func (AlreadyExists) IsError()                   {}
 
+type ChangeProjectDatesInput struct {
+	StartAt *time.Time `json:"startAt"`
+	EndAt   *time.Time `json:"endAt"`
+}
+
 type Contact struct {
 	ID         string            `json:"id"`
 	FullName   string            `json:"fullName"`
@@ -181,6 +190,7 @@ type Forbidden struct {
 }
 
 func (Forbidden) IsAddContactResult()             {}
+func (Forbidden) IsChangeProjectDatesResult()     {}
 func (Forbidden) IsCreateProjectResult()          {}
 func (Forbidden) IsDeleteContactResult()          {}
 func (Forbidden) IsUpdateContactResult()          {}
@@ -279,11 +289,12 @@ type NotFound struct {
 	Message string `json:"message"`
 }
 
-func (NotFound) IsDeleteContactResult() {}
-func (NotFound) IsUpdateContactResult() {}
-func (NotFound) IsProjectResult()       {}
-func (NotFound) IsWorkspaceResult()     {}
-func (NotFound) IsError()               {}
+func (NotFound) IsChangeProjectDatesResult() {}
+func (NotFound) IsDeleteContactResult()      {}
+func (NotFound) IsUpdateContactResult()      {}
+func (NotFound) IsProjectResult()            {}
+func (NotFound) IsWorkspaceResult()          {}
+func (NotFound) IsError()                    {}
 
 type PinSentByEmail struct {
 	Email string `json:"email"`
@@ -337,6 +348,12 @@ type ProjectCreated struct {
 }
 
 func (ProjectCreated) IsCreateProjectResult() {}
+
+type ProjectDatesChanged struct {
+	Project *Project `json:"project"`
+}
+
+func (ProjectDatesChanged) IsChangeProjectDatesResult() {}
 
 type ProjectFile struct {
 	ID       string          `json:"id"`
@@ -422,6 +439,7 @@ type ServerError struct {
 }
 
 func (ServerError) IsAddContactResult()             {}
+func (ServerError) IsChangeProjectDatesResult()     {}
 func (ServerError) IsConfirmLoginLinkResult()       {}
 func (ServerError) IsConfirmLoginPinResult()        {}
 func (ServerError) IsCreateProjectResult()          {}

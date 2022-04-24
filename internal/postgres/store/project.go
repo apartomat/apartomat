@@ -31,6 +31,8 @@ func (s *projectStore) Save(ctx context.Context, project *store.Project) (*store
 
 	if project.ModifiedAt.IsZero() {
 		project.ModifiedAt = project.CreatedAt
+	} else {
+		project.ModifiedAt = time.Now()
 	}
 
 	q, args, err := InsertIntoProjects().
@@ -54,7 +56,17 @@ func (s *projectStore) Save(ctx context.Context, project *store.Project) (*store
 			project.CreatedAt,
 			project.ModifiedAt,
 		).
+		Suffix(`ON CONFLICT (id) DO UPDATE SET
+			name = EXCLUDED.name,
+			status = EXCLUDED.status,
+			workspace_id = EXCLUDED.workspace_id,
+			start_at = EXCLUDED.start_at,
+			end_at = EXCLUDED.end_at,
+			created_at = EXCLUDED.created_at,
+			modified_at = EXCLUDED.modified_at`).
+		Suffix("RETURNING id").
 		ToSql()
+	println(q)
 
 	if err != nil {
 		return nil, err
@@ -122,7 +134,7 @@ type projectInsertBuilder struct {
 
 func InsertIntoProjects() *projectInsertBuilder {
 	return &projectInsertBuilder{
-		sq.Insert(projectTableName).PlaceholderFormat(sq.Dollar).Suffix("RETURNING id"),
+		sq.Insert(projectTableName).PlaceholderFormat(sq.Dollar),
 	}
 }
 

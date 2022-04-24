@@ -29,6 +29,13 @@ export type AlreadyExists = Error & {
   message: Scalars['String'];
 };
 
+export type ChangeProjectDatesInput = {
+  endAt?: Maybe<Scalars['Time']>;
+  startAt?: Maybe<Scalars['Time']>;
+};
+
+export type ChangeProjectDatesResult = Forbidden | NotFound | ProjectDatesChanged | ServerError;
+
 export type ConfirmLoginLinkResult = ExpiredToken | InvalidToken | LoginConfirmed | ServerError;
 
 export type ConfirmLoginPinResult = ExpiredToken | InvalidPin | InvalidToken | LoginConfirmed | ServerError;
@@ -191,6 +198,7 @@ export type MenuResult = MenuItems | ServerError;
 export type Mutation = {
   __typename?: 'Mutation';
   addContact: AddContactResult;
+  changeProjectDates: ChangeProjectDatesResult;
   confirmLoginLink: ConfirmLoginLinkResult;
   confirmLoginPin: ConfirmLoginPinResult;
   createProject: CreateProjectResult;
@@ -204,6 +212,12 @@ export type Mutation = {
 
 export type MutationAddContactArgs = {
   contact: AddContactInput;
+  projectId: Scalars['String'];
+};
+
+
+export type MutationChangeProjectDatesArgs = {
+  dates: ChangeProjectDatesInput;
   projectId: Scalars['String'];
 };
 
@@ -313,6 +327,11 @@ export type ProjectContactsTotalResult = Forbidden | ProjectContactsTotal | Serv
 
 export type ProjectCreated = {
   __typename?: 'ProjectCreated';
+  project: Project;
+};
+
+export type ProjectDatesChanged = {
+  __typename?: 'ProjectDatesChanged';
   project: Project;
 };
 
@@ -605,6 +624,14 @@ export type AddContactMutationVariables = Exact<{
 
 export type AddContactMutation = { __typename?: 'Mutation', addContact: { __typename: 'ContactAdded', contact: { __typename?: 'Contact', id: string, fullName: string, photo: string, details: Array<{ __typename?: 'ContactDetails', type: ContactType, value: string }> } } | { __typename: 'Forbidden', message: string } | { __typename: 'ServerError', message: string } };
 
+export type ChangeProjectDatesMutationVariables = Exact<{
+  projectId: Scalars['String'];
+  dates: ChangeProjectDatesInput;
+}>;
+
+
+export type ChangeProjectDatesMutation = { __typename?: 'Mutation', changeProjectDates: { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'ProjectDatesChanged', project: { __typename?: 'Project', startAt?: any | null | undefined, endAt?: any | null | undefined } } | { __typename: 'ServerError', message: string } };
+
 export type ConfirmLoginLinkMutationVariables = Exact<{
   token: Scalars['String'];
 }>;
@@ -649,6 +676,8 @@ export type ProfileQuery = { __typename?: 'Query', profile: { __typename: 'Forbi
 export type ProjectScreenHouseRoomsFragment = { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null | undefined, design: boolean }> } | { __typename?: 'ServerError', message: string } };
 
 export type ProjectScreenHousesFragment = { __typename?: 'ProjectHouses', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectHousesList', items: Array<{ __typename?: 'House', id: string, city: string, address: string, housingComplex: string, createdAt: any, modifiedAt: any, rooms: { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null | undefined, design: boolean }> } | { __typename?: 'ServerError', message: string } } }> } | { __typename: 'ServerError', message: string } };
+
+export type ProjectScreenProjectFragment = { __typename?: 'Project', id: string, title: string, startAt?: any | null | undefined, endAt?: any | null | undefined, contacts: { __typename?: 'ProjectContacts', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectContactsList', items: Array<{ __typename?: 'Contact', id: string, fullName: string, photo: string, details: Array<{ __typename?: 'ContactDetails', type: ContactType, value: string }> }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectContactsTotal', total: number } | { __typename: 'ServerError' } }, houses: { __typename?: 'ProjectHouses', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectHousesList', items: Array<{ __typename?: 'House', id: string, city: string, address: string, housingComplex: string, createdAt: any, modifiedAt: any, rooms: { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null | undefined, design: boolean }> } | { __typename?: 'ServerError', message: string } } }> } | { __typename: 'ServerError', message: string } }, files: { __typename?: 'ProjectFiles', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectFilesList', items: Array<{ __typename?: 'ProjectFile', id: string, name: string, url: any, type: ProjectFileType }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectFilesTotal', total: number } | { __typename: 'ServerError' } } };
 
 export type ProjectQueryVariables = Exact<{
   id: Scalars['String'];
@@ -726,6 +755,64 @@ export const ProjectScreenHousesFragmentDoc = gql`
   }
 }
     ${ProjectScreenHouseRoomsFragmentDoc}`;
+export const ProjectScreenProjectFragmentDoc = gql`
+    fragment ProjectScreenProject on Project {
+  id
+  title
+  startAt
+  endAt
+  contacts {
+    list(filter: {}, limit: 10, offset: 0) {
+      __typename
+      ... on ProjectContactsList {
+        items {
+          id
+          fullName
+          photo
+          details {
+            type
+            value
+          }
+        }
+      }
+      ... on Error {
+        message
+      }
+    }
+    total {
+      __typename
+      ... on ProjectContactsTotal {
+        total
+      }
+    }
+  }
+  houses {
+    ...ProjectScreenHouses
+  }
+  files {
+    list(filter: {type: [VISUALIZATION]}, limit: 10, offset: 0) {
+      __typename
+      ... on ProjectFilesList {
+        items {
+          id
+          name
+          url
+          type
+        }
+      }
+      ... on Error {
+        message
+      }
+    }
+    total {
+      __typename
+      ... on ProjectFilesTotal {
+        total
+      }
+    }
+  }
+}
+    ${ProjectScreenHousesFragmentDoc}`;
 export const AddContactDocument = gql`
     mutation addContact($projectId: String!, $contact: AddContactInput!) {
   addContact(projectId: $projectId, contact: $contact) {
@@ -777,6 +864,55 @@ export function useAddContactMutation(baseOptions?: Apollo.MutationHookOptions<A
 export type AddContactMutationHookResult = ReturnType<typeof useAddContactMutation>;
 export type AddContactMutationResult = Apollo.MutationResult<AddContactMutation>;
 export type AddContactMutationOptions = Apollo.BaseMutationOptions<AddContactMutation, AddContactMutationVariables>;
+export const ChangeProjectDatesDocument = gql`
+    mutation changeProjectDates($projectId: String!, $dates: ChangeProjectDatesInput!) {
+  changeProjectDates(projectId: $projectId, dates: $dates) {
+    __typename
+    ... on ProjectDatesChanged {
+      project {
+        startAt
+        endAt
+      }
+    }
+    ... on NotFound {
+      message
+    }
+    ... on Forbidden {
+      message
+    }
+    ... on ServerError {
+      message
+    }
+  }
+}
+    `;
+export type ChangeProjectDatesMutationFn = Apollo.MutationFunction<ChangeProjectDatesMutation, ChangeProjectDatesMutationVariables>;
+
+/**
+ * __useChangeProjectDatesMutation__
+ *
+ * To run a mutation, you first call `useChangeProjectDatesMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useChangeProjectDatesMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [changeProjectDatesMutation, { data, loading, error }] = useChangeProjectDatesMutation({
+ *   variables: {
+ *      projectId: // value for 'projectId'
+ *      dates: // value for 'dates'
+ *   },
+ * });
+ */
+export function useChangeProjectDatesMutation(baseOptions?: Apollo.MutationHookOptions<ChangeProjectDatesMutation, ChangeProjectDatesMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ChangeProjectDatesMutation, ChangeProjectDatesMutationVariables>(ChangeProjectDatesDocument, options);
+      }
+export type ChangeProjectDatesMutationHookResult = ReturnType<typeof useChangeProjectDatesMutation>;
+export type ChangeProjectDatesMutationResult = Apollo.MutationResult<ChangeProjectDatesMutation>;
+export type ChangeProjectDatesMutationOptions = Apollo.BaseMutationOptions<ChangeProjectDatesMutation, ChangeProjectDatesMutationVariables>;
 export const ConfirmLoginLinkDocument = gql`
     mutation confirmLoginLink($token: String!) {
   confirmLoginLink(token: $token) {
@@ -1069,60 +1205,7 @@ export const ProjectDocument = gql`
       project {
         __typename
         ... on Project {
-          id
-          title
-          startAt
-          endAt
-          contacts {
-            list(filter: {}, limit: 10, offset: 0) {
-              __typename
-              ... on ProjectContactsList {
-                items {
-                  id
-                  fullName
-                  photo
-                  details {
-                    type
-                    value
-                  }
-                }
-              }
-              ... on Error {
-                message
-              }
-            }
-            total {
-              __typename
-              ... on ProjectContactsTotal {
-                total
-              }
-            }
-          }
-          houses {
-            ...ProjectScreenHouses
-          }
-          files {
-            list(filter: {type: [VISUALIZATION]}, limit: 10, offset: 0) {
-              __typename
-              ... on ProjectFilesList {
-                items {
-                  id
-                  name
-                  url
-                  type
-                }
-              }
-              ... on Error {
-                message
-              }
-            }
-            total {
-              __typename
-              ... on ProjectFilesTotal {
-                total
-              }
-            }
-          }
+          ...ProjectScreenProject
         }
         ... on Error {
           message
@@ -1140,7 +1223,7 @@ export const ProjectDocument = gql`
     }
   }
 }
-    ${ProjectScreenHousesFragmentDoc}`;
+    ${ProjectScreenProjectFragmentDoc}`;
 
 /**
  * __useProjectQuery__

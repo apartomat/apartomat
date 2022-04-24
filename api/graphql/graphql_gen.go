@@ -158,15 +158,16 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		AddContact        func(childComplexity int, projectID string, contact AddContactInput) int
-		ConfirmLoginLink  func(childComplexity int, token string) int
-		ConfirmLoginPin   func(childComplexity int, token string, pin string) int
-		CreateProject     func(childComplexity int, input CreateProjectInput) int
-		DeleteContact     func(childComplexity int, id string) int
-		LoginByEmail      func(childComplexity int, email string, workspaceName string) int
-		Ping              func(childComplexity int) int
-		UpdateContact     func(childComplexity int, contactID string, data UpdateContactInput) int
-		UploadProjectFile func(childComplexity int, input UploadProjectFileInput) int
+		AddContact         func(childComplexity int, projectID string, contact AddContactInput) int
+		ChangeProjectDates func(childComplexity int, projectID string, dates ChangeProjectDatesInput) int
+		ConfirmLoginLink   func(childComplexity int, token string) int
+		ConfirmLoginPin    func(childComplexity int, token string, pin string) int
+		CreateProject      func(childComplexity int, input CreateProjectInput) int
+		DeleteContact      func(childComplexity int, id string) int
+		LoginByEmail       func(childComplexity int, email string, workspaceName string) int
+		Ping               func(childComplexity int) int
+		UpdateContact      func(childComplexity int, contactID string, data UpdateContactInput) int
+		UploadProjectFile  func(childComplexity int, input UploadProjectFileInput) int
 	}
 
 	NotFound struct {
@@ -209,6 +210,10 @@ type ComplexityRoot struct {
 	}
 
 	ProjectCreated struct {
+		Project func(childComplexity int) int
+	}
+
+	ProjectDatesChanged struct {
 		Project func(childComplexity int) int
 	}
 
@@ -362,6 +367,7 @@ type HouseRoomsResolver interface {
 type MutationResolver interface {
 	Ping(ctx context.Context) (string, error)
 	AddContact(ctx context.Context, projectID string, contact AddContactInput) (AddContactResult, error)
+	ChangeProjectDates(ctx context.Context, projectID string, dates ChangeProjectDatesInput) (ChangeProjectDatesResult, error)
 	ConfirmLoginLink(ctx context.Context, token string) (ConfirmLoginLinkResult, error)
 	ConfirmLoginPin(ctx context.Context, token string, pin string) (ConfirmLoginPinResult, error)
 	CreateProject(ctx context.Context, input CreateProjectInput) (CreateProjectResult, error)
@@ -700,6 +706,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.AddContact(childComplexity, args["projectId"].(string), args["contact"].(AddContactInput)), true
 
+	case "Mutation.changeProjectDates":
+		if e.complexity.Mutation.ChangeProjectDates == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_changeProjectDates_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.ChangeProjectDates(childComplexity, args["projectId"].(string), args["dates"].(ChangeProjectDatesInput)), true
+
 	case "Mutation.confirmLoginLink":
 		if e.complexity.Mutation.ConfirmLoginLink == nil {
 			break
@@ -933,6 +951,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ProjectCreated.Project(childComplexity), true
+
+	case "ProjectDatesChanged.project":
+		if e.complexity.ProjectDatesChanged.Project == nil {
+			break
+		}
+
+		return e.complexity.ProjectDatesChanged.Project(childComplexity), true
 
 	case "ProjectFile.id":
 		if e.complexity.ProjectFile.ID == nil {
@@ -1518,6 +1543,20 @@ union AddContactResult = ContactAdded | Forbidden | ServerError
 type ContactAdded {
     contact: Contact!
 }`, BuiltIn: false},
+	{Name: "graphql/schema/mutation_change_project_dates.graphql", Input: `extend type Mutation {
+    changeProjectDates(projectId: String! dates: ChangeProjectDatesInput!): ChangeProjectDatesResult!
+}
+
+input ChangeProjectDatesInput {
+    startAt: Time
+    endAt: Time
+}
+
+union ChangeProjectDatesResult = ProjectDatesChanged | NotFound | Forbidden | ServerError
+
+type ProjectDatesChanged {
+    project: Project!
+}`, BuiltIn: false},
 	{Name: "graphql/schema/mutation_confirm_login.graphql", Input: `extend type Mutation {
     confirmLoginLink(token: String!): ConfirmLoginLinkResult!
 }
@@ -1999,6 +2038,30 @@ func (ec *executionContext) field_Mutation_addContact_args(ctx context.Context, 
 		}
 	}
 	args["contact"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_changeProjectDates_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["projectId"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("projectId"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["projectId"] = arg0
+	var arg1 ChangeProjectDatesInput
+	if tmp, ok := rawArgs["dates"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("dates"))
+		arg1, err = ec.unmarshalNChangeProjectDatesInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐChangeProjectDatesInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["dates"] = arg1
 	return args, nil
 }
 
@@ -3739,6 +3802,48 @@ func (ec *executionContext) _Mutation_addContact(ctx context.Context, field grap
 	return ec.marshalNAddContactResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAddContactResult(ctx, field.Selections, res)
 }
 
+func (ec *executionContext) _Mutation_changeProjectDates(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   true,
+		IsResolver: true,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_changeProjectDates_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	fc.Args = args
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().ChangeProjectDates(rctx, args["projectId"].(string), args["dates"].(ChangeProjectDatesInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(ChangeProjectDatesResult)
+	fc.Result = res
+	return ec.marshalNChangeProjectDatesResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐChangeProjectDatesResult(ctx, field.Selections, res)
+}
+
 func (ec *executionContext) _Mutation_confirmLoginLink(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -4680,6 +4785,41 @@ func (ec *executionContext) _ProjectCreated_project(ctx context.Context, field g
 	}()
 	fc := &graphql.FieldContext{
 		Object:     "ProjectCreated",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Project, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*Project)
+	fc.Result = res
+	return ec.marshalNProject2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProject(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _ProjectDatesChanged_project(ctx context.Context, field graphql.CollectedField, obj *ProjectDatesChanged) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "ProjectDatesChanged",
 		Field:      field,
 		Args:       nil,
 		IsMethod:   false,
@@ -8286,6 +8426,37 @@ func (ec *executionContext) unmarshalInputAddContactInput(ctx context.Context, o
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputChangeProjectDatesInput(ctx context.Context, obj interface{}) (ChangeProjectDatesInput, error) {
+	var it ChangeProjectDatesInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "startAt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("startAt"))
+			it.StartAt, err = ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "endAt":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("endAt"))
+			it.EndAt, err = ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputContactDetailsInput(ctx context.Context, obj interface{}) (ContactDetailsInput, error) {
 	var it ContactDetailsInput
 	asMap := map[string]interface{}{}
@@ -8541,6 +8712,43 @@ func (ec *executionContext) _AddContactResult(ctx context.Context, sel ast.Selec
 			return graphql.Null
 		}
 		return ec._ContactAdded(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
+func (ec *executionContext) _ChangeProjectDatesResult(ctx context.Context, sel ast.SelectionSet, obj ChangeProjectDatesResult) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case ProjectDatesChanged:
+		return ec._ProjectDatesChanged(ctx, sel, &obj)
+	case *ProjectDatesChanged:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ProjectDatesChanged(ctx, sel, obj)
+	case NotFound:
+		return ec._NotFound(ctx, sel, &obj)
+	case *NotFound:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._NotFound(ctx, sel, obj)
 	case Forbidden:
 		return ec._Forbidden(ctx, sel, &obj)
 	case *Forbidden:
@@ -9683,7 +9891,7 @@ func (ec *executionContext) _FilesScreen(ctx context.Context, sel ast.SelectionS
 	return out
 }
 
-var forbiddenImplementors = []string{"Forbidden", "AddContactResult", "CreateProjectResult", "DeleteContactResult", "UpdateContactResult", "UploadProjectFileResult", "UserProfileResult", "ProjectResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectFilesResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "WorkspaceResult", "WorkspaceUsersResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "Error"}
+var forbiddenImplementors = []string{"Forbidden", "AddContactResult", "ChangeProjectDatesResult", "CreateProjectResult", "DeleteContactResult", "UpdateContactResult", "UploadProjectFileResult", "UserProfileResult", "ProjectResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectFilesResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "WorkspaceResult", "WorkspaceUsersResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "Error"}
 
 func (ec *executionContext) _Forbidden(ctx context.Context, sel ast.SelectionSet, obj *Forbidden) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, forbiddenImplementors)
@@ -10215,6 +10423,16 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "changeProjectDates":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_changeProjectDates(ctx, field)
+			}
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, innerFunc)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "confirmLoginLink":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_confirmLoginLink(ctx, field)
@@ -10296,7 +10514,7 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 	return out
 }
 
-var notFoundImplementors = []string{"NotFound", "DeleteContactResult", "UpdateContactResult", "ProjectResult", "WorkspaceResult", "Error"}
+var notFoundImplementors = []string{"NotFound", "ChangeProjectDatesResult", "DeleteContactResult", "UpdateContactResult", "ProjectResult", "WorkspaceResult", "Error"}
 
 func (ec *executionContext) _NotFound(ctx context.Context, sel ast.SelectionSet, obj *NotFound) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, notFoundImplementors)
@@ -10680,6 +10898,37 @@ func (ec *executionContext) _ProjectCreated(ctx context.Context, sel ast.Selecti
 		case "project":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._ProjectCreated_project(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var projectDatesChangedImplementors = []string{"ProjectDatesChanged", "ChangeProjectDatesResult"}
+
+func (ec *executionContext) _ProjectDatesChanged(ctx context.Context, sel ast.SelectionSet, obj *ProjectDatesChanged) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, projectDatesChangedImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ProjectDatesChanged")
+		case "project":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._ProjectDatesChanged_project(ctx, field, obj)
 			}
 
 			out.Values[i] = innerFunc(ctx)
@@ -11415,7 +11664,7 @@ func (ec *executionContext) _ScreenQuery(ctx context.Context, sel ast.SelectionS
 	return out
 }
 
-var serverErrorImplementors = []string{"ServerError", "AddContactResult", "ConfirmLoginLinkResult", "ConfirmLoginPinResult", "CreateProjectResult", "DeleteContactResult", "LoginByEmailResult", "UpdateContactResult", "UploadProjectFileResult", "UserProfileResult", "ProjectResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectFilesResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "MenuResult", "WorkspaceResult", "WorkspaceUsersResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "Error"}
+var serverErrorImplementors = []string{"ServerError", "AddContactResult", "ChangeProjectDatesResult", "ConfirmLoginLinkResult", "ConfirmLoginPinResult", "CreateProjectResult", "DeleteContactResult", "LoginByEmailResult", "UpdateContactResult", "UploadProjectFileResult", "UserProfileResult", "ProjectResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectFilesResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "MenuResult", "WorkspaceResult", "WorkspaceUsersResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "Error"}
 
 func (ec *executionContext) _ServerError(ctx context.Context, sel ast.SelectionSet, obj *ServerError) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, serverErrorImplementors)
@@ -12523,6 +12772,21 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNChangeProjectDatesInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐChangeProjectDatesInput(ctx context.Context, v interface{}) (ChangeProjectDatesInput, error) {
+	res, err := ec.unmarshalInputChangeProjectDatesInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNChangeProjectDatesResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐChangeProjectDatesResult(ctx context.Context, sel ast.SelectionSet, v ChangeProjectDatesResult) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	return ec._ChangeProjectDatesResult(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNConfirmLoginLinkResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐConfirmLoginLinkResult(ctx context.Context, sel ast.SelectionSet, v ConfirmLoginLinkResult) graphql.Marshaler {
