@@ -83,6 +83,8 @@ models:
         resolver: true
       menu:
         resolver: true
+      enums:
+        resolver: true
   FilesScreen:
     fields:
       project:

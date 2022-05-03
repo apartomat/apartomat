@@ -5,6 +5,7 @@ extend type ScreenQuery {
 type ProjectScreen {
     project: ProjectResult!
     menu: MenuResult!
+    enums: ProjectEnums!
 }
 
 union MenuResult = MenuItems | ServerError
@@ -16,4 +17,17 @@ type MenuItems {
 type MenuItem {
     title: String!
     url: String!
+}
+
+type ProjectEnums {
+    status: ProjectStatusEnum!
+}
+
+type ProjectStatusEnum {
+    items: [ProjectStatusEnumItem!]!
+}
+
+type ProjectStatusEnumItem {
+    key: ProjectStatus!
+    value: String!
 }

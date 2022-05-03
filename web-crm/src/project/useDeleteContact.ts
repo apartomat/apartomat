@@ -8,7 +8,7 @@ export function useDeleteContact(): [
     DeleteContactMutationResult
 ] {
     const client = useApolloClient()
-    const [deleteContact, result] = useDeleteContactMutation({ client, errorPolicy: 'all' })
+    const [ deleteContact, result ] = useDeleteContactMutation({ client, errorPolicy: 'all' })
 
     return [
         (id: string) => deleteContact({ variables: { id } }),

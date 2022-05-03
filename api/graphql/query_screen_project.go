@@ -50,12 +50,25 @@ func (r *projectScreenResolver) Project(ctx context.Context, obj *ProjectScreen)
 func (r *projectScreenResolver) Menu(ctx context.Context, obj *ProjectScreen) (MenuResult, error) {
 	if p, ok := obj.Project.(Project); ok {
 		return MenuItems{Items: []*MenuItem{
-			{Title: "Файлы", URL: fmt.Sprintf("/p/%d/files", p.ID)},
-			{Title: "Комплектация", URL: fmt.Sprintf("/p/%d/spec", p.ID)},
+			{Title: "Файлы", URL: fmt.Sprintf("/p/%s/files", p.ID)},
+			{Title: "Комплектация", URL: fmt.Sprintf("/p/%s/spec", p.ID)},
 		}}, nil
 	}
 
 	log.Printf("obj.Project is not a Project")
 
 	return serverError()
+}
+
+func (r *projectScreenResolver) Enums(ctx context.Context, obj *ProjectScreen) (*ProjectEnums, error) {
+	return &ProjectEnums{
+		Status: &ProjectStatusEnum{
+			Items: []*ProjectStatusEnumItem{
+				{ProjectStatusNew, "Новый"},
+				{ProjectStatusInProgress, "В работе"},
+				{ProjectStatusDone, "Завершен"},
+				{ProjectStatusCanceled, "Отменен"},
+			},
+		},
+	}, nil
 }

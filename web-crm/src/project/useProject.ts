@@ -1,16 +1,18 @@
-import { useApolloClient } from "@apollo/client";
-import { useProjectQuery } from "../api/types.d";
+import { useApolloClient } from "@apollo/client"
+import { useProjectQuery } from "../api/types.d"
 
-import type { ProjectFile, ProjectFilesTotal, Contact, ProjectContactsTotal, Forbidden, ServerError, MenuItem } from "../api/types.d";
+import type { ProjectFile, ProjectFilesTotal, Contact, ProjectContactsTotal, Forbidden, ServerError, MenuItem } from "../api/types.d"
 
 export function useProject(id: string) {
     const client = useApolloClient(); 
-    return useProjectQuery({client, errorPolicy: "all", variables: { id }});
+    return useProjectQuery({client, errorPolicy: "all", variables: { id }})
 }
 
-export default useProject;
+export default useProject
 
-export type { ProjectScreenHousesFragment as ProjectHouses, ProjectScreenHouseRoomsFragment as HouseRooms, ProjectScreenProjectFragment as Project } from "../api/types.d";
+export type { ProjectScreenHousesFragment as ProjectHouses, ProjectScreenHouseRoomsFragment as HouseRooms, ProjectScreenProjectFragment as Project } from "../api/types.d"
+
+export { ProjectStatus }  from "../api/types.d"
 
 export type ProjectFiles = (
   { __typename?: 'ProjectFiles' }

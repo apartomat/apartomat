@@ -1,10 +1,10 @@
-import React, { ChangeEvent, Dispatch, SetStateAction, useEffect, useState, useRef } from "react"
+import React, { ChangeEvent, Dispatch, SetStateAction, useEffect, useState, useRef, useMemo } from "react"
 import { useParams } from "react-router-dom"
 
 import { Main, Box, Header, Heading, Text,
     Paragraph, Spinner, SpinnerExtendedProps, Image,
-FileInput, Button, Layer, Form, FormField, Drop, MaskedInput, Card, CardHeader, CardBody, CardFooter, Calendar } from "grommet"
-import { FormClose, StatusGood, Add, Trash, Instagram } from "grommet-icons"
+FileInput, Button, Layer, Form, FormField, Drop, MaskedInput, Card, CardHeader, CardBody, CardFooter, Calendar, Menu, Select } from "grommet"
+import { FormClose, StatusGood, Add, Trash, Instagram, AddCircle, Next, Checkmark } from "grommet-icons"
 
 import AnchorLink from "../common/AnchorLink"
 import UserAvatar from "./UserAvatar"
@@ -12,13 +12,14 @@ import UserAvatar from "./UserAvatar"
 
 import { useAuthContext } from "../common/context/auth/useAuthContext"
 
-import { useProject, Project  as ProjectType, ProjectFiles, ProjectContacts, ProjectHouses, HouseRooms } from "./useProject"
+import { useProject, Project  as ProjectType, ProjectFiles, ProjectContacts, ProjectHouses, HouseRooms, ProjectStatus } from "./useProject"
 import { useUploadProjectFile, ProjectFileType } from "./useUploadProjectFile"
 import { useAddContact, ContactType, Contact } from "./useAddContact"
 import { useUpdateContact } from "./useUpdateContact"
 import { useDeleteContact } from "./useDeleteContact"
 import { useChangeDates } from "./useChangeDates"
-import { KeyboardType } from "grommet/utils"
+import { ProjectEnums, ProjectStatusEnum, ProjectStatusEnumItem } from "../api/types"
+import { useChangeStatus } from "./useChangeStatus"
 
 interface RouteParams {
     id: string
@@ -73,10 +74,13 @@ export function Project () {
 
     const [ project, setProject ] = useState<ProjectType | undefined>(undefined)
 
+    const [ projectEnums, setProjectEnums ] = useState<ProjectEnums | undefined>(undefined)
+
     useEffect(() => {
         switch (data?.screen.projectScreen.project.__typename) {
             case "Project":
                 setProject(data?.screen.projectScreen.project)
+                setProjectEnums(data?.screen.projectScreen.enums)
                 return
         }
     }, [ data ])
@@ -129,7 +133,7 @@ export function Project () {
         //     );
     }
 
-    if (project ) {
+    if (project) {
         return (
             <Main pad={{vertical: "medium", horizontal: "large"}}>
 
@@ -164,9 +168,21 @@ export function Project () {
             </Header>
 
             <Box>
-                <Box margin={{vertical: "medium"}}>
-                    <Heading level={2} margin="none">{project.title}</Heading>
+                <Box direction="row" justify="between" margin={{vertical: "medium"}}>
+                    <Box direction="row" justify="center">
+                        <Heading level={2} margin="none">{project.title}</Heading>
+                        <ChangeProjectStatus
+                            projectId={project.id}
+                            status={project.status}
+                            values={projectEnums?.status}
+                            onProjectStatusChanged={({ status }) => {
+                                setProject({ ...project, status })
+                            }}
+                        />
+                    </Box>
+                    <AddSomething showUploadFiles={setShowUploadFiles}/>
                 </Box>
+
                 <Box direction="row" justify="between" wrap>
                     <Box width={{min: "35%"}}>
                         <Box margin="none">
@@ -175,7 +191,7 @@ export function Project () {
                                 projectId={project.id}
                                 startAt={project.startAt}
                                 endAt={project.endAt}
-                                onChangeDates={({ startAt, endAt }) => {
+                                onProjectDatesChanged={({ startAt, endAt }) => {
                                     notify({ message: "Даты изменены" })
                                     setProject({ ...project, startAt, endAt })
                                 }}
@@ -263,8 +279,6 @@ export function Project () {
                     </Box>
                 </Box> */}
 
-                <AddSomething showUploadFiles={setShowUploadFiles}/>
-
                 {showUploadFiles ?
                     <UploadFiles
                         projectId={project.id}
@@ -281,6 +295,111 @@ export function Project () {
 }
 
 export default Project;
+
+function statusToLabel({ status, items }: { status: ProjectStatus, items?: ProjectStatusEnumItem[] }): string {
+    if (!items) {
+        return ""
+    }
+
+    for (let item of items) {
+        if (item.key === status) {
+            return item.value
+        }
+    }
+
+    return ""
+}
+
+function statusColor(status: ProjectStatus): string {
+    switch(status) {
+        case ProjectStatus.New:
+            return "status-unknown"
+        case ProjectStatus.InProgress:
+            return "status-ok"
+        case ProjectStatus.Done:
+            return "status-warning"
+        case ProjectStatus.Canceled:
+            return "status-error"
+    }
+}
+
+function ChangeProjectStatus({
+    projectId,
+    status,
+    values,
+    onProjectStatusChanged
+}: {
+    projectId: string,
+    status: ProjectStatus,
+    values?: ProjectStatusEnum,
+    onProjectStatusChanged?: ({ status }: { status: ProjectStatus }) => void
+}) {
+    const [ show, setShow ] = useState<Boolean>(false)
+    
+    const [ state, setState ] = useState(status)
+
+    const [ changeStatus, { data, loading, error }] = useChangeStatus()
+
+    const handleItemClick = (projectId: string, status: ProjectStatus) => {
+        changeStatus(projectId, status)
+        setShow(false)
+        setState(status)
+    }
+
+    useEffect(() => {
+        switch (data?.changeProjectStatus.__typename) {
+            case "ProjectStatusChanged":
+                const { status } = data?.changeProjectStatus.project
+                onProjectStatusChanged && onProjectStatusChanged({ status })
+        }
+    }, [ data ])
+
+    useEffect(() => {
+        if (error) {
+            setTimeout(() => setState(status), 300)
+        }
+    })
+
+    const label = useMemo(() => statusToLabel({ status: state, items: values?.items }), [ state, values])
+
+    const color = useMemo(() => statusColor(state), [ state, values ])
+
+    const targetRef = useRef<HTMLDivElement>(null)
+
+    return (
+        <Box justify="center" margin={{ horizontal: "medium"}}>
+            <Box ref={targetRef}>
+                <Button
+                    label={label}
+                    color={color}
+                    size="small"
+                    onClick={() => setShow(true)}
+                    disabled={loading}
+                />
+            </Box>
+
+            {show && targetRef.current && (
+                <Drop
+                    elevation="small"
+                    round="small"
+                    align={{ top: "bottom", left: "left" }}
+                    margin={{ top: "xsmall" }}
+                    target={targetRef.current}
+                    onClickOutside={() => setShow(false)}
+                    onEsc={() => setShow(false)}
+                >
+                    {values?.items.map(item => {
+                        return (
+                            <Button key={item.key} plain hoverIndicator={{color: "light-2"}}>
+                                <Box pad="small" onClick={() => handleItemClick(projectId, item.key)}><Text>{item.value}</Text></Box>
+                            </Button>
+                        )
+                    })}
+                </Drop>
+            )}
+        </Box>
+    )
+}
 
 function ContactLayer(
     { contact, hide }:
@@ -580,12 +699,12 @@ function ProjectDates ({
     projectId,
     startAt,
     endAt,
-    onChangeDates
+    onProjectDatesChanged
 }: {
     projectId: string,
     startAt?: string,
     endAt?: string,
-    onChangeDates?: (dates: { startAt?: string, endAt?: string }) => void,
+    onProjectDatesChanged?: (dates: { startAt?: string, endAt?: string }) => void,
 }) {
     const [ showChangeDates, setShowChangeDates ] = useState(false)
 
@@ -625,8 +744,8 @@ function ProjectDates ({
                     onEsc={() => setShowChangeDates(false) }
                     onClickOutside={() => setShowChangeDates(false) }
                     onClickClose={() => setShowChangeDates(false) }
-                    onChangeDates={({ startAt, endAt }) => {
-                        onChangeDates && onChangeDates({ startAt, endAt })
+                    onProjectDatesChanged={({ startAt, endAt }) => {
+                        onProjectDatesChanged && onProjectDatesChanged({ startAt, endAt })
                         setShowChangeDates(false)
                     }}
                 />
@@ -641,19 +760,18 @@ function AddSomething ({ showUploadFiles }: { showUploadFiles: Dispatch<SetState
     const targetRef = useRef<HTMLDivElement>(null)
 
     return (
-        <Box align="center" margin={{top:"xlarge"}}>
-
+        <Box justify="center">
             <Box ref={targetRef}>
-                <Button primary label="Добавить" onClick={() => setShow(true)} size="large" />
+                <Button label="Добавить" icon={<Next/>} reverse onClick={() => setShow(true)} />
             </Box>
 
             {show && targetRef.current && (
                 <Drop
                     elevation="small"
                     round="small"
-                    align={{bottom: "top"}}
+                    align={{top: "bottom", right: "right"}}
+                    margin={{top: "xsmall"}}
                     target={targetRef.current}
-                    margin={{bottom:"small"}}
                     onClickOutside={() => setShow(false)}
                     onEsc={() => setShow(false)}
                 >
@@ -677,10 +795,6 @@ function AddSomething ({ showUploadFiles }: { showUploadFiles: Dispatch<SetState
                     </Button>
                 </Drop>
             )}
-            
-            <Box margin={{top: "medium"}}>
-                <Text>Добавьте визуализации, планы, исходники, создайте альбом и спецификацию.</Text>
-            </Box>
         </Box>
     )
 }
@@ -1011,11 +1125,19 @@ function ContactForm({ contact, onSet, onSubmit, submit }:
     )
 }
 
-function ChangeDates({ projectId, startAt, endAt, onChangeDates, onEsc, onClickOutside, onClickClose }: {
+function ChangeDates({
+    projectId,
+    startAt,
+    endAt,
+    onProjectDatesChanged,
+    onEsc,
+    onClickOutside,
+    onClickClose
+}: {
     projectId: string,
     startAt?: string,
     endAt?: string,
-    onChangeDates?: (dates: { startAt?: string, endAt?: string }) => void,
+    onProjectDatesChanged?: (dates: { startAt?: string, endAt?: string }) => void,
     onEsc?: () => void,
     onClickOutside?: () => void,
     onClickClose?: () => void
@@ -1027,7 +1149,7 @@ function ChangeDates({ projectId, startAt, endAt, onChangeDates, onEsc, onClickO
     useEffect(() => {
         switch (data?.changeProjectDates.__typename) {
             case "ProjectDatesChanged":
-                onChangeDates && onChangeDates({ startAt: dates && dates[0] && dates[0][0], endAt: dates && dates[0] && dates[0][1] })
+                onProjectDatesChanged && onProjectDatesChanged({ startAt: dates && dates[0] && dates[0][0], endAt: dates && dates[0] && dates[0][1] })
         }
     }, [ data ])
 

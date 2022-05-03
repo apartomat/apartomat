@@ -8,6 +8,34 @@ import (
 	"time"
 )
 
+func (u *Apartomat) ChangeProjectStatus(ctx context.Context, projectID string, status store.ProjectStatus) (*store.Project, error) {
+	projects, err := u.Projects.List(ctx, store.ProjectStoreQuery{ID: expr.StrEq(projectID), Limit: 1, Offset: 0})
+	if err != nil {
+		return nil, err
+	}
+
+	if len(projects) == 0 {
+		return nil, errors.Wrapf(ErrNotFound, "project %s", projectID)
+	}
+
+	var (
+		project = projects[0]
+	)
+
+	if ok, err := u.CanUpdateProject(ctx, UserFromCtx(ctx), project); err != nil {
+		return nil, err
+	} else if !ok {
+		return nil, errors.Wrapf(ErrForbidden, "can't update project (id=%s)", project.ID)
+	}
+
+	if project.Status != status {
+		project.Status = status
+		return u.Projects.Save(ctx, project)
+	}
+
+	return project, nil
+}
+
 func (u *Apartomat) ChangeProjectDates(ctx context.Context, projectID string, startAt, endAt *time.Time) (*store.Project, error) {
 	projects, err := u.Projects.List(ctx, store.ProjectStoreQuery{ID: expr.StrEq(projectID), Limit: 1, Offset: 0})
 	if err != nil {

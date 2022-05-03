@@ -36,6 +36,8 @@ export type ChangeProjectDatesInput = {
 
 export type ChangeProjectDatesResult = Forbidden | NotFound | ProjectDatesChanged | ServerError;
 
+export type ChangeProjectStatusResult = Forbidden | NotFound | ProjectStatusChanged | ServerError;
+
 export type ConfirmLoginLinkResult = ExpiredToken | InvalidToken | LoginConfirmed | ServerError;
 
 export type ConfirmLoginPinResult = ExpiredToken | InvalidPin | InvalidToken | LoginConfirmed | ServerError;
@@ -199,6 +201,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   addContact: AddContactResult;
   changeProjectDates: ChangeProjectDatesResult;
+  changeProjectStatus: ChangeProjectStatusResult;
   confirmLoginLink: ConfirmLoginLinkResult;
   confirmLoginPin: ConfirmLoginPinResult;
   createProject: CreateProjectResult;
@@ -219,6 +222,12 @@ export type MutationAddContactArgs = {
 export type MutationChangeProjectDatesArgs = {
   dates: ChangeProjectDatesInput;
   projectId: Scalars['String'];
+};
+
+
+export type MutationChangeProjectStatusArgs = {
+  projectId: Scalars['String'];
+  status: ProjectStatus;
 };
 
 
@@ -335,6 +344,11 @@ export type ProjectDatesChanged = {
   project: Project;
 };
 
+export type ProjectEnums = {
+  __typename?: 'ProjectEnums';
+  status: ProjectStatusEnum;
+};
+
 export type ProjectFile = {
   __typename?: 'ProjectFile';
   id: Scalars['String'];
@@ -427,6 +441,7 @@ export type ProjectResult = Forbidden | NotFound | Project | ServerError;
 
 export type ProjectScreen = {
   __typename?: 'ProjectScreen';
+  enums: ProjectEnums;
   menu: MenuResult;
   project: ProjectResult;
 };
@@ -437,6 +452,22 @@ export enum ProjectStatus {
   InProgress = 'IN_PROGRESS',
   New = 'NEW'
 }
+
+export type ProjectStatusChanged = {
+  __typename?: 'ProjectStatusChanged';
+  project: Project;
+};
+
+export type ProjectStatusEnum = {
+  __typename?: 'ProjectStatusEnum';
+  items: Array<ProjectStatusEnumItem>;
+};
+
+export type ProjectStatusEnumItem = {
+  __typename?: 'ProjectStatusEnumItem';
+  key: ProjectStatus;
+  value: Scalars['String'];
+};
 
 export type Query = {
   __typename?: 'Query';
@@ -639,6 +670,14 @@ export type ChangeProjectDatesMutationVariables = Exact<{
 
 export type ChangeProjectDatesMutation = { __typename?: 'Mutation', changeProjectDates: { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'ProjectDatesChanged', project: { __typename?: 'Project', startAt?: any | null | undefined, endAt?: any | null | undefined } } | { __typename: 'ServerError', message: string } };
 
+export type ChangeProjectStatusMutationVariables = Exact<{
+  projectId: Scalars['String'];
+  status: ProjectStatus;
+}>;
+
+
+export type ChangeProjectStatusMutation = { __typename?: 'Mutation', changeProjectStatus: { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'ProjectStatusChanged', project: { __typename?: 'Project', status: ProjectStatus } } | { __typename: 'ServerError', message: string } };
+
 export type ConfirmLoginLinkMutationVariables = Exact<{
   token: Scalars['String'];
 }>;
@@ -684,14 +723,14 @@ export type ProjectScreenHouseRoomsFragment = { __typename?: 'HouseRooms', list:
 
 export type ProjectScreenHousesFragment = { __typename?: 'ProjectHouses', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectHousesList', items: Array<{ __typename?: 'House', id: string, city: string, address: string, housingComplex: string, createdAt: any, modifiedAt: any, rooms: { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null | undefined, design: boolean }> } | { __typename?: 'ServerError', message: string } } }> } | { __typename: 'ServerError', message: string } };
 
-export type ProjectScreenProjectFragment = { __typename?: 'Project', id: string, title: string, startAt?: any | null | undefined, endAt?: any | null | undefined, contacts: { __typename?: 'ProjectContacts', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectContactsList', items: Array<{ __typename?: 'Contact', id: string, fullName: string, photo: string, details: Array<{ __typename?: 'ContactDetails', type: ContactType, value: string }> }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectContactsTotal', total: number } | { __typename: 'ServerError' } }, houses: { __typename?: 'ProjectHouses', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectHousesList', items: Array<{ __typename?: 'House', id: string, city: string, address: string, housingComplex: string, createdAt: any, modifiedAt: any, rooms: { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null | undefined, design: boolean }> } | { __typename?: 'ServerError', message: string } } }> } | { __typename: 'ServerError', message: string } }, files: { __typename?: 'ProjectFiles', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectFilesList', items: Array<{ __typename?: 'ProjectFile', id: string, name: string, url: any, type: ProjectFileType }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectFilesTotal', total: number } | { __typename: 'ServerError' } } };
+export type ProjectScreenProjectFragment = { __typename?: 'Project', id: string, title: string, startAt?: any | null | undefined, endAt?: any | null | undefined, status: ProjectStatus, contacts: { __typename?: 'ProjectContacts', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectContactsList', items: Array<{ __typename?: 'Contact', id: string, fullName: string, photo: string, details: Array<{ __typename?: 'ContactDetails', type: ContactType, value: string }> }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectContactsTotal', total: number } | { __typename: 'ServerError' } }, houses: { __typename?: 'ProjectHouses', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectHousesList', items: Array<{ __typename?: 'House', id: string, city: string, address: string, housingComplex: string, createdAt: any, modifiedAt: any, rooms: { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null | undefined, design: boolean }> } | { __typename?: 'ServerError', message: string } } }> } | { __typename: 'ServerError', message: string } }, files: { __typename?: 'ProjectFiles', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectFilesList', items: Array<{ __typename?: 'ProjectFile', id: string, name: string, url: any, type: ProjectFileType }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectFilesTotal', total: number } | { __typename: 'ServerError' } } };
 
 export type ProjectQueryVariables = Exact<{
   id: Scalars['String'];
 }>;
 
 
-export type ProjectQuery = { __typename?: 'Query', screen: { __typename?: 'ScreenQuery', projectScreen: { __typename?: 'ProjectScreen', project: { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'Project', id: string, title: string, startAt?: any | null | undefined, endAt?: any | null | undefined, contacts: { __typename?: 'ProjectContacts', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectContactsList', items: Array<{ __typename?: 'Contact', id: string, fullName: string, photo: string, details: Array<{ __typename?: 'ContactDetails', type: ContactType, value: string }> }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectContactsTotal', total: number } | { __typename: 'ServerError' } }, houses: { __typename?: 'ProjectHouses', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectHousesList', items: Array<{ __typename?: 'House', id: string, city: string, address: string, housingComplex: string, createdAt: any, modifiedAt: any, rooms: { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null | undefined, design: boolean }> } | { __typename?: 'ServerError', message: string } } }> } | { __typename: 'ServerError', message: string } }, files: { __typename?: 'ProjectFiles', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectFilesList', items: Array<{ __typename?: 'ProjectFile', id: string, name: string, url: any, type: ProjectFileType }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectFilesTotal', total: number } | { __typename: 'ServerError' } } } | { __typename: 'ServerError', message: string }, menu: { __typename: 'MenuItems', items: Array<{ __typename?: 'MenuItem', title: string, url: string }> } | { __typename: 'ServerError' } } } };
+export type ProjectQuery = { __typename?: 'Query', screen: { __typename?: 'ScreenQuery', projectScreen: { __typename?: 'ProjectScreen', project: { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'Project', id: string, title: string, startAt?: any | null | undefined, endAt?: any | null | undefined, status: ProjectStatus, contacts: { __typename?: 'ProjectContacts', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectContactsList', items: Array<{ __typename?: 'Contact', id: string, fullName: string, photo: string, details: Array<{ __typename?: 'ContactDetails', type: ContactType, value: string }> }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectContactsTotal', total: number } | { __typename: 'ServerError' } }, houses: { __typename?: 'ProjectHouses', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectHousesList', items: Array<{ __typename?: 'House', id: string, city: string, address: string, housingComplex: string, createdAt: any, modifiedAt: any, rooms: { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null | undefined, design: boolean }> } | { __typename?: 'ServerError', message: string } } }> } | { __typename: 'ServerError', message: string } }, files: { __typename?: 'ProjectFiles', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectFilesList', items: Array<{ __typename?: 'ProjectFile', id: string, name: string, url: any, type: ProjectFileType }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectFilesTotal', total: number } | { __typename: 'ServerError' } } } | { __typename: 'ServerError', message: string }, menu: { __typename: 'MenuItems', items: Array<{ __typename?: 'MenuItem', title: string, url: string }> } | { __typename: 'ServerError' }, enums: { __typename?: 'ProjectEnums', status: { __typename?: 'ProjectStatusEnum', items: Array<{ __typename?: 'ProjectStatusEnumItem', key: ProjectStatus, value: string }> } } } } };
 
 export type SpecScreenQueryVariables = Exact<{
   projectId: Scalars['String'];
@@ -769,6 +808,7 @@ export const ProjectScreenProjectFragmentDoc = gql`
   title
   startAt
   endAt
+  status
   contacts {
     list(filter: {}, limit: 10, offset: 0) {
       __typename
@@ -921,6 +961,54 @@ export function useChangeProjectDatesMutation(baseOptions?: Apollo.MutationHookO
 export type ChangeProjectDatesMutationHookResult = ReturnType<typeof useChangeProjectDatesMutation>;
 export type ChangeProjectDatesMutationResult = Apollo.MutationResult<ChangeProjectDatesMutation>;
 export type ChangeProjectDatesMutationOptions = Apollo.BaseMutationOptions<ChangeProjectDatesMutation, ChangeProjectDatesMutationVariables>;
+export const ChangeProjectStatusDocument = gql`
+    mutation changeProjectStatus($projectId: String!, $status: ProjectStatus!) {
+  changeProjectStatus(projectId: $projectId, status: $status) {
+    __typename
+    ... on ProjectStatusChanged {
+      project {
+        status
+      }
+    }
+    ... on NotFound {
+      message
+    }
+    ... on Forbidden {
+      message
+    }
+    ... on ServerError {
+      message
+    }
+  }
+}
+    `;
+export type ChangeProjectStatusMutationFn = Apollo.MutationFunction<ChangeProjectStatusMutation, ChangeProjectStatusMutationVariables>;
+
+/**
+ * __useChangeProjectStatusMutation__
+ *
+ * To run a mutation, you first call `useChangeProjectStatusMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useChangeProjectStatusMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [changeProjectStatusMutation, { data, loading, error }] = useChangeProjectStatusMutation({
+ *   variables: {
+ *      projectId: // value for 'projectId'
+ *      status: // value for 'status'
+ *   },
+ * });
+ */
+export function useChangeProjectStatusMutation(baseOptions?: Apollo.MutationHookOptions<ChangeProjectStatusMutation, ChangeProjectStatusMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ChangeProjectStatusMutation, ChangeProjectStatusMutationVariables>(ChangeProjectStatusDocument, options);
+      }
+export type ChangeProjectStatusMutationHookResult = ReturnType<typeof useChangeProjectStatusMutation>;
+export type ChangeProjectStatusMutationResult = Apollo.MutationResult<ChangeProjectStatusMutation>;
+export type ChangeProjectStatusMutationOptions = Apollo.BaseMutationOptions<ChangeProjectStatusMutation, ChangeProjectStatusMutationVariables>;
 export const ConfirmLoginLinkDocument = gql`
     mutation confirmLoginLink($token: String!) {
   confirmLoginLink(token: $token) {
@@ -1225,6 +1313,14 @@ export const ProjectDocument = gql`
           items {
             title
             url
+          }
+        }
+      }
+      enums {
+        status {
+          items {
+            key
+            value
           }
         }
       }

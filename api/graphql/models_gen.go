@@ -19,6 +19,10 @@ type ChangeProjectDatesResult interface {
 	IsChangeProjectDatesResult()
 }
 
+type ChangeProjectStatusResult interface {
+	IsChangeProjectStatusResult()
+}
+
 type ConfirmLoginLinkResult interface {
 	IsConfirmLoginLinkResult()
 }
@@ -189,6 +193,7 @@ type Forbidden struct {
 	Message string `json:"message"`
 }
 
+func (Forbidden) IsChangeProjectStatusResult()    {}
 func (Forbidden) IsAddContactResult()             {}
 func (Forbidden) IsChangeProjectDatesResult()     {}
 func (Forbidden) IsCreateProjectResult()          {}
@@ -289,12 +294,13 @@ type NotFound struct {
 	Message string `json:"message"`
 }
 
-func (NotFound) IsChangeProjectDatesResult() {}
-func (NotFound) IsDeleteContactResult()      {}
-func (NotFound) IsUpdateContactResult()      {}
-func (NotFound) IsProjectResult()            {}
-func (NotFound) IsWorkspaceResult()          {}
-func (NotFound) IsError()                    {}
+func (NotFound) IsChangeProjectStatusResult() {}
+func (NotFound) IsChangeProjectDatesResult()  {}
+func (NotFound) IsDeleteContactResult()       {}
+func (NotFound) IsUpdateContactResult()       {}
+func (NotFound) IsProjectResult()             {}
+func (NotFound) IsWorkspaceResult()           {}
+func (NotFound) IsError()                     {}
 
 type PinSentByEmail struct {
 	Email string `json:"email"`
@@ -354,6 +360,10 @@ type ProjectDatesChanged struct {
 }
 
 func (ProjectDatesChanged) IsChangeProjectDatesResult() {}
+
+type ProjectEnums struct {
+	Status *ProjectStatusEnum `json:"status"`
+}
 
 type ProjectFile struct {
 	ID       string          `json:"id"`
@@ -416,6 +426,22 @@ func (ProjectHousesTotal) IsProjectHousesTotalResult() {}
 type ProjectScreen struct {
 	Project ProjectResult `json:"project"`
 	Menu    MenuResult    `json:"menu"`
+	Enums   *ProjectEnums `json:"enums"`
+}
+
+type ProjectStatusChanged struct {
+	Project *Project `json:"project"`
+}
+
+func (ProjectStatusChanged) IsChangeProjectStatusResult() {}
+
+type ProjectStatusEnum struct {
+	Items []*ProjectStatusEnumItem `json:"items"`
+}
+
+type ProjectStatusEnumItem struct {
+	Key   ProjectStatus `json:"key"`
+	Value string        `json:"value"`
 }
 
 type Room struct {
@@ -438,6 +464,7 @@ type ServerError struct {
 	Message string `json:"message"`
 }
 
+func (ServerError) IsChangeProjectStatusResult()    {}
 func (ServerError) IsAddContactResult()             {}
 func (ServerError) IsChangeProjectDatesResult()     {}
 func (ServerError) IsConfirmLoginLinkResult()       {}

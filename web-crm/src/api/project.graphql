@@ -41,6 +41,7 @@ fragment ProjectScreenProject on Project {
     title
     startAt
     endAt
+    status
     contacts {
         list(filter: {} limit: 10 offset: 0) {
             __typename
@@ -115,6 +116,15 @@ query project($id: String!) {
                         url
                     }
                 }
+            }
+            enums {
+                status {
+                    items {
+                        key
+                        value
+                    }
+                }
+
             }
         }
     }

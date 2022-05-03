@@ -1,0 +1,9 @@
+extend type Mutation {
+    changeProjectStatus(projectId: String! status: ProjectStatus!): ChangeProjectStatusResult!
+}
+
+union ChangeProjectStatusResult = ProjectStatusChanged | NotFound | Forbidden | ServerError
+
+type ProjectStatusChanged {
+    project: Project!
+}
