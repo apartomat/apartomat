@@ -3,8 +3,8 @@ import { useParams } from "react-router-dom"
 
 import { Main, Box, Header, Heading, Text,
     Paragraph, Spinner, SpinnerExtendedProps, Image,
-FileInput, Button, Layer, Form, FormField, Drop, MaskedInput, Card, CardHeader, CardBody, CardFooter, Calendar, Menu, Select } from "grommet"
-import { FormClose, StatusGood, Add, Trash, Instagram, AddCircle, Next, Checkmark } from "grommet-icons"
+FileInput, Button, Layer, Form, FormField, Drop, MaskedInput, Card, CardHeader, CardBody, CardFooter, Calendar } from "grommet"
+import { FormClose, StatusGood, Add, Trash, Instagram, Next } from "grommet-icons"
 
 import AnchorLink from "../common/AnchorLink"
 import UserAvatar from "./UserAvatar"
@@ -352,7 +352,7 @@ function ChangeProjectStatus({
                 const { status } = data?.changeProjectStatus.project
                 onProjectStatusChanged && onProjectStatusChanged({ status })
         }
-    }, [ data ])
+    }, [ data, onProjectStatusChanged ])
 
     useEffect(() => {
         if (error) {
@@ -360,9 +360,9 @@ function ChangeProjectStatus({
         }
     })
 
-    const label = useMemo(() => statusToLabel({ status: state, items: values?.items }), [ state, values])
+    const label = useMemo(() => statusToLabel({ status: state, items: values?.items }), [ state, values ])
 
-    const color = useMemo(() => statusColor(state), [ state, values ])
+    const color = useMemo(() => statusColor(state), [ state ])
 
     const targetRef = useRef<HTMLDivElement>(null)
 
@@ -401,41 +401,6 @@ function ChangeProjectStatus({
     )
 }
 
-function ContactLayer(
-    { contact, hide }:
-    { contact: Contact, hide: () => void }
-) {
-    return (
-        <Layer onClickOutside={hide} onEsc={hide} full>
-            <Box pad="medium">
-                <Heading level={3}>{contact.fullName}</Heading>
-            </Box>
-            <Box pad="medium">
-                {contact.details.filter(c => ![ContactType.Instagram].includes(c.type)).map(c => {
-                    return <Box pad={{vertical: "small"}}>{c.value}</Box>
-                })}
-                {contact.details.filter(c => [ContactType.Instagram].includes(c.type)).length > 0
-                    ? <Box pad={{vertical: "small"}} direction="row">
-                    {contact.details.filter(c => [ContactType.Instagram].includes(c.type)).map(c => {
-                        switch (c.type) {
-                            case ContactType.Instagram:
-                                return <Button icon={<Instagram color="primary"/>} plain href={c.value}/>
-                        }
-
-                        return null
-                    })}
-                    </Box>
-                    : null
-                }
-            </Box>
-            <Box direction="row" align="stretch">
-                <Button icon={<Trash/>}/>
-                <Button label="Редактировать"/>
-            </Box>
-        </Layer>
-    )
-}
-
 function ContactCard(
     { contact, onDelete, onClickUpdate }:
     { contact: Contact , onDelete: (contact: Contact) => void, onClickUpdate: (contact: Contact) => void }
@@ -446,7 +411,7 @@ function ContactCard(
 
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
-    const [deleteContact, { data, loading, error } ] = useDeleteContact()
+    const [deleteContact, { data } ] = useDeleteContact()
 
     const handleDelete = () => {
         setShowDeleteConfirm(true)
@@ -467,9 +432,7 @@ function ContactCard(
                 setShowCard(false)
                 onDelete(contact)
         }
-    }, [data])
-
-    // const [ viewContact, setViewContact ] = useState<Contact | undefined>()
+    }, [ data, contact ]) //todo
 
     return (
         <Box>
@@ -482,11 +445,6 @@ function ContactCard(
                 style={{whiteSpace: "nowrap"}}
                 onClick={() => setShowCard(!showCard) }
             />
-            {/* {viewContact ? 
-                <ContactLayer
-                    contact={viewContact}
-                    hide={() => { setViewContact(undefined) }}
-                /> : null} */}
             {ref.current && showCard &&
                 <Drop
                     target={ref.current}
@@ -566,6 +524,7 @@ function Contacts({ contacts, projectId, notify }: { contacts: ProjectContacts, 
                             {[...list.map((contact) => {
                                 return (
                                     <ContactCard
+                                        key={contact.id}
                                         contact={contact}
                                         onDelete={(contact: Contact) => {
                                             setJustDeleted([...justDeleted, contact.id])
@@ -576,7 +535,7 @@ function Contacts({ contacts, projectId, notify }: { contacts: ProjectContacts, 
                                         }}
                                     />
                                 )
-                            }), <Button icon={<Add/>} label="Добавить" onClick={() => setShowAddContact(true) }/>]}
+                            }), <Button key="" icon={<Add/>} label="Добавить" onClick={() => setShowAddContact(true) }/>]}
                         </Box>
                     </Box>
 
@@ -685,14 +644,6 @@ function firstHouse(houses: ProjectHouses) {
         default:
             return undefined
     }
-}
-
-function LocaleDate ({ children }: { children: string }) {
-    const date = new Date(children)
-
-    return (
-        <>{date.toLocaleDateString('ru-RU')}</>
-    )
 }
 
 function ProjectDates ({
@@ -997,10 +948,11 @@ function AddContact(
     useEffect(() => {
         switch (data?.addContact.__typename) {
             case "ContactAdded":
+                const { addContact: { contact }} = data
+                onAdd(contact)
                 setShow(false)
-                onAdd(data.addContact.contact)
         }
-    }, [ data, setShow, onAdd ])
+    }, [ data, setShow, onAdd ]) // todo
 
     return (
         <Layer
@@ -1037,13 +989,17 @@ function AddContact(
 
 type ContactFormData = { fullName: string, phone: string, email: string, instagram: string }
 
-function ContactForm({ contact, onSet, onSubmit, submit }:
-    {
-        contact: ContactFormData,
-        onSet: React.Dispatch<ContactFormData>,
-        onSubmit: (event: React.FormEvent) => void,
-        submit: JSX.Element
-    }) {
+function ContactForm({
+    contact,
+    onSet,
+    onSubmit,
+    submit
+}: {
+    contact: ContactFormData,
+    onSet: React.Dispatch<ContactFormData>,
+    onSubmit: (event: React.FormEvent) => void,
+    submit: JSX.Element
+}) {
     return (
         <Form
             validate="submit"
@@ -1144,14 +1100,14 @@ function ChangeDates({
 }) {
     const [ dates, setDates ] = useState(startAt && endAt ? [[startAt, endAt]] : undefined)
 
-    const [ change, { loading, data, error } ] = useChangeDates()
+    const [ change, { loading, data } ] = useChangeDates()
 
     useEffect(() => {
         switch (data?.changeProjectDates.__typename) {
             case "ProjectDatesChanged":
                 onProjectDatesChanged && onProjectDatesChanged({ startAt: dates && dates[0] && dates[0][0], endAt: dates && dates[0] && dates[0][1] })
         }
-    }, [ data ])
+    }, [ data, dates, onProjectDatesChanged ])
 
 
     const handleSelect = (value: any) => {
@@ -1168,27 +1124,25 @@ function ChangeDates({
             onClickOutside={onClickOutside}
             onEsc={onEsc}
         >
-                {/* {error && <Box><Text>{error.message}</Text></Box>} */}
-
-                <Box pad="medium" gap="medium">
-                    <Box direction="row" justify="between" align="center">
-                        <Heading level={2} margin="none">Сроки проекта</Heading>
-                        <Button icon={ <FormClose/> } onClick={onClickClose}/>
-                    </Box>
-                    <Box>
-                        <Calendar
-                            firstDayOfWeek={1}
-                            locale="ru-RU"
-                            range="array"
-                            activeDate={undefined}
-                            dates={dates}
-                            onSelect={handleSelect}
-                        />
-                    </Box>
-                    <Box direction="row" margin={{top: "medium"}}>
-                        <Button type="submit" primary label="Сохранить" onClick={handleSubmit} disabled={loading}/>
-                    </Box>
+            <Box pad="medium" gap="medium">
+                <Box direction="row" justify="between" align="center">
+                    <Heading level={2} margin="none">Сроки проекта</Heading>
+                    <Button icon={ <FormClose/> } onClick={onClickClose}/>
                 </Box>
+                <Box>
+                    <Calendar
+                        firstDayOfWeek={1}
+                        locale="ru-RU"
+                        range="array"
+                        activeDate={undefined}
+                        dates={dates}
+                        onSelect={handleSelect}
+                    />
+                </Box>
+                <Box direction="row" margin={{top: "medium"}}>
+                    <Button type="submit" primary label="Сохранить" onClick={handleSubmit} disabled={loading}/>
+                </Box>
+            </Box>
         </Layer>
     )
 }
@@ -1203,9 +1157,9 @@ function UpdateContact(
 
     const [ value, setValue ] = useState({
         fullName: contact.fullName,
-        phone: contact.details.filter(val => val.type == ContactType.Phone)[0]?.value,
-        email: contact.details.filter(val => val.type == ContactType.Email)[0]?.value,
-        instagram: contact.details.filter(val => val.type == ContactType.Instagram)[0]?.value
+        phone: contact.details.filter(val => val.type === ContactType.Phone)[0]?.value,
+        email: contact.details.filter(val => val.type === ContactType.Email)[0]?.value,
+        instagram: contact.details.filter(val => val.type === ContactType.Instagram)[0]?.value
     } as ContactFormData)
 
     const [ update, { data, loading, error } ] = useUpdateContact()
@@ -1238,7 +1192,7 @@ function UpdateContact(
                 hide()
                 onUpdate(data.updateContact.contact)
         }
-    }, [ data ])
+    }, [ data, hide, onUpdate ])
 
     return (
         <Layer

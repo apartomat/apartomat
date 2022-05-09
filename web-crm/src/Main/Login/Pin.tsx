@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react"
-import { useLocation, useHistory } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 
 import { useConfirmLoginPin, ConfirmLoginPinMutation } from "./useConfirmLoginPin"
 
 import useAuthContext from "../../common/context/auth/useAuthContext";
 import useToken from "../../common/context/auth/useToken"
 
-import { Main, Heading, Box, Form, FormField, TextInput, Button, MaskedInput, Text } from "grommet"
+import { Main, Heading, Box, Form, FormField, Button, MaskedInput, Text } from "grommet"
 
 function Pin({ email, token, redirectTo = "/" }: { email: string, token: string, redirectTo?: string}) {
-    const [ confirmLogin, { data, loading, error } ] = useConfirmLoginPin()
+    const [ confirmLogin, { data, loading } ] = useConfirmLoginPin()
     const { check } = useAuthContext()
     const [, saveToken ] = useToken()
     const history = useHistory()
@@ -17,12 +17,12 @@ function Pin({ email, token, redirectTo = "/" }: { email: string, token: string,
     const [ pin, setPin ] = useState("")
 
     useEffect(() => {
-        if (data?.confirmLoginPin .__typename === "LoginConfirmed") {
+        if (data?.confirmLoginPin.__typename === "LoginConfirmed") {
             saveToken(data?.confirmLoginPin?.token)
             check()
             history.push(redirectTo)
         }
-    }, [data])
+    }, [ data ])
 
     function handleInputPin({ target: { value }}: React.ChangeEvent<HTMLInputElement>) {
         setPin(value);

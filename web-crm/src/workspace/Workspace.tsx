@@ -6,7 +6,7 @@ import { useWorkspace, WorkspaceUsersResult, WorkspaceProjectsListResult, Worksp
 import { useCreateProject, State as CreateProjectState } from "./useCreateProject"
 
 import { Main, Box, Header, Heading, Text,
-    Avatar, List, Button, Tip, Paragraph, Spinner, SpinnerExtendedProps,
+    List, Button, Paragraph, Spinner, SpinnerExtendedProps,
     Layer, Form, FormField, TextInput, DateInput, Accordion, AccordionPanel } from "grommet"
 import { FormClose } from "grommet-icons"
 import AnchorLink from "../common/AnchorLink"
@@ -122,9 +122,9 @@ function WorkspaceUsers({ users }: {users: WorkspaceUsersResult}) {
         case "WorkspaceUsers":
             return (
                 <Box direction="row">
-                    {users.items.map(user => {
+                    {/* {users.items.map(user => {
                         return (
-                            <Tip content={user.profile.email}>
+                            <Tip content={user.profile.email} key={user.id}>
                                 <Avatar
                                     key={user.id}
                                     src={user.profile.gravatar?.url}
@@ -134,7 +134,7 @@ function WorkspaceUsers({ users }: {users: WorkspaceUsersResult}) {
                                 >{user.profile.abbr}</Avatar>
                             </Tip>
                         )
-                    })}
+                    })} */}
                 </Box>
             )
         default:
@@ -221,7 +221,7 @@ function CreateProject({ workspaceId, setShow }: { workspaceId: string, setShow:
         if (state.state === CreateProjectState.DONE) {
             setShow(false)
         }
-    }, [ state.state ])
+    }, [ state.state, setShow ])
 
     const handleChangeDates = ({ value }: { value: string | string[] }) => {
         if (Array.isArray(value)) {
