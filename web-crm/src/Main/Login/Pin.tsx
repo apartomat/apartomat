@@ -22,7 +22,7 @@ function Pin({ email, token, redirectTo = "/" }: { email: string, token: string,
             check()
             history.push(redirectTo)
         }
-    }, [ data ])
+    }, [ data, saveToken, check, redirectTo, history ])
 
     function handleInputPin({ target: { value }}: React.ChangeEvent<HTMLInputElement>) {
         setPin(value);

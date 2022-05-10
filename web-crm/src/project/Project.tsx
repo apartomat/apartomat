@@ -1,4 +1,4 @@
-import React, { ChangeEvent, Dispatch, SetStateAction, useEffect, useState, useRef, useMemo } from "react"
+import React, { ChangeEvent, Dispatch, SetStateAction, useEffect, useState, useRef } from "react"
 import { useParams } from "react-router-dom"
 
 import { Main, Box, Header, Heading, Text,
@@ -12,14 +12,16 @@ import UserAvatar from "./UserAvatar"
 
 import { useAuthContext } from "../common/context/auth/useAuthContext"
 
-import { useProject, Project  as ProjectType, ProjectFiles, ProjectContacts, ProjectHouses, HouseRooms, ProjectStatus } from "./useProject"
+import { useProject, Project  as ProjectType, ProjectFiles, ProjectContacts, ProjectHouses, HouseRooms } from "./useProject"
 import { useUploadProjectFile, ProjectFileType } from "./useUploadProjectFile"
 import { useAddContact, ContactType, Contact } from "./useAddContact"
 import { useUpdateContact } from "./useUpdateContact"
 import { useDeleteContact } from "./useDeleteContact"
 import { useChangeDates } from "./useChangeDates"
-import { ProjectEnums, ProjectStatusEnum, ProjectStatusEnumItem } from "../api/types"
-import { useChangeStatus } from "./useChangeStatus"
+import { ProjectEnums } from "../api/types"
+
+import { ChangeStatus } from "./ChangeStatus"
+
 
 interface RouteParams {
     id: string
@@ -171,7 +173,7 @@ export function Project () {
                 <Box direction="row" justify="between" margin={{vertical: "medium"}}>
                     <Box direction="row" justify="center">
                         <Heading level={2} margin="none">{project.title}</Heading>
-                        <ChangeProjectStatus
+                        <ChangeStatus
                             projectId={project.id}
                             status={project.status}
                             values={projectEnums?.status}
@@ -296,110 +298,7 @@ export function Project () {
 
 export default Project;
 
-function statusToLabel({ status, items }: { status: ProjectStatus, items?: ProjectStatusEnumItem[] }): string {
-    if (!items) {
-        return ""
-    }
 
-    for (let item of items) {
-        if (item.key === status) {
-            return item.value
-        }
-    }
-
-    return ""
-}
-
-function statusColor(status: ProjectStatus): string {
-    switch(status) {
-        case ProjectStatus.New:
-            return "status-unknown"
-        case ProjectStatus.InProgress:
-            return "status-ok"
-        case ProjectStatus.Done:
-            return "status-warning"
-        case ProjectStatus.Canceled:
-            return "status-error"
-    }
-}
-
-function ChangeProjectStatus({
-    projectId,
-    status,
-    values,
-    onProjectStatusChanged
-}: {
-    projectId: string,
-    status: ProjectStatus,
-    values?: ProjectStatusEnum,
-    onProjectStatusChanged?: ({ status }: { status: ProjectStatus }) => void
-}) {
-    const [ show, setShow ] = useState<Boolean>(false)
-    
-    const [ state, setState ] = useState(status)
-
-    const [ changeStatus, { data, loading, error }] = useChangeStatus()
-
-    const handleItemClick = (projectId: string, status: ProjectStatus) => {
-        changeStatus(projectId, status)
-        setShow(false)
-        setState(status)
-    }
-
-    useEffect(() => {
-        switch (data?.changeProjectStatus.__typename) {
-            case "ProjectStatusChanged":
-                const { status } = data?.changeProjectStatus.project
-                onProjectStatusChanged && onProjectStatusChanged({ status })
-        }
-    }, [ data, onProjectStatusChanged ])
-
-    useEffect(() => {
-        if (error) {
-            setTimeout(() => setState(status), 300)
-        }
-    })
-
-    const label = useMemo(() => statusToLabel({ status: state, items: values?.items }), [ state, values ])
-
-    const color = useMemo(() => statusColor(state), [ state ])
-
-    const targetRef = useRef<HTMLDivElement>(null)
-
-    return (
-        <Box justify="center" margin={{ horizontal: "medium"}}>
-            <Box ref={targetRef}>
-                <Button
-                    label={label}
-                    color={color}
-                    size="small"
-                    onClick={() => setShow(true)}
-                    disabled={loading}
-                />
-            </Box>
-
-            {show && targetRef.current && (
-                <Drop
-                    elevation="small"
-                    round="small"
-                    align={{ top: "bottom", left: "left" }}
-                    margin={{ top: "xsmall" }}
-                    target={targetRef.current}
-                    onClickOutside={() => setShow(false)}
-                    onEsc={() => setShow(false)}
-                >
-                    {values?.items.map(item => {
-                        return (
-                            <Button key={item.key} plain hoverIndicator={{color: "light-2"}}>
-                                <Box pad="small" onClick={() => handleItemClick(projectId, item.key)}><Text>{item.value}</Text></Box>
-                            </Button>
-                        )
-                    })}
-                </Drop>
-            )}
-        </Box>
-    )
-}
 
 function ContactCard(
     { contact, onDelete, onClickUpdate }:
@@ -432,7 +331,7 @@ function ContactCard(
                 setShowCard(false)
                 onDelete(contact)
         }
-    }, [ data, contact ]) //todo
+    }, [ data, contact, onDelete ])
 
     return (
         <Box>
