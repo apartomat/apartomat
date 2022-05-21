@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useMemo, useRef } from "react"
 
-import { useChangeStatus } from "./useChangeStatus"
+import { useChangeStatus } from "../useChangeStatus"
 
-import { ProjectStatus, ProjectStatusEnum, ProjectStatusEnumItem } from "../api/types.d"
+import { ProjectStatus, ProjectStatusEnum, ProjectStatusEnumItem } from "../../api/types.d"
 
 import { Box, Button, Drop, Text } from "grommet"
 
-export function ChangeStatus({
+export default function ChangeStatus({
     projectId,
     status,
     values,
