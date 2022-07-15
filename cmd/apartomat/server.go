@@ -9,9 +9,11 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 )
@@ -27,6 +29,10 @@ type addrOpt struct {
 }
 
 func Addr(addr string) addrOpt {
+	if addr == "" {
+		return addrOpt{addr: defaultAddr}
+	}
+
 	return addrOpt{addr: addr}
 }
 
@@ -58,7 +64,7 @@ func (server *server) Run(opts ...Option) {
 		server.useCases.CheckAuthToken,
 		server.loaders,
 		graphql.NewRootResolver(server.useCases),
-		100,
+		10000,
 	))
 
 	mux.Handle("/pg", playground.Handler("GraphQL playground", "/graphql"))
@@ -103,9 +109,27 @@ func (server *server) Run(opts ...Option) {
 		}
 	}()
 
-	log.Printf("Visit %s/pg for playground", s.Addr)
+	log.Printf("Visit http://%s/pg for playground", serverHttpAddr(s.Addr))
 
 	<-done
 
 	log.Print("Buy")
+}
+
+func serverHttpAddr(addr string) string {
+	if !strings.HasPrefix(addr, ":") {
+		return addr
+	}
+
+	if addrs, err := net.InterfaceAddrs(); err == nil {
+		for _, a := range addrs {
+			if ipnet, ok := a.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
+				if ipnet.IP.To4() != nil {
+					return ipnet.IP.String() + addr
+				}
+			}
+		}
+	}
+
+	return addr
 }

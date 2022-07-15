@@ -5,6 +5,7 @@ package graphql
 import (
 	"bytes"
 	"context"
+	"embed"
 	"errors"
 	"fmt"
 	"strconv"
@@ -117,12 +118,20 @@ type ComplexityRoot struct {
 		Rooms          func(childComplexity int) int
 	}
 
+	HouseAdded struct {
+		House func(childComplexity int) int
+	}
+
 	HouseRooms struct {
 		List func(childComplexity int, limit int, offset int) int
 	}
 
 	HouseRoomsList struct {
 		Items func(childComplexity int) int
+	}
+
+	HouseUpdated struct {
+		House func(childComplexity int) int
 	}
 
 	Id struct {
@@ -160,6 +169,7 @@ type ComplexityRoot struct {
 
 	Mutation struct {
 		AddContact          func(childComplexity int, projectID string, contact AddContactInput) int
+		AddHouse            func(childComplexity int, projectID string, house AddHouseInput) int
 		ChangeProjectDates  func(childComplexity int, projectID string, dates ChangeProjectDatesInput) int
 		ChangeProjectStatus func(childComplexity int, projectID string, status ProjectStatus) int
 		ConfirmLoginLink    func(childComplexity int, token string) int
@@ -169,6 +179,7 @@ type ComplexityRoot struct {
 		LoginByEmail        func(childComplexity int, email string, workspaceName string) int
 		Ping                func(childComplexity int) int
 		UpdateContact       func(childComplexity int, contactID string, data UpdateContactInput) int
+		UpdateHouse         func(childComplexity int, houseID string, data UpdateHouseInput) int
 		UploadProjectFile   func(childComplexity int, input UploadProjectFileInput) int
 	}
 
@@ -388,15 +399,17 @@ type HouseRoomsResolver interface {
 }
 type MutationResolver interface {
 	Ping(ctx context.Context) (string, error)
-	ChangeProjectStatus(ctx context.Context, projectID string, status ProjectStatus) (ChangeProjectStatusResult, error)
 	AddContact(ctx context.Context, projectID string, contact AddContactInput) (AddContactResult, error)
+	AddHouse(ctx context.Context, projectID string, house AddHouseInput) (AddHouseResult, error)
 	ChangeProjectDates(ctx context.Context, projectID string, dates ChangeProjectDatesInput) (ChangeProjectDatesResult, error)
+	ChangeProjectStatus(ctx context.Context, projectID string, status ProjectStatus) (ChangeProjectStatusResult, error)
 	ConfirmLoginLink(ctx context.Context, token string) (ConfirmLoginLinkResult, error)
 	ConfirmLoginPin(ctx context.Context, token string, pin string) (ConfirmLoginPinResult, error)
 	CreateProject(ctx context.Context, input CreateProjectInput) (CreateProjectResult, error)
 	DeleteContact(ctx context.Context, id string) (DeleteContactResult, error)
 	LoginByEmail(ctx context.Context, email string, workspaceName string) (LoginByEmailResult, error)
 	UpdateContact(ctx context.Context, contactID string, data UpdateContactInput) (UpdateContactResult, error)
+	UpdateHouse(ctx context.Context, houseID string, data UpdateHouseInput) (UpdateHouseResult, error)
 	UploadProjectFile(ctx context.Context, input UploadProjectFileInput) (UploadProjectFileResult, error)
 }
 type ProjectResolver interface {
@@ -639,6 +652,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.House.Rooms(childComplexity), true
 
+	case "HouseAdded.house":
+		if e.complexity.HouseAdded.House == nil {
+			break
+		}
+
+		return e.complexity.HouseAdded.House(childComplexity), true
+
 	case "HouseRooms.list":
 		if e.complexity.HouseRooms.List == nil {
 			break
@@ -657,6 +677,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.HouseRoomsList.Items(childComplexity), true
+
+	case "HouseUpdated.house":
+		if e.complexity.HouseUpdated.House == nil {
+			break
+		}
+
+		return e.complexity.HouseUpdated.House(childComplexity), true
 
 	case "Id.id":
 		if e.complexity.Id.ID == nil {
@@ -732,6 +759,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.AddContact(childComplexity, args["projectId"].(string), args["contact"].(AddContactInput)), true
+
+	case "Mutation.addHouse":
+		if e.complexity.Mutation.AddHouse == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_addHouse_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AddHouse(childComplexity, args["projectId"].(string), args["house"].(AddHouseInput)), true
 
 	case "Mutation.changeProjectDates":
 		if e.complexity.Mutation.ChangeProjectDates == nil {
@@ -835,6 +874,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateContact(childComplexity, args["contactId"].(string), args["data"].(UpdateContactInput)), true
+
+	case "Mutation.updateHouse":
+		if e.complexity.Mutation.UpdateHouse == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateHouse_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateHouse(childComplexity, args["houseId"].(string), args["data"].(UpdateHouseInput)), true
 
 	case "Mutation.uploadProjectFile":
 		if e.complexity.Mutation.UploadProjectFile == nil {
@@ -1566,6 +1617,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	ec := executionContext{rc, e}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputAddContactInput,
+		ec.unmarshalInputAddHouseInput,
 		ec.unmarshalInputChangeProjectDatesInput,
 		ec.unmarshalInputContactDetailsInput,
 		ec.unmarshalInputCreateProjectInput,
@@ -1573,6 +1625,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputProjectFilesListFilter,
 		ec.unmarshalInputProjectHousesFilter,
 		ec.unmarshalInputUpdateContactInput,
+		ec.unmarshalInputUpdateHouseInput,
 		ec.unmarshalInputUploadProjectFileInput,
 		ec.unmarshalInputWorkspaceProjectsFilter,
 	)
@@ -1634,497 +1687,40 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 	return introspection.WrapTypeFromDef(parsedSchema, parsedSchema.Types[name]), nil
 }
 
+//go:embed "schema/mutation.graphql" "schema/mutation_add_contact.graphql" "schema/mutation_add_house.graphql" "schema/mutation_change_project_dates.graphql" "schema/mutation_change_project_status.graphql" "schema/mutation_confirm_login.graphql" "schema/mutation_create_project.graphql" "schema/mutation_delete_contact.graphql" "schema/mutation_login_by_email.graphql" "schema/mutation_update_contact.graphql" "schema/mutation_update_house.graphql" "schema/mutation_upload_project_file.graphql" "schema/query.graphql" "schema/query_profile.graphql" "schema/query_project.graphql" "schema/query_screen.graphql" "schema/query_screen_files.graphql" "schema/query_screen_project.graphql" "schema/query_screen_spec.graphql" "schema/query_shoppinglist.graphql" "schema/query_workspace.graphql" "schema/root.graphql"
+var sourcesFS embed.FS
+
+func sourceData(filename string) string {
+	data, err := sourcesFS.ReadFile(filename)
+	if err != nil {
+		panic(fmt.Sprintf("codegen problem: %s not available", filename))
+	}
+	return string(data)
+}
+
 var sources = []*ast.Source{
-	{Name: "graphql/schema/mutation_change_project_status.graphql", Input: `extend type Mutation {
-    changeProjectStatus(projectId: String! status: ProjectStatus!): ChangeProjectStatusResult!
-}
-
-union ChangeProjectStatusResult = ProjectStatusChanged | NotFound | Forbidden | ServerError
-
-type ProjectStatusChanged {
-    project: Project!
-}`, BuiltIn: false},
-	{Name: "graphql/schema/mutation.graphql", Input: `type Mutation {
-    ping: String!
-}`, BuiltIn: false},
-	{Name: "graphql/schema/mutation_add_contact.graphql", Input: `extend type Mutation {
-    addContact(projectId: String! contact: AddContactInput!): AddContactResult!
-}
-
-input AddContactInput {
-    fullName: String!
-    details:   [ContactDetailsInput!]!
-}
-
-input ContactDetailsInput {
-    type: ContactType!
-    value: String!
-}
-
-union AddContactResult = ContactAdded | Forbidden | ServerError
-
-type ContactAdded {
-    contact: Contact!
-}`, BuiltIn: false},
-	{Name: "graphql/schema/mutation_change_project_dates.graphql", Input: `extend type Mutation {
-    changeProjectDates(projectId: String! dates: ChangeProjectDatesInput!): ChangeProjectDatesResult!
-}
-
-input ChangeProjectDatesInput {
-    startAt: Time
-    endAt: Time
-}
-
-union ChangeProjectDatesResult = ProjectDatesChanged | NotFound | Forbidden | ServerError
-
-type ProjectDatesChanged {
-    project: Project!
-}`, BuiltIn: false},
-	{Name: "graphql/schema/mutation_confirm_login.graphql", Input: `extend type Mutation {
-    confirmLoginLink(token: String!): ConfirmLoginLinkResult!
-}
-
-union ConfirmLoginLinkResult = LoginConfirmed | InvalidToken | ExpiredToken | ServerError
-
-type LoginConfirmed {
-    token: String!
-}
-
-type InvalidToken implements Error {
-    message: String!
-}
-
-type ExpiredToken implements Error {
-    message: String!
-}
-
-
-extend type Mutation {
-    confirmLoginPin(token: String! pin: String!): ConfirmLoginPinResult!
-}
-
-union ConfirmLoginPinResult = LoginConfirmed | InvalidPin | InvalidToken | ExpiredToken | ServerError
-
-type InvalidPin implements Error {
-    message: String!
-}`, BuiltIn: false},
-	{Name: "graphql/schema/mutation_create_project.graphql", Input: `extend type Mutation {
-    createProject(input: CreateProjectInput!): CreateProjectResult!
-}
-
-input CreateProjectInput {
-    workspaceId: String!
-    title: String!
-    startAt: Time
-    endAt: Time
-}
-
-union CreateProjectResult = ProjectCreated | Forbidden | ServerError
-
-type ProjectCreated {
-    project: Project!
-}`, BuiltIn: false},
-	{Name: "graphql/schema/mutation_delete_contact.graphql", Input: `extend type Mutation {
-    deleteContact(id: String!): DeleteContactResult!
-}
-
-union DeleteContactResult = ContactDeleted | Forbidden | NotFound | ServerError
-
-type ContactDeleted {
-    contact: Contact!
-}`, BuiltIn: false},
-	{Name: "graphql/schema/mutation_login_by_email.graphql", Input: `extend type Mutation {
-    loginByEmail(email: String!, workspaceName: String! = "Workspace"): LoginByEmailResult!
-}
-
-union LoginByEmailResult = LinkSentByEmail | PinSentByEmail | InvalidEmail | ServerError
-
-type LinkSentByEmail {
-    email: String!
-}
-
-type PinSentByEmail {
-    email: String!
-    token: String!
-}
-
-type InvalidEmail implements Error {
-    message: String!
-}
-`, BuiltIn: false},
-	{Name: "graphql/schema/mutation_update_contact.graphql", Input: `extend type Mutation {
-    updateContact(contactId: String! data: UpdateContactInput!): UpdateContactResult!
-}
-
-input UpdateContactInput {
-    fullName: String!
-    details:   [ContactDetailsInput!]!
-}
-
-union UpdateContactResult = ContactUpdated | NotFound | Forbidden | ServerError
-
-type ContactUpdated {
-    contact: Contact!
-}`, BuiltIn: false},
-	{Name: "graphql/schema/mutation_upload_project_file.graphql", Input: `extend type Mutation {
-    uploadProjectFile(input: UploadProjectFileInput!): UploadProjectFileResult!
-}
-
-input UploadProjectFileInput {
-    projectId: String!
-    type: ProjectFileType!
-    file: Upload!
-}
-
-union UploadProjectFileResult = ProjectFileUploaded | Forbidden | AlreadyExists | ServerError
-
-type ProjectFileUploaded {
-    file: ProjectFile!
-}`, BuiltIn: false},
-	{Name: "graphql/schema/query.graphql", Input: `type Query {
-    version: String!
-}`, BuiltIn: false},
-	{Name: "graphql/schema/query_profile.graphql", Input: `extend type Query {
-    profile: UserProfileResult!
-}
-
-union UserProfileResult = UserProfile | Forbidden | ServerError
-
-type UserProfile {
-    id: String!
-    email: String!
-    fullName: String!
-    abbr: String!
-    gravatar: Gravatar
-    defaultWorkspace: Workspace!
-}`, BuiltIn: false},
-	{Name: "graphql/schema/query_project.graphql", Input: `union ProjectResult = Project | NotFound | Forbidden | ServerError
-
-type Project {
-    id: String!
-    title: String!
-    status: ProjectStatus!
-    startAt: Time
-    endAt: Time
-    files: ProjectFiles!
-    contacts: ProjectContacts!
-    houses: ProjectHouses!
-}
-
-enum ProjectStatus {
-    NEW
-    IN_PROGRESS
-    DONE
-    CANCELED
-}
-
-type ProjectFiles {
-    list(filter: ProjectFilesListFilter! = {} limit: Int! = 10 offset: Int! = 0): ProjectFilesListResult!
-    total: ProjectFilesTotalResult!
-}
-
-input ProjectFilesListFilter {
-    type: [ProjectFileType!]
-}
-
-enum ProjectFileType {
-    NONE
-    VISUALIZATION
-}
-
-union ProjectFilesListResult = ProjectFilesList | Forbidden | ServerError
-
-type ProjectFilesList {
-    items: [ProjectFile!]!
-}
-
-union ProjectFilesTotalResult = ProjectFilesTotal | Forbidden | ServerError
-
-type ProjectFilesTotal {
-    total: Int!
-}
-
-union ProjectFilesResult = ProjectFiles | Forbidden | ServerError
-
-type ProjectFile {
-    id: String!
-    name: String!
-    url: Url!
-    type: ProjectFileType!
-    mimeType: String!
-}
-
-type ProjectContacts {
-    list(filter: ProjectContactsFilter! = {} limit: Int! = 10 offset: Int! = 0): ProjectContactsListResult!
-    total(filter: ProjectContactsFilter! = {}): ProjectContactsTotalResult!
-}
-
-input ProjectContactsFilter {
-    type: [ContactType!]
-}
-
-union ProjectContactsListResult = ProjectContactsList | Forbidden | ServerError
-
-type ProjectContactsList {
-    items: [Contact!]!
-}
-
-union ProjectContactsTotalResult = ProjectContactsTotal | Forbidden | ServerError
-
-type ProjectContactsTotal {
-    total: Int!
-}
-
-enum ContactType {
-    INSTAGRAM
-    PHONE
-    EMAIL
-    WHATSAPP
-    TELEGRAM
-    UNKNOWN
-}
-
-type Contact {
-    id: String!
-    fullName: String!
-    photo: String!
-    details:   [ContactDetails!]!
-    createdAt:  Time!
-    modifiedAt: Time!
-}
-
-type ContactDetails {
-    type: ContactType!
-    value: String!
-}
-
-type ProjectHouses {
-    list(filter: ProjectHousesFilter! = {} limit: Int! = 10 offset: Int! = 0): ProjectHousesListResult!
-    total(filter: ProjectHousesFilter! = {}): ProjectHousesTotalResult!
-}
-
-input ProjectHousesFilter {
-    ID: [String!]
-}
-
-union ProjectHousesListResult = ProjectHousesList | Forbidden | ServerError
-
-type ProjectHousesList {
-    items: [House!]!
-}
-
-union ProjectHousesTotalResult = ProjectHousesTotal | Forbidden | ServerError
-
-type ProjectHousesTotal {
-    total: Int!
-}
-
-type House {
-    id: String!
-    city: String!
-    address: String!
-    housingComplex: String!
-    createdAt:  Time!
-    modifiedAt: Time!
-    rooms: HouseRooms!
-}
-
-type HouseRooms {
-    list(limit: Int! = 10 offset: Int! = 0): HouseRoomsListResult!
-}
-
-union HouseRoomsListResult = HouseRoomsList | Forbidden | ServerError
-
-type HouseRoomsList {
-    items: [Room!]!
-}
-
-type Room {
-    id: String!
-    name: String!
-    square: Float
-    design: Boolean!
-    createdAt:  Time!
-    modifiedAt: Time!
-}`, BuiltIn: false},
-	{Name: "graphql/schema/query_screen.graphql", Input: `extend type Query {
-    screen: ScreenQuery!
-}
-
-type ScreenQuery {
-    version: String!
-}`, BuiltIn: false},
-	{Name: "graphql/schema/query_screen_files.graphql", Input: `extend type ScreenQuery {
-    files(projectId: String!): FilesScreen!
-}
-
-type FilesScreen {
-    project: ProjectResult!
-    menu: MenuResult!
-}`, BuiltIn: false},
-	{Name: "graphql/schema/query_screen_project.graphql", Input: `extend type ScreenQuery {
-    project(id: String!): ProjectScreen!
-}
-
-type ProjectScreen {
-    project: ProjectResult!
-    menu: MenuResult!
-    enums: ProjectEnums!
-}
-
-union MenuResult = MenuItems | ServerError
-
-type MenuItems {
-    items: [MenuItem!]!
-}
-
-type MenuItem {
-    title: String!
-    url: String!
-}
-
-type ProjectEnums {
-    status: ProjectStatusEnum!
-}
-
-type ProjectStatusEnum {
-    items: [ProjectStatusEnumItem!]!
-}
-
-type ProjectStatusEnumItem {
-    key: ProjectStatus!
-    value: String!
-}`, BuiltIn: false},
-	{Name: "graphql/schema/query_screen_spec.graphql", Input: `extend type ScreenQuery {
-    spec(projectId: String!): SpecScreen!
-}
-
-type SpecScreen {
-    project: ProjectResult!
-    menu: MenuResult!
-}`, BuiltIn: false},
-	{Name: "graphql/schema/query_shoppinglist.graphql", Input: `extend type Query {
-    shoppinglist: ShoppinglistQuery!
-}
-
-type ShoppinglistQuery {
-    productOnPage(url: String!): Product
-}
-
-type Product {
-    name: String!
-    description: String!
-    image: String!
-}`, BuiltIn: false},
-	{Name: "graphql/schema/query_workspace.graphql", Input: `extend type Query {
-    workspace(id: String!): WorkspaceResult!
-}
-
-union WorkspaceResult = Workspace | NotFound | Forbidden | ServerError
-
-type Workspace {
-    id: String!
-    name: String!
-    users: WorkspaceUsersResult!
-    projects: WorkspaceProjects!
-}
-
-union WorkspaceUsersResult = WorkspaceUsers | Forbidden | ServerError
-
-type WorkspaceUsers {
-	items: [WorkspaceUser!]!
-}
-
-type WorkspaceUser {
-	id: String!
-	workspace: Id!
-	role: WorkspaceUserRole!
-	profile: WorkspaceUserProfile!
-}
-
-enum WorkspaceUserRole {
-	ADMIN
-	USER
-}
-
-type WorkspaceUserProfile {
-    id: String!
-    email: String!
-	fullName: String!
-	abbr: String!
-    gravatar: Gravatar
-}
-
-type WorkspaceProjects {
-	workspace: Id
-	list(filter: WorkspaceProjectsFilter! = {} limit: Int! = 10): WorkspaceProjectsListResult!
-	total(filter: WorkspaceProjectsFilter! = {}): WorkspaceProjectsTotalResult!
-}
-
-input WorkspaceProjectsFilter {
-	status: [ProjectStatus!]
-}
-
-union WorkspaceProjectsListResult = WorkspaceProjectsList | Forbidden | ServerError
-
-type WorkspaceProjectsList {
-	items: [WorkspaceProject!]!
-}
-
-union WorkspaceProjectsTotalResult = WorkspaceProjectsTotal | Forbidden | ServerError
-
-type WorkspaceProjectsTotal {
-	total: Int!
-}
-
-type WorkspaceProject {
-	id: String!
-	name: String!
-	status: ProjectStatus!
-	startAt: Time
-	endAt: Time
-	period(timezone: String): String
-}`, BuiltIn: false},
-	{Name: "graphql/schema/root.graphql", Input: `schema {
-    query: Query
-    mutation: Mutation
-}
-
-
-interface Error {
-    message: String!
-}
-
-type ServerError implements Error {
-    message: String!
-}
-
-type Forbidden implements Error {
-    message: String!
-}
-
-type NotFound implements Error {
-    message: String!
-}
-
-type AlreadyExists implements Error {
-    message: String!
-}
-
-
-type Gravatar {
-    url: String!
-}
-
-type Id {
-	id: String!
-}
-
-scalar Url
-
-scalar Upload
-
-scalar Time`, BuiltIn: false},
+	{Name: "schema/mutation.graphql", Input: sourceData("schema/mutation.graphql"), BuiltIn: false},
+	{Name: "schema/mutation_add_contact.graphql", Input: sourceData("schema/mutation_add_contact.graphql"), BuiltIn: false},
+	{Name: "schema/mutation_add_house.graphql", Input: sourceData("schema/mutation_add_house.graphql"), BuiltIn: false},
+	{Name: "schema/mutation_change_project_dates.graphql", Input: sourceData("schema/mutation_change_project_dates.graphql"), BuiltIn: false},
+	{Name: "schema/mutation_change_project_status.graphql", Input: sourceData("schema/mutation_change_project_status.graphql"), BuiltIn: false},
+	{Name: "schema/mutation_confirm_login.graphql", Input: sourceData("schema/mutation_confirm_login.graphql"), BuiltIn: false},
+	{Name: "schema/mutation_create_project.graphql", Input: sourceData("schema/mutation_create_project.graphql"), BuiltIn: false},
+	{Name: "schema/mutation_delete_contact.graphql", Input: sourceData("schema/mutation_delete_contact.graphql"), BuiltIn: false},
+	{Name: "schema/mutation_login_by_email.graphql", Input: sourceData("schema/mutation_login_by_email.graphql"), BuiltIn: false},
+	{Name: "schema/mutation_update_contact.graphql", Input: sourceData("schema/mutation_update_contact.graphql"), BuiltIn: false},
+	{Name: "schema/mutation_update_house.graphql", Input: sourceData("schema/mutation_update_house.graphql"), BuiltIn: false},
+	{Name: "schema/mutation_upload_project_file.graphql", Input: sourceData("schema/mutation_upload_project_file.graphql"), BuiltIn: false},
+	{Name: "schema/query.graphql", Input: sourceData("schema/query.graphql"), BuiltIn: false},
+	{Name: "schema/query_profile.graphql", Input: sourceData("schema/query_profile.graphql"), BuiltIn: false},
+	{Name: "schema/query_project.graphql", Input: sourceData("schema/query_project.graphql"), BuiltIn: false},
+	{Name: "schema/query_screen.graphql", Input: sourceData("schema/query_screen.graphql"), BuiltIn: false},
+	{Name: "schema/query_screen_files.graphql", Input: sourceData("schema/query_screen_files.graphql"), BuiltIn: false},
+	{Name: "schema/query_screen_project.graphql", Input: sourceData("schema/query_screen_project.graphql"), BuiltIn: false},
+	{Name: "schema/query_screen_spec.graphql", Input: sourceData("schema/query_screen_spec.graphql"), BuiltIn: false},
+	{Name: "schema/query_shoppinglist.graphql", Input: sourceData("schema/query_shoppinglist.graphql"), BuiltIn: false},
+	{Name: "schema/query_workspace.graphql", Input: sourceData("schema/query_workspace.graphql"), BuiltIn: false},
+	{Name: "schema/root.graphql", Input: sourceData("schema/root.graphql"), BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
@@ -2177,6 +1773,30 @@ func (ec *executionContext) field_Mutation_addContact_args(ctx context.Context, 
 		}
 	}
 	args["contact"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_addHouse_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["projectId"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("projectId"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["projectId"] = arg0
+	var arg1 AddHouseInput
+	if tmp, ok := rawArgs["house"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("house"))
+		arg1, err = ec.unmarshalNAddHouseInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAddHouseInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["house"] = arg1
 	return args, nil
 }
 
@@ -2337,6 +1957,30 @@ func (ec *executionContext) field_Mutation_updateContact_args(ctx context.Contex
 	if tmp, ok := rawArgs["data"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("data"))
 		arg1, err = ec.unmarshalNUpdateContactInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐUpdateContactInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["data"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateHouse_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["houseId"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("houseId"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["houseId"] = arg0
+	var arg1 UpdateHouseInput
+	if tmp, ok := rawArgs["data"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("data"))
+		arg1, err = ec.unmarshalNUpdateHouseInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐUpdateHouseInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -3779,6 +3423,66 @@ func (ec *executionContext) fieldContext_House_rooms(ctx context.Context, field 
 	return fc, nil
 }
 
+func (ec *executionContext) _HouseAdded_house(ctx context.Context, field graphql.CollectedField, obj *HouseAdded) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_HouseAdded_house(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.House, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*House)
+	fc.Result = res
+	return ec.marshalNHouse2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐHouse(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_HouseAdded_house(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "HouseAdded",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_House_id(ctx, field)
+			case "city":
+				return ec.fieldContext_House_city(ctx, field)
+			case "address":
+				return ec.fieldContext_House_address(ctx, field)
+			case "housingComplex":
+				return ec.fieldContext_House_housingComplex(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_House_createdAt(ctx, field)
+			case "modifiedAt":
+				return ec.fieldContext_House_modifiedAt(ctx, field)
+			case "rooms":
+				return ec.fieldContext_House_rooms(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type House", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _HouseRooms_list(ctx context.Context, field graphql.CollectedField, obj *HouseRooms) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_HouseRooms_list(ctx, field)
 	if err != nil {
@@ -3887,6 +3591,66 @@ func (ec *executionContext) fieldContext_HouseRoomsList_items(ctx context.Contex
 				return ec.fieldContext_Room_modifiedAt(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Room", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _HouseUpdated_house(ctx context.Context, field graphql.CollectedField, obj *HouseUpdated) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_HouseUpdated_house(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.House, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*House)
+	fc.Result = res
+	return ec.marshalNHouse2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐHouse(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_HouseUpdated_house(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "HouseUpdated",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_House_id(ctx, field)
+			case "city":
+				return ec.fieldContext_House_city(ctx, field)
+			case "address":
+				return ec.fieldContext_House_address(ctx, field)
+			case "housingComplex":
+				return ec.fieldContext_House_housingComplex(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_House_createdAt(ctx, field)
+			case "modifiedAt":
+				return ec.fieldContext_House_modifiedAt(ctx, field)
+			case "rooms":
+				return ec.fieldContext_House_rooms(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type House", field.Name)
 		},
 	}
 	return fc, nil
@@ -4338,61 +4102,6 @@ func (ec *executionContext) fieldContext_Mutation_ping(ctx context.Context, fiel
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_changeProjectStatus(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_changeProjectStatus(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().ChangeProjectStatus(rctx, fc.Args["projectId"].(string), fc.Args["status"].(ProjectStatus))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(ChangeProjectStatusResult)
-	fc.Result = res
-	return ec.marshalNChangeProjectStatusResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐChangeProjectStatusResult(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Mutation_changeProjectStatus(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ChangeProjectStatusResult does not have child fields")
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_changeProjectStatus_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Mutation_addContact(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_addContact(ctx, field)
 	if err != nil {
@@ -4448,6 +4157,61 @@ func (ec *executionContext) fieldContext_Mutation_addContact(ctx context.Context
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_addHouse(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_addHouse(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().AddHouse(rctx, fc.Args["projectId"].(string), fc.Args["house"].(AddHouseInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(AddHouseResult)
+	fc.Result = res
+	return ec.marshalNAddHouseResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAddHouseResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_addHouse(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type AddHouseResult does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_addHouse_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_changeProjectDates(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_changeProjectDates(ctx, field)
 	if err != nil {
@@ -4497,6 +4261,61 @@ func (ec *executionContext) fieldContext_Mutation_changeProjectDates(ctx context
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_changeProjectDates_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_changeProjectStatus(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_changeProjectStatus(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().ChangeProjectStatus(rctx, fc.Args["projectId"].(string), fc.Args["status"].(ProjectStatus))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(ChangeProjectStatusResult)
+	fc.Result = res
+	return ec.marshalNChangeProjectStatusResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐChangeProjectStatusResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_changeProjectStatus(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ChangeProjectStatusResult does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_changeProjectStatus_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -4827,6 +4646,61 @@ func (ec *executionContext) fieldContext_Mutation_updateContact(ctx context.Cont
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_updateContact_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateHouse(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateHouse(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateHouse(rctx, fc.Args["houseId"].(string), fc.Args["data"].(UpdateHouseInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(UpdateHouseResult)
+	fc.Result = res
+	return ec.marshalNUpdateHouseResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐUpdateHouseResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateHouse(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type UpdateHouseResult does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateHouse_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -11210,7 +11084,12 @@ func (ec *executionContext) unmarshalInputAddContactInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"fullName", "details"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "fullName":
 			var err error
@@ -11234,6 +11113,50 @@ func (ec *executionContext) unmarshalInputAddContactInput(ctx context.Context, o
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputAddHouseInput(ctx context.Context, obj interface{}) (AddHouseInput, error) {
+	var it AddHouseInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"city", "address", "housingComplex"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "city":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("city"))
+			it.City, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "address":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("address"))
+			it.Address, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "housingComplex":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("housingComplex"))
+			it.HousingComplex, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputChangeProjectDatesInput(ctx context.Context, obj interface{}) (ChangeProjectDatesInput, error) {
 	var it ChangeProjectDatesInput
 	asMap := map[string]interface{}{}
@@ -11241,7 +11164,12 @@ func (ec *executionContext) unmarshalInputChangeProjectDatesInput(ctx context.Co
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"startAt", "endAt"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "startAt":
 			var err error
@@ -11272,7 +11200,12 @@ func (ec *executionContext) unmarshalInputContactDetailsInput(ctx context.Contex
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"type", "value"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "type":
 			var err error
@@ -11303,7 +11236,12 @@ func (ec *executionContext) unmarshalInputCreateProjectInput(ctx context.Context
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"workspaceId", "title", "startAt", "endAt"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "workspaceId":
 			var err error
@@ -11350,7 +11288,12 @@ func (ec *executionContext) unmarshalInputProjectContactsFilter(ctx context.Cont
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"type"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "type":
 			var err error
@@ -11373,7 +11316,12 @@ func (ec *executionContext) unmarshalInputProjectFilesListFilter(ctx context.Con
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"type"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "type":
 			var err error
@@ -11396,7 +11344,12 @@ func (ec *executionContext) unmarshalInputProjectHousesFilter(ctx context.Contex
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"ID"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "ID":
 			var err error
@@ -11419,7 +11372,12 @@ func (ec *executionContext) unmarshalInputUpdateContactInput(ctx context.Context
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"fullName", "details"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "fullName":
 			var err error
@@ -11443,6 +11401,50 @@ func (ec *executionContext) unmarshalInputUpdateContactInput(ctx context.Context
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdateHouseInput(ctx context.Context, obj interface{}) (UpdateHouseInput, error) {
+	var it UpdateHouseInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"city", "address", "housingComplex"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "city":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("city"))
+			it.City, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "address":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("address"))
+			it.Address, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "housingComplex":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("housingComplex"))
+			it.HousingComplex, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUploadProjectFileInput(ctx context.Context, obj interface{}) (UploadProjectFileInput, error) {
 	var it UploadProjectFileInput
 	asMap := map[string]interface{}{}
@@ -11450,7 +11452,12 @@ func (ec *executionContext) unmarshalInputUploadProjectFileInput(ctx context.Con
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"projectId", "type", "file"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "projectId":
 			var err error
@@ -11489,7 +11496,12 @@ func (ec *executionContext) unmarshalInputWorkspaceProjectsFilter(ctx context.Co
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"status"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "status":
 			var err error
@@ -11520,6 +11532,43 @@ func (ec *executionContext) _AddContactResult(ctx context.Context, sel ast.Selec
 			return graphql.Null
 		}
 		return ec._ContactAdded(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
+func (ec *executionContext) _AddHouseResult(ctx context.Context, sel ast.SelectionSet, obj AddHouseResult) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case HouseAdded:
+		return ec._HouseAdded(ctx, sel, &obj)
+	case *HouseAdded:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._HouseAdded(ctx, sel, obj)
+	case NotFound:
+		return ec._NotFound(ctx, sel, &obj)
+	case *NotFound:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._NotFound(ctx, sel, obj)
 	case Forbidden:
 		return ec._Forbidden(ctx, sel, &obj)
 	case *Forbidden:
@@ -12200,6 +12249,43 @@ func (ec *executionContext) _UpdateContactResult(ctx context.Context, sel ast.Se
 	}
 }
 
+func (ec *executionContext) _UpdateHouseResult(ctx context.Context, sel ast.SelectionSet, obj UpdateHouseResult) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case HouseUpdated:
+		return ec._HouseUpdated(ctx, sel, &obj)
+	case *HouseUpdated:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._HouseUpdated(ctx, sel, obj)
+	case NotFound:
+		return ec._NotFound(ctx, sel, &obj)
+	case *NotFound:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._NotFound(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
 func (ec *executionContext) _UploadProjectFileResult(ctx context.Context, sel ast.SelectionSet, obj UploadProjectFileResult) graphql.Marshaler {
 	switch obj := (obj).(type) {
 	case nil:
@@ -12697,7 +12783,7 @@ func (ec *executionContext) _FilesScreen(ctx context.Context, sel ast.SelectionS
 	return out
 }
 
-var forbiddenImplementors = []string{"Forbidden", "ChangeProjectStatusResult", "AddContactResult", "ChangeProjectDatesResult", "CreateProjectResult", "DeleteContactResult", "UpdateContactResult", "UploadProjectFileResult", "UserProfileResult", "ProjectResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectFilesResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "WorkspaceResult", "WorkspaceUsersResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "Error"}
+var forbiddenImplementors = []string{"Forbidden", "AddContactResult", "AddHouseResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "CreateProjectResult", "DeleteContactResult", "UpdateContactResult", "UpdateHouseResult", "UploadProjectFileResult", "UserProfileResult", "ProjectResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectFilesResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "WorkspaceResult", "WorkspaceUsersResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "Error"}
 
 func (ec *executionContext) _Forbidden(ctx context.Context, sel ast.SelectionSet, obj *Forbidden) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, forbiddenImplementors)
@@ -12836,6 +12922,34 @@ func (ec *executionContext) _House(ctx context.Context, sel ast.SelectionSet, ob
 	return out
 }
 
+var houseAddedImplementors = []string{"HouseAdded", "AddHouseResult"}
+
+func (ec *executionContext) _HouseAdded(ctx context.Context, sel ast.SelectionSet, obj *HouseAdded) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, houseAddedImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("HouseAdded")
+		case "house":
+
+			out.Values[i] = ec._HouseAdded_house(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var houseRoomsImplementors = []string{"HouseRooms"}
 
 func (ec *executionContext) _HouseRooms(ctx context.Context, sel ast.SelectionSet, obj *HouseRooms) graphql.Marshaler {
@@ -12890,6 +13004,34 @@ func (ec *executionContext) _HouseRoomsList(ctx context.Context, sel ast.Selecti
 		case "items":
 
 			out.Values[i] = ec._HouseRoomsList_items(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var houseUpdatedImplementors = []string{"HouseUpdated", "UpdateHouseResult"}
+
+func (ec *executionContext) _HouseUpdated(ctx context.Context, sel ast.SelectionSet, obj *HouseUpdated) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, houseUpdatedImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("HouseUpdated")
+		case "house":
+
+			out.Values[i] = ec._HouseUpdated_house(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
@@ -13164,15 +13306,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "changeProjectStatus":
-
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_changeProjectStatus(ctx, field)
-			})
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "addContact":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
@@ -13182,10 +13315,28 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "addHouse":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_addHouse(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "changeProjectDates":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_changeProjectDates(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "changeProjectStatus":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_changeProjectStatus(ctx, field)
 			})
 
 			if out.Values[i] == graphql.Null {
@@ -13245,6 +13396,15 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "updateHouse":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateHouse(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "uploadProjectFile":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
@@ -13265,7 +13425,7 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 	return out
 }
 
-var notFoundImplementors = []string{"NotFound", "ChangeProjectStatusResult", "ChangeProjectDatesResult", "DeleteContactResult", "UpdateContactResult", "ProjectResult", "WorkspaceResult", "Error"}
+var notFoundImplementors = []string{"NotFound", "AddHouseResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "DeleteContactResult", "UpdateContactResult", "UpdateHouseResult", "ProjectResult", "WorkspaceResult", "Error"}
 
 func (ec *executionContext) _NotFound(ctx context.Context, sel ast.SelectionSet, obj *NotFound) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, notFoundImplementors)
@@ -14450,7 +14610,7 @@ func (ec *executionContext) _ScreenQuery(ctx context.Context, sel ast.SelectionS
 	return out
 }
 
-var serverErrorImplementors = []string{"ServerError", "ChangeProjectStatusResult", "AddContactResult", "ChangeProjectDatesResult", "ConfirmLoginLinkResult", "ConfirmLoginPinResult", "CreateProjectResult", "DeleteContactResult", "LoginByEmailResult", "UpdateContactResult", "UploadProjectFileResult", "UserProfileResult", "ProjectResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectFilesResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "MenuResult", "WorkspaceResult", "WorkspaceUsersResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "Error"}
+var serverErrorImplementors = []string{"ServerError", "AddContactResult", "AddHouseResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "ConfirmLoginLinkResult", "ConfirmLoginPinResult", "CreateProjectResult", "DeleteContactResult", "LoginByEmailResult", "UpdateContactResult", "UpdateHouseResult", "UploadProjectFileResult", "UserProfileResult", "ProjectResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectFilesResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "MenuResult", "WorkspaceResult", "WorkspaceUsersResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "Error"}
 
 func (ec *executionContext) _ServerError(ctx context.Context, sel ast.SelectionSet, obj *ServerError) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, serverErrorImplementors)
@@ -15389,6 +15549,21 @@ func (ec *executionContext) marshalNAddContactResult2githubᚗcomᚋapartomatᚋ
 	return ec._AddContactResult(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNAddHouseInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAddHouseInput(ctx context.Context, v interface{}) (AddHouseInput, error) {
+	res, err := ec.unmarshalInputAddHouseInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNAddHouseResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAddHouseResult(ctx context.Context, sel ast.SelectionSet, v AddHouseResult) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._AddHouseResult(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
 	res, err := graphql.UnmarshalBoolean(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -16239,6 +16414,21 @@ func (ec *executionContext) marshalNUpdateContactResult2githubᚗcomᚋapartomat
 		return graphql.Null
 	}
 	return ec._UpdateContactResult(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNUpdateHouseInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐUpdateHouseInput(ctx context.Context, v interface{}) (UpdateHouseInput, error) {
+	res, err := ec.unmarshalInputUpdateHouseInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNUpdateHouseResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐUpdateHouseResult(ctx context.Context, sel ast.SelectionSet, v UpdateHouseResult) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._UpdateHouseResult(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx context.Context, v interface{}) (graphql.Upload, error) {

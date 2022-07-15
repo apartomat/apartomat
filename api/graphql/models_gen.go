@@ -15,6 +15,10 @@ type AddContactResult interface {
 	IsAddContactResult()
 }
 
+type AddHouseResult interface {
+	IsAddHouseResult()
+}
+
 type ChangeProjectDatesResult interface {
 	IsChangeProjectDatesResult()
 }
@@ -91,6 +95,10 @@ type UpdateContactResult interface {
 	IsUpdateContactResult()
 }
 
+type UpdateHouseResult interface {
+	IsUpdateHouseResult()
+}
+
 type UploadProjectFileResult interface {
 	IsUploadProjectFileResult()
 }
@@ -118,6 +126,12 @@ type WorkspaceUsersResult interface {
 type AddContactInput struct {
 	FullName string                 `json:"fullName"`
 	Details  []*ContactDetailsInput `json:"details"`
+}
+
+type AddHouseInput struct {
+	City           string `json:"city"`
+	Address        string `json:"address"`
+	HousingComplex string `json:"housingComplex"`
 }
 
 type AlreadyExists struct {
@@ -193,12 +207,14 @@ type Forbidden struct {
 	Message string `json:"message"`
 }
 
-func (Forbidden) IsChangeProjectStatusResult()    {}
 func (Forbidden) IsAddContactResult()             {}
+func (Forbidden) IsAddHouseResult()               {}
 func (Forbidden) IsChangeProjectDatesResult()     {}
+func (Forbidden) IsChangeProjectStatusResult()    {}
 func (Forbidden) IsCreateProjectResult()          {}
 func (Forbidden) IsDeleteContactResult()          {}
 func (Forbidden) IsUpdateContactResult()          {}
+func (Forbidden) IsUpdateHouseResult()            {}
 func (Forbidden) IsUploadProjectFileResult()      {}
 func (Forbidden) IsUserProfileResult()            {}
 func (Forbidden) IsProjectResult()                {}
@@ -230,6 +246,12 @@ type House struct {
 	Rooms          *HouseRooms `json:"rooms"`
 }
 
+type HouseAdded struct {
+	House *House `json:"house"`
+}
+
+func (HouseAdded) IsAddHouseResult() {}
+
 type HouseRooms struct {
 	List HouseRoomsListResult `json:"list"`
 }
@@ -239,6 +261,12 @@ type HouseRoomsList struct {
 }
 
 func (HouseRoomsList) IsHouseRoomsListResult() {}
+
+type HouseUpdated struct {
+	House *House `json:"house"`
+}
+
+func (HouseUpdated) IsUpdateHouseResult() {}
 
 type ID struct {
 	ID string `json:"id"`
@@ -294,10 +322,12 @@ type NotFound struct {
 	Message string `json:"message"`
 }
 
-func (NotFound) IsChangeProjectStatusResult() {}
+func (NotFound) IsAddHouseResult()            {}
 func (NotFound) IsChangeProjectDatesResult()  {}
+func (NotFound) IsChangeProjectStatusResult() {}
 func (NotFound) IsDeleteContactResult()       {}
 func (NotFound) IsUpdateContactResult()       {}
+func (NotFound) IsUpdateHouseResult()         {}
 func (NotFound) IsProjectResult()             {}
 func (NotFound) IsWorkspaceResult()           {}
 func (NotFound) IsError()                     {}
@@ -464,15 +494,17 @@ type ServerError struct {
 	Message string `json:"message"`
 }
 
-func (ServerError) IsChangeProjectStatusResult()    {}
 func (ServerError) IsAddContactResult()             {}
+func (ServerError) IsAddHouseResult()               {}
 func (ServerError) IsChangeProjectDatesResult()     {}
+func (ServerError) IsChangeProjectStatusResult()    {}
 func (ServerError) IsConfirmLoginLinkResult()       {}
 func (ServerError) IsConfirmLoginPinResult()        {}
 func (ServerError) IsCreateProjectResult()          {}
 func (ServerError) IsDeleteContactResult()          {}
 func (ServerError) IsLoginByEmailResult()           {}
 func (ServerError) IsUpdateContactResult()          {}
+func (ServerError) IsUpdateHouseResult()            {}
 func (ServerError) IsUploadProjectFileResult()      {}
 func (ServerError) IsUserProfileResult()            {}
 func (ServerError) IsProjectResult()                {}
@@ -503,6 +535,12 @@ type SpecScreen struct {
 type UpdateContactInput struct {
 	FullName string                 `json:"fullName"`
 	Details  []*ContactDetailsInput `json:"details"`
+}
+
+type UpdateHouseInput struct {
+	City           string `json:"city"`
+	Address        string `json:"address"`
+	HousingComplex string `json:"housingComplex"`
 }
 
 type UploadProjectFileInput struct {

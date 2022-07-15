@@ -6,6 +6,7 @@ import (
 	. "github.com/apartomat/apartomat/internal/store/houses"
 	"github.com/doug-martin/goqu/v9"
 	"github.com/go-pg/pg/v10"
+	"time"
 )
 
 const (
@@ -24,8 +25,23 @@ var (
 	_ Store = (*housesStore)(nil)
 )
 
-func (s *housesStore) Save(context.Context, *House) (*House, error) {
-	return nil, errors.New("HousesStore.Save not implemented yet")
+func (s *housesStore) Save(ctx context.Context, house *House) (*House, error) {
+	if house.CreatedAt.IsZero() {
+		house.CreatedAt = time.Now()
+	}
+
+	if house.ModifiedAt.IsZero() {
+		house.ModifiedAt = house.CreatedAt
+	}
+
+	rec := toHousesRecord(house)
+
+	_, err := s.db.ModelContext(ctx, rec).Returning("NULL").OnConflict("(id) DO UPDATE").Insert()
+	if err != nil {
+		return nil, err
+	}
+
+	return house, nil
 }
 
 func (s *housesStore) List(ctx context.Context, spec Spec, limit, offset int) ([]*House, error) {
@@ -44,14 +60,14 @@ func (s *housesStore) List(ctx context.Context, spec Spec, limit, offset int) ([
 		return nil, err
 	}
 
-	contacts := make([]*House, 0)
+	houses := make([]*housesRecord, 0)
 
-	_, err = s.db.QueryContext(ctx, &contacts, sql, args...)
+	_, err = s.db.QueryContext(ctx, &houses, sql, args...)
 	if err != nil {
 		return nil, err
 	}
 
-	return contacts, nil
+	return fromHousesRecords(houses), nil
 }
 
 type houseSpecQuery interface {
@@ -88,4 +104,45 @@ type houseProjectIDInSpecQuery struct {
 
 func (s houseProjectIDInSpecQuery) Expression() (goqu.Expression, error) {
 	return goqu.Ex{"project_id": s.spec.IDs}, nil
+}
+
+type housesRecord struct {
+	tableName      struct{}  `pg:"apartomat.houses,alias:houses"`
+	ID             string    `pg:"id,pk"`
+	City           string    `pg:"city"`
+	Address        string    `pg:"address"`
+	HousingComplex string    `pg:"housing_complex"`
+	CreatedAt      time.Time `pg:"created_at"`
+	ModifiedAt     time.Time `pg:"modified_at"`
+	ProjectID      string    `pg:"project_id"`
+}
+
+func toHousesRecord(house *House) *housesRecord {
+	return &housesRecord{
+		ID:             house.ID,
+		City:           house.City,
+		Address:        house.Address,
+		HousingComplex: house.HousingComplex,
+		CreatedAt:      house.CreatedAt,
+		ModifiedAt:     house.ModifiedAt,
+		ProjectID:      house.ProjectID,
+	}
+}
+
+func fromHousesRecords(records []*housesRecord) []*House {
+	houses := make([]*House, len(records))
+
+	for i, r := range records {
+		houses[i] = &House{
+			ID:             r.ID,
+			City:           r.City,
+			Address:        r.Address,
+			HousingComplex: r.HousingComplex,
+			CreatedAt:      r.CreatedAt,
+			ModifiedAt:     r.ModifiedAt,
+			ProjectID:      r.ProjectID,
+		}
+	}
+
+	return houses
 }

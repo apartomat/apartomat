@@ -1,0 +1,15 @@
+extend type Mutation {
+    updateHouse(houseId: String! data: UpdateHouseInput!): UpdateHouseResult!
+}
+
+input UpdateHouseInput {
+    city: String!
+    address: String!
+    housingComplex: String!
+}
+
+union UpdateHouseResult = HouseUpdated | NotFound | Forbidden | ServerError
+
+type HouseUpdated {
+    house: House!
+}
