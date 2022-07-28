@@ -1,0 +1,24 @@
+fragment AddHouse on House {
+  id
+  city
+  address
+  housingComplex
+  createdAt
+  modifiedAt
+}
+
+
+mutation addHouse($projectId: String! $house: AddHouseInput!) {
+  addHouse(projectId: $projectId house: $house) {
+    __typename
+    ...on HouseAdded {
+      house {
+        ...AddHouse
+      }
+    }
+    ...on Error {
+        __typename
+        message
+    }
+  }
+}

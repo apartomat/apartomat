@@ -56,8 +56,11 @@ interface RouteParams {
 export function Project () {
     let { id } = useParams<RouteParams>()
 
+    const [ error, setError ] = useState<string | undefined>(undefined)
+
     const { user } = useAuthContext()
-    const { data, loading, error } = useProject(id)
+
+    const { data, loading, error: fetchError, refetch, refetching } = useProject(id)
 
     const [ notification, setNotification ] = useState("")
     const [ showNotification, setShowNotification ] = useState(false)
@@ -79,17 +82,38 @@ export function Project () {
     const [ projectEnums, setProjectEnums ] = useState<ProjectEnums | undefined>(undefined)
 
     useEffect(() => {
-        switch (data?.screen.projectScreen.project.__typename) {
-            case "Project":
-                setProject(data?.screen.projectScreen.project)
-                setProjectEnums(data?.screen.projectScreen.enums)
-                return
+        console.log({ loading, data, fetchError })
+    }, [ loading, data, fetchError ])
+
+    useEffect(() => {
+        if (fetchError) {
+            setError("Ошибка сервера")
+            console.error({...fetchError})
         }
+    }, [ fetchError ])
+
+    useEffect(() => {
+        const screen = data?.screen.projectScreen
+
+        if (screen?.project) {
+            switch (screen.project.__typename) {
+                case "Project":
+                    setProject(screen.project)
+                    setProjectEnums(screen.enums)
+                    break
+                case "NotFound":
+                    setError("Проект не найден")
+                    break
+                case "Forbidden":
+                    setError("Доступ запрещен")
+                    break
+            }
+        }        
     }, [ data ])
 
     const [showUploadFiles, setShowUploadFiles] = useState(false);
 
-    if (loading) {
+    if (loading && !refetching) {
         return (
             <Main pad="large">
                 <Box direction="row" gap="small" align="center">
@@ -102,42 +126,26 @@ export function Project () {
 
     if (error) {
         return (
-            <Main pad="large">
-                <Heading>Ошибка</Heading>
-                <Paragraph>{error}</Paragraph>
-            </Main>
-        );
-    }
-
-    switch (data?.screen.projectScreen.project.__typename) {
-        case "NotFound":
-            return (
-                <Main pad="large">
-                    <Heading level={2}>Ошибка</Heading>
-                    <Box>
-                        <Text>Проект не найден</Text>
-                    </Box>
-                </Main>
-            );
-        case "Forbidden":
-            return (
-                <Main pad="large">
-                    <Heading level={2}>Ошибка</Heading>
-                    <Paragraph>Доступ запрещен</Paragraph>
-                </Main>
-            );
-        // default:
-        //     return (
-        //         <Main pad="large">
-        //             <Heading>Ошибка</Heading>
-        //             <Paragraph>Неизвестная ошибка</Paragraph>
-        //         </Main>
-        //     );
+        <Main pad="large">
+            <Heading level={2}>Ошибка</Heading>
+            <Box>
+                <Text>{error}</Text>
+            </Box>
+        </Main>
+        )
     }
 
     if (project) {
         return (
             <Main pad={{vertical: "medium", horizontal: "large"}}>
+
+            {refetching ?
+                <Layer position="top" margin="medium" plain animate={false}>
+                    <Box direction="row" gap="small">
+                        <Loading message="Загрузка..."/>
+                        <Text>Загрузка...</Text>
+                    </Box>
+                </Layer> : null}
 
             {showNotification ? <Layer
                 position="top"
@@ -202,8 +210,19 @@ export function Project () {
                         <Contacts contacts={project.contacts} projectId={project.id.toString()} notify={notify}/>
                     </Box>
                     <Box width={{min: "35%"}}>
-                        <House houses={project.houses}/>
-                        <Rooms houses={project.houses}/>
+                        <Box margin="none">
+                            <Heading level={4} margin={{ bottom: "xsmall"}}>Адрес</Heading>
+                            <House
+                                projectId={project.id}
+                                houses={project.houses}
+                                onAdd={() => refetch()}
+                                onUpdate={() => refetch()}
+                            />
+                        </Box>
+                        <Box margin={{top: "small"}}>
+                            <Heading level={4} margin={{ bottom: "xsmall"}}>Комплектация</Heading>
+                            <Rooms houses={project.houses}/>
+                        </Box>
                     </Box>
                 </Box>
 

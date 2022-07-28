@@ -8,13 +8,10 @@ export default function Rooms({ houses }: { houses: ProjectHouses }) {
     const house = firstHouse(houses)
 
     return (
-        <Box margin={{top: "small"}}>
-            <Heading level={4} margin={{ bottom: "xsmall"}}>Комплектация</Heading>
-            <Box height="36px" justify="center">
-                {
-                    (house ? <RoomsText rooms={house.rooms}/> : <Text>n/a</Text>)
-                }
-            </Box>
+        <Box height="36px" justify="center">
+            {
+                (house ? <RoomsText rooms={house.rooms}/> : <Text>n/a</Text>)
+            }
         </Box>
     )
 }

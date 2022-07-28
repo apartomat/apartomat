@@ -1,37 +1,33 @@
-fragment ProjectScreenHouseRooms on HouseRooms {
-    list {
-        ...on HouseRoomsList {
-            items {
-                id
-                name
-                square
-                design
-            }
-        }
-        ...on Error {
-            message
-        }
-    }
-}
-
-fragment ProjectScreenHouses on ProjectHouses {
-    list(filter: {} limit: 1 offset: 0) {
-        __typename
-        ...on ProjectHousesList {
-            items {
-                id
-                city
-                address
-                housingComplex
-                createdAt
-                modifiedAt
-                rooms {
-                    ...ProjectScreenHouseRooms
+query project($id: String!) {
+    screen {
+        projectScreen: project(id: $id) {
+            project {
+                __typename
+                ...on Project {
+                    ...ProjectScreenProject
+                }
+                ...on Error {
+                    message
                 }
             }
-        }
-        ...on Error {
-            message
+            menu {
+                __typename
+                ...on MenuItems {
+                    items {
+                        title
+                        url
+                    }
+                }
+            }
+            enums {
+                status {
+                    items {
+                        key
+                        value
+                    }
+                }
+
+            }
         }
     }
 }
@@ -94,38 +90,49 @@ fragment ProjectScreenProject on Project {
     }
 }
 
-
-query project($id: String!) {
-    screen {
-        projectScreen: project(id: $id) {
-            project {
-                __typename
-                ...on Project {
-                    ...ProjectScreenProject
-                }
-                ...on Error {
-                    message
-                }
-               
-            }
-            menu {
-                __typename
-                ...on MenuItems {
-                    items {
-                        title
-                        url
-                    }
+fragment ProjectScreenHouses on ProjectHouses {
+    list(filter: {} limit: 1 offset: 0) {
+        __typename
+        ...on ProjectHousesList {
+            items {
+                ...ProjectScreenHouse
+                rooms {
+                    ...ProjectScreenHouseRooms
                 }
             }
-            enums {
-                status {
-                    items {
-                        key
-                        value
-                    }
-                }
-
-            }
+        }
+        ...on Error {
+            message
         }
     }
 }
+
+fragment ProjectScreenHouse on House {
+    id
+    city
+    address
+    housingComplex
+    createdAt
+    modifiedAt
+}
+
+fragment ProjectScreenHouseRooms on HouseRooms {
+    list {
+        ...on HouseRoomsList {
+            items {
+                ...ProjectScreenHouseRoom
+            }
+        }
+        ...on Error {
+            message
+        }
+    }
+}
+
+fragment ProjectScreenHouseRoom on Room {
+    id
+    name
+    square
+    design
+}
+
