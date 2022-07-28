@@ -12,7 +12,7 @@ func (r *mutationResolver) UpdateHouse(
 	houseID string,
 	input UpdateHouseInput,
 ) (UpdateHouseResult, error) {
-	contact, err := r.useCases.UpdateHouse(
+	house, err := r.useCases.UpdateHouse(
 		ctx,
 		houseID,
 		input.City,
@@ -33,5 +33,5 @@ func (r *mutationResolver) UpdateHouse(
 		return ServerError{Message: "can't update house"}, nil
 	}
 
-	return HouseUpdated{House: houseToGraphQL(contact)}, nil
+	return HouseUpdated{House: houseToGraphQL(house)}, nil
 }

@@ -109,9 +109,9 @@ func (s houseProjectIDInSpecQuery) Expression() (goqu.Expression, error) {
 type housesRecord struct {
 	tableName      struct{}  `pg:"apartomat.houses,alias:houses"`
 	ID             string    `pg:"id,pk"`
-	City           string    `pg:"city"`
-	Address        string    `pg:"address"`
-	HousingComplex string    `pg:"housing_complex"`
+	City           string    `pg:"city,use_zero"`
+	Address        string    `pg:"address,use_zero"`
+	HousingComplex string    `pg:"housing_complex,use_zero"`
 	CreatedAt      time.Time `pg:"created_at"`
 	ModifiedAt     time.Time `pg:"modified_at"`
 	ProjectID      string    `pg:"project_id"`

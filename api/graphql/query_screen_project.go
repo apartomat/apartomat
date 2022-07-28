@@ -34,9 +34,9 @@ func (r *projectScreenResolver) Project(ctx context.Context, obj *ProjectScreen)
 				return notFound()
 			}
 
-			log.Printf("can't resolve project (id=%d): %s", p.ID, err)
+			log.Printf("can't resolve project (id=%s): %s", p.ID, err)
 
-			return serverError()
+			return nil, fmt.Errorf("can't resolve project (id=%s): %w", p.ID, err)
 		}
 
 		return projectToGraphQL(project), nil
@@ -44,7 +44,7 @@ func (r *projectScreenResolver) Project(ctx context.Context, obj *ProjectScreen)
 
 	log.Printf("obj.Project is not a Project")
 
-	return serverError()
+	return nil, errors.New("obj.Project is not a Project")
 }
 
 func (r *projectScreenResolver) Menu(ctx context.Context, obj *ProjectScreen) (MenuResult, error) {
