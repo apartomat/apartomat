@@ -1,5 +1,5 @@
 import { FetchResult, useApolloClient } from "@apollo/client"
-import { useChangeProjectStatusMutation, ChangeProjectStatusMutation, ProjectStatus, ChangeProjectStatusMutationResult } from "../api/types.d"
+import { useChangeProjectStatusMutation, ChangeProjectStatusMutation, ProjectStatus, ChangeProjectStatusMutationResult } from "api/types.d"
 
 export function useChangeStatus(): [
     (projectId: string, status: ProjectStatus) => Promise<FetchResult<ChangeProjectStatusMutation>>,

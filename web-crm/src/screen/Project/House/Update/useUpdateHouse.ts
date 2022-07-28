@@ -5,7 +5,7 @@ import {
     UpdateHouseInput,
     UpdateHouseMutationResult,
     UpdateHouseFragment
-} from "../../../api/types.d"
+} from "api/types.d"
 
 export type UpdateHouse = (projectId: string, contact: UpdateHouseInput) => Promise<FetchResult<UpdateHouseMutation>>
 

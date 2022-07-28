@@ -1,6 +1,6 @@
 import React from "react"
 
-import { UserContext, UserContextStatus } from "../../common/context/auth/useAuthContext"
+import { UserContext, UserContextStatus } from "common/context/auth/useAuthContext"
 
 import { Avatar } from "grommet"
 

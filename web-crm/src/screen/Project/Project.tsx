@@ -4,14 +4,14 @@ import { useParams } from "react-router-dom"
 import { Main, Box, Header, Heading, Text, Paragraph,  Layer } from "grommet"
 import { StatusGood } from "grommet-icons"
 
-import AnchorLink from "../common/AnchorLink"
+import AnchorLink from "common/AnchorLink"
 import UserAvatar from "./UserAvatar/UserAvatar"
 
-import { useAuthContext } from "../common/context/auth/useAuthContext"
+import { useAuthContext } from "common/context/auth/useAuthContext"
 
 import { useProject, Project  as ProjectType } from "./useProject"
 import { ProjectFileType } from "./useUploadProjectFile"
-import { ProjectEnums } from "../api/types"
+import { ProjectEnums } from "api/types"
 
 import ChangeStatus from "./ChangeStatus/ChangeStatus"
 import Contacts from "./Contacts/Contacts"

@@ -11,7 +11,7 @@ import Login from "./Main/Login/Login";
 import Logout from "./logout/Logout";
 import Confirm from "./confirm/Confirm";
 import Workspace from './workspace/Workspace';
-import Project from './project/Project';
+import Project from 'screen/Project/Project'
 import Files from './files/Files';
 import Spec from './spec/Spec';
 

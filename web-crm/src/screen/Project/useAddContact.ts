@@ -1,5 +1,5 @@
 import { FetchResult, useApolloClient } from "@apollo/client"
-import { useAddContactMutation, AddContactMutation, AddContactInput, AddContactMutationResult, Contact as ContactType } from "../api/types.d"
+import { useAddContactMutation, AddContactMutation, AddContactInput, AddContactMutationResult, Contact as ContactType } from "api/types.d"
 
 export type AddContact = (projectId: string, contact: AddContactInput) => Promise<FetchResult<AddContactMutation>>
 
@@ -18,6 +18,6 @@ export function useAddContact(): [
 
 export default useAddContact
 
-export { ContactType } from "../api/types.d"  // @todo conflicts with Contact alias
+export { ContactType } from "api/types.d"  // @todo conflicts with Contact alias
 
 export type Contact = Pick<ContactType, "id" | "fullName" | "photo" | "details">
