@@ -8,7 +8,7 @@ import (
 	"log"
 )
 
-func (r *queryResolver) Spec(ctx context.Context, id string) (*SpecScreen, error) {
+func (r *screenQueryResolver) Spec(ctx context.Context, obj *ScreenQuery, id string) (*SpecScreen, error) {
 	return &SpecScreen{
 		Project: Project{ID: id},
 	}, nil

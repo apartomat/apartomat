@@ -443,6 +443,7 @@ type QueryResolver interface {
 }
 type ScreenQueryResolver interface {
 	Project(ctx context.Context, obj *ScreenQuery, id string) (*ProjectScreen, error)
+	Spec(ctx context.Context, obj *ScreenQuery, projectID string) (*SpecScreen, error)
 }
 type ShoppinglistQueryResolver interface {
 	ProductOnPage(ctx context.Context, obj *ShoppinglistQuery, url string) (*Product, error)
@@ -7616,7 +7617,7 @@ func (ec *executionContext) _ScreenQuery_spec(ctx context.Context, field graphql
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Spec, nil
+		return ec.resolvers.ScreenQuery().Spec(rctx, obj, fc.Args["projectId"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -7637,8 +7638,8 @@ func (ec *executionContext) fieldContext_ScreenQuery_spec(ctx context.Context, f
 	fc = &graphql.FieldContext{
 		Object:     "ScreenQuery",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "project":
@@ -14593,12 +14594,25 @@ func (ec *executionContext) _ScreenQuery(ctx context.Context, sel ast.SelectionS
 
 			})
 		case "spec":
+			field := field
 
-			out.Values[i] = ec._ScreenQuery_spec(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._ScreenQuery_spec(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
 			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -16359,6 +16373,10 @@ func (ec *executionContext) marshalNShoppinglistQuery2ᚖgithubᚗcomᚋapartoma
 		return graphql.Null
 	}
 	return ec._ShoppinglistQuery(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNSpecScreen2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐSpecScreen(ctx context.Context, sel ast.SelectionSet, v SpecScreen) graphql.Marshaler {
+	return ec._SpecScreen(ctx, sel, &v)
 }
 
 func (ec *executionContext) marshalNSpecScreen2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐSpecScreen(ctx context.Context, sel ast.SelectionSet, v *SpecScreen) graphql.Marshaler {

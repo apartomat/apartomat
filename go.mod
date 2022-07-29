@@ -3,7 +3,7 @@ module github.com/apartomat/apartomat
 go 1.18
 
 require (
-	github.com/99designs/gqlgen v0.17.12
+	github.com/99designs/gqlgen v0.17.13
 	github.com/Masterminds/squirrel v1.5.0
 	github.com/aws/aws-lambda-go v1.26.0
 	github.com/aws/aws-sdk-go-v2 v1.7.1

@@ -77,6 +77,8 @@ models:
     fields:
       project:
         resolver: true
+      spec:
+        resolver: true
   ProjectScreen:
     fields:
       project:
