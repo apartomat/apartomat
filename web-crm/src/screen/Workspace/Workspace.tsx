@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
 
-import { useAuthContext } from "../common/context/auth/useAuthContext"
+import { useAuthContext } from "common/context/auth/useAuthContext"
 import { useWorkspace, WorkspaceUsersResult, WorkspaceProjectsListResult, WorkspaceProject } from "./useWorkspace"
 import { useCreateProject, State as CreateProjectState } from "./useCreateProject"
 
@@ -9,7 +9,7 @@ import { Main, Box, Header, Heading, Text,
     List, Button, Paragraph, Spinner, SpinnerExtendedProps,
     Layer, Form, FormField, TextInput, DateInput, Accordion, AccordionPanel } from "grommet"
 import { FormClose } from "grommet-icons"
-import AnchorLink from "../common/AnchorLink"
+import AnchorLink from "common/AnchorLink"
 import UserAvatar from "./UserAvatar";
 
 interface RouteParams {
