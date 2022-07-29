@@ -12,7 +12,7 @@ import Logout from "./logout/Logout";
 import Confirm from "./confirm/Confirm";
 import Workspace from './workspace/Workspace';
 import Project from 'screen/Project/Project'
-import Files from './files/Files';
+import Files from 'screen/Files/Files';
 import Spec from 'screen/Spec/Spec';
 
 import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
