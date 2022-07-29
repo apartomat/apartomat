@@ -8,7 +8,7 @@ import PrivateRoute from "./common/context/auth/PrivateRoute/PrivateRoute"
 import RedirectToDefaultWorkspace from "./common/context/auth/RedirectToDefaultWorkspace/RedirectToDefaultWorkspace"
 
 import Login from "screen/Login/Login";
-import Logout from "./logout/Logout";
+import Logout from "screen/Logout/Logout";
 import Confirm from "screen/Confirm/Confirm";
 import Workspace from './workspace/Workspace';
 import Project from 'screen/Project/Project'
