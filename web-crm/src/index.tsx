@@ -13,7 +13,7 @@ import Confirm from "./confirm/Confirm";
 import Workspace from './workspace/Workspace';
 import Project from 'screen/Project/Project'
 import Files from './files/Files';
-import Spec from './spec/Spec';
+import Spec from 'screen/Spec/Spec';
 
 import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
 import { setContext } from '@apollo/client/link/context';

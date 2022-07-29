@@ -791,7 +791,7 @@ export type SpecScreenQueryVariables = Exact<{
 }>;
 
 
-export type SpecScreenQuery = { __typename?: 'Query', screen: { __typename?: 'ScreenQuery', screen: { __typename?: 'SpecScreen', project: { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'Project', id: string, title: string } | { __typename: 'ServerError', message: string } } } };
+export type SpecScreenQuery = { __typename?: 'Query', screen: { __typename?: 'ScreenQuery', specScreen: { __typename?: 'SpecScreen', project: { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'Project', id: string, title: string } | { __typename: 'ServerError', message: string } } } };
 
 export type UpdateContactMutationVariables = Exact<{
   contactId: Scalars['String'];
@@ -1497,7 +1497,7 @@ export type ProjectQueryResult = Apollo.QueryResult<ProjectQuery, ProjectQueryVa
 export const SpecScreenDocument = gql`
     query specScreen($projectId: String!) {
   screen {
-    screen: spec(projectId: $projectId) {
+    specScreen: spec(projectId: $projectId) {
       project {
         __typename
         ... on Project {

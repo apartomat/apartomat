@@ -1,6 +1,6 @@
 query specScreen($projectId: String!) {
     screen {
-        screen: spec(projectId: $projectId) {
+        specScreen: spec(projectId: $projectId) {
             project {
                 __typename
                 ...on Project {

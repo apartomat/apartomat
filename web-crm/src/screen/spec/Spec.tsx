@@ -35,9 +35,9 @@ export default function Spec() {
         console.log("add", { ...args })
     }
 
-    switch (data?.screen.screen.project.__typename) {
+    switch (data?.screen.specScreen.project.__typename) {
         case "Project":
-            const { project } = data?.screen.screen;
+            const { project } = data?.screen.specScreen;
             return (
                 <Fragment>
                     <h2>{project.title}</h2>

@@ -1,5 +1,5 @@
 import { useApolloClient } from "@apollo/client";
-import { useSpecScreenQuery } from "../api/types.d";
+import { useSpecScreenQuery } from "api/types.d";
 
 export default function useSpecScreen(projectId: string) {
     const client = useApolloClient(); 
