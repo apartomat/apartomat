@@ -5,7 +5,7 @@ import LoginForm from "./LoginForm"
 import CheckEmail from "./CheckEmail"
 import Pin from "./Pin"
 
-import useAuthContext, { UserContextStatus } from "../../common/context/auth/useAuthContext"
+import useAuthContext, { UserContextStatus } from "common/context/auth/useAuthContext"
 
 import { useLoginByEmail } from "./useLoginByEmail"
 

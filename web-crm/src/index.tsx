@@ -7,7 +7,7 @@ import AuthProvider from "./common/context/auth/AuthProvider/AuthProvider"
 import PrivateRoute from "./common/context/auth/PrivateRoute/PrivateRoute"
 import RedirectToDefaultWorkspace from "./common/context/auth/RedirectToDefaultWorkspace/RedirectToDefaultWorkspace"
 
-import Login from "./Main/Login/Login";
+import Login from "screen/Login/Login";
 import Logout from "./logout/Logout";
 import Confirm from "./confirm/Confirm";
 import Workspace from './workspace/Workspace';

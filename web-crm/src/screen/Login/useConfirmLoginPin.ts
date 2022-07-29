@@ -1,7 +1,7 @@
 import { FetchResult, useApolloClient } from "@apollo/client"
-import { useConfirmLoginPinMutation, ConfirmLoginPinMutation, ConfirmLoginPinMutationResult } from "../../api/types.d"
+import { useConfirmLoginPinMutation, ConfirmLoginPinMutation, ConfirmLoginPinMutationResult } from "api/types.d"
 
-export type { ConfirmLoginPinMutation } from "../../api/types.d"
+export type { ConfirmLoginPinMutation } from "api/types.d"
 
 export function useConfirmLoginPin(): [
     (token: string, pin: string) => Promise<FetchResult<ConfirmLoginPinMutation>>,
