@@ -3,8 +3,8 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useHistory } from "react-router-dom";
 
 import useConfirmLogin from "./useConfirmLogin";
-import useAuthContext from "../common/context/auth/useAuthContext";
-import useToken from "../common/context/auth/useToken";
+import useAuthContext from "common/context/auth/useAuthContext";
+import useToken from "common/context/auth/useToken";
 
 export function Confirm({ redrectTo = "/"}) {
     const location = useLocation();

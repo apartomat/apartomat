@@ -9,7 +9,7 @@ import RedirectToDefaultWorkspace from "./common/context/auth/RedirectToDefaultW
 
 import Login from "screen/Login/Login";
 import Logout from "./logout/Logout";
-import Confirm from "./confirm/Confirm";
+import Confirm from "screen/Confirm/Confirm";
 import Workspace from './workspace/Workspace';
 import Project from 'screen/Project/Project'
 import Files from 'screen/Files/Files';
