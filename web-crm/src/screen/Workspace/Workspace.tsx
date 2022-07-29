@@ -10,7 +10,7 @@ import { Main, Box, Header, Heading, Text,
     Layer, Form, FormField, TextInput, DateInput, Accordion, AccordionPanel } from "grommet"
 import { FormClose } from "grommet-icons"
 import AnchorLink from "common/AnchorLink"
-import UserAvatar from "./UserAvatar";
+import UserAvatar from "./UserAvatar"
 
 interface RouteParams {
     id: string

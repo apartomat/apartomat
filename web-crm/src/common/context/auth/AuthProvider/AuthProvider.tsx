@@ -1,6 +1,6 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode } from "react"
 
-import { authContext, useAuthProvider } from "../useAuthContext";
+import { authContext, useAuthProvider } from "../useAuthContext"
 
 export function AuthProvider({ children }: { children: ReactNode }) {
     const auth = useAuthProvider();

@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import {Route, Redirect, RouteProps } from "react-router-dom";
+import React, { useEffect } from "react"
+import {Route, Redirect, RouteProps } from "react-router-dom"
 
 import { Main, Box, Text, SpinnerExtendedProps, Spinner, Heading, Paragraph } from "grommet"
 

@@ -1,5 +1,5 @@
-import React from "react";
-import {Form as FormElement, FormField, TextInput} from "grommet";
+import React from "react"
+import {Form as FormElement, FormField, TextInput} from "grommet"
 
 export type Value = { city: string, address: string, housingComplex: string }
 

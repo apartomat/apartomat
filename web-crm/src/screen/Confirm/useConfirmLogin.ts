@@ -1,5 +1,5 @@
-import { FetchResult, useApolloClient } from "@apollo/client";
-import { useConfirmLoginLinkMutation, ConfirmLoginLinkMutation, ConfirmLoginLinkMutationResult } from "api/types.d";
+import { FetchResult, useApolloClient } from "@apollo/client"
+import { useConfirmLoginLinkMutation, ConfirmLoginLinkMutation, ConfirmLoginLinkMutationResult } from "api/types.d"
 
 export function useConfirmLogin(): [
     (email: string) => Promise<FetchResult<ConfirmLoginLinkMutation>>,

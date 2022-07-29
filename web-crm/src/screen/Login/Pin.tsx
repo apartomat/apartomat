@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react"
-import { useHistory } from "react-router-dom";
+import { useHistory } from "react-router-dom"
 
 import { useConfirmLoginPin, ConfirmLoginPinMutation } from "./useConfirmLoginPin"
 
-import useAuthContext from "common/context/auth/useAuthContext";
+import useAuthContext from "common/context/auth/useAuthContext"
 import useToken from "common/context/auth/useToken"
 
 import { Main, Heading, Box, Form, FormField, Button, MaskedInput, Text } from "grommet"

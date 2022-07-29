@@ -5,8 +5,8 @@ import {Box, Button, BoxExtendedProps } from "grommet"
 import { ProjectHouses } from "../useProject"
 
 import { House as HouseType } from "./Add/useAddHouse"
-import { Update } from "./Update/Update";
-import { Add } from "./Add/Add";
+import { Update } from "./Update/Update"
+import { Add } from "./Add/Add"
 
 export default function House({
     houses,

@@ -3,21 +3,21 @@ import { Grommet } from "grommet"
 import ReactDOM from "react-dom"
 import {BrowserRouter as Router, Switch, Route} from "react-router-dom"
 
-import AuthProvider from "./common/context/auth/AuthProvider/AuthProvider"
-import PrivateRoute from "./common/context/auth/PrivateRoute/PrivateRoute"
-import RedirectToDefaultWorkspace from "./common/context/auth/RedirectToDefaultWorkspace/RedirectToDefaultWorkspace"
+import AuthProvider from "common/context/auth/AuthProvider/AuthProvider"
+import PrivateRoute from "common/context/auth/PrivateRoute/PrivateRoute"
+import RedirectToDefaultWorkspace from "common/context/auth/RedirectToDefaultWorkspace/RedirectToDefaultWorkspace"
 
-import Login from "screen/Login/Login";
-import Logout from "screen/Logout/Logout";
-import Confirm from "screen/Confirm/Confirm";
-import Workspace from 'screen/Workspace/Workspace';
-import Project from 'screen/Project/Project'
-import Files from 'screen/Files/Files';
-import Spec from 'screen/Spec/Spec';
+import Login from "screen/Login/Login"
+import Logout from "screen/Logout/Logout"
+import Confirm from "screen/Confirm/Confirm"
+import Workspace from "screen/Workspace/Workspace"
+import Project from "screen/Project/Project"
+import Files from "screen/Files/Files"
+import Spec from "screen/Spec/Spec"
 
-import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
-import { setContext } from '@apollo/client/link/context';
-import { createUploadLink } from "apollo-upload-client";
+import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client"
+import { setContext } from "@apollo/client/link/context"
+import { createUploadLink } from "apollo-upload-client"
 
 const authLink = setContext((_, { headers }) => {
   const token = JSON.parse(localStorage.getItem("token") || `""`);

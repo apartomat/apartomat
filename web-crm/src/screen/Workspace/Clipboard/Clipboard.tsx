@@ -1,6 +1,6 @@
-import React, { useState, useEffect }from 'react';
+import React, { useState, useEffect } from 'react'
 
-import './Clipboard.css';
+import './Clipboard.css'
 
 function useLoading(): [boolean, (fn: () => void) => void] {
     const [ isLoading, setLoading ] = useState(false);

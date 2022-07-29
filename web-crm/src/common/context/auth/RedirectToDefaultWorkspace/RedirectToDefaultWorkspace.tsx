@@ -1,7 +1,7 @@
-import React from "react";
-import { Redirect, RouteProps} from "react-router-dom";
+import React from "react"
+import { Redirect, RouteProps} from "react-router-dom"
 
-import useAuthContext from '../useAuthContext';
+import useAuthContext from "../useAuthContext"
 
 function RedirectToDefaultWorkspace({ children, ...rest }: RouteProps) {
     const { user } = useAuthContext();
