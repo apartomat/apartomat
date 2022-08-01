@@ -4,19 +4,20 @@ import { useChangeStatus } from "../useChangeStatus"
 
 import { ProjectStatus, ProjectStatusEnum, ProjectStatusEnumItem } from "api/types.d"
 
-import { Box, Button, Drop, Text } from "grommet"
+import { Box, BoxExtendedProps, Button, Drop, Text } from "grommet"
 
 export default function ChangeStatus({
     projectId,
     status,
     values,
-    onProjectStatusChanged
+    onProjectStatusChanged,
+    ...boxProps
 }: {
     projectId: string,
     status: ProjectStatus,
     values?: ProjectStatusEnum,
     onProjectStatusChanged?: ({ status }: { status: ProjectStatus }) => void
-}) {
+} & BoxExtendedProps) {
     const [ show, setShow ] = useState<Boolean>(false)
     
     const [ state, setState ] = useState(status)
@@ -50,7 +51,7 @@ export default function ChangeStatus({
     const targetRef = useRef<HTMLDivElement>(null)
 
     return (
-        <Box justify="center" margin={{ horizontal: "medium"}}>
+        <Box {...boxProps} justify="center">
             <Box ref={targetRef}>
                 <Button
                     label={label}

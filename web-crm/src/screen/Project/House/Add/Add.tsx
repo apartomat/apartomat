@@ -46,7 +46,12 @@ export function Add({
             }
         }
 
-    }, [ data, onAdd ])
+        if (error) {
+            console.error(error)
+            setErrorMessage("Ошибка сервера")
+        }
+
+    }, [ data, error, onAdd ])
 
     return (
         <Layer

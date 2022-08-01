@@ -1,6 +1,6 @@
 import React from "react"
 
-import { Box, Heading, Text } from "grommet"
+import { Box, Text } from "grommet"
 
 import { ProjectHouses, HouseRooms } from "../useProject"
 

@@ -3,13 +3,13 @@ import React, { useState, useEffect} from "react"
 import { Layer, Box, Heading, Button, Calendar } from "grommet"
 import { FormClose } from "grommet-icons"
 
-import { useChangeDates } from "../useChangeDates"
+import { useChangeDates } from "../../useChangeDates"
 
-export default function ChangeDates({
+export default function Change({
     projectId,
     startAt,
     endAt,
-    onProjectDatesChanged,
+    onChange,
     onEsc,
     onClickOutside,
     onClickClose
@@ -17,7 +17,7 @@ export default function ChangeDates({
     projectId: string,
     startAt?: string,
     endAt?: string,
-    onProjectDatesChanged?: (dates: { startAt?: string, endAt?: string }) => void,
+    onChange?: (dates: { startAt?: string, endAt?: string }) => void,
     onEsc?: () => void,
     onClickOutside?: () => void,
     onClickClose?: () => void
@@ -29,9 +29,9 @@ export default function ChangeDates({
     useEffect(() => {
         switch (data?.changeProjectDates.__typename) {
             case "ProjectDatesChanged":
-                onProjectDatesChanged && onProjectDatesChanged({ startAt: dates && dates[0] && dates[0][0], endAt: dates && dates[0] && dates[0][1] })
+                onChange && onChange({ startAt: dates && dates[0] && dates[0][0], endAt: dates && dates[0] && dates[0][1] })
         }
-    }, [ data, dates, onProjectDatesChanged ])
+    }, [ data, dates, onChange ])
 
 
     const handleSelect = (value: any) => {

@@ -20,4 +20,4 @@ export default useAddContact
 
 export { ContactType } from "api/types.d"  // @todo conflicts with Contact alias
 
-export type Contact = Pick<ContactType, "id" | "fullName" | "photo" | "details">
+export type ProjectContact = Pick<ContactType, "id" | "fullName" | "photo" | "details">

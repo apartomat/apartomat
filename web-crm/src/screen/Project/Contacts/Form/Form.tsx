@@ -1,10 +1,10 @@
 import React from "react"
 
-import { Form, FormField, MaskedInput } from "grommet"
+import { Form as FormElement, FormField, MaskedInput } from "grommet"
 
 export type ContactFormData = { fullName: string, phone: string, email: string, instagram: string }
 
-export function ContactForm({
+export function Form({
     contact,
     onSet,
     onSubmit,
@@ -16,7 +16,7 @@ export function ContactForm({
     submit: JSX.Element
 }) {
     return (
-        <Form
+        <FormElement
             validate="submit"
             value={contact}
             onChange={val => onSet(val)}
@@ -92,9 +92,8 @@ export function ContactForm({
                 />
             </FormField>
             {submit}
-        </Form>
+        </FormElement>
     )
 }
 
-
-export default ContactForm
+export default Form

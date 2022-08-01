@@ -1,14 +1,15 @@
-import React, { Dispatch, SetStateAction } from "react"
+import React from "react"
 
-import { Box, Heading, Image, Button, Text } from "grommet"
+import { Box, BoxExtendedProps, Image, Text } from "grommet"
 
 import { ProjectFiles } from "../useProject"
 
-export default function Visualizations({ files, showUploadFiles }: { files: ProjectFiles, showUploadFiles: Dispatch<SetStateAction<boolean>> }) {
-    const handleUploadFiles = () => {
-        showUploadFiles(true)
-    }
-
+export default function Visualizations({
+    files,
+    ...boxProps
+}: {
+    files: ProjectFiles
+} & BoxExtendedProps) {
     switch (files.list.__typename) {
         case "ProjectFilesList":
             if (files.list.items.length === 0) {
@@ -16,14 +17,8 @@ export default function Visualizations({ files, showUploadFiles }: { files: Proj
             }
 
             return (
-                <Box margin={{vertical: "medium"}}>
-                    <Box direction="row" justify="between">
-                        <Heading level={3}>Визуализации</Heading>
-                        <Box justify="center">
-                            <Button color="brand" label="Загрузить" onClick={handleUploadFiles} />
-                        </Box>
-                    </Box>
-                    <Box direction="row" gap="small" overflow={{"horizontal":"auto"}} >
+                <Box {...boxProps}>
+                    <Box direction="row" gap="small" overflow={{"horizontal":"auto"}}>
                         {files.list.items.map(file =>
                             <Box
                                 key={file.id}
@@ -50,6 +45,6 @@ export default function Visualizations({ files, showUploadFiles }: { files: Proj
                 </Box>
             )
         default:
-            return <div>n/a</div>
+            return null
     }
 }

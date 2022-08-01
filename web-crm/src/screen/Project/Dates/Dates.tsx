@@ -2,18 +2,18 @@ import React, { useState, useEffect } from "react"
 
 import { Box, Button } from "grommet"
 
-import ChangeDates from "../ChangeDates/ChangeDates"
+import ChangeDates from "./Change/Change"
 
-export default function ProjectDates ({
+export default function Dates({
     projectId,
     startAt,
     endAt,
-    onProjectDatesChanged
+    onChange
 }: {
     projectId: string,
     startAt?: string,
     endAt?: string,
-    onProjectDatesChanged?: (dates: { startAt?: string, endAt?: string }) => void,
+    onChange?: (dates: { startAt?: string, endAt?: string }) => void,
 }) {
     const [ showChangeDates, setShowChangeDates ] = useState(false)
 
@@ -53,8 +53,8 @@ export default function ProjectDates ({
                     onEsc={() => setShowChangeDates(false) }
                     onClickOutside={() => setShowChangeDates(false) }
                     onClickClose={() => setShowChangeDates(false) }
-                    onProjectDatesChanged={({ startAt, endAt }) => {
-                        onProjectDatesChanged && onProjectDatesChanged({ startAt, endAt })
+                    onChange={({ startAt, endAt }) => {
+                        onChange && onChange({ startAt, endAt })
                         setShowChangeDates(false)
                     }}
                 />

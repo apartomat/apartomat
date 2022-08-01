@@ -3,16 +3,16 @@ import React, { useEffect, useState, Dispatch, SetStateAction } from "react"
 import { Box, Button, Heading, Layer, Text } from "grommet"
 import { FormClose } from "grommet-icons"
 
-import ContactForm, { ContactFormData }  from "../ContactForm/ContactForm"
+import Form, { ContactFormData }  from "../Form/Form"
 
-import { useAddContact, ContactType, Contact } from "../useAddContact"
+import { useAddContact, ContactType, ProjectContact } from "./useAddContact"
 
-export default function AddContact(
+export default function Add(
     { projectId, setShow, onAdd }:
     {
         projectId: string,
         setShow: Dispatch<SetStateAction<boolean>>,
-        onAdd: (contact: Contact) => void
+        onAdd: (contact: ProjectContact) => void
     }) {
 
     const [ value, setValue ] = useState({} as ContactFormData)
@@ -62,7 +62,7 @@ export default function AddContact(
                         <Heading level={3} margin="none">Добавить контакт</Heading>
                         <Button icon={ <FormClose/> } onClick={() => setShow(false)}/>
                     </Box>
-                    <ContactForm
+                    <Form
                         contact={value}
                         onSet={setValue}
                         onSubmit={handleSubmit}

@@ -3,11 +3,11 @@ import React, { useEffect, useState } from "react"
 import { Box, Button, Heading, Layer, Text } from "grommet"
 import { FormClose } from "grommet-icons"
 
-import { ContactForm, ContactFormData } from "../ContactForm/ContactForm"
+import { Form, ContactFormData } from "../Form/Form"
 
-import { useUpdateContact, Contact, ContactType } from "../useUpdateContact"
+import { useUpdateContact, Contact, ContactType } from "./useUpdateContact"
 
-export default function UpdateContact(
+export default function Update(
     { contact, hide, onUpdate }:
     {
         contact: Contact,
@@ -66,7 +66,7 @@ export default function UpdateContact(
                         <Heading level={3} margin="none">Изменить контакт</Heading>
                         <Button icon={ <FormClose/> } onClick={hide}/>
                     </Box>
-                    <ContactForm
+                    <Form
                         contact={value}
                         onSet={setValue}
                         onSubmit={handleSubmit}

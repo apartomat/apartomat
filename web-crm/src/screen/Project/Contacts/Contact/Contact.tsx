@@ -3,11 +3,11 @@ import React, { useState, useEffect, useRef } from "react"
 import { Box, Button, Drop, Card, CardHeader, CardBody, CardFooter } from "grommet"
 import { Instagram, Trash } from "grommet-icons"
 
-import useDeleteContact, { Contact, ContactType } from "../useDeleteContact"
+import useDeleteContact, { Contact as ProjectContact, ContactType } from "../../useDeleteContact"
 
-export default function ContactCard(
+export default function Contact(
     { contact, onDelete, onClickUpdate }:
-    { contact: Contact , onDelete: (contact: Contact) => void, onClickUpdate: (contact: Contact) => void }
+    { contact: ProjectContact , onDelete: (contact: ProjectContact) => void, onClickUpdate: (contact: ProjectContact) => void }
 ) {
     const ref = useRef(null)
 
