@@ -3,7 +3,7 @@ import React, { useState, useEffect} from "react"
 import { Layer, Box, Heading, Button, Calendar } from "grommet"
 import { FormClose } from "grommet-icons"
 
-import { useChangeDates } from "../../useChangeDates"
+import { useChangeDates } from "../useChangeDates"
 
 export default function Change({
     projectId,

@@ -3,7 +3,7 @@ import React, { useState, useEffect, Dispatch, SetStateAction, ChangeEvent } fro
 import { Layer, Form, FormField, Box, Heading, Button, FileInput, Image, Text  } from "grommet"
 import { FormClose } from "grommet-icons"
 
-import useUploadProjectFile, { ProjectFileType } from "../useUploadProjectFile"
+import useUploadProjectFile, { ProjectFileType } from "./useUploadProjectFile"
 
 export default function UploadFiles(
     { projectId, type, setShow, onUploadComplete }:

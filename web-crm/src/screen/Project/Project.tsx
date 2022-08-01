@@ -10,7 +10,7 @@ import UserAvatar from "./UserAvatar/UserAvatar"
 import { useAuthContext } from "common/context/auth/useAuthContext"
 
 import { useProject, Project  as ProjectType } from "./useProject"
-import { ProjectFileType } from "./useUploadProjectFile"
+import { ProjectFileType } from "api/types.d"
 import { ProjectEnums } from "api/types"
 
 import ChangeStatus from "./ChangeStatus/ChangeStatus"
