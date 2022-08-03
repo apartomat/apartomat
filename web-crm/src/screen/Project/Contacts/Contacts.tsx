@@ -40,7 +40,7 @@ export default function Contacts({
 
             return (
                 <Box {...boxProps}>
-                    <Box direction="row" gap="small" wrap>
+                    <Box direction="row">
                         {[...list.map((contact) => {
                             return (
                                 <Contact
@@ -53,6 +53,7 @@ export default function Contacts({
                                     onClickUpdate={(contact: ProjectContact) => {
                                         setUpdateContact(contact)
                                     }}
+                                    margin={{right: "xsmall", bottom: "xsmall"}}
                                 />
                             )
                         }), <Button key="" icon={<Add/>} label="Добавить" onClick={() => setShowAddContact(true) }/>]}

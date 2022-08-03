@@ -1,14 +1,20 @@
 import React, { useState, useEffect, useRef } from "react"
 
-import { Box, Button, Drop, Card, CardHeader, CardBody, CardFooter } from "grommet"
+import { Box, BoxExtendedProps, Button, Drop, Card, CardHeader, CardBody, CardFooter } from "grommet"
 import { Instagram, Trash } from "grommet-icons"
 
 import useDeleteContact, { Contact as ProjectContact, ContactType } from "../useDeleteContact"
 
-export default function Contact(
-    { contact, onDelete, onClickUpdate }:
-    { contact: ProjectContact , onDelete: (contact: ProjectContact) => void, onClickUpdate: (contact: ProjectContact) => void }
-) {
+export default function Contact({
+    contact,
+    onDelete,
+    onClickUpdate,
+    ...boxProps
+}: {
+    contact: ProjectContact,
+    onDelete: (contact: ProjectContact) => void,
+    onClickUpdate: (contact: ProjectContact) => void
+} & BoxExtendedProps) {
     const ref = useRef(null)
 
     const [showCard, setShowCard] = useState(false)
@@ -39,7 +45,7 @@ export default function Contact(
     }, [ data, contact, onDelete ])
 
     return (
-        <Box>
+        <Box {...boxProps}>
             <Button
                 key={contact.id}
                 ref={ref}
