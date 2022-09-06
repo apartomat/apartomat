@@ -66,7 +66,7 @@ func roomToGraphQL(room *rooms.Room) *Room {
 		ID:         room.ID,
 		Name:       room.Name,
 		Square:     room.Square,
-		Design:     room.Design,
+		Level:      room.Level,
 		CreatedAt:  room.CreatedAt,
 		ModifiedAt: room.ModifiedAt,
 	}

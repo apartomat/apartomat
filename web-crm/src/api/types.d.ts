@@ -32,6 +32,14 @@ export type AddHouseInput = {
 
 export type AddHouseResult = Forbidden | HouseAdded | NotFound | ServerError;
 
+export type AddRoomInput = {
+  level?: Maybe<Scalars['Int']>;
+  name: Scalars['String'];
+  square?: Maybe<Scalars['Float']>;
+};
+
+export type AddRoomResult = Forbidden | NotFound | RoomAdded;
+
 export type AlreadyExists = Error & {
   __typename?: 'AlreadyExists';
   message: Scalars['String'];
@@ -105,6 +113,8 @@ export type CreateProjectInput = {
 export type CreateProjectResult = Forbidden | ProjectCreated | ServerError;
 
 export type DeleteContactResult = ContactDeleted | Forbidden | NotFound | ServerError;
+
+export type DeleteRoomResult = Forbidden | NotFound | RoomDeleted;
 
 export type Error = {
   message: Scalars['String'];
@@ -219,16 +229,19 @@ export type Mutation = {
   __typename?: 'Mutation';
   addContact: AddContactResult;
   addHouse: AddHouseResult;
+  addRoom: AddRoomResult;
   changeProjectDates: ChangeProjectDatesResult;
   changeProjectStatus: ChangeProjectStatusResult;
   confirmLoginLink: ConfirmLoginLinkResult;
   confirmLoginPin: ConfirmLoginPinResult;
   createProject: CreateProjectResult;
   deleteContact: DeleteContactResult;
+  deleteRoom: DeleteRoomResult;
   loginByEmail: LoginByEmailResult;
   ping: Scalars['String'];
   updateContact: UpdateContactResult;
   updateHouse: UpdateHouseResult;
+  updateRoom: UpdateRoomResult;
   uploadProjectFile: UploadProjectFileResult;
 };
 
@@ -242,6 +255,12 @@ export type MutationAddContactArgs = {
 export type MutationAddHouseArgs = {
   house: AddHouseInput;
   projectId: Scalars['String'];
+};
+
+
+export type MutationAddRoomArgs = {
+  houseId: Scalars['String'];
+  room: AddRoomInput;
 };
 
 
@@ -278,6 +297,11 @@ export type MutationDeleteContactArgs = {
 };
 
 
+export type MutationDeleteRoomArgs = {
+  id: Scalars['String'];
+};
+
+
 export type MutationLoginByEmailArgs = {
   email: Scalars['String'];
   workspaceName?: Scalars['String'];
@@ -293,6 +317,12 @@ export type MutationUpdateContactArgs = {
 export type MutationUpdateHouseArgs = {
   data: UpdateHouseInput;
   houseId: Scalars['String'];
+};
+
+
+export type MutationUpdateRoomArgs = {
+  data: UpdateRoomInput;
+  roomId: Scalars['String'];
 };
 
 
@@ -518,11 +548,26 @@ export type QueryWorkspaceArgs = {
 export type Room = {
   __typename?: 'Room';
   createdAt: Scalars['Time'];
-  design: Scalars['Boolean'];
   id: Scalars['String'];
+  level?: Maybe<Scalars['Int']>;
   modifiedAt: Scalars['Time'];
   name: Scalars['String'];
   square?: Maybe<Scalars['Float']>;
+};
+
+export type RoomAdded = {
+  __typename?: 'RoomAdded';
+  room: Room;
+};
+
+export type RoomDeleted = {
+  __typename?: 'RoomDeleted';
+  room: Room;
+};
+
+export type RoomUpdated = {
+  __typename?: 'RoomUpdated';
+  room: Room;
 };
 
 export type ScreenQuery = {
@@ -583,6 +628,14 @@ export type UpdateHouseInput = {
 };
 
 export type UpdateHouseResult = Forbidden | HouseUpdated | NotFound | ServerError;
+
+export type UpdateRoomInput = {
+  level?: Maybe<Scalars['Int']>;
+  name: Scalars['String'];
+  square?: Maybe<Scalars['Float']>;
+};
+
+export type UpdateRoomResult = Forbidden | NotFound | RoomUpdated;
 
 export type UploadProjectFileInput = {
   file: Scalars['Upload'];
@@ -774,17 +827,17 @@ export type ProjectQueryVariables = Exact<{
 }>;
 
 
-export type ProjectQuery = { __typename?: 'Query', screen: { __typename?: 'ScreenQuery', projectScreen: { __typename?: 'ProjectScreen', project: { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'Project', id: string, title: string, startAt?: any | null | undefined, endAt?: any | null | undefined, status: ProjectStatus, contacts: { __typename?: 'ProjectContacts', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectContactsList', items: Array<{ __typename?: 'Contact', id: string, fullName: string, photo: string, details: Array<{ __typename?: 'ContactDetails', type: ContactType, value: string }> }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectContactsTotal', total: number } | { __typename: 'ServerError' } }, houses: { __typename?: 'ProjectHouses', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectHousesList', items: Array<{ __typename?: 'House', id: string, city: string, address: string, housingComplex: string, createdAt: any, modifiedAt: any, rooms: { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null | undefined, design: boolean }> } | { __typename?: 'ServerError', message: string } } }> } | { __typename: 'ServerError', message: string } }, files: { __typename?: 'ProjectFiles', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectFilesList', items: Array<{ __typename?: 'ProjectFile', id: string, name: string, url: any, type: ProjectFileType }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectFilesTotal', total: number } | { __typename: 'ServerError' } } } | { __typename: 'ServerError', message: string }, menu: { __typename: 'MenuItems', items: Array<{ __typename?: 'MenuItem', title: string, url: string }> } | { __typename: 'ServerError' }, enums: { __typename?: 'ProjectEnums', status: { __typename?: 'ProjectStatusEnum', items: Array<{ __typename?: 'ProjectStatusEnumItem', key: ProjectStatus, value: string }> } } } } };
+export type ProjectQuery = { __typename?: 'Query', screen: { __typename?: 'ScreenQuery', projectScreen: { __typename?: 'ProjectScreen', project: { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'Project', id: string, title: string, startAt?: any | null | undefined, endAt?: any | null | undefined, status: ProjectStatus, contacts: { __typename?: 'ProjectContacts', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectContactsList', items: Array<{ __typename?: 'Contact', id: string, fullName: string, photo: string, details: Array<{ __typename?: 'ContactDetails', type: ContactType, value: string }> }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectContactsTotal', total: number } | { __typename: 'ServerError' } }, houses: { __typename?: 'ProjectHouses', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectHousesList', items: Array<{ __typename?: 'House', id: string, city: string, address: string, housingComplex: string, createdAt: any, modifiedAt: any, rooms: { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined }> } | { __typename?: 'ServerError', message: string } } }> } | { __typename: 'ServerError', message: string } }, files: { __typename?: 'ProjectFiles', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectFilesList', items: Array<{ __typename?: 'ProjectFile', id: string, name: string, url: any, type: ProjectFileType }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectFilesTotal', total: number } | { __typename: 'ServerError' } } } | { __typename: 'ServerError', message: string }, menu: { __typename: 'MenuItems', items: Array<{ __typename?: 'MenuItem', title: string, url: string }> } | { __typename: 'ServerError' }, enums: { __typename?: 'ProjectEnums', status: { __typename?: 'ProjectStatusEnum', items: Array<{ __typename?: 'ProjectStatusEnumItem', key: ProjectStatus, value: string }> } } } } };
 
-export type ProjectScreenProjectFragment = { __typename?: 'Project', id: string, title: string, startAt?: any | null | undefined, endAt?: any | null | undefined, status: ProjectStatus, contacts: { __typename?: 'ProjectContacts', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectContactsList', items: Array<{ __typename?: 'Contact', id: string, fullName: string, photo: string, details: Array<{ __typename?: 'ContactDetails', type: ContactType, value: string }> }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectContactsTotal', total: number } | { __typename: 'ServerError' } }, houses: { __typename?: 'ProjectHouses', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectHousesList', items: Array<{ __typename?: 'House', id: string, city: string, address: string, housingComplex: string, createdAt: any, modifiedAt: any, rooms: { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null | undefined, design: boolean }> } | { __typename?: 'ServerError', message: string } } }> } | { __typename: 'ServerError', message: string } }, files: { __typename?: 'ProjectFiles', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectFilesList', items: Array<{ __typename?: 'ProjectFile', id: string, name: string, url: any, type: ProjectFileType }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectFilesTotal', total: number } | { __typename: 'ServerError' } } };
+export type ProjectScreenProjectFragment = { __typename?: 'Project', id: string, title: string, startAt?: any | null | undefined, endAt?: any | null | undefined, status: ProjectStatus, contacts: { __typename?: 'ProjectContacts', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectContactsList', items: Array<{ __typename?: 'Contact', id: string, fullName: string, photo: string, details: Array<{ __typename?: 'ContactDetails', type: ContactType, value: string }> }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectContactsTotal', total: number } | { __typename: 'ServerError' } }, houses: { __typename?: 'ProjectHouses', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectHousesList', items: Array<{ __typename?: 'House', id: string, city: string, address: string, housingComplex: string, createdAt: any, modifiedAt: any, rooms: { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined }> } | { __typename?: 'ServerError', message: string } } }> } | { __typename: 'ServerError', message: string } }, files: { __typename?: 'ProjectFiles', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectFilesList', items: Array<{ __typename?: 'ProjectFile', id: string, name: string, url: any, type: ProjectFileType }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectFilesTotal', total: number } | { __typename: 'ServerError' } } };
 
-export type ProjectScreenHousesFragment = { __typename?: 'ProjectHouses', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectHousesList', items: Array<{ __typename?: 'House', id: string, city: string, address: string, housingComplex: string, createdAt: any, modifiedAt: any, rooms: { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null | undefined, design: boolean }> } | { __typename?: 'ServerError', message: string } } }> } | { __typename: 'ServerError', message: string } };
+export type ProjectScreenHousesFragment = { __typename?: 'ProjectHouses', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectHousesList', items: Array<{ __typename?: 'House', id: string, city: string, address: string, housingComplex: string, createdAt: any, modifiedAt: any, rooms: { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined }> } | { __typename?: 'ServerError', message: string } } }> } | { __typename: 'ServerError', message: string } };
 
 export type ProjectScreenHouseFragment = { __typename?: 'House', id: string, city: string, address: string, housingComplex: string, createdAt: any, modifiedAt: any };
 
-export type ProjectScreenHouseRoomsFragment = { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null | undefined, design: boolean }> } | { __typename?: 'ServerError', message: string } };
+export type ProjectScreenHouseRoomsFragment = { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined }> } | { __typename?: 'ServerError', message: string } };
 
-export type ProjectScreenHouseRoomFragment = { __typename?: 'Room', id: string, name: string, square?: number | null | undefined, design: boolean };
+export type ProjectScreenHouseRoomFragment = { __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined };
 
 export type SpecScreenQueryVariables = Exact<{
   projectId: Scalars['String'];
@@ -826,6 +879,29 @@ export type WorkspaceQueryVariables = Exact<{
 
 export type WorkspaceQuery = { __typename?: 'Query', workspace: { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'ServerError', message: string } | { __typename: 'Workspace', id: string, name: string, users: { __typename: 'Forbidden', message: string } | { __typename: 'ServerError', message: string } | { __typename: 'WorkspaceUsers', items: Array<{ __typename?: 'WorkspaceUser', id: string, role: WorkspaceUserRole, workspace: { __typename?: 'Id', id: string }, profile: { __typename?: 'WorkspaceUserProfile', id: string, email: string, fullName: string, abbr: string, gravatar?: { __typename?: 'Gravatar', url: string } | null | undefined } }> }, projects: { __typename: 'WorkspaceProjects', current: { __typename: 'Forbidden', message: string } | { __typename: 'ServerError', message: string } | { __typename: 'WorkspaceProjectsList', items: Array<{ __typename?: 'WorkspaceProject', id: string, name: string, status: ProjectStatus, startAt?: any | null | undefined, endAt?: any | null | undefined, period?: string | null | undefined }> }, done: { __typename: 'Forbidden', message: string } | { __typename: 'ServerError', message: string } | { __typename: 'WorkspaceProjectsList', items: Array<{ __typename?: 'WorkspaceProject', id: string, name: string, status: ProjectStatus, startAt?: any | null | undefined, endAt?: any | null | undefined, period?: string | null | undefined }> } } } };
 
+export type AddRoomMutationVariables = Exact<{
+  houseId: Scalars['String'];
+  room: AddRoomInput;
+}>;
+
+
+export type AddRoomMutation = { __typename?: 'Mutation', addRoom: { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'RoomAdded', room: { __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined } } };
+
+export type DeleteRoomMutationVariables = Exact<{
+  id: Scalars['String'];
+}>;
+
+
+export type DeleteRoomMutation = { __typename?: 'Mutation', deleteRoom: { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'RoomDeleted', room: { __typename?: 'Room', id: string } } };
+
+export type UpdateRoomMutationVariables = Exact<{
+  roomId: Scalars['String'];
+  data: UpdateRoomInput;
+}>;
+
+
+export type UpdateRoomMutation = { __typename?: 'Mutation', updateRoom: { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'RoomUpdated', room: { __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined } } };
+
 export const AddHouseFragmentDoc = gql`
     fragment AddHouse on House {
   id
@@ -851,7 +927,7 @@ export const ProjectScreenHouseRoomFragmentDoc = gql`
   id
   name
   square
-  design
+  level
 }
     `;
 export const ProjectScreenHouseRoomsFragmentDoc = gql`
@@ -1781,3 +1857,134 @@ export function useWorkspaceLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<
 export type WorkspaceQueryHookResult = ReturnType<typeof useWorkspaceQuery>;
 export type WorkspaceLazyQueryHookResult = ReturnType<typeof useWorkspaceLazyQuery>;
 export type WorkspaceQueryResult = Apollo.QueryResult<WorkspaceQuery, WorkspaceQueryVariables>;
+export const AddRoomDocument = gql`
+    mutation addRoom($houseId: String!, $room: AddRoomInput!) {
+  addRoom(houseId: $houseId, room: $room) {
+    __typename
+    ... on RoomAdded {
+      room {
+        ...ProjectScreenHouseRoom
+      }
+    }
+    ... on Error {
+      message
+    }
+  }
+}
+    ${ProjectScreenHouseRoomFragmentDoc}`;
+export type AddRoomMutationFn = Apollo.MutationFunction<AddRoomMutation, AddRoomMutationVariables>;
+
+/**
+ * __useAddRoomMutation__
+ *
+ * To run a mutation, you first call `useAddRoomMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddRoomMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addRoomMutation, { data, loading, error }] = useAddRoomMutation({
+ *   variables: {
+ *      houseId: // value for 'houseId'
+ *      room: // value for 'room'
+ *   },
+ * });
+ */
+export function useAddRoomMutation(baseOptions?: Apollo.MutationHookOptions<AddRoomMutation, AddRoomMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AddRoomMutation, AddRoomMutationVariables>(AddRoomDocument, options);
+      }
+export type AddRoomMutationHookResult = ReturnType<typeof useAddRoomMutation>;
+export type AddRoomMutationResult = Apollo.MutationResult<AddRoomMutation>;
+export type AddRoomMutationOptions = Apollo.BaseMutationOptions<AddRoomMutation, AddRoomMutationVariables>;
+export const DeleteRoomDocument = gql`
+    mutation deleteRoom($id: String!) {
+  deleteRoom(id: $id) {
+    __typename
+    ... on RoomDeleted {
+      room {
+        id
+      }
+    }
+    ... on NotFound {
+      message
+    }
+    ... on Forbidden {
+      message
+    }
+  }
+}
+    `;
+export type DeleteRoomMutationFn = Apollo.MutationFunction<DeleteRoomMutation, DeleteRoomMutationVariables>;
+
+/**
+ * __useDeleteRoomMutation__
+ *
+ * To run a mutation, you first call `useDeleteRoomMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteRoomMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteRoomMutation, { data, loading, error }] = useDeleteRoomMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useDeleteRoomMutation(baseOptions?: Apollo.MutationHookOptions<DeleteRoomMutation, DeleteRoomMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteRoomMutation, DeleteRoomMutationVariables>(DeleteRoomDocument, options);
+      }
+export type DeleteRoomMutationHookResult = ReturnType<typeof useDeleteRoomMutation>;
+export type DeleteRoomMutationResult = Apollo.MutationResult<DeleteRoomMutation>;
+export type DeleteRoomMutationOptions = Apollo.BaseMutationOptions<DeleteRoomMutation, DeleteRoomMutationVariables>;
+export const UpdateRoomDocument = gql`
+    mutation updateRoom($roomId: String!, $data: UpdateRoomInput!) {
+  updateRoom(roomId: $roomId, data: $data) {
+    __typename
+    ... on RoomUpdated {
+      room {
+        ...ProjectScreenHouseRoom
+      }
+    }
+    ... on NotFound {
+      message
+    }
+    ... on Forbidden {
+      message
+    }
+  }
+}
+    ${ProjectScreenHouseRoomFragmentDoc}`;
+export type UpdateRoomMutationFn = Apollo.MutationFunction<UpdateRoomMutation, UpdateRoomMutationVariables>;
+
+/**
+ * __useUpdateRoomMutation__
+ *
+ * To run a mutation, you first call `useUpdateRoomMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateRoomMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateRoomMutation, { data, loading, error }] = useUpdateRoomMutation({
+ *   variables: {
+ *      roomId: // value for 'roomId'
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useUpdateRoomMutation(baseOptions?: Apollo.MutationHookOptions<UpdateRoomMutation, UpdateRoomMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateRoomMutation, UpdateRoomMutationVariables>(UpdateRoomDocument, options);
+      }
+export type UpdateRoomMutationHookResult = ReturnType<typeof useUpdateRoomMutation>;
+export type UpdateRoomMutationResult = Apollo.MutationResult<UpdateRoomMutation>;
+export type UpdateRoomMutationOptions = Apollo.BaseMutationOptions<UpdateRoomMutation, UpdateRoomMutationVariables>;

@@ -1,0 +1,9 @@
+extend type Mutation {
+    deleteRoom(id: String!): DeleteRoomResult!
+}
+
+union DeleteRoomResult = RoomDeleted | NotFound | Forbidden
+
+type RoomDeleted {
+    room: Room!
+}

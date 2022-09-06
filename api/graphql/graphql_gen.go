@@ -170,16 +170,19 @@ type ComplexityRoot struct {
 	Mutation struct {
 		AddContact          func(childComplexity int, projectID string, contact AddContactInput) int
 		AddHouse            func(childComplexity int, projectID string, house AddHouseInput) int
+		AddRoom             func(childComplexity int, houseID string, room AddRoomInput) int
 		ChangeProjectDates  func(childComplexity int, projectID string, dates ChangeProjectDatesInput) int
 		ChangeProjectStatus func(childComplexity int, projectID string, status ProjectStatus) int
 		ConfirmLoginLink    func(childComplexity int, token string) int
 		ConfirmLoginPin     func(childComplexity int, token string, pin string) int
 		CreateProject       func(childComplexity int, input CreateProjectInput) int
 		DeleteContact       func(childComplexity int, id string) int
+		DeleteRoom          func(childComplexity int, id string) int
 		LoginByEmail        func(childComplexity int, email string, workspaceName string) int
 		Ping                func(childComplexity int) int
 		UpdateContact       func(childComplexity int, contactID string, data UpdateContactInput) int
 		UpdateHouse         func(childComplexity int, houseID string, data UpdateHouseInput) int
+		UpdateRoom          func(childComplexity int, roomID string, data UpdateRoomInput) int
 		UploadProjectFile   func(childComplexity int, input UploadProjectFileInput) int
 	}
 
@@ -301,11 +304,23 @@ type ComplexityRoot struct {
 
 	Room struct {
 		CreatedAt  func(childComplexity int) int
-		Design     func(childComplexity int) int
 		ID         func(childComplexity int) int
+		Level      func(childComplexity int) int
 		ModifiedAt func(childComplexity int) int
 		Name       func(childComplexity int) int
 		Square     func(childComplexity int) int
+	}
+
+	RoomAdded struct {
+		Room func(childComplexity int) int
+	}
+
+	RoomDeleted struct {
+		Room func(childComplexity int) int
+	}
+
+	RoomUpdated struct {
+		Room func(childComplexity int) int
 	}
 
 	ScreenQuery struct {
@@ -401,15 +416,18 @@ type MutationResolver interface {
 	Ping(ctx context.Context) (string, error)
 	AddContact(ctx context.Context, projectID string, contact AddContactInput) (AddContactResult, error)
 	AddHouse(ctx context.Context, projectID string, house AddHouseInput) (AddHouseResult, error)
+	AddRoom(ctx context.Context, houseID string, room AddRoomInput) (AddRoomResult, error)
 	ChangeProjectDates(ctx context.Context, projectID string, dates ChangeProjectDatesInput) (ChangeProjectDatesResult, error)
 	ChangeProjectStatus(ctx context.Context, projectID string, status ProjectStatus) (ChangeProjectStatusResult, error)
 	ConfirmLoginLink(ctx context.Context, token string) (ConfirmLoginLinkResult, error)
 	ConfirmLoginPin(ctx context.Context, token string, pin string) (ConfirmLoginPinResult, error)
 	CreateProject(ctx context.Context, input CreateProjectInput) (CreateProjectResult, error)
 	DeleteContact(ctx context.Context, id string) (DeleteContactResult, error)
+	DeleteRoom(ctx context.Context, id string) (DeleteRoomResult, error)
 	LoginByEmail(ctx context.Context, email string, workspaceName string) (LoginByEmailResult, error)
 	UpdateContact(ctx context.Context, contactID string, data UpdateContactInput) (UpdateContactResult, error)
 	UpdateHouse(ctx context.Context, houseID string, data UpdateHouseInput) (UpdateHouseResult, error)
+	UpdateRoom(ctx context.Context, roomID string, data UpdateRoomInput) (UpdateRoomResult, error)
 	UploadProjectFile(ctx context.Context, input UploadProjectFileInput) (UploadProjectFileResult, error)
 }
 type ProjectResolver interface {
@@ -773,6 +791,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.AddHouse(childComplexity, args["projectId"].(string), args["house"].(AddHouseInput)), true
 
+	case "Mutation.addRoom":
+		if e.complexity.Mutation.AddRoom == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_addRoom_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AddRoom(childComplexity, args["houseId"].(string), args["room"].(AddRoomInput)), true
+
 	case "Mutation.changeProjectDates":
 		if e.complexity.Mutation.ChangeProjectDates == nil {
 			break
@@ -845,6 +875,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.DeleteContact(childComplexity, args["id"].(string)), true
 
+	case "Mutation.deleteRoom":
+		if e.complexity.Mutation.DeleteRoom == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteRoom_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteRoom(childComplexity, args["id"].(string)), true
+
 	case "Mutation.loginByEmail":
 		if e.complexity.Mutation.LoginByEmail == nil {
 			break
@@ -887,6 +929,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.UpdateHouse(childComplexity, args["houseId"].(string), args["data"].(UpdateHouseInput)), true
+
+	case "Mutation.updateRoom":
+		if e.complexity.Mutation.UpdateRoom == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateRoom_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateRoom(childComplexity, args["roomId"].(string), args["data"].(UpdateRoomInput)), true
 
 	case "Mutation.uploadProjectFile":
 		if e.complexity.Mutation.UploadProjectFile == nil {
@@ -1266,19 +1320,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Room.CreatedAt(childComplexity), true
 
-	case "Room.design":
-		if e.complexity.Room.Design == nil {
-			break
-		}
-
-		return e.complexity.Room.Design(childComplexity), true
-
 	case "Room.id":
 		if e.complexity.Room.ID == nil {
 			break
 		}
 
 		return e.complexity.Room.ID(childComplexity), true
+
+	case "Room.level":
+		if e.complexity.Room.Level == nil {
+			break
+		}
+
+		return e.complexity.Room.Level(childComplexity), true
 
 	case "Room.modifiedAt":
 		if e.complexity.Room.ModifiedAt == nil {
@@ -1300,6 +1354,27 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Room.Square(childComplexity), true
+
+	case "RoomAdded.room":
+		if e.complexity.RoomAdded.Room == nil {
+			break
+		}
+
+		return e.complexity.RoomAdded.Room(childComplexity), true
+
+	case "RoomDeleted.room":
+		if e.complexity.RoomDeleted.Room == nil {
+			break
+		}
+
+		return e.complexity.RoomDeleted.Room(childComplexity), true
+
+	case "RoomUpdated.room":
+		if e.complexity.RoomUpdated.Room == nil {
+			break
+		}
+
+		return e.complexity.RoomUpdated.Room(childComplexity), true
 
 	case "ScreenQuery.files":
 		if e.complexity.ScreenQuery.Files == nil {
@@ -1619,6 +1694,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputAddContactInput,
 		ec.unmarshalInputAddHouseInput,
+		ec.unmarshalInputAddRoomInput,
 		ec.unmarshalInputChangeProjectDatesInput,
 		ec.unmarshalInputContactDetailsInput,
 		ec.unmarshalInputCreateProjectInput,
@@ -1627,6 +1703,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputProjectHousesFilter,
 		ec.unmarshalInputUpdateContactInput,
 		ec.unmarshalInputUpdateHouseInput,
+		ec.unmarshalInputUpdateRoomInput,
 		ec.unmarshalInputUploadProjectFileInput,
 		ec.unmarshalInputWorkspaceProjectsFilter,
 	)
@@ -1688,7 +1765,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 	return introspection.WrapTypeFromDef(parsedSchema, parsedSchema.Types[name]), nil
 }
 
-//go:embed "schema/mutation.graphql" "schema/mutation_add_contact.graphql" "schema/mutation_add_house.graphql" "schema/mutation_change_project_dates.graphql" "schema/mutation_change_project_status.graphql" "schema/mutation_confirm_login.graphql" "schema/mutation_create_project.graphql" "schema/mutation_delete_contact.graphql" "schema/mutation_login_by_email.graphql" "schema/mutation_update_contact.graphql" "schema/mutation_update_house.graphql" "schema/mutation_upload_project_file.graphql" "schema/query.graphql" "schema/query_profile.graphql" "schema/query_project.graphql" "schema/query_screen.graphql" "schema/query_screen_files.graphql" "schema/query_screen_project.graphql" "schema/query_screen_spec.graphql" "schema/query_shoppinglist.graphql" "schema/query_workspace.graphql" "schema/root.graphql"
+//go:embed "schema/mutation.graphql" "schema/mutation_add_contact.graphql" "schema/mutation_add_house.graphql" "schema/mutation_add_room.graphql" "schema/mutation_change_project_dates.graphql" "schema/mutation_change_project_status.graphql" "schema/mutation_confirm_login.graphql" "schema/mutation_create_project.graphql" "schema/mutation_delete_contact.graphql" "schema/mutation_delete_room.graphql" "schema/mutation_login_by_email.graphql" "schema/mutation_update_contact.graphql" "schema/mutation_update_house.graphql" "schema/mutation_update_room.graphql" "schema/mutation_upload_project_file.graphql" "schema/query.graphql" "schema/query_profile.graphql" "schema/query_project.graphql" "schema/query_screen.graphql" "schema/query_screen_files.graphql" "schema/query_screen_project.graphql" "schema/query_screen_spec.graphql" "schema/query_shoppinglist.graphql" "schema/query_workspace.graphql" "schema/root.graphql"
 var sourcesFS embed.FS
 
 func sourceData(filename string) string {
@@ -1703,14 +1780,17 @@ var sources = []*ast.Source{
 	{Name: "schema/mutation.graphql", Input: sourceData("schema/mutation.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_add_contact.graphql", Input: sourceData("schema/mutation_add_contact.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_add_house.graphql", Input: sourceData("schema/mutation_add_house.graphql"), BuiltIn: false},
+	{Name: "schema/mutation_add_room.graphql", Input: sourceData("schema/mutation_add_room.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_change_project_dates.graphql", Input: sourceData("schema/mutation_change_project_dates.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_change_project_status.graphql", Input: sourceData("schema/mutation_change_project_status.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_confirm_login.graphql", Input: sourceData("schema/mutation_confirm_login.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_create_project.graphql", Input: sourceData("schema/mutation_create_project.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_delete_contact.graphql", Input: sourceData("schema/mutation_delete_contact.graphql"), BuiltIn: false},
+	{Name: "schema/mutation_delete_room.graphql", Input: sourceData("schema/mutation_delete_room.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_login_by_email.graphql", Input: sourceData("schema/mutation_login_by_email.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_update_contact.graphql", Input: sourceData("schema/mutation_update_contact.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_update_house.graphql", Input: sourceData("schema/mutation_update_house.graphql"), BuiltIn: false},
+	{Name: "schema/mutation_update_room.graphql", Input: sourceData("schema/mutation_update_room.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_upload_project_file.graphql", Input: sourceData("schema/mutation_upload_project_file.graphql"), BuiltIn: false},
 	{Name: "schema/query.graphql", Input: sourceData("schema/query.graphql"), BuiltIn: false},
 	{Name: "schema/query_profile.graphql", Input: sourceData("schema/query_profile.graphql"), BuiltIn: false},
@@ -1798,6 +1878,30 @@ func (ec *executionContext) field_Mutation_addHouse_args(ctx context.Context, ra
 		}
 	}
 	args["house"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_addRoom_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["houseId"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("houseId"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["houseId"] = arg0
+	var arg1 AddRoomInput
+	if tmp, ok := rawArgs["room"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("room"))
+		arg1, err = ec.unmarshalNAddRoomInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAddRoomInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["room"] = arg1
 	return args, nil
 }
 
@@ -1918,6 +2022,21 @@ func (ec *executionContext) field_Mutation_deleteContact_args(ctx context.Contex
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_deleteRoom_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_loginByEmail_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -1982,6 +2101,30 @@ func (ec *executionContext) field_Mutation_updateHouse_args(ctx context.Context,
 	if tmp, ok := rawArgs["data"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("data"))
 		arg1, err = ec.unmarshalNUpdateHouseInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐUpdateHouseInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["data"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateRoom_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["roomId"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("roomId"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["roomId"] = arg0
+	var arg1 UpdateRoomInput
+	if tmp, ok := rawArgs["data"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("data"))
+		arg1, err = ec.unmarshalNUpdateRoomInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐUpdateRoomInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -3584,8 +3727,8 @@ func (ec *executionContext) fieldContext_HouseRoomsList_items(ctx context.Contex
 				return ec.fieldContext_Room_name(ctx, field)
 			case "square":
 				return ec.fieldContext_Room_square(ctx, field)
-			case "design":
-				return ec.fieldContext_Room_design(ctx, field)
+			case "level":
+				return ec.fieldContext_Room_level(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Room_createdAt(ctx, field)
 			case "modifiedAt":
@@ -4213,6 +4356,61 @@ func (ec *executionContext) fieldContext_Mutation_addHouse(ctx context.Context, 
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_addRoom(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_addRoom(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().AddRoom(rctx, fc.Args["houseId"].(string), fc.Args["room"].(AddRoomInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(AddRoomResult)
+	fc.Result = res
+	return ec.marshalNAddRoomResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAddRoomResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_addRoom(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type AddRoomResult does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_addRoom_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_changeProjectDates(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_changeProjectDates(ctx, field)
 	if err != nil {
@@ -4543,6 +4741,61 @@ func (ec *executionContext) fieldContext_Mutation_deleteContact(ctx context.Cont
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_deleteRoom(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteRoom(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteRoom(rctx, fc.Args["id"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(DeleteRoomResult)
+	fc.Result = res
+	return ec.marshalNDeleteRoomResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐDeleteRoomResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteRoom(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DeleteRoomResult does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteRoom_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_loginByEmail(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_loginByEmail(ctx, field)
 	if err != nil {
@@ -4702,6 +4955,61 @@ func (ec *executionContext) fieldContext_Mutation_updateHouse(ctx context.Contex
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_updateHouse_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateRoom(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateRoom(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateRoom(rctx, fc.Args["roomId"].(string), fc.Args["data"].(UpdateRoomInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(UpdateRoomResult)
+	fc.Result = res
+	return ec.marshalNUpdateRoomResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐUpdateRoomResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateRoom(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type UpdateRoomResult does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateRoom_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -7303,8 +7611,8 @@ func (ec *executionContext) fieldContext_Room_square(ctx context.Context, field 
 	return fc, nil
 }
 
-func (ec *executionContext) _Room_design(ctx context.Context, field graphql.CollectedField, obj *Room) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Room_design(ctx, field)
+func (ec *executionContext) _Room_level(ctx context.Context, field graphql.CollectedField, obj *Room) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Room_level(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -7317,31 +7625,28 @@ func (ec *executionContext) _Room_design(ctx context.Context, field graphql.Coll
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Design, nil
+		return obj.Level, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(bool)
+	res := resTmp.(*int)
 	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+	return ec.marshalOInt2ᚖint(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Room_design(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Room_level(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Room",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Boolean does not have child fields")
+			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
@@ -7430,6 +7735,180 @@ func (ec *executionContext) fieldContext_Room_modifiedAt(ctx context.Context, fi
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _RoomAdded_room(ctx context.Context, field graphql.CollectedField, obj *RoomAdded) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_RoomAdded_room(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Room, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*Room)
+	fc.Result = res
+	return ec.marshalNRoom2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐRoom(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_RoomAdded_room(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "RoomAdded",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Room_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Room_name(ctx, field)
+			case "square":
+				return ec.fieldContext_Room_square(ctx, field)
+			case "level":
+				return ec.fieldContext_Room_level(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Room_createdAt(ctx, field)
+			case "modifiedAt":
+				return ec.fieldContext_Room_modifiedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Room", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _RoomDeleted_room(ctx context.Context, field graphql.CollectedField, obj *RoomDeleted) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_RoomDeleted_room(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Room, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*Room)
+	fc.Result = res
+	return ec.marshalNRoom2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐRoom(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_RoomDeleted_room(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "RoomDeleted",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Room_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Room_name(ctx, field)
+			case "square":
+				return ec.fieldContext_Room_square(ctx, field)
+			case "level":
+				return ec.fieldContext_Room_level(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Room_createdAt(ctx, field)
+			case "modifiedAt":
+				return ec.fieldContext_Room_modifiedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Room", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _RoomUpdated_room(ctx context.Context, field graphql.CollectedField, obj *RoomUpdated) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_RoomUpdated_room(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Room, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*Room)
+	fc.Result = res
+	return ec.marshalNRoom2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐRoom(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_RoomUpdated_room(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "RoomUpdated",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Room_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Room_name(ctx, field)
+			case "square":
+				return ec.fieldContext_Room_square(ctx, field)
+			case "level":
+				return ec.fieldContext_Room_level(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Room_createdAt(ctx, field)
+			case "modifiedAt":
+				return ec.fieldContext_Room_modifiedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Room", field.Name)
 		},
 	}
 	return fc, nil
@@ -11158,6 +11637,50 @@ func (ec *executionContext) unmarshalInputAddHouseInput(ctx context.Context, obj
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputAddRoomInput(ctx context.Context, obj interface{}) (AddRoomInput, error) {
+	var it AddRoomInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"name", "square", "level"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "square":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("square"))
+			it.Square, err = ec.unmarshalOFloat2ᚖfloat64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "level":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("level"))
+			it.Level, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputChangeProjectDatesInput(ctx context.Context, obj interface{}) (ChangeProjectDatesInput, error) {
 	var it ChangeProjectDatesInput
 	asMap := map[string]interface{}{}
@@ -11446,6 +11969,50 @@ func (ec *executionContext) unmarshalInputUpdateHouseInput(ctx context.Context, 
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdateRoomInput(ctx context.Context, obj interface{}) (UpdateRoomInput, error) {
+	var it UpdateRoomInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"name", "square", "level"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "name":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "square":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("square"))
+			it.Square, err = ec.unmarshalOFloat2ᚖfloat64(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "level":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("level"))
+			it.Level, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUploadProjectFileInput(ctx context.Context, obj interface{}) (UploadProjectFileInput, error) {
 	var it UploadProjectFileInput
 	asMap := map[string]interface{}{}
@@ -11584,6 +12151,36 @@ func (ec *executionContext) _AddHouseResult(ctx context.Context, sel ast.Selecti
 			return graphql.Null
 		}
 		return ec._ServerError(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
+func (ec *executionContext) _AddRoomResult(ctx context.Context, sel ast.SelectionSet, obj AddRoomResult) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case RoomAdded:
+		return ec._RoomAdded(ctx, sel, &obj)
+	case *RoomAdded:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._RoomAdded(ctx, sel, obj)
+	case NotFound:
+		return ec._NotFound(ctx, sel, &obj)
+	case *NotFound:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._NotFound(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
 	default:
 		panic(fmt.Errorf("unexpected type %T", obj))
 	}
@@ -11806,6 +12403,36 @@ func (ec *executionContext) _DeleteContactResult(ctx context.Context, sel ast.Se
 			return graphql.Null
 		}
 		return ec._ServerError(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
+func (ec *executionContext) _DeleteRoomResult(ctx context.Context, sel ast.SelectionSet, obj DeleteRoomResult) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case RoomDeleted:
+		return ec._RoomDeleted(ctx, sel, &obj)
+	case *RoomDeleted:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._RoomDeleted(ctx, sel, obj)
+	case NotFound:
+		return ec._NotFound(ctx, sel, &obj)
+	case *NotFound:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._NotFound(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
 	default:
 		panic(fmt.Errorf("unexpected type %T", obj))
 	}
@@ -12282,6 +12909,36 @@ func (ec *executionContext) _UpdateHouseResult(ctx context.Context, sel ast.Sele
 			return graphql.Null
 		}
 		return ec._ServerError(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
+func (ec *executionContext) _UpdateRoomResult(ctx context.Context, sel ast.SelectionSet, obj UpdateRoomResult) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case RoomUpdated:
+		return ec._RoomUpdated(ctx, sel, &obj)
+	case *RoomUpdated:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._RoomUpdated(ctx, sel, obj)
+	case NotFound:
+		return ec._NotFound(ctx, sel, &obj)
+	case *NotFound:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._NotFound(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
 	default:
 		panic(fmt.Errorf("unexpected type %T", obj))
 	}
@@ -12784,7 +13441,7 @@ func (ec *executionContext) _FilesScreen(ctx context.Context, sel ast.SelectionS
 	return out
 }
 
-var forbiddenImplementors = []string{"Forbidden", "AddContactResult", "AddHouseResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "CreateProjectResult", "DeleteContactResult", "UpdateContactResult", "UpdateHouseResult", "UploadProjectFileResult", "UserProfileResult", "ProjectResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectFilesResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "WorkspaceResult", "WorkspaceUsersResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "Error"}
+var forbiddenImplementors = []string{"Forbidden", "AddContactResult", "AddHouseResult", "AddRoomResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "CreateProjectResult", "DeleteContactResult", "DeleteRoomResult", "UpdateContactResult", "UpdateHouseResult", "UpdateRoomResult", "UploadProjectFileResult", "UserProfileResult", "ProjectResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectFilesResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "WorkspaceResult", "WorkspaceUsersResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "Error"}
 
 func (ec *executionContext) _Forbidden(ctx context.Context, sel ast.SelectionSet, obj *Forbidden) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, forbiddenImplementors)
@@ -13325,6 +13982,15 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "addRoom":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_addRoom(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "changeProjectDates":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
@@ -13379,6 +14045,15 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "deleteRoom":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteRoom(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "loginByEmail":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
@@ -13406,6 +14081,15 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "updateRoom":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateRoom(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "uploadProjectFile":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
@@ -13426,7 +14110,7 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 	return out
 }
 
-var notFoundImplementors = []string{"NotFound", "AddHouseResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "DeleteContactResult", "UpdateContactResult", "UpdateHouseResult", "ProjectResult", "WorkspaceResult", "Error"}
+var notFoundImplementors = []string{"NotFound", "AddHouseResult", "AddRoomResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "DeleteContactResult", "DeleteRoomResult", "UpdateContactResult", "UpdateHouseResult", "UpdateRoomResult", "ProjectResult", "WorkspaceResult", "Error"}
 
 func (ec *executionContext) _NotFound(ctx context.Context, sel ast.SelectionSet, obj *NotFound) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, notFoundImplementors)
@@ -14517,13 +15201,10 @@ func (ec *executionContext) _Room(ctx context.Context, sel ast.SelectionSet, obj
 
 			out.Values[i] = ec._Room_square(ctx, field, obj)
 
-		case "design":
+		case "level":
 
-			out.Values[i] = ec._Room_design(ctx, field, obj)
+			out.Values[i] = ec._Room_level(ctx, field, obj)
 
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "createdAt":
 
 			out.Values[i] = ec._Room_createdAt(ctx, field, obj)
@@ -14534,6 +15215,90 @@ func (ec *executionContext) _Room(ctx context.Context, sel ast.SelectionSet, obj
 		case "modifiedAt":
 
 			out.Values[i] = ec._Room_modifiedAt(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var roomAddedImplementors = []string{"RoomAdded", "AddRoomResult"}
+
+func (ec *executionContext) _RoomAdded(ctx context.Context, sel ast.SelectionSet, obj *RoomAdded) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, roomAddedImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("RoomAdded")
+		case "room":
+
+			out.Values[i] = ec._RoomAdded_room(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var roomDeletedImplementors = []string{"RoomDeleted", "DeleteRoomResult"}
+
+func (ec *executionContext) _RoomDeleted(ctx context.Context, sel ast.SelectionSet, obj *RoomDeleted) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, roomDeletedImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("RoomDeleted")
+		case "room":
+
+			out.Values[i] = ec._RoomDeleted_room(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var roomUpdatedImplementors = []string{"RoomUpdated", "UpdateRoomResult"}
+
+func (ec *executionContext) _RoomUpdated(ctx context.Context, sel ast.SelectionSet, obj *RoomUpdated) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, roomUpdatedImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("RoomUpdated")
+		case "room":
+
+			out.Values[i] = ec._RoomUpdated_room(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
@@ -15578,6 +16343,21 @@ func (ec *executionContext) marshalNAddHouseResult2githubᚗcomᚋapartomatᚋap
 	return ec._AddHouseResult(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNAddRoomInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAddRoomInput(ctx context.Context, v interface{}) (AddRoomInput, error) {
+	res, err := ec.unmarshalInputAddRoomInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNAddRoomResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAddRoomResult(ctx context.Context, sel ast.SelectionSet, v AddRoomResult) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._AddRoomResult(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
 	res, err := graphql.UnmarshalBoolean(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -15801,6 +16581,16 @@ func (ec *executionContext) marshalNDeleteContactResult2githubᚗcomᚋapartomat
 		return graphql.Null
 	}
 	return ec._DeleteContactResult(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNDeleteRoomResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐDeleteRoomResult(ctx context.Context, sel ast.SelectionSet, v DeleteRoomResult) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._DeleteRoomResult(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNFilesScreen2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐFilesScreen(ctx context.Context, sel ast.SelectionSet, v *FilesScreen) graphql.Marshaler {
@@ -16449,6 +17239,21 @@ func (ec *executionContext) marshalNUpdateHouseResult2githubᚗcomᚋapartomat�
 	return ec._UpdateHouseResult(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNUpdateRoomInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐUpdateRoomInput(ctx context.Context, v interface{}) (UpdateRoomInput, error) {
+	res, err := ec.unmarshalInputUpdateRoomInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNUpdateRoomResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐUpdateRoomResult(ctx context.Context, sel ast.SelectionSet, v UpdateRoomResult) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._UpdateRoomResult(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx context.Context, v interface{}) (graphql.Upload, error) {
 	res, err := graphql.UnmarshalUpload(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -17083,6 +17888,22 @@ func (ec *executionContext) marshalOId2ᚖgithubᚗcomᚋapartomatᚋapartomat�
 		return graphql.Null
 	}
 	return ec._Id(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v interface{}) (*int, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalInt(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.SelectionSet, v *int) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalInt(*v)
+	return res
 }
 
 func (ec *executionContext) marshalOProduct2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProduct(ctx context.Context, sel ast.SelectionSet, v *Product) graphql.Marshaler {

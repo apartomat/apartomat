@@ -10,14 +10,14 @@ import (
 func (r *mutationResolver) UpdateContact(
 	ctx context.Context,
 	contactID string,
-	data UpdateContactInput,
+	input UpdateContactInput,
 ) (UpdateContactResult, error) {
 	contact, err := r.useCases.UpdateContact(
 		ctx,
 		contactID,
 		apartomat.UpdateContactParams{
-			FullName: data.FullName,
-			Details:  contactsDetailsFromGraphQL(data.Details),
+			FullName: input.FullName,
+			Details:  contactsDetailsFromGraphQL(input.Details),
 		},
 	)
 	if err != nil {

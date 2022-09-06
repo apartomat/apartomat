@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, useContext } from "react"
 import { useParams } from "react-router-dom"
 
-import { Main, Box, Header, Heading, Text, Layer, Button } from "grommet"
+import { Main, Box, Grid, Header, Heading, Text, Layer, Button, ResponsiveContext } from "grommet"
 import { StatusGood } from "grommet-icons"
 
 import AnchorLink from "common/AnchorLink"
@@ -169,49 +169,52 @@ export function Project () {
                     <AddSomething showUploadFiles={setShowUploadFiles}/>
                 </Box>
 
-                <Box direction="row" justify="between" wrap>
-                    <Box width={{min: "35%"}}>
-                        <Box margin="none">
-                            <Heading level={4} margin={{ bottom: "xsmall"}}>Сроки проекта</Heading>
-                            <ProjectDates
-                                projectId={project.id}
-                                startAt={project.startAt}
-                                endAt={project.endAt}
-                                onChange={({ startAt, endAt }) => {
-                                    notify({ message: "Даты изменены" })
-                                    setProject({ ...project, startAt, endAt })
-                                }}
-                            />
-                        </Box>
-                        <Box margin={{top: "small"}}>
-                            <Heading level={4} margin={{ bottom: "xsmall" }}>Заказчик</Heading>
-                            <Contacts
-                                projectId={project.id}
-                                contacts={project.contacts}
-                                notify={notify}
-                                onAdd={() => notify({ message: "Контакт добавлен"})}
-                                onDelete={() => notify({ message: "Контакт удален"})}
-                                onUpdate={() => notify({ message: "Контакт сохранен"})}
-                            />
-                        </Box>
+                <Grid columns={{count: respSize === "small" ? 1 : 2, size: "auto"}} gap="small" responsive>
+                    <Box>
+                        <Heading level={4}>Сроки проекта</Heading>
+                        <ProjectDates
+                            projectId={project.id}
+                            startAt={project.startAt}
+                            endAt={project.endAt}
+                            onChange={({ startAt, endAt }) => {
+                                notify({ message: "Даты изменены" })
+                                setProject({ ...project, startAt, endAt })
+                            }}
+                        />
+                    </Box>
 
+                    <Box>
+                        <Heading level={4}>Адрес</Heading>
+                        <House
+                            projectId={project.id}
+                            houses={project.houses}
+                            onAdd={() => refetch()}
+                            onUpdate={() => refetch()}
+                        />
                     </Box>
-                    <Box width={{min: "35%"}}>
-                        <Box margin="none">
-                            <Heading level={4} margin={{ bottom: "xsmall" }}>Адрес</Heading>
-                            <House
-                                projectId={project.id}
-                                houses={project.houses}
-                                onAdd={() => refetch()}
-                                onUpdate={() => refetch()}
-                            />
-                        </Box>
-                        <Box margin={{top: "small"}}>
-                            <Heading level={4} margin={{ bottom: "xsmall"}}>Комнаты</Heading>
-                            <Rooms houses={project.houses}/>
-                        </Box>
+
+                    <Box>
+                        <Heading level={4}>Заказчик</Heading>
+                        <Contacts
+                            projectId={project.id}
+                            contacts={project.contacts}
+                            notify={notify}
+                            onAdd={() => notify({ message: "Контакт добавлен", callback: refetch })}
+                            onDelete={() => notify({ message: "Контакт удален" })}
+                            onUpdate={() => notify({ message: "Контакт сохранен" })}
+                        />
                     </Box>
-                </Box>
+
+                    <Box>
+                        <Heading level={4}>Комнаты</Heading>
+                        <Rooms
+                            houses={project.houses}
+                            onAddRoom={() => notify({ message: "Комната добавлена", callback: refetch })}
+                            onDeleteRoom={() => notify({ message: "Комната удалена", callback: refetch })}
+                            onUpdateRoom={() => notify({ message: "Комната сохранена", callback: refetch })}
+                        />
+                    </Box>
+                </Grid>
 
                 {project.files.list.__typename === "ProjectFilesList" && project.files.list.items.length > 0 &&
                     <Box margin={{vertical: "large"}}>

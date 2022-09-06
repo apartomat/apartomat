@@ -1,0 +1,16 @@
+mutation deleteRoom($id: String!) {
+    deleteRoom(id: $id) {
+        __typename
+        ...on RoomDeleted {
+            room {
+                id
+            }
+        }
+        ...on NotFound {
+            message
+        }
+        ...on Forbidden {
+            message
+        }
+    }
+}

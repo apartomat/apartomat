@@ -1,0 +1,16 @@
+mutation updateRoom($roomId: String! $data: UpdateRoomInput!) {
+    updateRoom(roomId: $roomId data: $data) {
+        __typename
+        ...on RoomUpdated {
+            room {
+                ...ProjectScreenHouseRoom
+            }
+        }
+        ...on NotFound {
+            message
+        }
+        ...on Forbidden {
+            message
+        }
+    }
+}

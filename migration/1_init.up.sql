@@ -83,7 +83,7 @@ create table apartomat.rooms (
      id char(21) primary key,
      name text not null,
      square real,
-     design boolean not null,
+     level integer,
      created_at timestamp with time zone not null default now(),
      modified_at timestamp with time zone not null default now(),
      house_id char(21) not null,

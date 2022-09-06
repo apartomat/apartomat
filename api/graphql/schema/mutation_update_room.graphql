@@ -1,0 +1,15 @@
+extend type Mutation {
+    updateRoom(roomId: String! data: UpdateRoomInput!): UpdateRoomResult!
+}
+
+input UpdateRoomInput {
+    name: String!
+    square: Float
+    level: Int
+}
+
+union UpdateRoomResult = RoomUpdated | NotFound | Forbidden
+
+type RoomUpdated {
+    room: Room!
+}

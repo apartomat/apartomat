@@ -1,0 +1,15 @@
+extend type Mutation {
+    addRoom(houseId: String! room: AddRoomInput!): AddRoomResult!
+}
+
+input AddRoomInput {
+    name: String!
+    square: Float
+    level: Int
+}
+
+union AddRoomResult = RoomAdded | NotFound | Forbidden
+
+type RoomAdded {
+    room: Room!
+}

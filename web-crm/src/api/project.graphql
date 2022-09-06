@@ -133,6 +133,6 @@ fragment ProjectScreenHouseRoom on Room {
     id
     name
     square
-    design
+    level
 }
 

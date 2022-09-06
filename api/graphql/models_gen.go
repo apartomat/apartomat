@@ -19,6 +19,10 @@ type AddHouseResult interface {
 	IsAddHouseResult()
 }
 
+type AddRoomResult interface {
+	IsAddRoomResult()
+}
+
 type ChangeProjectDatesResult interface {
 	IsChangeProjectDatesResult()
 }
@@ -43,8 +47,13 @@ type DeleteContactResult interface {
 	IsDeleteContactResult()
 }
 
+type DeleteRoomResult interface {
+	IsDeleteRoomResult()
+}
+
 type Error interface {
 	IsError()
+	GetMessage() string
 }
 
 type HouseRoomsListResult interface {
@@ -99,6 +108,10 @@ type UpdateHouseResult interface {
 	IsUpdateHouseResult()
 }
 
+type UpdateRoomResult interface {
+	IsUpdateRoomResult()
+}
+
 type UploadProjectFileResult interface {
 	IsUploadProjectFileResult()
 }
@@ -134,12 +147,20 @@ type AddHouseInput struct {
 	HousingComplex string `json:"housingComplex"`
 }
 
+type AddRoomInput struct {
+	Name   string   `json:"name"`
+	Square *float64 `json:"square"`
+	Level  *int     `json:"level"`
+}
+
 type AlreadyExists struct {
 	Message string `json:"message"`
 }
 
 func (AlreadyExists) IsUploadProjectFileResult() {}
-func (AlreadyExists) IsError()                   {}
+
+func (AlreadyExists) IsError()                {}
+func (this AlreadyExists) GetMessage() string { return this.Message }
 
 type ChangeProjectDatesInput struct {
 	StartAt *time.Time `json:"startAt"`
@@ -195,8 +216,11 @@ type ExpiredToken struct {
 }
 
 func (ExpiredToken) IsConfirmLoginLinkResult() {}
-func (ExpiredToken) IsError()                  {}
-func (ExpiredToken) IsConfirmLoginPinResult()  {}
+
+func (ExpiredToken) IsError()                {}
+func (this ExpiredToken) GetMessage() string { return this.Message }
+
+func (ExpiredToken) IsConfirmLoginPinResult() {}
 
 type FilesScreen struct {
 	Project ProjectResult `json:"project"`
@@ -207,30 +231,60 @@ type Forbidden struct {
 	Message string `json:"message"`
 }
 
-func (Forbidden) IsAddContactResult()             {}
-func (Forbidden) IsAddHouseResult()               {}
-func (Forbidden) IsChangeProjectDatesResult()     {}
-func (Forbidden) IsChangeProjectStatusResult()    {}
-func (Forbidden) IsCreateProjectResult()          {}
-func (Forbidden) IsDeleteContactResult()          {}
-func (Forbidden) IsUpdateContactResult()          {}
-func (Forbidden) IsUpdateHouseResult()            {}
-func (Forbidden) IsUploadProjectFileResult()      {}
-func (Forbidden) IsUserProfileResult()            {}
-func (Forbidden) IsProjectResult()                {}
-func (Forbidden) IsProjectFilesListResult()       {}
-func (Forbidden) IsProjectFilesTotalResult()      {}
-func (Forbidden) IsProjectFilesResult()           {}
-func (Forbidden) IsProjectContactsListResult()    {}
-func (Forbidden) IsProjectContactsTotalResult()   {}
-func (Forbidden) IsProjectHousesListResult()      {}
-func (Forbidden) IsProjectHousesTotalResult()     {}
-func (Forbidden) IsHouseRoomsListResult()         {}
-func (Forbidden) IsWorkspaceResult()              {}
-func (Forbidden) IsWorkspaceUsersResult()         {}
-func (Forbidden) IsWorkspaceProjectsListResult()  {}
+func (Forbidden) IsAddContactResult() {}
+
+func (Forbidden) IsAddHouseResult() {}
+
+func (Forbidden) IsAddRoomResult() {}
+
+func (Forbidden) IsChangeProjectDatesResult() {}
+
+func (Forbidden) IsChangeProjectStatusResult() {}
+
+func (Forbidden) IsCreateProjectResult() {}
+
+func (Forbidden) IsDeleteContactResult() {}
+
+func (Forbidden) IsDeleteRoomResult() {}
+
+func (Forbidden) IsUpdateContactResult() {}
+
+func (Forbidden) IsUpdateHouseResult() {}
+
+func (Forbidden) IsUpdateRoomResult() {}
+
+func (Forbidden) IsUploadProjectFileResult() {}
+
+func (Forbidden) IsUserProfileResult() {}
+
+func (Forbidden) IsProjectResult() {}
+
+func (Forbidden) IsProjectFilesListResult() {}
+
+func (Forbidden) IsProjectFilesTotalResult() {}
+
+func (Forbidden) IsProjectFilesResult() {}
+
+func (Forbidden) IsProjectContactsListResult() {}
+
+func (Forbidden) IsProjectContactsTotalResult() {}
+
+func (Forbidden) IsProjectHousesListResult() {}
+
+func (Forbidden) IsProjectHousesTotalResult() {}
+
+func (Forbidden) IsHouseRoomsListResult() {}
+
+func (Forbidden) IsWorkspaceResult() {}
+
+func (Forbidden) IsWorkspaceUsersResult() {}
+
+func (Forbidden) IsWorkspaceProjectsListResult() {}
+
 func (Forbidden) IsWorkspaceProjectsTotalResult() {}
-func (Forbidden) IsError()                        {}
+
+func (Forbidden) IsError()                {}
+func (this Forbidden) GetMessage() string { return this.Message }
 
 type Gravatar struct {
 	URL string `json:"url"`
@@ -277,22 +331,29 @@ type InvalidEmail struct {
 }
 
 func (InvalidEmail) IsLoginByEmailResult() {}
-func (InvalidEmail) IsError()              {}
+
+func (InvalidEmail) IsError()                {}
+func (this InvalidEmail) GetMessage() string { return this.Message }
 
 type InvalidPin struct {
 	Message string `json:"message"`
 }
 
 func (InvalidPin) IsConfirmLoginPinResult() {}
-func (InvalidPin) IsError()                 {}
+
+func (InvalidPin) IsError()                {}
+func (this InvalidPin) GetMessage() string { return this.Message }
 
 type InvalidToken struct {
 	Message string `json:"message"`
 }
 
 func (InvalidToken) IsConfirmLoginLinkResult() {}
-func (InvalidToken) IsError()                  {}
-func (InvalidToken) IsConfirmLoginPinResult()  {}
+
+func (InvalidToken) IsError()                {}
+func (this InvalidToken) GetMessage() string { return this.Message }
+
+func (InvalidToken) IsConfirmLoginPinResult() {}
 
 type LinkSentByEmail struct {
 	Email string `json:"email"`
@@ -305,7 +366,8 @@ type LoginConfirmed struct {
 }
 
 func (LoginConfirmed) IsConfirmLoginLinkResult() {}
-func (LoginConfirmed) IsConfirmLoginPinResult()  {}
+
+func (LoginConfirmed) IsConfirmLoginPinResult() {}
 
 type MenuItem struct {
 	Title string `json:"title"`
@@ -322,15 +384,30 @@ type NotFound struct {
 	Message string `json:"message"`
 }
 
-func (NotFound) IsAddHouseResult()            {}
-func (NotFound) IsChangeProjectDatesResult()  {}
+func (NotFound) IsAddHouseResult() {}
+
+func (NotFound) IsAddRoomResult() {}
+
+func (NotFound) IsChangeProjectDatesResult() {}
+
 func (NotFound) IsChangeProjectStatusResult() {}
-func (NotFound) IsDeleteContactResult()       {}
-func (NotFound) IsUpdateContactResult()       {}
-func (NotFound) IsUpdateHouseResult()         {}
-func (NotFound) IsProjectResult()             {}
-func (NotFound) IsWorkspaceResult()           {}
-func (NotFound) IsError()                     {}
+
+func (NotFound) IsDeleteContactResult() {}
+
+func (NotFound) IsDeleteRoomResult() {}
+
+func (NotFound) IsUpdateContactResult() {}
+
+func (NotFound) IsUpdateHouseResult() {}
+
+func (NotFound) IsUpdateRoomResult() {}
+
+func (NotFound) IsProjectResult() {}
+
+func (NotFound) IsWorkspaceResult() {}
+
+func (NotFound) IsError()                {}
+func (this NotFound) GetMessage() string { return this.Message }
 
 type PinSentByEmail struct {
 	Email string `json:"email"`
@@ -478,10 +555,28 @@ type Room struct {
 	ID         string    `json:"id"`
 	Name       string    `json:"name"`
 	Square     *float64  `json:"square"`
-	Design     bool      `json:"design"`
+	Level      *int      `json:"level"`
 	CreatedAt  time.Time `json:"createdAt"`
 	ModifiedAt time.Time `json:"modifiedAt"`
 }
+
+type RoomAdded struct {
+	Room *Room `json:"room"`
+}
+
+func (RoomAdded) IsAddRoomResult() {}
+
+type RoomDeleted struct {
+	Room *Room `json:"room"`
+}
+
+func (RoomDeleted) IsDeleteRoomResult() {}
+
+type RoomUpdated struct {
+	Room *Room `json:"room"`
+}
+
+func (RoomUpdated) IsUpdateRoomResult() {}
 
 type ScreenQuery struct {
 	Version string         `json:"version"`
@@ -494,34 +589,62 @@ type ServerError struct {
 	Message string `json:"message"`
 }
 
-func (ServerError) IsAddContactResult()             {}
-func (ServerError) IsAddHouseResult()               {}
-func (ServerError) IsChangeProjectDatesResult()     {}
-func (ServerError) IsChangeProjectStatusResult()    {}
-func (ServerError) IsConfirmLoginLinkResult()       {}
-func (ServerError) IsConfirmLoginPinResult()        {}
-func (ServerError) IsCreateProjectResult()          {}
-func (ServerError) IsDeleteContactResult()          {}
-func (ServerError) IsLoginByEmailResult()           {}
-func (ServerError) IsUpdateContactResult()          {}
-func (ServerError) IsUpdateHouseResult()            {}
-func (ServerError) IsUploadProjectFileResult()      {}
-func (ServerError) IsUserProfileResult()            {}
-func (ServerError) IsProjectResult()                {}
-func (ServerError) IsProjectFilesListResult()       {}
-func (ServerError) IsProjectFilesTotalResult()      {}
-func (ServerError) IsProjectFilesResult()           {}
-func (ServerError) IsProjectContactsListResult()    {}
-func (ServerError) IsProjectContactsTotalResult()   {}
-func (ServerError) IsProjectHousesListResult()      {}
-func (ServerError) IsProjectHousesTotalResult()     {}
-func (ServerError) IsHouseRoomsListResult()         {}
-func (ServerError) IsMenuResult()                   {}
-func (ServerError) IsWorkspaceResult()              {}
-func (ServerError) IsWorkspaceUsersResult()         {}
-func (ServerError) IsWorkspaceProjectsListResult()  {}
+func (ServerError) IsAddContactResult() {}
+
+func (ServerError) IsAddHouseResult() {}
+
+func (ServerError) IsChangeProjectDatesResult() {}
+
+func (ServerError) IsChangeProjectStatusResult() {}
+
+func (ServerError) IsConfirmLoginLinkResult() {}
+
+func (ServerError) IsConfirmLoginPinResult() {}
+
+func (ServerError) IsCreateProjectResult() {}
+
+func (ServerError) IsDeleteContactResult() {}
+
+func (ServerError) IsLoginByEmailResult() {}
+
+func (ServerError) IsUpdateContactResult() {}
+
+func (ServerError) IsUpdateHouseResult() {}
+
+func (ServerError) IsUploadProjectFileResult() {}
+
+func (ServerError) IsUserProfileResult() {}
+
+func (ServerError) IsProjectResult() {}
+
+func (ServerError) IsProjectFilesListResult() {}
+
+func (ServerError) IsProjectFilesTotalResult() {}
+
+func (ServerError) IsProjectFilesResult() {}
+
+func (ServerError) IsProjectContactsListResult() {}
+
+func (ServerError) IsProjectContactsTotalResult() {}
+
+func (ServerError) IsProjectHousesListResult() {}
+
+func (ServerError) IsProjectHousesTotalResult() {}
+
+func (ServerError) IsHouseRoomsListResult() {}
+
+func (ServerError) IsMenuResult() {}
+
+func (ServerError) IsWorkspaceResult() {}
+
+func (ServerError) IsWorkspaceUsersResult() {}
+
+func (ServerError) IsWorkspaceProjectsListResult() {}
+
 func (ServerError) IsWorkspaceProjectsTotalResult() {}
-func (ServerError) IsError()                        {}
+
+func (ServerError) IsError()                {}
+func (this ServerError) GetMessage() string { return this.Message }
 
 type ShoppinglistQuery struct {
 	ProductOnPage *Product `json:"productOnPage"`
@@ -541,6 +664,12 @@ type UpdateHouseInput struct {
 	City           string `json:"city"`
 	Address        string `json:"address"`
 	HousingComplex string `json:"housingComplex"`
+}
+
+type UpdateRoomInput struct {
+	Name   string   `json:"name"`
+	Square *float64 `json:"square"`
+	Level  *int     `json:"level"`
 }
 
 type UploadProjectFileInput struct {

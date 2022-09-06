@@ -55,8 +55,6 @@ export default function Add(
             onClickOutside={() => setShow(false)}
             onEsc={() => setShow(false)}
         >
-                {error && <Box><Text>{error.message}</Text></Box>}
-
                 <Box pad="medium" gap="medium" width={{min: "500px"}}>
                     <Box direction="row"justify="between"align="center">
                         <Heading level={3} margin="none">Добавить контакт</Heading>
@@ -75,6 +73,7 @@ export default function Add(
                                     disabled={loading}
                                 />
                                 <Box><Text color="status-critical"><ErrorMessage res={data?.addContact}/></Text></Box>
+                                {error && <Box><Text color="status-critical">{error.message}</Text></Box>}
                             </Box>
                         }
                     />

@@ -40,7 +40,7 @@ export default function Contacts({
 
             return (
                 <Box {...boxProps}>
-                    <Box direction="row">
+                    <Box direction="row" wrap>
                         {[...list.map((contact) => {
                             return (
                                 <Contact
@@ -53,10 +53,12 @@ export default function Contacts({
                                     onClickUpdate={(contact: ProjectContact) => {
                                         setUpdateContact(contact)
                                     }}
-                                    margin={{right: "xsmall", bottom: "xsmall"}}
+                                    width={{min:"xsmall"}}
+                                    overflow="hidden"
+                                    margin={{right: "xsmall", bottom: "small"}}
                                 />
                             )
-                        }), <Button key="" icon={<Add/>} label="Добавить" onClick={() => setShowAddContact(true) }/>]}
+                        }), <Button key="" icon={<Add/>} label="Добавить" onClick={() => setShowAddContact(true) } margin={{bottom: "small"}}/>]}
                     </Box>
 
                     {showAddContact ?

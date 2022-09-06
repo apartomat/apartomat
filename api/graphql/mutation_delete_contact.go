@@ -7,10 +7,10 @@ import (
 	"log"
 )
 
-func (r *mutationResolver) DeleteContact(ctx context.Context, contactID string) (DeleteContactResult, error) {
+func (r *mutationResolver) DeleteContact(ctx context.Context, id string) (DeleteContactResult, error) {
 	contact, err := r.useCases.DeleteContact(
 		ctx,
-		contactID,
+		id,
 	)
 	if err != nil {
 		if errors.Is(err, apartomat.ErrForbidden) {
