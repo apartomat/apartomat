@@ -28,7 +28,7 @@ export function Update({
     const handleSubmit = (event: React.FormEvent) => {
         const { name, square } = value
 
-        updateRoom(room.id, { name, square: parseFloat(square.replace(",", ".")) })
+        updateRoom(room.id, { name, square: square ? parseFloat(square.replace(",", ".")) : undefined })
 
         event.preventDefault()
     }
