@@ -6,5 +6,5 @@ import (
 )
 
 type Uploader interface {
-	Upload(ctx context.Context, reader io.Reader, path, contentType string) (string, error)
+	Upload(ctx context.Context, reader io.Reader, size int64, path, contentType string) (string, error)
 }

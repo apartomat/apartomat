@@ -72,8 +72,35 @@ func projectFileToGraphQL(file *store.ProjectFile) *ProjectFile {
 	}
 }
 
-func (r *projectFilesResolver) Total(ctx context.Context, obj *ProjectFiles) (ProjectFilesTotalResult, error) {
-	return ProjectFilesTotal{Total: 99}, nil // todo
+func (r *projectFilesResolver) Total(
+	ctx context.Context,
+	obj *ProjectFiles,
+	filter ProjectFilesListFilter,
+) (ProjectFilesTotalResult, error) {
+	if project, ok := graphql.GetFieldContext(ctx).Parent.Parent.Result.(*Project); !ok {
+		log.Printf("can't resolve project files: %s", errors.New("unknown project"))
+
+		return nil, errors.New("server error: can't resolver project files")
+	} else {
+		tot, err := r.useCases.CountProjectFiles(
+			ctx,
+			project.ID,
+			apartomat.GetProjectFilesFilter{
+				Type: store.ProjectFileTypeExpr{Eq: toProjectFileTypes(filter.Type)},
+			},
+		)
+		if err != nil {
+			if errors.Is(err, apartomat.ErrForbidden) {
+				return Forbidden{}, nil
+			}
+
+			log.Printf("can't resolve project (id=%d) files: %s", project.ID, err)
+
+			return nil, errors.New("server error: can't resolver project files")
+		}
+
+		return ProjectFilesTotal{Total: tot}, nil
+	}
 }
 
 func projectFileTypeToGraphQL(t store.ProjectFileType) ProjectFileType {

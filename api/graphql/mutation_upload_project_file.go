@@ -19,6 +19,7 @@ func (r *mutationResolver) UploadProjectFile(
 			Type:     toProjectFileType(input.Type),
 			MimeType: input.File.ContentType,
 			Data:     input.File.File,
+			Size:     input.File.Size,
 		},
 	)
 	if err != nil {

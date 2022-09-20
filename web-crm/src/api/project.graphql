@@ -81,7 +81,7 @@ fragment ProjectScreenProject on Project {
                 message
             }
         }
-        total {
+        total(filter: {type: [VISUALIZATION]}) {
             __typename
             ...on ProjectFilesTotal {
                 total

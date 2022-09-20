@@ -14,6 +14,7 @@ type Upload struct {
 	Type     store.ProjectFileType
 	MimeType string
 	Data     io.Reader
+	Size     int64
 }
 
 func (u *Apartomat) UploadFile(
@@ -36,9 +37,9 @@ func (u *Apartomat) UploadFile(
 		return nil, errors.Wrapf(ErrForbidden, "can't upload file to project (id=%d)", project.ID)
 	}
 
-	path := fmt.Sprintf("p/%d/%s", project.ID, upload.Name)
+	path := fmt.Sprintf("p/%s/%s", project.ID, upload.Name)
 
-	url, err := u.Uploader.Upload(ctx, upload.Data, path, upload.MimeType)
+	url, err := u.Uploader.Upload(ctx, upload.Data, upload.Size, path, upload.MimeType)
 	if err != nil {
 		return nil, err
 	}

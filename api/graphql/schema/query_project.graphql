@@ -20,7 +20,7 @@ enum ProjectStatus {
 
 type ProjectFiles {
     list(filter: ProjectFilesListFilter! = {} limit: Int! = 10 offset: Int! = 0): ProjectFilesListResult!
-    total: ProjectFilesTotalResult!
+    total(filter: ProjectFilesListFilter! = {}): ProjectFilesTotalResult!
 }
 
 input ProjectFilesListFilter {
@@ -38,7 +38,7 @@ type ProjectFilesList {
     items: [ProjectFile!]!
 }
 
-union ProjectFilesTotalResult = ProjectFilesTotal | Forbidden | ServerError
+union ProjectFilesTotalResult = ProjectFilesTotal | Forbidden
 
 type ProjectFilesTotal {
     total: Int!

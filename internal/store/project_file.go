@@ -27,6 +27,7 @@ const (
 type ProjectFileStore interface {
 	Save(context.Context, *ProjectFile) (*ProjectFile, error)
 	List(context.Context, ProjectFileStoreQuery) ([]*ProjectFile, error)
+	Count(context.Context, ProjectFileStoreQuery) (int, error)
 }
 
 type ProjectFileStoreQuery struct {

@@ -619,8 +619,6 @@ func (ServerError) IsProjectResult() {}
 
 func (ServerError) IsProjectFilesListResult() {}
 
-func (ServerError) IsProjectFilesTotalResult() {}
-
 func (ServerError) IsProjectFilesResult() {}
 
 func (ServerError) IsProjectContactsListResult() {}

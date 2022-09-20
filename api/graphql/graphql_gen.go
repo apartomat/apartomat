@@ -251,7 +251,7 @@ type ComplexityRoot struct {
 
 	ProjectFiles struct {
 		List  func(childComplexity int, filter ProjectFilesListFilter, limit int, offset int) int
-		Total func(childComplexity int) int
+		Total func(childComplexity int, filter ProjectFilesListFilter) int
 	}
 
 	ProjectFilesList struct {
@@ -441,7 +441,7 @@ type ProjectContactsResolver interface {
 }
 type ProjectFilesResolver interface {
 	List(ctx context.Context, obj *ProjectFiles, filter ProjectFilesListFilter, limit int, offset int) (ProjectFilesListResult, error)
-	Total(ctx context.Context, obj *ProjectFiles) (ProjectFilesTotalResult, error)
+	Total(ctx context.Context, obj *ProjectFiles, filter ProjectFilesListFilter) (ProjectFilesTotalResult, error)
 }
 type ProjectHousesResolver interface {
 	List(ctx context.Context, obj *ProjectHouses, filter ProjectHousesFilter, limit int, offset int) (ProjectHousesListResult, error)
@@ -1170,7 +1170,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.ProjectFiles.Total(childComplexity), true
+		args, err := ec.field_ProjectFiles_total_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.ProjectFiles.Total(childComplexity, args["filter"].(ProjectFilesListFilter)), true
 
 	case "ProjectFilesList.items":
 		if e.complexity.ProjectFilesList.Items == nil {
@@ -2226,6 +2231,21 @@ func (ec *executionContext) field_ProjectFiles_list_args(ctx context.Context, ra
 		}
 	}
 	args["offset"] = arg2
+	return args, nil
+}
+
+func (ec *executionContext) field_ProjectFiles_total_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 ProjectFilesListFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalNProjectFilesListFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectFilesListFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
 	return args, nil
 }
 
@@ -6428,7 +6448,7 @@ func (ec *executionContext) _ProjectFiles_total(ctx context.Context, field graph
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.ProjectFiles().Total(rctx, obj)
+		return ec.resolvers.ProjectFiles().Total(rctx, obj, fc.Args["filter"].(ProjectFilesListFilter))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -6454,6 +6474,17 @@ func (ec *executionContext) fieldContext_ProjectFiles_total(ctx context.Context,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type ProjectFilesTotalResult does not have child fields")
 		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_ProjectFiles_total_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
 	}
 	return fc, nil
 }
@@ -12731,13 +12762,6 @@ func (ec *executionContext) _ProjectFilesTotalResult(ctx context.Context, sel as
 			return graphql.Null
 		}
 		return ec._Forbidden(ctx, sel, obj)
-	case ServerError:
-		return ec._ServerError(ctx, sel, &obj)
-	case *ServerError:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._ServerError(ctx, sel, obj)
 	default:
 		panic(fmt.Errorf("unexpected type %T", obj))
 	}
@@ -15389,7 +15413,7 @@ func (ec *executionContext) _ScreenQuery(ctx context.Context, sel ast.SelectionS
 	return out
 }
 
-var serverErrorImplementors = []string{"ServerError", "AddContactResult", "AddHouseResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "ConfirmLoginLinkResult", "ConfirmLoginPinResult", "CreateProjectResult", "DeleteContactResult", "LoginByEmailResult", "UpdateContactResult", "UpdateHouseResult", "UploadProjectFileResult", "UserProfileResult", "ProjectResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectFilesResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "MenuResult", "WorkspaceResult", "WorkspaceUsersResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "Error"}
+var serverErrorImplementors = []string{"ServerError", "AddContactResult", "AddHouseResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "ConfirmLoginLinkResult", "ConfirmLoginPinResult", "CreateProjectResult", "DeleteContactResult", "LoginByEmailResult", "UpdateContactResult", "UpdateHouseResult", "UploadProjectFileResult", "UserProfileResult", "ProjectResult", "ProjectFilesListResult", "ProjectFilesResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "MenuResult", "WorkspaceResult", "WorkspaceUsersResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "Error"}
 
 func (ec *executionContext) _ServerError(ctx context.Context, sel ast.SelectionSet, obj *ServerError) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, serverErrorImplementors)

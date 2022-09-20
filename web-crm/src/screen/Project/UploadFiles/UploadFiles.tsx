@@ -40,8 +40,8 @@ export default function UploadFiles(
         event.preventDefault()
     }
 
-    const handleFileInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-        if (event.target.files) {
+    const handleFileInputChange = (event?: ChangeEvent<HTMLInputElement>) => {
+        if (event?.target.files) {
             setFiles(event.target.files)
         }
     }

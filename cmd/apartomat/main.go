@@ -8,7 +8,7 @@ import (
 	"fmt"
 	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/dataloader"
-	"github.com/apartomat/apartomat/internal/image/s3"
+	"github.com/apartomat/apartomat/internal/image/minio"
 	"github.com/apartomat/apartomat/internal/mail"
 	"github.com/apartomat/apartomat/internal/mail/smtp"
 	"github.com/apartomat/apartomat/internal/postgres/store"
@@ -84,16 +84,18 @@ func main() {
 
 		usersLoader := dataloader.NewUserLoader(dataloader.NewUserLoaderConfig(ctx, users))
 
-		uploader, err := s3.NewS3ImageUploaderWithCred(
-			ctx,
-			os.Getenv("S3_ACCESS_KEY_ID"),
-			os.Getenv("S3_SECRET_ACCESS_KEY"),
-			os.Getenv("S3_REGION"),
-			os.Getenv("S3_BUCKET_NAME"),
-		)
-		if err != nil {
-			log.Fatalf("can't init s3: %s", err)
-		}
+		//uploader, err := s3.NewS3ImageUploaderWithCred(
+		//	ctx,
+		//	os.Getenv("S3_ACCESS_KEY_ID"),
+		//	os.Getenv("S3_SECRET_ACCESS_KEY"),
+		//	os.Getenv("S3_REGION"),
+		//	os.Getenv("S3_BUCKET_NAME"),
+		//)
+		//if err != nil {
+		//	log.Fatalf("can't init s3: %s", err)
+		//}
+
+		uploader := minio.NewUploader("apartomat")
 
 		usecases := &apartomat.Apartomat{
 			AuthTokenIssuer:              authIssuerVerifier,

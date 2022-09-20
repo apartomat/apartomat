@@ -46,7 +46,7 @@ func NewS3ImageUploaderWithCred(
 	return NewS3ImageUploader(client, region, bucketName), nil
 }
 
-func (u *s3ImageUploader) Upload(ctx context.Context, reader io.Reader, path, contentType string) (string, error) {
+func (u *s3ImageUploader) Upload(ctx context.Context, reader io.Reader, size int64, path, contentType string) (string, error) {
 	inp := &s3.PutObjectInput{
 		Bucket:      aws.String(u.bucketName),
 		Body:        reader,

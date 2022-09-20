@@ -101,6 +101,25 @@ func (s *projectFileStore) List(ctx context.Context, q store.ProjectFileStoreQue
 	return files, nil
 }
 
+func (s *projectFileStore) Count(ctx context.Context, q store.ProjectFileStoreQuery) (int, error) {
+	sql, args, err := SelectFromProjectFiles("count(id)").Where(q).Limit(1).ToSql()
+	if err != nil {
+		return 0, err
+	}
+
+	row := s.pg.QueryRow(ctx, sql, args...)
+
+	var (
+		c = 0
+	)
+
+	if err := row.Scan(&c); err != nil {
+		return 0, err
+	}
+
+	return c, nil
+}
+
 //
 type projectFilesInsertBuilder struct {
 	sq.InsertBuilder
