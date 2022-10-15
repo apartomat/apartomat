@@ -55,7 +55,7 @@ export default function Add(
             onClickOutside={() => setShow(false)}
             onEsc={() => setShow(false)}
         >
-                <Box pad="medium" gap="medium" width={{min: "500px"}}>
+                <Box pad="medium" gap="medium" width="large">
                     <Box direction="row"justify="between"align="center">
                         <Heading level={3} margin="none">Добавить контакт</Heading>
                         <Button icon={ <FormClose/> } onClick={() => setShow(false)}/>

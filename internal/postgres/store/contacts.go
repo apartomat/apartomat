@@ -64,9 +64,9 @@ func (s *contactsStore) List(ctx context.Context, spec Spec, limit, offset int) 
 		return nil, err
 	}
 
-	sort := goqu.I("modified_at").Asc()
+	orderExpr := goqu.I("created_at").Asc()
 
-	q := goqu.From(contactsTableName).Where(expr).Order(sort)
+	q := goqu.From(contactsTableName).Where(expr).Order(orderExpr)
 
 	sql, args, err := q.Limit(uint(limit)).Offset(uint(offset)).ToSQL()
 	if err != nil {

@@ -53,8 +53,7 @@ create table apartomat.project_files (
     created_at timestamp with time zone not null default now(),
     modified_at timestamp with time zone not null default now(),
     project_id char(21) not null,
-    constraint project_files_project_id_fkey foreign key (project_id) references apartomat.projects on delete cascade,
-    constraint project_files_ukey unique (project_id, name)
+    constraint project_files_project_id_fkey foreign key (project_id) references apartomat.projects on delete cascade
 );
 
 create table apartomat.contacts (
@@ -88,4 +87,19 @@ create table apartomat.rooms (
      modified_at timestamp with time zone not null default now(),
      house_id char(21) not null,
      constraint rooms_house_id_fkey foreign key (house_id) references apartomat.houses on delete cascade
+);
+
+create table apartomat.visualizations (
+     id char(21) primary key,
+     name text not null,
+     description text not null,
+     version integer not null default 0,
+     created_at timestamp with time zone not null default now(),
+     modified_at timestamp with time zone not null default now(),
+     project_id char(21) not null,
+     project_file_id char(21) not null,
+     room_id char(21),
+     constraint visualizations_project_id_fkey foreign key (project_id) references apartomat.projects on delete cascade,
+     constraint visualizations_project_file_id_fkey foreign key (project_file_id) references apartomat.project_files on delete cascade,
+     constraint visualizations_room_id_fkey foreign key (room_id) references apartomat.rooms
 );

@@ -66,27 +66,45 @@ fragment ProjectScreenProject on Project {
     houses {
         ...ProjectScreenHouses
     }
-    files {
-        list(filter: {type: [VISUALIZATION]} limit: 10 offset: 0) {
-            __typename
-            ...on ProjectFilesList {
-                items {
-                    id
-                    name
-                    url
-                    type
-                }
-            }
-            ...on Error {
-                message
+    visualizations {
+        ...ProjectScreenVisualizations
+    }
+}
+
+fragment ProjectScreenVisualizations on ProjectVisualizations {
+    list(filter: {} limit: 10 offset: 0) {
+        __typename
+        ...on ProjectVisualizationsList {
+            items {
+                ...ProjectScreenVisualization
             }
         }
-        total(filter: {type: [VISUALIZATION]}) {
-            __typename
-            ...on ProjectFilesTotal {
-                total
-            }
+        ...on Error {
+            message
         }
+    }
+    total(filter: {}) {
+        __typename
+        ...on ProjectVisualizationsTotal {
+            total
+        }
+    }
+}
+
+fragment ProjectScreenVisualization on Visualization {
+    id
+    name
+    description
+    version
+    file {
+        id
+        name
+        url
+        type
+        mimeType
+    }
+    room {
+        ...ProjectScreenHouseRoom
     }
 }
 

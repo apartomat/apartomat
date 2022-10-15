@@ -12,6 +12,7 @@ import (
 	"github.com/apartomat/apartomat/internal/mail"
 	"github.com/apartomat/apartomat/internal/mail/smtp"
 	"github.com/apartomat/apartomat/internal/postgres/store"
+	visualizations "github.com/apartomat/apartomat/internal/store/visualizations/postgres"
 	"github.com/apartomat/apartomat/internal/token"
 	"github.com/go-pg/pg/v10"
 	"github.com/jackc/pgx/v4/pgxpool"
@@ -81,6 +82,7 @@ func main() {
 		contactsStore := store.NewContactsStore(pgdb)
 		housesStore := store.NewHousesStore(pgdb)
 		roomsStore := store.NewRoomsStore(pgdb)
+		visualizationsStore := visualizations.NewStore(pgdb)
 
 		usersLoader := dataloader.NewUserLoader(dataloader.NewUserLoaderConfig(ctx, users))
 
@@ -113,6 +115,7 @@ func main() {
 			ProjectFiles:                 projectFiles,
 			Rooms:                        roomsStore,
 			Users:                        users,
+			Visualizations:               visualizationsStore,
 			Workspaces:                   workspaces,
 			WorkspaceUsers:               workspaceUsers,
 		}

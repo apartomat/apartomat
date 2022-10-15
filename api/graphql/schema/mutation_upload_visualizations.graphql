@@ -1,0 +1,13 @@
+extend type Mutation {
+    uploadVisualizations(projectId: String! files: [Upload!]! roomId: String): UploadVisualizationsResult!
+}
+
+union UploadVisualizationsResult = VisualizationsUploaded | SomeVisualizationsUploaded | Forbidden | ServerError
+
+type VisualizationsUploaded {
+    visualizations: [Visualization!]!
+}
+
+type SomeVisualizationsUploaded {
+    visualizations: [Visualization!]!
+}

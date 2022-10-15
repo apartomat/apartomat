@@ -10,7 +10,6 @@ import UserAvatar from "./UserAvatar/UserAvatar"
 import { useAuthContext } from "common/context/auth/useAuthContext"
 
 import { useProject, Project  as ProjectType } from "./useProject"
-import { ProjectFileType } from "api/types.d"
 import { ProjectEnums } from "api/types"
 
 import ChangeStatus from "./ChangeStatus/ChangeStatus"
@@ -21,7 +20,7 @@ import ProjectDates from "./Dates/Dates"
 import House from "./House/House"
 import Rooms from "./Rooms/Rooms"
 import Visualizations from "./Visualizations/Visualizations"
-import UploadFiles from "./UploadFiles/UploadFiles"
+import UploadVisualizations from "./UploadVisualizations/UploadVisualizations"
 
 
 interface RouteParams {
@@ -38,10 +37,25 @@ export function Project () {
     const { data, loading, error: fetchError, refetch, refetching } = useProject(id)
 
     const [ notification, setNotification ] = useState("")
+
     const [ showNotification, setShowNotification ] = useState(false)
 
-    const notify = ({ message, timeout = 250, duration = 1500 }: { message: string, timeout?: number, duration?: number }) => {
+    const respSize = useContext(ResponsiveContext);
+
+    const notify = ({
+        message,
+        callback,
+        timeout = 250,
+        duration = 1500
+    }: {
+        message: string,
+        callback?: () => void,
+        timeout?: number,
+        duration?: number
+    }) => {
         setNotification(message)
+
+        callback && callback()
         
         setTimeout(() => {
             setShowNotification(true)
@@ -57,13 +71,8 @@ export function Project () {
     const [ projectEnums, setProjectEnums ] = useState<ProjectEnums | undefined>(undefined)
 
     useEffect(() => {
-        console.log({ loading, data, fetchError })
-    }, [ loading, data, fetchError ])
-
-    useEffect(() => {
         if (fetchError) {
             setError("Ошибка сервера")
-            console.error({...fetchError})
         }
     }, [ fetchError ])
 
@@ -86,7 +95,7 @@ export function Project () {
         }        
     }, [ data ])
 
-    const [showUploadFiles, setShowUploadFiles] = useState(false);
+    const [showUploadVisualizations, setShowUploadVisualizations] = useState(false);
 
     if (loading && !refetching) {
         return (
@@ -166,7 +175,11 @@ export function Project () {
                             }}
                         />
                     </Box>
-                    <AddSomething showUploadFiles={setShowUploadFiles}/>
+                    <AddSomething
+                        onClickAddVisualizations={() => {
+                            setShowUploadVisualizations(true)
+                        }}
+                    />
                 </Box>
 
                 <Grid columns={{count: respSize === "small" ? 1 : 2, size: "auto"}} gap="small" responsive>
@@ -216,25 +229,34 @@ export function Project () {
                     </Box>
                 </Grid>
 
-                {project.files.list.__typename === "ProjectFilesList" && project.files.list.items.length > 0 &&
+                {project.visualizations.list.__typename === "ProjectVisualizationsList" && project.visualizations.list.items.length > 0 &&
                     <Box margin={{vertical: "large"}}>
                         <Box direction="row" justify="between">
                             <Heading level={3}>Визуализации</Heading>
                             <Box justify="center">
-                                <Button color="brand" label="Загрузить" onClick={() => setShowUploadFiles(true)} />
+                                <Button color="brand" label="Загрузить" onClick={() => setShowUploadVisualizations(true)} />
                             </Box>
                         </Box>
-                        <Visualizations files={project.files}/>
+                        <Visualizations visualizations={project.visualizations}/>
                     </Box>
                 }
 
-                {showUploadFiles ?
-                    <UploadFiles
+                {showUploadVisualizations &&
+                    <UploadVisualizations
                         projectId={project.id}
-                        type={ProjectFileType.Visualization}
-                        setShow={setShowUploadFiles}
-                        onUploadComplete={({message}) => notify({ message })}
-                    /> : null}
+                        houses={project.houses}
+                        onUploadComplete={({ files }: { files: File[] }) => {
+                            setShowUploadVisualizations(false)
+                            notify({ message: files?.length === 1 ? "Файл загружен" : `Загружено файлов ${files?.length}` })
+                            refetch()
+                        }}
+                        onClickOutside={() => {
+                            setShowUploadVisualizations(false)
+                        }}
+                        onClickClose={() => {
+                            setShowUploadVisualizations(false)
+                        }}
+                    />}
                 </Box>
             </Main>
         );

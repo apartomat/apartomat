@@ -23,6 +23,10 @@ func (r *projectResolver) Houses(ctx context.Context, obj *Project) (*ProjectHou
 	return &ProjectHouses{}, nil
 }
 
+func (r *projectResolver) Visualizations(ctx context.Context, obj *Project) (*ProjectVisualizations, error) {
+	return &ProjectVisualizations{}, nil
+}
+
 func projectToGraphQL(p *store.Project) *Project {
 	if p == nil {
 		return nil

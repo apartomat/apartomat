@@ -55,7 +55,14 @@ func (s *housesStore) List(ctx context.Context, spec Spec, limit, offset int) ([
 		return nil, err
 	}
 
-	sql, args, err := goqu.From(housesTableName).Where(expr).Limit(uint(limit)).Offset(uint(offset)).ToSQL()
+	orderExpr := goqu.I("created_at").Asc()
+
+	sql, args, err := goqu.From(housesTableName).
+		Where(expr).
+		Order(orderExpr).
+		Limit(uint(limit)).
+		Offset(uint(offset)).
+		ToSQL()
 	if err != nil {
 		return nil, err
 	}

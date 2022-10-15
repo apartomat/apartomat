@@ -43,7 +43,7 @@ export function Update({
     return (
         <Layer {...layerProps}>
                 <Box pad="medium" gap="medium" width={{min: "500px"}}>
-                    <Box direction="row"justify="between"align="center">
+                    <Box direction="row" justify="between" align="center">
                         <Heading level={3} margin="none">Комната</Heading>
                         <Button icon={ <FormClose/> } onClick={onClickClose}/>
                     </Box>

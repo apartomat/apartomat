@@ -80,10 +80,6 @@ type ProjectFilesListResult interface {
 	IsProjectFilesListResult()
 }
 
-type ProjectFilesResult interface {
-	IsProjectFilesResult()
-}
-
 type ProjectFilesTotalResult interface {
 	IsProjectFilesTotalResult()
 }
@@ -100,6 +96,14 @@ type ProjectResult interface {
 	IsProjectResult()
 }
 
+type ProjectVisualizationsListResult interface {
+	IsProjectVisualizationsListResult()
+}
+
+type ProjectVisualizationsTotalResult interface {
+	IsProjectVisualizationsTotalResult()
+}
+
 type UpdateContactResult interface {
 	IsUpdateContactResult()
 }
@@ -114,6 +118,14 @@ type UpdateRoomResult interface {
 
 type UploadProjectFileResult interface {
 	IsUploadProjectFileResult()
+}
+
+type UploadVisualizationResult interface {
+	IsUploadVisualizationResult()
+}
+
+type UploadVisualizationsResult interface {
+	IsUploadVisualizationsResult()
 }
 
 type UserProfileResult interface {
@@ -255,15 +267,13 @@ func (Forbidden) IsUpdateRoomResult() {}
 
 func (Forbidden) IsUploadProjectFileResult() {}
 
+func (Forbidden) IsUploadVisualizationResult() {}
+
+func (Forbidden) IsUploadVisualizationsResult() {}
+
 func (Forbidden) IsUserProfileResult() {}
 
 func (Forbidden) IsProjectResult() {}
-
-func (Forbidden) IsProjectFilesListResult() {}
-
-func (Forbidden) IsProjectFilesTotalResult() {}
-
-func (Forbidden) IsProjectFilesResult() {}
 
 func (Forbidden) IsProjectContactsListResult() {}
 
@@ -274,6 +284,14 @@ func (Forbidden) IsProjectHousesListResult() {}
 func (Forbidden) IsProjectHousesTotalResult() {}
 
 func (Forbidden) IsHouseRoomsListResult() {}
+
+func (Forbidden) IsProjectVisualizationsListResult() {}
+
+func (Forbidden) IsProjectVisualizationsTotalResult() {}
+
+func (Forbidden) IsProjectFilesListResult() {}
+
+func (Forbidden) IsProjectFilesTotalResult() {}
 
 func (Forbidden) IsWorkspaceResult() {}
 
@@ -423,14 +441,15 @@ type Product struct {
 }
 
 type Project struct {
-	ID       string           `json:"id"`
-	Title    string           `json:"title"`
-	Status   ProjectStatus    `json:"status"`
-	StartAt  *time.Time       `json:"startAt"`
-	EndAt    *time.Time       `json:"endAt"`
-	Files    *ProjectFiles    `json:"files"`
-	Contacts *ProjectContacts `json:"contacts"`
-	Houses   *ProjectHouses   `json:"houses"`
+	ID             string                 `json:"id"`
+	Title          string                 `json:"title"`
+	Status         ProjectStatus          `json:"status"`
+	StartAt        *time.Time             `json:"startAt"`
+	EndAt          *time.Time             `json:"endAt"`
+	Contacts       *ProjectContacts       `json:"contacts"`
+	Houses         *ProjectHouses         `json:"houses"`
+	Visualizations *ProjectVisualizations `json:"visualizations"`
+	Files          *ProjectFiles          `json:"files"`
 }
 
 func (Project) IsProjectResult() {}
@@ -491,8 +510,6 @@ type ProjectFiles struct {
 	Total ProjectFilesTotalResult `json:"total"`
 }
 
-func (ProjectFiles) IsProjectFilesResult() {}
-
 type ProjectFilesList struct {
 	Items []*ProjectFile `json:"items"`
 }
@@ -550,6 +567,27 @@ type ProjectStatusEnumItem struct {
 	Key   ProjectStatus `json:"key"`
 	Value string        `json:"value"`
 }
+
+type ProjectVisualizations struct {
+	List  ProjectVisualizationsListResult  `json:"list"`
+	Total ProjectVisualizationsTotalResult `json:"total"`
+}
+
+type ProjectVisualizationsList struct {
+	Items []*Visualization `json:"items"`
+}
+
+func (ProjectVisualizationsList) IsProjectVisualizationsListResult() {}
+
+type ProjectVisualizationsListFilter struct {
+	RoomID []string `json:"roomID"`
+}
+
+type ProjectVisualizationsTotal struct {
+	Total int `json:"total"`
+}
+
+func (ProjectVisualizationsTotal) IsProjectVisualizationsTotalResult() {}
 
 type Room struct {
 	ID         string    `json:"id"`
@@ -613,13 +651,13 @@ func (ServerError) IsUpdateHouseResult() {}
 
 func (ServerError) IsUploadProjectFileResult() {}
 
+func (ServerError) IsUploadVisualizationResult() {}
+
+func (ServerError) IsUploadVisualizationsResult() {}
+
 func (ServerError) IsUserProfileResult() {}
 
 func (ServerError) IsProjectResult() {}
-
-func (ServerError) IsProjectFilesListResult() {}
-
-func (ServerError) IsProjectFilesResult() {}
 
 func (ServerError) IsProjectContactsListResult() {}
 
@@ -630,6 +668,14 @@ func (ServerError) IsProjectHousesListResult() {}
 func (ServerError) IsProjectHousesTotalResult() {}
 
 func (ServerError) IsHouseRoomsListResult() {}
+
+func (ServerError) IsProjectVisualizationsListResult() {}
+
+func (ServerError) IsProjectVisualizationsTotalResult() {}
+
+func (ServerError) IsProjectFilesListResult() {}
+
+func (ServerError) IsProjectFilesTotalResult() {}
 
 func (ServerError) IsMenuResult() {}
 
@@ -647,6 +693,12 @@ func (this ServerError) GetMessage() string { return this.Message }
 type ShoppinglistQuery struct {
 	ProductOnPage *Product `json:"productOnPage"`
 }
+
+type SomeVisualizationsUploaded struct {
+	Visualizations []*Visualization `json:"visualizations"`
+}
+
+func (SomeVisualizationsUploaded) IsUploadVisualizationsResult() {}
 
 type SpecScreen struct {
 	Project ProjectResult `json:"project"`
@@ -686,6 +738,29 @@ type UserProfile struct {
 }
 
 func (UserProfile) IsUserProfileResult() {}
+
+type Visualization struct {
+	ID          string       `json:"id"`
+	Name        string       `json:"name"`
+	Description string       `json:"description"`
+	Version     int          `json:"version"`
+	CreatedAt   time.Time    `json:"createdAt"`
+	ModifiedAt  time.Time    `json:"modifiedAt"`
+	File        *ProjectFile `json:"file"`
+	Room        *Room        `json:"room"`
+}
+
+type VisualizationUploaded struct {
+	Visualization *Visualization `json:"visualization"`
+}
+
+func (VisualizationUploaded) IsUploadVisualizationResult() {}
+
+type VisualizationsUploaded struct {
+	Visualizations []*Visualization `json:"visualizations"`
+}
+
+func (VisualizationsUploaded) IsUploadVisualizationsResult() {}
 
 type Workspace struct {
 	ID       string               `json:"id"`

@@ -6,9 +6,10 @@ type Project {
     status: ProjectStatus!
     startAt: Time
     endAt: Time
-    files: ProjectFiles!
     contacts: ProjectContacts!
     houses: ProjectHouses!
+    visualizations: ProjectVisualizations!
+    files: ProjectFiles!
 }
 
 enum ProjectStatus {
@@ -16,42 +17,6 @@ enum ProjectStatus {
     IN_PROGRESS
     DONE
     CANCELED
-}
-
-type ProjectFiles {
-    list(filter: ProjectFilesListFilter! = {} limit: Int! = 10 offset: Int! = 0): ProjectFilesListResult!
-    total(filter: ProjectFilesListFilter! = {}): ProjectFilesTotalResult!
-}
-
-input ProjectFilesListFilter {
-    type: [ProjectFileType!]
-}
-
-enum ProjectFileType {
-    NONE
-    VISUALIZATION
-}
-
-union ProjectFilesListResult = ProjectFilesList | Forbidden | ServerError
-
-type ProjectFilesList {
-    items: [ProjectFile!]!
-}
-
-union ProjectFilesTotalResult = ProjectFilesTotal | Forbidden
-
-type ProjectFilesTotal {
-    total: Int!
-}
-
-union ProjectFilesResult = ProjectFiles | Forbidden | ServerError
-
-type ProjectFile {
-    id: String!
-    name: String!
-    url: Url!
-    type: ProjectFileType!
-    mimeType: String!
 }
 
 type ProjectContacts {
@@ -146,4 +111,70 @@ type Room {
     level: Int
     createdAt:  Time!
     modifiedAt: Time!
+}
+
+type ProjectVisualizations {
+    list(filter: ProjectVisualizationsListFilter! = {} limit: Int! = 10 offset: Int! = 0): ProjectVisualizationsListResult!
+    total(filter: ProjectVisualizationsListFilter! = {}): ProjectVisualizationsTotalResult!
+}
+
+input ProjectVisualizationsListFilter {
+    roomID: [String!]
+}
+
+union ProjectVisualizationsListResult = ProjectVisualizationsList | Forbidden | ServerError
+
+type ProjectVisualizationsList {
+    items: [Visualization!]!
+}
+
+union ProjectVisualizationsTotalResult = ProjectVisualizationsTotal | Forbidden | ServerError
+
+type ProjectVisualizationsTotal {
+    total: Int!
+}
+
+type Visualization {
+    id: String!
+    name: String!
+    description: String!
+    version: Int!
+    createdAt:  Time!
+    modifiedAt: Time!
+    file: ProjectFile!
+    room: Room
+}
+
+type ProjectFiles {
+    list(filter: ProjectFilesListFilter! = {} limit: Int! = 10 offset: Int! = 0): ProjectFilesListResult!
+    total(filter: ProjectFilesListFilter! = {}): ProjectFilesTotalResult!
+}
+
+input ProjectFilesListFilter {
+    type: [ProjectFileType!]
+}
+
+enum ProjectFileType {
+    NONE
+    VISUALIZATION
+}
+
+union ProjectFilesListResult = ProjectFilesList | Forbidden | ServerError
+
+type ProjectFilesList {
+    items: [ProjectFile!]!
+}
+
+union ProjectFilesTotalResult = ProjectFilesTotal | Forbidden | ServerError
+
+type ProjectFilesTotal {
+    total: Int!
+}
+
+type ProjectFile {
+    id: String!
+    name: String!
+    url: Url!
+    type: ProjectFileType!
+    mimeType: String!
 }

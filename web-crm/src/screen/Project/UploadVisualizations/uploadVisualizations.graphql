@@ -1,0 +1,26 @@
+mutation uploadVisualizations($projectId: String! $files: [Upload!]! $roomId: String) {
+    uploadVisualizations(projectId: $projectId files: $files roomId: $roomId) {
+        __typename
+        ...on VisualizationsUploaded {
+            visualizations {
+                id
+                file {
+                    id
+                    url
+                }
+            }
+        }
+        ...on SomeVisualizationsUploaded {
+            visualizations {
+                id
+                file {
+                    id
+                    url
+                }
+            }
+        }
+        ...on Error {
+            message
+        }
+    }
+}

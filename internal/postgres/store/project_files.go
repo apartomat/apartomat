@@ -4,7 +4,6 @@ import (
 	"context"
 	sq "github.com/Masterminds/squirrel"
 	"github.com/apartomat/apartomat/internal/store"
-	"github.com/jackc/pgconn"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"time"
 )
@@ -44,10 +43,6 @@ func (s *projectFileStore) Save(ctx context.Context, file *store.ProjectFile) (*
 
 	err = s.pg.QueryRow(ctx, q, args...).Scan(&file.ID)
 	if err != nil {
-		if pgerr, ok := err.(*pgconn.PgError); ok && pgerr.ConstraintName == "project_files_ukey" {
-			return nil, store.ErrAlreadyExists
-		}
-
 		return nil, err
 	}
 

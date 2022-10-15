@@ -26,6 +26,8 @@ models:
         resolver: true
       houses:
         resolver: true
+      visualizations:
+        resolver: true
   ProjectContacts:
     fields:
       list:
@@ -44,9 +46,21 @@ models:
         resolver: true
       total:
         resolver: true
+  ProjectVisualizations:
+    fields:
+      list:
+        resolver: true
+      total:
+        resolver: true
   UserProfile:
     fields:
       defaultWorkspace:
+        resolver: true
+  Visualization:
+    fields:
+      file:
+        resolver: true
+      room:
         resolver: true
   Workspace:
     fields:
