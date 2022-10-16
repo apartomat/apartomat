@@ -1093,7 +1093,7 @@ export const ProjectScreenVisualizationFragmentDoc = gql`
     ${ProjectScreenHouseRoomFragmentDoc}`;
 export const ProjectScreenVisualizationsFragmentDoc = gql`
     fragment ProjectScreenVisualizations on ProjectVisualizations {
-  list(filter: {}, limit: 10, offset: 0) {
+  list(filter: {}, limit: 100, offset: 0) {
     __typename
     ... on ProjectVisualizationsList {
       items {

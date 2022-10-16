@@ -7,7 +7,7 @@ export function useProject(id: string) {
     const client = useApolloClient();
     const result = useProjectQuery({ client, errorPolicy: "all", variables: { id }, notifyOnNetworkStatusChange: true })
 
-    return {...result, refetching: result.networkStatus === NetworkStatus.refetch }
+    return { ...result, refetching: result.networkStatus === NetworkStatus.refetch }
 }
 
 export default useProject
