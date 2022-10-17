@@ -37,7 +37,6 @@ type Config struct {
 }
 
 type ResolverRoot interface {
-	FilesScreen() FilesScreenResolver
 	House() HouseResolver
 	HouseRooms() HouseRoomsResolver
 	Mutation() MutationResolver
@@ -49,8 +48,6 @@ type ResolverRoot interface {
 	ProjectVisualizations() ProjectVisualizationsResolver
 	Query() QueryResolver
 	ScreenQuery() ScreenQueryResolver
-	ShoppinglistQuery() ShoppinglistQueryResolver
-	SpecScreen() SpecScreenResolver
 	UserProfile() UserProfileResolver
 	Visualization() VisualizationResolver
 	Workspace() WorkspaceResolver
@@ -95,11 +92,6 @@ type ComplexityRoot struct {
 
 	ExpiredToken struct {
 		Message func(childComplexity int) int
-	}
-
-	FilesScreen struct {
-		Menu    func(childComplexity int) int
-		Project func(childComplexity int) int
 	}
 
 	Forbidden struct {
@@ -197,12 +189,6 @@ type ComplexityRoot struct {
 	PinSentByEmail struct {
 		Email func(childComplexity int) int
 		Token func(childComplexity int) int
-	}
-
-	Product struct {
-		Description func(childComplexity int) int
-		Image       func(childComplexity int) int
-		Name        func(childComplexity int) int
 	}
 
 	Project struct {
@@ -313,11 +299,10 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Profile      func(childComplexity int) int
-		Screen       func(childComplexity int) int
-		Shoppinglist func(childComplexity int) int
-		Version      func(childComplexity int) int
-		Workspace    func(childComplexity int, id string) int
+		Profile   func(childComplexity int) int
+		Screen    func(childComplexity int) int
+		Version   func(childComplexity int) int
+		Workspace func(childComplexity int, id string) int
 	}
 
 	Room struct {
@@ -342,9 +327,7 @@ type ComplexityRoot struct {
 	}
 
 	ScreenQuery struct {
-		Files   func(childComplexity int, projectID string) int
 		Project func(childComplexity int, id string) int
-		Spec    func(childComplexity int, projectID string) int
 		Version func(childComplexity int) int
 	}
 
@@ -352,17 +335,8 @@ type ComplexityRoot struct {
 		Message func(childComplexity int) int
 	}
 
-	ShoppinglistQuery struct {
-		ProductOnPage func(childComplexity int, url string) int
-	}
-
 	SomeVisualizationsUploaded struct {
 		Visualizations func(childComplexity int) int
-	}
-
-	SpecScreen struct {
-		Menu    func(childComplexity int) int
-		Project func(childComplexity int) int
 	}
 
 	UserProfile struct {
@@ -443,10 +417,6 @@ type ComplexityRoot struct {
 	}
 }
 
-type FilesScreenResolver interface {
-	Project(ctx context.Context, obj *FilesScreen) (ProjectResult, error)
-	Menu(ctx context.Context, obj *FilesScreen) (MenuResult, error)
-}
 type HouseResolver interface {
 	Rooms(ctx context.Context, obj *House) (*HouseRooms, error)
 }
@@ -504,19 +474,10 @@ type QueryResolver interface {
 	Version(ctx context.Context) (string, error)
 	Profile(ctx context.Context) (UserProfileResult, error)
 	Screen(ctx context.Context) (*ScreenQuery, error)
-	Shoppinglist(ctx context.Context) (*ShoppinglistQuery, error)
 	Workspace(ctx context.Context, id string) (WorkspaceResult, error)
 }
 type ScreenQueryResolver interface {
 	Project(ctx context.Context, obj *ScreenQuery, id string) (*ProjectScreen, error)
-	Spec(ctx context.Context, obj *ScreenQuery, projectID string) (*SpecScreen, error)
-}
-type ShoppinglistQueryResolver interface {
-	ProductOnPage(ctx context.Context, obj *ShoppinglistQuery, url string) (*Product, error)
-}
-type SpecScreenResolver interface {
-	Project(ctx context.Context, obj *SpecScreen) (ProjectResult, error)
-	Menu(ctx context.Context, obj *SpecScreen) (MenuResult, error)
 }
 type UserProfileResolver interface {
 	DefaultWorkspace(ctx context.Context, obj *UserProfile) (*Workspace, error)
@@ -645,20 +606,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ExpiredToken.Message(childComplexity), true
-
-	case "FilesScreen.menu":
-		if e.complexity.FilesScreen.Menu == nil {
-			break
-		}
-
-		return e.complexity.FilesScreen.Menu(childComplexity), true
-
-	case "FilesScreen.project":
-		if e.complexity.FilesScreen.Project == nil {
-			break
-		}
-
-		return e.complexity.FilesScreen.Project(childComplexity), true
 
 	case "Forbidden.message":
 		if e.complexity.Forbidden.Message == nil {
@@ -1051,27 +998,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.PinSentByEmail.Token(childComplexity), true
 
-	case "Product.description":
-		if e.complexity.Product.Description == nil {
-			break
-		}
-
-		return e.complexity.Product.Description(childComplexity), true
-
-	case "Product.image":
-		if e.complexity.Product.Image == nil {
-			break
-		}
-
-		return e.complexity.Product.Image(childComplexity), true
-
-	case "Product.name":
-		if e.complexity.Product.Name == nil {
-			break
-		}
-
-		return e.complexity.Product.Name(childComplexity), true
-
 	case "Project.contacts":
 		if e.complexity.Project.Contacts == nil {
 			break
@@ -1413,13 +1339,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Screen(childComplexity), true
 
-	case "Query.shoppinglist":
-		if e.complexity.Query.Shoppinglist == nil {
-			break
-		}
-
-		return e.complexity.Query.Shoppinglist(childComplexity), true
-
 	case "Query.version":
 		if e.complexity.Query.Version == nil {
 			break
@@ -1502,18 +1421,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.RoomUpdated.Room(childComplexity), true
 
-	case "ScreenQuery.files":
-		if e.complexity.ScreenQuery.Files == nil {
-			break
-		}
-
-		args, err := ec.field_ScreenQuery_files_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.ScreenQuery.Files(childComplexity, args["projectId"].(string)), true
-
 	case "ScreenQuery.project":
 		if e.complexity.ScreenQuery.Project == nil {
 			break
@@ -1525,18 +1432,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ScreenQuery.Project(childComplexity, args["id"].(string)), true
-
-	case "ScreenQuery.spec":
-		if e.complexity.ScreenQuery.Spec == nil {
-			break
-		}
-
-		args, err := ec.field_ScreenQuery_spec_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.ScreenQuery.Spec(childComplexity, args["projectId"].(string)), true
 
 	case "ScreenQuery.version":
 		if e.complexity.ScreenQuery.Version == nil {
@@ -1552,38 +1447,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ServerError.Message(childComplexity), true
 
-	case "ShoppinglistQuery.productOnPage":
-		if e.complexity.ShoppinglistQuery.ProductOnPage == nil {
-			break
-		}
-
-		args, err := ec.field_ShoppinglistQuery_productOnPage_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.ShoppinglistQuery.ProductOnPage(childComplexity, args["url"].(string)), true
-
 	case "SomeVisualizationsUploaded.visualizations":
 		if e.complexity.SomeVisualizationsUploaded.Visualizations == nil {
 			break
 		}
 
 		return e.complexity.SomeVisualizationsUploaded.Visualizations(childComplexity), true
-
-	case "SpecScreen.menu":
-		if e.complexity.SpecScreen.Menu == nil {
-			break
-		}
-
-		return e.complexity.SpecScreen.Menu(childComplexity), true
-
-	case "SpecScreen.project":
-		if e.complexity.SpecScreen.Project == nil {
-			break
-		}
-
-		return e.complexity.SpecScreen.Project(childComplexity), true
 
 	case "UserProfile.abbr":
 		if e.complexity.UserProfile.Abbr == nil {
@@ -1969,7 +1838,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 	return introspection.WrapTypeFromDef(parsedSchema, parsedSchema.Types[name]), nil
 }
 
-//go:embed "schema/mutation.graphql" "schema/mutation_add_contact.graphql" "schema/mutation_add_house.graphql" "schema/mutation_add_room.graphql" "schema/mutation_change_project_dates.graphql" "schema/mutation_change_project_status.graphql" "schema/mutation_confirm_login.graphql" "schema/mutation_create_project.graphql" "schema/mutation_delete_contact.graphql" "schema/mutation_delete_room.graphql" "schema/mutation_login_by_email.graphql" "schema/mutation_update_contact.graphql" "schema/mutation_update_house.graphql" "schema/mutation_update_room.graphql" "schema/mutation_upload_project_file.graphql" "schema/mutation_upload_visualization.graphql" "schema/mutation_upload_visualizations.graphql" "schema/query.graphql" "schema/query_profile.graphql" "schema/query_project.graphql" "schema/query_screen.graphql" "schema/query_screen_files.graphql" "schema/query_screen_project.graphql" "schema/query_screen_spec.graphql" "schema/query_shoppinglist.graphql" "schema/query_workspace.graphql" "schema/root.graphql"
+//go:embed "schema/mutation.graphql" "schema/mutation_add_contact.graphql" "schema/mutation_add_house.graphql" "schema/mutation_add_room.graphql" "schema/mutation_change_project_dates.graphql" "schema/mutation_change_project_status.graphql" "schema/mutation_confirm_login.graphql" "schema/mutation_create_project.graphql" "schema/mutation_delete_contact.graphql" "schema/mutation_delete_room.graphql" "schema/mutation_login_by_email.graphql" "schema/mutation_update_contact.graphql" "schema/mutation_update_house.graphql" "schema/mutation_update_room.graphql" "schema/mutation_upload_project_file.graphql" "schema/mutation_upload_visualization.graphql" "schema/mutation_upload_visualizations.graphql" "schema/query.graphql" "schema/query_profile.graphql" "schema/query_project.graphql" "schema/query_screen.graphql" "schema/query_screen_project.graphql" "schema/query_workspace.graphql" "schema/root.graphql"
 var sourcesFS embed.FS
 
 func sourceData(filename string) string {
@@ -2002,10 +1871,7 @@ var sources = []*ast.Source{
 	{Name: "schema/query_profile.graphql", Input: sourceData("schema/query_profile.graphql"), BuiltIn: false},
 	{Name: "schema/query_project.graphql", Input: sourceData("schema/query_project.graphql"), BuiltIn: false},
 	{Name: "schema/query_screen.graphql", Input: sourceData("schema/query_screen.graphql"), BuiltIn: false},
-	{Name: "schema/query_screen_files.graphql", Input: sourceData("schema/query_screen_files.graphql"), BuiltIn: false},
 	{Name: "schema/query_screen_project.graphql", Input: sourceData("schema/query_screen_project.graphql"), BuiltIn: false},
-	{Name: "schema/query_screen_spec.graphql", Input: sourceData("schema/query_screen_spec.graphql"), BuiltIn: false},
-	{Name: "schema/query_shoppinglist.graphql", Input: sourceData("schema/query_shoppinglist.graphql"), BuiltIn: false},
 	{Name: "schema/query_workspace.graphql", Input: sourceData("schema/query_workspace.graphql"), BuiltIn: false},
 	{Name: "schema/root.graphql", Input: sourceData("schema/root.graphql"), BuiltIn: false},
 }
@@ -2642,21 +2508,6 @@ func (ec *executionContext) field_Query_workspace_args(ctx context.Context, rawA
 	return args, nil
 }
 
-func (ec *executionContext) field_ScreenQuery_files_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["projectId"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("projectId"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["projectId"] = arg0
-	return args, nil
-}
-
 func (ec *executionContext) field_ScreenQuery_project_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -2669,36 +2520,6 @@ func (ec *executionContext) field_ScreenQuery_project_args(ctx context.Context, 
 		}
 	}
 	args["id"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_ScreenQuery_spec_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["projectId"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("projectId"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["projectId"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_ShoppinglistQuery_productOnPage_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["url"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("url"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["url"] = arg0
 	return args, nil
 }
 
@@ -3409,94 +3230,6 @@ func (ec *executionContext) fieldContext_ExpiredToken_message(ctx context.Contex
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _FilesScreen_project(ctx context.Context, field graphql.CollectedField, obj *FilesScreen) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_FilesScreen_project(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.FilesScreen().Project(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(ProjectResult)
-	fc.Result = res
-	return ec.marshalNProjectResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectResult(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_FilesScreen_project(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "FilesScreen",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ProjectResult does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _FilesScreen_menu(ctx context.Context, field graphql.CollectedField, obj *FilesScreen) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_FilesScreen_menu(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.FilesScreen().Menu(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(MenuResult)
-	fc.Result = res
-	return ec.marshalNMenuResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐMenuResult(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_FilesScreen_menu(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "FilesScreen",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type MenuResult does not have child fields")
 		},
 	}
 	return fc, nil
@@ -5638,138 +5371,6 @@ func (ec *executionContext) _PinSentByEmail_token(ctx context.Context, field gra
 func (ec *executionContext) fieldContext_PinSentByEmail_token(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "PinSentByEmail",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Product_name(ctx context.Context, field graphql.CollectedField, obj *Product) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Product_name(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Name, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Product_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Product",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Product_description(ctx context.Context, field graphql.CollectedField, obj *Product) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Product_description(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Description, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Product_description(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Product",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Product_image(ctx context.Context, field graphql.CollectedField, obj *Product) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Product_image(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Image, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Product_image(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Product",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -7965,62 +7566,10 @@ func (ec *executionContext) fieldContext_Query_screen(ctx context.Context, field
 			switch field.Name {
 			case "version":
 				return ec.fieldContext_ScreenQuery_version(ctx, field)
-			case "files":
-				return ec.fieldContext_ScreenQuery_files(ctx, field)
 			case "project":
 				return ec.fieldContext_ScreenQuery_project(ctx, field)
-			case "spec":
-				return ec.fieldContext_ScreenQuery_spec(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type ScreenQuery", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Query_shoppinglist(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_shoppinglist(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Shoppinglist(rctx)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*ShoppinglistQuery)
-	fc.Result = res
-	return ec.marshalNShoppinglistQuery2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐShoppinglistQuery(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Query_shoppinglist(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "productOnPage":
-				return ec.fieldContext_ShoppinglistQuery_productOnPage(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type ShoppinglistQuery", field.Name)
 		},
 	}
 	return fc, nil
@@ -8686,67 +8235,6 @@ func (ec *executionContext) fieldContext_ScreenQuery_version(ctx context.Context
 	return fc, nil
 }
 
-func (ec *executionContext) _ScreenQuery_files(ctx context.Context, field graphql.CollectedField, obj *ScreenQuery) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ScreenQuery_files(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Files, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*FilesScreen)
-	fc.Result = res
-	return ec.marshalNFilesScreen2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐFilesScreen(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_ScreenQuery_files(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "ScreenQuery",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "project":
-				return ec.fieldContext_FilesScreen_project(ctx, field)
-			case "menu":
-				return ec.fieldContext_FilesScreen_menu(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type FilesScreen", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_ScreenQuery_files_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _ScreenQuery_project(ctx context.Context, field graphql.CollectedField, obj *ScreenQuery) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_ScreenQuery_project(ctx, field)
 	if err != nil {
@@ -8810,67 +8298,6 @@ func (ec *executionContext) fieldContext_ScreenQuery_project(ctx context.Context
 	return fc, nil
 }
 
-func (ec *executionContext) _ScreenQuery_spec(ctx context.Context, field graphql.CollectedField, obj *ScreenQuery) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ScreenQuery_spec(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.ScreenQuery().Spec(rctx, obj, fc.Args["projectId"].(string))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*SpecScreen)
-	fc.Result = res
-	return ec.marshalNSpecScreen2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐSpecScreen(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_ScreenQuery_spec(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "ScreenQuery",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "project":
-				return ec.fieldContext_SpecScreen_project(ctx, field)
-			case "menu":
-				return ec.fieldContext_SpecScreen_menu(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type SpecScreen", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_ScreenQuery_spec_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _ServerError_message(ctx context.Context, field graphql.CollectedField, obj *ServerError) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_ServerError_message(ctx, field)
 	if err != nil {
@@ -8911,66 +8338,6 @@ func (ec *executionContext) fieldContext_ServerError_message(ctx context.Context
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
 		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _ShoppinglistQuery_productOnPage(ctx context.Context, field graphql.CollectedField, obj *ShoppinglistQuery) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ShoppinglistQuery_productOnPage(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.ShoppinglistQuery().ProductOnPage(rctx, obj, fc.Args["url"].(string))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*Product)
-	fc.Result = res
-	return ec.marshalOProduct2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProduct(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_ShoppinglistQuery_productOnPage(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "ShoppinglistQuery",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "name":
-				return ec.fieldContext_Product_name(ctx, field)
-			case "description":
-				return ec.fieldContext_Product_description(ctx, field)
-			case "image":
-				return ec.fieldContext_Product_image(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Product", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_ShoppinglistQuery_productOnPage_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return
 	}
 	return fc, nil
 }
@@ -9032,94 +8399,6 @@ func (ec *executionContext) fieldContext_SomeVisualizationsUploaded_visualizatio
 				return ec.fieldContext_Visualization_room(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Visualization", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _SpecScreen_project(ctx context.Context, field graphql.CollectedField, obj *SpecScreen) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_SpecScreen_project(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.SpecScreen().Project(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(ProjectResult)
-	fc.Result = res
-	return ec.marshalNProjectResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectResult(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_SpecScreen_project(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "SpecScreen",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ProjectResult does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _SpecScreen_menu(ctx context.Context, field graphql.CollectedField, obj *SpecScreen) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_SpecScreen_menu(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.SpecScreen().Menu(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(MenuResult)
-	fc.Result = res
-	return ec.marshalNMenuResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐMenuResult(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_SpecScreen_menu(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "SpecScreen",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type MenuResult does not have child fields")
 		},
 	}
 	return fc, nil
@@ -14794,67 +14073,6 @@ func (ec *executionContext) _ExpiredToken(ctx context.Context, sel ast.Selection
 	return out
 }
 
-var filesScreenImplementors = []string{"FilesScreen"}
-
-func (ec *executionContext) _FilesScreen(ctx context.Context, sel ast.SelectionSet, obj *FilesScreen) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, filesScreenImplementors)
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("FilesScreen")
-		case "project":
-			field := field
-
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._FilesScreen_project(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
-				return res
-			}
-
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
-
-			})
-		case "menu":
-			field := field
-
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._FilesScreen_menu(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
-				return res
-			}
-
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
-
-			})
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
 var forbiddenImplementors = []string{"Forbidden", "AddContactResult", "AddHouseResult", "AddRoomResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "CreateProjectResult", "DeleteContactResult", "DeleteRoomResult", "UpdateContactResult", "UpdateHouseResult", "UpdateRoomResult", "UploadProjectFileResult", "UploadVisualizationResult", "UploadVisualizationsResult", "UserProfileResult", "ProjectResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "ProjectVisualizationsListResult", "ProjectVisualizationsTotalResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "WorkspaceResult", "WorkspaceUsersResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "Error"}
 
 func (ec *executionContext) _Forbidden(ctx context.Context, sel ast.SelectionSet, obj *Forbidden) graphql.Marshaler {
@@ -15590,48 +14808,6 @@ func (ec *executionContext) _PinSentByEmail(ctx context.Context, sel ast.Selecti
 		case "token":
 
 			out.Values[i] = ec._PinSentByEmail_token(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
-var productImplementors = []string{"Product"}
-
-func (ec *executionContext) _Product(ctx context.Context, sel ast.SelectionSet, obj *Product) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, productImplementors)
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("Product")
-		case "name":
-
-			out.Values[i] = ec._Product_name(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "description":
-
-			out.Values[i] = ec._Product_description(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "image":
-
-			out.Values[i] = ec._Product_image(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
@@ -16673,29 +15849,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Concurrently(i, func() graphql.Marshaler {
 				return rrm(innerCtx)
 			})
-		case "shoppinglist":
-			field := field
-
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_shoppinglist(ctx, field)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
-				return res
-			}
-
-			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
-			}
-
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
 		case "workspace":
 			field := field
 
@@ -16900,13 +16053,6 @@ func (ec *executionContext) _ScreenQuery(ctx context.Context, sel ast.SelectionS
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
-		case "files":
-
-			out.Values[i] = ec._ScreenQuery_files(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
 		case "project":
 			field := field
 
@@ -16917,26 +16063,6 @@ func (ec *executionContext) _ScreenQuery(ctx context.Context, sel ast.SelectionS
 					}
 				}()
 				res = ec._ScreenQuery_project(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
-				return res
-			}
-
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
-
-			})
-		case "spec":
-			field := field
-
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._ScreenQuery_spec(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -16986,44 +16112,6 @@ func (ec *executionContext) _ServerError(ctx context.Context, sel ast.SelectionS
 	return out
 }
 
-var shoppinglistQueryImplementors = []string{"ShoppinglistQuery"}
-
-func (ec *executionContext) _ShoppinglistQuery(ctx context.Context, sel ast.SelectionSet, obj *ShoppinglistQuery) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, shoppinglistQueryImplementors)
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("ShoppinglistQuery")
-		case "productOnPage":
-			field := field
-
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._ShoppinglistQuery_productOnPage(ctx, field, obj)
-				return res
-			}
-
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
-
-			})
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
 var someVisualizationsUploadedImplementors = []string{"SomeVisualizationsUploaded", "UploadVisualizationsResult"}
 
 func (ec *executionContext) _SomeVisualizationsUploaded(ctx context.Context, sel ast.SelectionSet, obj *SomeVisualizationsUploaded) graphql.Marshaler {
@@ -17041,67 +16129,6 @@ func (ec *executionContext) _SomeVisualizationsUploaded(ctx context.Context, sel
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
-var specScreenImplementors = []string{"SpecScreen"}
-
-func (ec *executionContext) _SpecScreen(ctx context.Context, sel ast.SelectionSet, obj *SpecScreen) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, specScreenImplementors)
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("SpecScreen")
-		case "project":
-			field := field
-
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._SpecScreen_project(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
-				return res
-			}
-
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
-
-			})
-		case "menu":
-			field := field
-
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._SpecScreen_menu(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
-				return res
-			}
-
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
-
-			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -18346,16 +17373,6 @@ func (ec *executionContext) marshalNDeleteRoomResult2githubᚗcomᚋapartomatᚋ
 	return ec._DeleteRoomResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNFilesScreen2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐFilesScreen(ctx context.Context, sel ast.SelectionSet, v *FilesScreen) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._FilesScreen(ctx, sel, v)
-}
-
 func (ec *executionContext) marshalNHouse2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐHouseᚄ(ctx context.Context, sel ast.SelectionSet, v []*House) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
@@ -18945,34 +17962,6 @@ func (ec *executionContext) marshalNScreenQuery2ᚖgithubᚗcomᚋapartomatᚋap
 		return graphql.Null
 	}
 	return ec._ScreenQuery(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalNShoppinglistQuery2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐShoppinglistQuery(ctx context.Context, sel ast.SelectionSet, v ShoppinglistQuery) graphql.Marshaler {
-	return ec._ShoppinglistQuery(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNShoppinglistQuery2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐShoppinglistQuery(ctx context.Context, sel ast.SelectionSet, v *ShoppinglistQuery) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._ShoppinglistQuery(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalNSpecScreen2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐSpecScreen(ctx context.Context, sel ast.SelectionSet, v SpecScreen) graphql.Marshaler {
-	return ec._SpecScreen(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNSpecScreen2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐSpecScreen(ctx context.Context, sel ast.SelectionSet, v *SpecScreen) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._SpecScreen(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
@@ -19827,13 +18816,6 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 	}
 	res := graphql.MarshalInt(*v)
 	return res
-}
-
-func (ec *executionContext) marshalOProduct2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProduct(ctx context.Context, sel ast.SelectionSet, v *Product) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._Product(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOProjectFileType2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectFileTypeᚄ(ctx context.Context, v interface{}) ([]ProjectFileType, error) {

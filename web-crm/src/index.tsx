@@ -12,8 +12,6 @@ import Logout from "screen/Logout/Logout"
 import Confirm from "screen/Confirm/Confirm"
 import Workspace from "screen/Workspace/Workspace"
 import Project from "screen/Project/Project"
-import Files from "screen/Files/Files"
-import Spec from "screen/Spec/Spec"
 
 import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client"
 import { setContext } from "@apollo/client/link/context"
@@ -69,12 +67,6 @@ ReactDOM.render(
                             </PrivateRoute>
                             <PrivateRoute exact path="/p/:id">
                                 <Project/>
-                            </PrivateRoute>
-                            <PrivateRoute exact path="/p/:projectId/files">
-                                <Files/>
-                            </PrivateRoute>
-                            <PrivateRoute exact path="/p/:projectId/spec">
-                                <Spec/>
                             </PrivateRoute>
                         </Switch>
                     </Router>

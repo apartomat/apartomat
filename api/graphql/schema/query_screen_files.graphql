@@ -1,8 +1,0 @@
-extend type ScreenQuery {
-    files(projectId: String!): FilesScreen!
-}
-
-type FilesScreen {
-    project: ProjectResult!
-    menu: MenuResult!
-}

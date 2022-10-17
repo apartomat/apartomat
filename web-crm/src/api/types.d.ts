@@ -125,12 +125,6 @@ export type ExpiredToken = Error & {
   message: Scalars['String'];
 };
 
-export type FilesScreen = {
-  __typename?: 'FilesScreen';
-  menu: MenuResult;
-  project: ProjectResult;
-};
-
 export type Forbidden = Error & {
   __typename?: 'Forbidden';
   message: Scalars['String'];
@@ -355,13 +349,6 @@ export type PinSentByEmail = {
   __typename?: 'PinSentByEmail';
   email: Scalars['String'];
   token: Scalars['String'];
-};
-
-export type Product = {
-  __typename?: 'Product';
-  description: Scalars['String'];
-  image: Scalars['String'];
-  name: Scalars['String'];
 };
 
 export type Project = {
@@ -591,7 +578,6 @@ export type Query = {
   __typename?: 'Query';
   profile: UserProfileResult;
   screen: ScreenQuery;
-  shoppinglist: ShoppinglistQuery;
   version: Scalars['String'];
   workspace: WorkspaceResult;
 };
@@ -628,15 +614,8 @@ export type RoomUpdated = {
 
 export type ScreenQuery = {
   __typename?: 'ScreenQuery';
-  files: FilesScreen;
   project: ProjectScreen;
-  spec: SpecScreen;
   version: Scalars['String'];
-};
-
-
-export type ScreenQueryFilesArgs = {
-  projectId: Scalars['String'];
 };
 
 
@@ -644,35 +623,14 @@ export type ScreenQueryProjectArgs = {
   id: Scalars['String'];
 };
 
-
-export type ScreenQuerySpecArgs = {
-  projectId: Scalars['String'];
-};
-
 export type ServerError = Error & {
   __typename?: 'ServerError';
   message: Scalars['String'];
 };
 
-export type ShoppinglistQuery = {
-  __typename?: 'ShoppinglistQuery';
-  productOnPage?: Maybe<Product>;
-};
-
-
-export type ShoppinglistQueryProductOnPageArgs = {
-  url: Scalars['String'];
-};
-
 export type SomeVisualizationsUploaded = {
   __typename?: 'SomeVisualizationsUploaded';
   visualizations: Array<Visualization>;
-};
-
-export type SpecScreen = {
-  __typename?: 'SpecScreen';
-  menu: MenuResult;
-  project: ProjectResult;
 };
 
 export type UpdateContactInput = {
@@ -908,13 +866,6 @@ export type ProfileQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type ProfileQuery = { __typename?: 'Query', profile: { __typename: 'Forbidden', message: string } | { __typename: 'ServerError', message: string } | { __typename: 'UserProfile', id: string, email: string, gravatar?: { __typename?: 'Gravatar', url: string } | null | undefined, defaultWorkspace: { __typename?: 'Workspace', id: string, name: string } } };
-
-export type SpecScreenQueryVariables = Exact<{
-  projectId: Scalars['String'];
-}>;
-
-
-export type SpecScreenQuery = { __typename?: 'Query', screen: { __typename?: 'ScreenQuery', specScreen: { __typename?: 'SpecScreen', project: { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'Project', id: string, title: string } | { __typename: 'ServerError', message: string } } } };
 
 export type UpdateContactMutationVariables = Exact<{
   contactId: Scalars['String'];
@@ -1629,52 +1580,6 @@ export function useProfileLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Pr
 export type ProfileQueryHookResult = ReturnType<typeof useProfileQuery>;
 export type ProfileLazyQueryHookResult = ReturnType<typeof useProfileLazyQuery>;
 export type ProfileQueryResult = Apollo.QueryResult<ProfileQuery, ProfileQueryVariables>;
-export const SpecScreenDocument = gql`
-    query specScreen($projectId: String!) {
-  screen {
-    specScreen: spec(projectId: $projectId) {
-      project {
-        __typename
-        ... on Project {
-          id
-          title
-        }
-        ... on Error {
-          message
-        }
-      }
-    }
-  }
-}
-    `;
-
-/**
- * __useSpecScreenQuery__
- *
- * To run a query within a React component, call `useSpecScreenQuery` and pass it any options that fit your needs.
- * When your component renders, `useSpecScreenQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useSpecScreenQuery({
- *   variables: {
- *      projectId: // value for 'projectId'
- *   },
- * });
- */
-export function useSpecScreenQuery(baseOptions: Apollo.QueryHookOptions<SpecScreenQuery, SpecScreenQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<SpecScreenQuery, SpecScreenQueryVariables>(SpecScreenDocument, options);
-      }
-export function useSpecScreenLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SpecScreenQuery, SpecScreenQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<SpecScreenQuery, SpecScreenQueryVariables>(SpecScreenDocument, options);
-        }
-export type SpecScreenQueryHookResult = ReturnType<typeof useSpecScreenQuery>;
-export type SpecScreenLazyQueryHookResult = ReturnType<typeof useSpecScreenLazyQuery>;
-export type SpecScreenQueryResult = Apollo.QueryResult<SpecScreenQuery, SpecScreenQueryVariables>;
 export const UpdateContactDocument = gql`
     mutation updateContact($contactId: String!, $data: UpdateContactInput!) {
   updateContact(contactId: $contactId, data: $data) {

@@ -234,11 +234,6 @@ func (this ExpiredToken) GetMessage() string { return this.Message }
 
 func (ExpiredToken) IsConfirmLoginPinResult() {}
 
-type FilesScreen struct {
-	Project ProjectResult `json:"project"`
-	Menu    MenuResult    `json:"menu"`
-}
-
 type Forbidden struct {
 	Message string `json:"message"`
 }
@@ -434,12 +429,6 @@ type PinSentByEmail struct {
 
 func (PinSentByEmail) IsLoginByEmailResult() {}
 
-type Product struct {
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	Image       string `json:"image"`
-}
-
 type Project struct {
 	ID             string                 `json:"id"`
 	Title          string                 `json:"title"`
@@ -618,9 +607,7 @@ func (RoomUpdated) IsUpdateRoomResult() {}
 
 type ScreenQuery struct {
 	Version string         `json:"version"`
-	Files   *FilesScreen   `json:"files"`
 	Project *ProjectScreen `json:"project"`
-	Spec    *SpecScreen    `json:"spec"`
 }
 
 type ServerError struct {
@@ -690,20 +677,11 @@ func (ServerError) IsWorkspaceProjectsTotalResult() {}
 func (ServerError) IsError()                {}
 func (this ServerError) GetMessage() string { return this.Message }
 
-type ShoppinglistQuery struct {
-	ProductOnPage *Product `json:"productOnPage"`
-}
-
 type SomeVisualizationsUploaded struct {
 	Visualizations []*Visualization `json:"visualizations"`
 }
 
 func (SomeVisualizationsUploaded) IsUploadVisualizationsResult() {}
-
-type SpecScreen struct {
-	Project ProjectResult `json:"project"`
-	Menu    MenuResult    `json:"menu"`
-}
 
 type UpdateContactInput struct {
 	FullName string                 `json:"fullName"`

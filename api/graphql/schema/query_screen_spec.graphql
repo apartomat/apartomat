@@ -1,8 +1,0 @@
-extend type ScreenQuery {
-    spec(projectId: String!): SpecScreen!
-}
-
-type SpecScreen {
-    project: ProjectResult!
-    menu: MenuResult!
-}
