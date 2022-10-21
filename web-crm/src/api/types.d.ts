@@ -874,13 +874,6 @@ export type UpdateHouseMutationVariables = Exact<{
 
 export type UpdateHouseMutation = { __typename?: 'Mutation', updateHouse: { __typename: 'Forbidden', message: string } | { __typename: 'HouseUpdated', house: { __typename?: 'House', id: string, city: string, address: string, housingComplex: string, createdAt: any, modifiedAt: any } } | { __typename: 'NotFound', message: string } | { __typename: 'ServerError', message: string } };
 
-export type UploadProjectFileMutationVariables = Exact<{
-  input: UploadProjectFileInput;
-}>;
-
-
-export type UploadProjectFileMutation = { __typename?: 'Mutation', uploadProjectFile: { __typename: 'AlreadyExists', message: string } | { __typename: 'Forbidden', message: string } | { __typename: 'ProjectFileUploaded', file: { __typename?: 'ProjectFile', id: string, url: any } } | { __typename: 'ServerError', message: string } };
-
 export type AddRoomMutationVariables = Exact<{
   houseId: Scalars['String'];
   room: AddRoomInput;
@@ -1764,48 +1757,6 @@ export function useUpdateHouseMutation(baseOptions?: Apollo.MutationHookOptions<
 export type UpdateHouseMutationHookResult = ReturnType<typeof useUpdateHouseMutation>;
 export type UpdateHouseMutationResult = Apollo.MutationResult<UpdateHouseMutation>;
 export type UpdateHouseMutationOptions = Apollo.BaseMutationOptions<UpdateHouseMutation, UpdateHouseMutationVariables>;
-export const UploadProjectFileDocument = gql`
-    mutation uploadProjectFile($input: UploadProjectFileInput!) {
-  uploadProjectFile(input: $input) {
-    __typename
-    ... on ProjectFileUploaded {
-      file {
-        id
-        url
-      }
-    }
-    ... on Error {
-      message
-    }
-  }
-}
-    `;
-export type UploadProjectFileMutationFn = Apollo.MutationFunction<UploadProjectFileMutation, UploadProjectFileMutationVariables>;
-
-/**
- * __useUploadProjectFileMutation__
- *
- * To run a mutation, you first call `useUploadProjectFileMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useUploadProjectFileMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [uploadProjectFileMutation, { data, loading, error }] = useUploadProjectFileMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useUploadProjectFileMutation(baseOptions?: Apollo.MutationHookOptions<UploadProjectFileMutation, UploadProjectFileMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<UploadProjectFileMutation, UploadProjectFileMutationVariables>(UploadProjectFileDocument, options);
-      }
-export type UploadProjectFileMutationHookResult = ReturnType<typeof useUploadProjectFileMutation>;
-export type UploadProjectFileMutationResult = Apollo.MutationResult<UploadProjectFileMutation>;
-export type UploadProjectFileMutationOptions = Apollo.BaseMutationOptions<UploadProjectFileMutation, UploadProjectFileMutationVariables>;
 export const AddRoomDocument = gql`
     mutation addRoom($houseId: String!, $room: AddRoomInput!) {
   addRoom(houseId: $houseId, room: $room) {
