@@ -44,10 +44,8 @@ type ResolverRoot interface {
 	ProjectContacts() ProjectContactsResolver
 	ProjectFiles() ProjectFilesResolver
 	ProjectHouses() ProjectHousesResolver
-	ProjectScreen() ProjectScreenResolver
 	ProjectVisualizations() ProjectVisualizationsResolver
 	Query() QueryResolver
-	ScreenQuery() ScreenQueryResolver
 	UserProfile() UserProfileResolver
 	Visualization() VisualizationResolver
 	Workspace() WorkspaceResolver
@@ -88,6 +86,10 @@ type ComplexityRoot struct {
 
 	ContactUpdated struct {
 		Contact func(childComplexity int) int
+	}
+
+	Enums struct {
+		Project func(childComplexity int) int
 	}
 
 	ExpiredToken struct {
@@ -150,15 +152,6 @@ type ComplexityRoot struct {
 
 	LoginConfirmed struct {
 		Token func(childComplexity int) int
-	}
-
-	MenuItem struct {
-		Title func(childComplexity int) int
-		URL   func(childComplexity int) int
-	}
-
-	MenuItems struct {
-		Items func(childComplexity int) int
 	}
 
 	Mutation struct {
@@ -267,12 +260,6 @@ type ComplexityRoot struct {
 		Total func(childComplexity int) int
 	}
 
-	ProjectScreen struct {
-		Enums   func(childComplexity int) int
-		Menu    func(childComplexity int) int
-		Project func(childComplexity int) int
-	}
-
 	ProjectStatusChanged struct {
 		Project func(childComplexity int) int
 	}
@@ -300,8 +287,9 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
+		Enums     func(childComplexity int) int
 		Profile   func(childComplexity int) int
-		Screen    func(childComplexity int) int
+		Project   func(childComplexity int, id string) int
 		Version   func(childComplexity int) int
 		Workspace func(childComplexity int, id string) int
 	}
@@ -325,11 +313,6 @@ type ComplexityRoot struct {
 
 	RoomUpdated struct {
 		Room func(childComplexity int) int
-	}
-
-	ScreenQuery struct {
-		Project func(childComplexity int, id string) int
-		Version func(childComplexity int) int
 	}
 
 	ServerError struct {
@@ -454,23 +437,16 @@ type ProjectHousesResolver interface {
 	List(ctx context.Context, obj *ProjectHouses, filter ProjectHousesFilter, limit int, offset int) (ProjectHousesListResult, error)
 	Total(ctx context.Context, obj *ProjectHouses, filter ProjectHousesFilter) (ProjectHousesTotalResult, error)
 }
-type ProjectScreenResolver interface {
-	Project(ctx context.Context, obj *ProjectScreen) (ProjectResult, error)
-	Menu(ctx context.Context, obj *ProjectScreen) (MenuResult, error)
-	Enums(ctx context.Context, obj *ProjectScreen) (*ProjectEnums, error)
-}
 type ProjectVisualizationsResolver interface {
 	List(ctx context.Context, obj *ProjectVisualizations, filter ProjectVisualizationsListFilter, limit int, offset int) (ProjectVisualizationsListResult, error)
 	Total(ctx context.Context, obj *ProjectVisualizations, filter ProjectVisualizationsListFilter) (ProjectVisualizationsTotalResult, error)
 }
 type QueryResolver interface {
 	Version(ctx context.Context) (string, error)
+	Enums(ctx context.Context) (*Enums, error)
 	Profile(ctx context.Context) (UserProfileResult, error)
-	Screen(ctx context.Context) (*ScreenQuery, error)
+	Project(ctx context.Context, id string) (ProjectResult, error)
 	Workspace(ctx context.Context, id string) (WorkspaceResult, error)
-}
-type ScreenQueryResolver interface {
-	Project(ctx context.Context, obj *ScreenQuery, id string) (*ProjectScreen, error)
 }
 type UserProfileResolver interface {
 	DefaultWorkspace(ctx context.Context, obj *UserProfile) (*Workspace, error)
@@ -593,6 +569,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ContactUpdated.Contact(childComplexity), true
+
+	case "Enums.project":
+		if e.complexity.Enums.Project == nil {
+			break
+		}
+
+		return e.complexity.Enums.Project(childComplexity), true
 
 	case "ExpiredToken.message":
 		if e.complexity.ExpiredToken.Message == nil {
@@ -738,27 +721,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.LoginConfirmed.Token(childComplexity), true
-
-	case "MenuItem.title":
-		if e.complexity.MenuItem.Title == nil {
-			break
-		}
-
-		return e.complexity.MenuItem.Title(childComplexity), true
-
-	case "MenuItem.url":
-		if e.complexity.MenuItem.URL == nil {
-			break
-		}
-
-		return e.complexity.MenuItem.URL(childComplexity), true
-
-	case "MenuItems.items":
-		if e.complexity.MenuItems.Items == nil {
-			break
-		}
-
-		return e.complexity.MenuItems.Items(childComplexity), true
 
 	case "Mutation.addContact":
 		if e.complexity.Mutation.AddContact == nil {
@@ -1244,27 +1206,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ProjectHousesTotal.Total(childComplexity), true
 
-	case "ProjectScreen.enums":
-		if e.complexity.ProjectScreen.Enums == nil {
-			break
-		}
-
-		return e.complexity.ProjectScreen.Enums(childComplexity), true
-
-	case "ProjectScreen.menu":
-		if e.complexity.ProjectScreen.Menu == nil {
-			break
-		}
-
-		return e.complexity.ProjectScreen.Menu(childComplexity), true
-
-	case "ProjectScreen.project":
-		if e.complexity.ProjectScreen.Project == nil {
-			break
-		}
-
-		return e.complexity.ProjectScreen.Project(childComplexity), true
-
 	case "ProjectStatusChanged.project":
 		if e.complexity.ProjectStatusChanged.Project == nil {
 			break
@@ -1331,6 +1272,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ProjectVisualizationsTotal.Total(childComplexity), true
 
+	case "Query.enums":
+		if e.complexity.Query.Enums == nil {
+			break
+		}
+
+		return e.complexity.Query.Enums(childComplexity), true
+
 	case "Query.profile":
 		if e.complexity.Query.Profile == nil {
 			break
@@ -1338,12 +1286,17 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Profile(childComplexity), true
 
-	case "Query.screen":
-		if e.complexity.Query.Screen == nil {
+	case "Query.project":
+		if e.complexity.Query.Project == nil {
 			break
 		}
 
-		return e.complexity.Query.Screen(childComplexity), true
+		args, err := ec.field_Query_project_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Project(childComplexity, args["id"].(string)), true
 
 	case "Query.version":
 		if e.complexity.Query.Version == nil {
@@ -1426,25 +1379,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.RoomUpdated.Room(childComplexity), true
-
-	case "ScreenQuery.project":
-		if e.complexity.ScreenQuery.Project == nil {
-			break
-		}
-
-		args, err := ec.field_ScreenQuery_project_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.ScreenQuery.Project(childComplexity, args["id"].(string)), true
-
-	case "ScreenQuery.version":
-		if e.complexity.ScreenQuery.Version == nil {
-			break
-		}
-
-		return e.complexity.ScreenQuery.Version(childComplexity), true
 
 	case "ServerError.message":
 		if e.complexity.ServerError.Message == nil {
@@ -1787,7 +1721,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 	return introspection.WrapTypeFromDef(parsedSchema, parsedSchema.Types[name]), nil
 }
 
-//go:embed "schema/mutation.graphql" "schema/mutation_add_contact.graphql" "schema/mutation_add_house.graphql" "schema/mutation_add_room.graphql" "schema/mutation_change_project_dates.graphql" "schema/mutation_change_project_status.graphql" "schema/mutation_confirm_login.graphql" "schema/mutation_create_project.graphql" "schema/mutation_delete_contact.graphql" "schema/mutation_delete_room.graphql" "schema/mutation_login_by_email.graphql" "schema/mutation_update_contact.graphql" "schema/mutation_update_house.graphql" "schema/mutation_update_room.graphql" "schema/mutation_upload_project_file.graphql" "schema/mutation_upload_visualization.graphql" "schema/mutation_upload_visualizations.graphql" "schema/query.graphql" "schema/query_profile.graphql" "schema/query_project.graphql" "schema/query_screen.graphql" "schema/query_screen_project.graphql" "schema/query_workspace.graphql" "schema/root.graphql"
+//go:embed "schema/mutation.graphql" "schema/mutation_add_contact.graphql" "schema/mutation_add_house.graphql" "schema/mutation_add_room.graphql" "schema/mutation_change_project_dates.graphql" "schema/mutation_change_project_status.graphql" "schema/mutation_confirm_login.graphql" "schema/mutation_create_project.graphql" "schema/mutation_delete_contact.graphql" "schema/mutation_delete_room.graphql" "schema/mutation_login_by_email.graphql" "schema/mutation_update_contact.graphql" "schema/mutation_update_house.graphql" "schema/mutation_update_room.graphql" "schema/mutation_upload_project_file.graphql" "schema/mutation_upload_visualization.graphql" "schema/mutation_upload_visualizations.graphql" "schema/query.graphql" "schema/query_enums.graphql" "schema/query_profile.graphql" "schema/query_project.graphql" "schema/query_workspace.graphql" "schema/root.graphql"
 var sourcesFS embed.FS
 
 func sourceData(filename string) string {
@@ -1817,10 +1751,9 @@ var sources = []*ast.Source{
 	{Name: "schema/mutation_upload_visualization.graphql", Input: sourceData("schema/mutation_upload_visualization.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_upload_visualizations.graphql", Input: sourceData("schema/mutation_upload_visualizations.graphql"), BuiltIn: false},
 	{Name: "schema/query.graphql", Input: sourceData("schema/query.graphql"), BuiltIn: false},
+	{Name: "schema/query_enums.graphql", Input: sourceData("schema/query_enums.graphql"), BuiltIn: false},
 	{Name: "schema/query_profile.graphql", Input: sourceData("schema/query_profile.graphql"), BuiltIn: false},
 	{Name: "schema/query_project.graphql", Input: sourceData("schema/query_project.graphql"), BuiltIn: false},
-	{Name: "schema/query_screen.graphql", Input: sourceData("schema/query_screen.graphql"), BuiltIn: false},
-	{Name: "schema/query_screen_project.graphql", Input: sourceData("schema/query_screen_project.graphql"), BuiltIn: false},
 	{Name: "schema/query_workspace.graphql", Input: sourceData("schema/query_workspace.graphql"), BuiltIn: false},
 	{Name: "schema/root.graphql", Input: sourceData("schema/root.graphql"), BuiltIn: false},
 }
@@ -2457,7 +2390,7 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_workspace_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_project_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
@@ -2472,7 +2405,7 @@ func (ec *executionContext) field_Query_workspace_args(ctx context.Context, rawA
 	return args, nil
 }
 
-func (ec *executionContext) field_ScreenQuery_project_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_Query_workspace_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
@@ -3174,6 +3107,54 @@ func (ec *executionContext) fieldContext_ContactUpdated_contact(ctx context.Cont
 				return ec.fieldContext_Contact_modifiedAt(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Contact", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Enums_project(ctx context.Context, field graphql.CollectedField, obj *Enums) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Enums_project(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Project, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*ProjectEnums)
+	fc.Result = res
+	return ec.marshalNProjectEnums2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectEnums(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Enums_project(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Enums",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "status":
+				return ec.fieldContext_ProjectEnums_status(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProjectEnums", field.Name)
 		},
 	}
 	return fc, nil
@@ -4115,144 +4096,6 @@ func (ec *executionContext) fieldContext_LoginConfirmed_token(ctx context.Contex
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _MenuItem_title(ctx context.Context, field graphql.CollectedField, obj *MenuItem) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_MenuItem_title(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Title, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_MenuItem_title(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "MenuItem",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _MenuItem_url(ctx context.Context, field graphql.CollectedField, obj *MenuItem) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_MenuItem_url(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.URL, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_MenuItem_url(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "MenuItem",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _MenuItems_items(ctx context.Context, field graphql.CollectedField, obj *MenuItems) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_MenuItems_items(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Items, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.([]*MenuItem)
-	fc.Result = res
-	return ec.marshalNMenuItem2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐMenuItemᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_MenuItems_items(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "MenuItems",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "title":
-				return ec.fieldContext_MenuItem_title(ctx, field)
-			case "url":
-				return ec.fieldContext_MenuItem_url(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type MenuItem", field.Name)
 		},
 	}
 	return fc, nil
@@ -6927,142 +6770,6 @@ func (ec *executionContext) fieldContext_ProjectHousesTotal_total(ctx context.Co
 	return fc, nil
 }
 
-func (ec *executionContext) _ProjectScreen_project(ctx context.Context, field graphql.CollectedField, obj *ProjectScreen) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ProjectScreen_project(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.ProjectScreen().Project(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(ProjectResult)
-	fc.Result = res
-	return ec.marshalNProjectResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectResult(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_ProjectScreen_project(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "ProjectScreen",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ProjectResult does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _ProjectScreen_menu(ctx context.Context, field graphql.CollectedField, obj *ProjectScreen) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ProjectScreen_menu(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.ProjectScreen().Menu(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(MenuResult)
-	fc.Result = res
-	return ec.marshalNMenuResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐMenuResult(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_ProjectScreen_menu(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "ProjectScreen",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type MenuResult does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _ProjectScreen_enums(ctx context.Context, field graphql.CollectedField, obj *ProjectScreen) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ProjectScreen_enums(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.ProjectScreen().Enums(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*ProjectEnums)
-	fc.Result = res
-	return ec.marshalNProjectEnums2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectEnums(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_ProjectScreen_enums(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "ProjectScreen",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "status":
-				return ec.fieldContext_ProjectEnums_status(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type ProjectEnums", field.Name)
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _ProjectStatusChanged_project(ctx context.Context, field graphql.CollectedField, obj *ProjectStatusChanged) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_ProjectStatusChanged_project(ctx, field)
 	if err != nil {
@@ -7527,6 +7234,51 @@ func (ec *executionContext) fieldContext_Query_version(ctx context.Context, fiel
 	return fc, nil
 }
 
+func (ec *executionContext) _Query_enums(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_enums(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Enums(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*Enums)
+	fc.Result = res
+	return ec.marshalOEnums2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐEnums(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_enums(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "project":
+				return ec.fieldContext_Enums_project(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Enums", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query_profile(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query_profile(ctx, field)
 	if err != nil {
@@ -7571,8 +7323,8 @@ func (ec *executionContext) fieldContext_Query_profile(ctx context.Context, fiel
 	return fc, nil
 }
 
-func (ec *executionContext) _Query_screen(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_screen(ctx, field)
+func (ec *executionContext) _Query_project(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_project(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -7585,7 +7337,7 @@ func (ec *executionContext) _Query_screen(ctx context.Context, field graphql.Col
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Screen(rctx)
+		return ec.resolvers.Query().Project(rctx, fc.Args["id"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -7597,26 +7349,31 @@ func (ec *executionContext) _Query_screen(ctx context.Context, field graphql.Col
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*ScreenQuery)
+	res := resTmp.(ProjectResult)
 	fc.Result = res
-	return ec.marshalNScreenQuery2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐScreenQuery(ctx, field.Selections, res)
+	return ec.marshalNProjectResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectResult(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Query_screen(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Query_project(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Query",
 		Field:      field,
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "version":
-				return ec.fieldContext_ScreenQuery_version(ctx, field)
-			case "project":
-				return ec.fieldContext_ScreenQuery_project(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type ScreenQuery", field.Name)
+			return nil, errors.New("field of type ProjectResult does not have child fields")
 		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_project_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
 	}
 	return fc, nil
 }
@@ -8233,113 +7990,6 @@ func (ec *executionContext) fieldContext_RoomUpdated_room(ctx context.Context, f
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Room", field.Name)
 		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _ScreenQuery_version(ctx context.Context, field graphql.CollectedField, obj *ScreenQuery) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ScreenQuery_version(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Version, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_ScreenQuery_version(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "ScreenQuery",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _ScreenQuery_project(ctx context.Context, field graphql.CollectedField, obj *ScreenQuery) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ScreenQuery_project(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.ScreenQuery().Project(rctx, obj, fc.Args["id"].(string))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*ProjectScreen)
-	fc.Result = res
-	return ec.marshalNProjectScreen2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectScreen(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_ScreenQuery_project(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "ScreenQuery",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "project":
-				return ec.fieldContext_ProjectScreen_project(ctx, field)
-			case "menu":
-				return ec.fieldContext_ProjectScreen_menu(ctx, field)
-			case "enums":
-				return ec.fieldContext_ProjectScreen_enums(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type ProjectScreen", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_ScreenQuery_project_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return
 	}
 	return fc, nil
 }
@@ -12876,29 +12526,6 @@ func (ec *executionContext) _LoginByEmailResult(ctx context.Context, sel ast.Sel
 	}
 }
 
-func (ec *executionContext) _MenuResult(ctx context.Context, sel ast.SelectionSet, obj MenuResult) graphql.Marshaler {
-	switch obj := (obj).(type) {
-	case nil:
-		return graphql.Null
-	case MenuItems:
-		return ec._MenuItems(ctx, sel, &obj)
-	case *MenuItems:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._MenuItems(ctx, sel, obj)
-	case ServerError:
-		return ec._ServerError(ctx, sel, &obj)
-	case *ServerError:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._ServerError(ctx, sel, obj)
-	default:
-		panic(fmt.Errorf("unexpected type %T", obj))
-	}
-}
-
 func (ec *executionContext) _ProjectContactsListResult(ctx context.Context, sel ast.SelectionSet, obj ProjectContactsListResult) graphql.Marshaler {
 	switch obj := (obj).(type) {
 	case nil:
@@ -13785,6 +13412,34 @@ func (ec *executionContext) _ContactUpdated(ctx context.Context, sel ast.Selecti
 	return out
 }
 
+var enumsImplementors = []string{"Enums"}
+
+func (ec *executionContext) _Enums(ctx context.Context, sel ast.SelectionSet, obj *Enums) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, enumsImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Enums")
+		case "project":
+
+			out.Values[i] = ec._Enums_project(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var expiredTokenImplementors = []string{"ExpiredToken", "ConfirmLoginLinkResult", "Error", "ConfirmLoginPinResult"}
 
 func (ec *executionContext) _ExpiredToken(ctx context.Context, sel ast.SelectionSet, obj *ExpiredToken) graphql.Marshaler {
@@ -14230,69 +13885,6 @@ func (ec *executionContext) _LoginConfirmed(ctx context.Context, sel ast.Selecti
 		case "token":
 
 			out.Values[i] = ec._LoginConfirmed_token(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
-var menuItemImplementors = []string{"MenuItem"}
-
-func (ec *executionContext) _MenuItem(ctx context.Context, sel ast.SelectionSet, obj *MenuItem) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, menuItemImplementors)
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("MenuItem")
-		case "title":
-
-			out.Values[i] = ec._MenuItem_title(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "url":
-
-			out.Values[i] = ec._MenuItem_url(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
-var menuItemsImplementors = []string{"MenuItems", "MenuResult"}
-
-func (ec *executionContext) _MenuItems(ctx context.Context, sel ast.SelectionSet, obj *MenuItems) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, menuItemsImplementors)
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("MenuItems")
-		case "items":
-
-			out.Values[i] = ec._MenuItems_items(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
@@ -15229,87 +14821,6 @@ func (ec *executionContext) _ProjectHousesTotal(ctx context.Context, sel ast.Sel
 	return out
 }
 
-var projectScreenImplementors = []string{"ProjectScreen"}
-
-func (ec *executionContext) _ProjectScreen(ctx context.Context, sel ast.SelectionSet, obj *ProjectScreen) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, projectScreenImplementors)
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("ProjectScreen")
-		case "project":
-			field := field
-
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._ProjectScreen_project(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
-				return res
-			}
-
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
-
-			})
-		case "menu":
-			field := field
-
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._ProjectScreen_menu(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
-				return res
-			}
-
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
-
-			})
-		case "enums":
-			field := field
-
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._ProjectScreen_enums(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
-				return res
-			}
-
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
-
-			})
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
 var projectStatusChangedImplementors = []string{"ProjectStatusChanged", "ChangeProjectStatusResult"}
 
 func (ec *executionContext) _ProjectStatusChanged(ctx context.Context, sel ast.SelectionSet, obj *ProjectStatusChanged) graphql.Marshaler {
@@ -15560,6 +15071,26 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Concurrently(i, func() graphql.Marshaler {
 				return rrm(innerCtx)
 			})
+		case "enums":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_enums(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
 		case "profile":
 			field := field
 
@@ -15583,7 +15114,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Concurrently(i, func() graphql.Marshaler {
 				return rrm(innerCtx)
 			})
-		case "screen":
+		case "project":
 			field := field
 
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
@@ -15592,7 +15123,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_screen(ctx, field)
+				res = ec._Query_project(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -15793,55 +15324,7 @@ func (ec *executionContext) _RoomUpdated(ctx context.Context, sel ast.SelectionS
 	return out
 }
 
-var screenQueryImplementors = []string{"ScreenQuery"}
-
-func (ec *executionContext) _ScreenQuery(ctx context.Context, sel ast.SelectionSet, obj *ScreenQuery) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, screenQueryImplementors)
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("ScreenQuery")
-		case "version":
-
-			out.Values[i] = ec._ScreenQuery_version(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
-		case "project":
-			field := field
-
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._ScreenQuery_project(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
-				return res
-			}
-
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
-
-			})
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
-var serverErrorImplementors = []string{"ServerError", "AddContactResult", "AddHouseResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "ConfirmLoginLinkResult", "ConfirmLoginPinResult", "CreateProjectResult", "DeleteContactResult", "LoginByEmailResult", "UpdateContactResult", "UpdateHouseResult", "UploadProjectFileResult", "UploadVisualizationResult", "UploadVisualizationsResult", "UserProfileResult", "ProjectResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "ProjectVisualizationsListResult", "ProjectVisualizationsTotalResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "MenuResult", "WorkspaceResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "WorkspaceUsersListResult", "WorkspaceUsersTotalResult", "Error"}
+var serverErrorImplementors = []string{"ServerError", "AddContactResult", "AddHouseResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "ConfirmLoginLinkResult", "ConfirmLoginPinResult", "CreateProjectResult", "DeleteContactResult", "LoginByEmailResult", "UpdateContactResult", "UpdateHouseResult", "UploadProjectFileResult", "UploadVisualizationResult", "UploadVisualizationsResult", "UserProfileResult", "ProjectResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "ProjectVisualizationsListResult", "ProjectVisualizationsTotalResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "WorkspaceResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "WorkspaceUsersListResult", "WorkspaceUsersTotalResult", "Error"}
 
 func (ec *executionContext) _ServerError(ctx context.Context, sel ast.SelectionSet, obj *ServerError) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, serverErrorImplementors)
@@ -17208,70 +16691,6 @@ func (ec *executionContext) marshalNLoginByEmailResult2githubᚗcomᚋapartomat�
 	return ec._LoginByEmailResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNMenuItem2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐMenuItemᚄ(ctx context.Context, sel ast.SelectionSet, v []*MenuItem) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNMenuItem2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐMenuItem(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	for _, e := range ret {
-		if e == graphql.Null {
-			return graphql.Null
-		}
-	}
-
-	return ret
-}
-
-func (ec *executionContext) marshalNMenuItem2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐMenuItem(ctx context.Context, sel ast.SelectionSet, v *MenuItem) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._MenuItem(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalNMenuResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐMenuResult(ctx context.Context, sel ast.SelectionSet, v MenuResult) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._MenuResult(ctx, sel, v)
-}
-
 func (ec *executionContext) marshalNProject2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectᚄ(ctx context.Context, sel ast.SelectionSet, v []*Project) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
@@ -17363,10 +16782,6 @@ func (ec *executionContext) marshalNProjectContactsTotalResult2githubᚗcomᚋap
 		return graphql.Null
 	}
 	return ec._ProjectContactsTotalResult(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalNProjectEnums2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectEnums(ctx context.Context, sel ast.SelectionSet, v ProjectEnums) graphql.Marshaler {
-	return ec._ProjectEnums(ctx, sel, &v)
 }
 
 func (ec *executionContext) marshalNProjectEnums2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectEnums(ctx context.Context, sel ast.SelectionSet, v *ProjectEnums) graphql.Marshaler {
@@ -17535,20 +16950,6 @@ func (ec *executionContext) marshalNProjectResult2githubᚗcomᚋapartomatᚋapa
 	return ec._ProjectResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNProjectScreen2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectScreen(ctx context.Context, sel ast.SelectionSet, v ProjectScreen) graphql.Marshaler {
-	return ec._ProjectScreen(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNProjectScreen2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectScreen(ctx context.Context, sel ast.SelectionSet, v *ProjectScreen) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._ProjectScreen(ctx, sel, v)
-}
-
 func (ec *executionContext) unmarshalNProjectStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectStatus(ctx context.Context, v interface{}) (ProjectStatus, error) {
 	var res ProjectStatus
 	err := res.UnmarshalGQL(v)
@@ -17714,20 +17115,6 @@ func (ec *executionContext) marshalNRoom2ᚖgithubᚗcomᚋapartomatᚋapartomat
 		return graphql.Null
 	}
 	return ec._Room(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalNScreenQuery2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐScreenQuery(ctx context.Context, sel ast.SelectionSet, v ScreenQuery) graphql.Marshaler {
-	return ec._ScreenQuery(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNScreenQuery2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐScreenQuery(ctx context.Context, sel ast.SelectionSet, v *ScreenQuery) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._ScreenQuery(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
@@ -18511,6 +17898,13 @@ func (ec *executionContext) marshalOContactType2ᚕgithubᚗcomᚋapartomatᚋap
 	}
 
 	return ret
+}
+
+func (ec *executionContext) marshalOEnums2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐEnums(ctx context.Context, sel ast.SelectionSet, v *Enums) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Enums(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOFloat2ᚖfloat64(ctx context.Context, v interface{}) (*float64, error) {

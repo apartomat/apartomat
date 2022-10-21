@@ -116,6 +116,11 @@ export type DeleteContactResult = ContactDeleted | Forbidden | NotFound | Server
 
 export type DeleteRoomResult = Forbidden | NotFound | RoomDeleted;
 
+export type Enums = {
+  __typename?: 'Enums';
+  project: ProjectEnums;
+};
+
 export type Error = {
   message: Scalars['String'];
 };
@@ -205,19 +210,6 @@ export type LoginConfirmed = {
   __typename?: 'LoginConfirmed';
   token: Scalars['String'];
 };
-
-export type MenuItem = {
-  __typename?: 'MenuItem';
-  title: Scalars['String'];
-  url: Scalars['String'];
-};
-
-export type MenuItems = {
-  __typename?: 'MenuItems';
-  items: Array<MenuItem>;
-};
-
-export type MenuResult = MenuItems | ServerError;
 
 export type Mutation = {
   __typename?: 'Mutation';
@@ -514,13 +506,6 @@ export type ProjectHousesTotalResult = Forbidden | ProjectHousesTotal | ServerEr
 
 export type ProjectResult = Forbidden | NotFound | Project | ServerError;
 
-export type ProjectScreen = {
-  __typename?: 'ProjectScreen';
-  enums: ProjectEnums;
-  menu: MenuResult;
-  project: ProjectResult;
-};
-
 export enum ProjectStatus {
   Canceled = 'CANCELED',
   Done = 'DONE',
@@ -582,10 +567,16 @@ export type ProjectVisualizationsTotalResult = Forbidden | ProjectVisualizations
 
 export type Query = {
   __typename?: 'Query';
+  enums?: Maybe<Enums>;
   profile: UserProfileResult;
-  screen: ScreenQuery;
+  project: ProjectResult;
   version: Scalars['String'];
   workspace: WorkspaceResult;
+};
+
+
+export type QueryProjectArgs = {
+  id: Scalars['String'];
 };
 
 
@@ -616,17 +607,6 @@ export type RoomDeleted = {
 export type RoomUpdated = {
   __typename?: 'RoomUpdated';
   room: Room;
-};
-
-export type ScreenQuery = {
-  __typename?: 'ScreenQuery';
-  project: ProjectScreen;
-  version: Scalars['String'];
-};
-
-
-export type ScreenQueryProjectArgs = {
-  id: Scalars['String'];
 };
 
 export type ServerError = Error & {
@@ -933,12 +913,12 @@ export type UploadVisualizationsMutationVariables = Exact<{
 
 export type UploadVisualizationsMutation = { __typename?: 'Mutation', uploadVisualizations: { __typename: 'Forbidden', message: string } | { __typename: 'ServerError', message: string } | { __typename: 'SomeVisualizationsUploaded', visualizations: Array<{ __typename?: 'Visualization', id: string, file: { __typename?: 'ProjectFile', id: string, url: any } }> } | { __typename: 'VisualizationsUploaded', visualizations: Array<{ __typename?: 'Visualization', id: string, file: { __typename?: 'ProjectFile', id: string, url: any } }> } };
 
-export type ProjectQueryVariables = Exact<{
+export type ProjectScreenQueryVariables = Exact<{
   id: Scalars['String'];
 }>;
 
 
-export type ProjectQuery = { __typename?: 'Query', screen: { __typename?: 'ScreenQuery', projectScreen: { __typename?: 'ProjectScreen', project: { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'Project', id: string, name: string, startAt?: any | null | undefined, endAt?: any | null | undefined, status: ProjectStatus, contacts: { __typename?: 'ProjectContacts', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectContactsList', items: Array<{ __typename?: 'Contact', id: string, fullName: string, photo: string, details: Array<{ __typename?: 'ContactDetails', type: ContactType, value: string }> }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectContactsTotal', total: number } | { __typename: 'ServerError' } }, houses: { __typename?: 'ProjectHouses', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectHousesList', items: Array<{ __typename?: 'House', id: string, city: string, address: string, housingComplex: string, createdAt: any, modifiedAt: any, rooms: { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined }> } | { __typename?: 'ServerError', message: string } } }> } | { __typename: 'ServerError', message: string } }, visualizations: { __typename?: 'ProjectVisualizations', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectVisualizationsList', items: Array<{ __typename?: 'Visualization', id: string, name: string, description: string, version: number, file: { __typename?: 'ProjectFile', id: string, name: string, url: any, type: ProjectFileType, mimeType: string }, room?: { __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined } | null | undefined }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectVisualizationsTotal', total: number } | { __typename: 'ServerError' } } } | { __typename: 'ServerError', message: string }, menu: { __typename: 'MenuItems', items: Array<{ __typename?: 'MenuItem', title: string, url: string }> } | { __typename: 'ServerError' }, enums: { __typename?: 'ProjectEnums', status: { __typename?: 'ProjectStatusEnum', items: Array<{ __typename?: 'ProjectStatusEnumItem', key: ProjectStatus, value: string }> } } } } };
+export type ProjectScreenQuery = { __typename?: 'Query', project: { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'Project', id: string, name: string, startAt?: any | null | undefined, endAt?: any | null | undefined, status: ProjectStatus, contacts: { __typename?: 'ProjectContacts', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectContactsList', items: Array<{ __typename?: 'Contact', id: string, fullName: string, photo: string, details: Array<{ __typename?: 'ContactDetails', type: ContactType, value: string }> }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectContactsTotal', total: number } | { __typename: 'ServerError' } }, houses: { __typename?: 'ProjectHouses', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectHousesList', items: Array<{ __typename?: 'House', id: string, city: string, address: string, housingComplex: string, createdAt: any, modifiedAt: any, rooms: { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined }> } | { __typename?: 'ServerError', message: string } } }> } | { __typename: 'ServerError', message: string } }, visualizations: { __typename?: 'ProjectVisualizations', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectVisualizationsList', items: Array<{ __typename?: 'Visualization', id: string, name: string, description: string, version: number, file: { __typename?: 'ProjectFile', id: string, name: string, url: any, type: ProjectFileType, mimeType: string }, room?: { __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined } | null | undefined }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectVisualizationsTotal', total: number } | { __typename: 'ServerError' } } } | { __typename: 'ServerError', message: string }, enums?: { __typename?: 'Enums', project: { __typename?: 'ProjectEnums', status: { __typename?: 'ProjectStatusEnum', items: Array<{ __typename?: 'ProjectStatusEnumItem', key: ProjectStatus, value: string }> } } } | null | undefined };
 
 export type ProjectScreenProjectFragment = { __typename?: 'Project', id: string, name: string, startAt?: any | null | undefined, endAt?: any | null | undefined, status: ProjectStatus, contacts: { __typename?: 'ProjectContacts', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectContactsList', items: Array<{ __typename?: 'Contact', id: string, fullName: string, photo: string, details: Array<{ __typename?: 'ContactDetails', type: ContactType, value: string }> }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectContactsTotal', total: number } | { __typename: 'ServerError' } }, houses: { __typename?: 'ProjectHouses', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectHousesList', items: Array<{ __typename?: 'House', id: string, city: string, address: string, housingComplex: string, createdAt: any, modifiedAt: any, rooms: { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined }> } | { __typename?: 'ServerError', message: string } } }> } | { __typename: 'ServerError', message: string } }, visualizations: { __typename?: 'ProjectVisualizations', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectVisualizationsList', items: Array<{ __typename?: 'Visualization', id: string, name: string, description: string, version: number, file: { __typename?: 'ProjectFile', id: string, name: string, url: any, type: ProjectFileType, mimeType: string }, room?: { __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined } | null | undefined }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectVisualizationsTotal', total: number } | { __typename: 'ServerError' } } };
 
@@ -2013,34 +1993,23 @@ export function useUploadVisualizationsMutation(baseOptions?: Apollo.MutationHoo
 export type UploadVisualizationsMutationHookResult = ReturnType<typeof useUploadVisualizationsMutation>;
 export type UploadVisualizationsMutationResult = Apollo.MutationResult<UploadVisualizationsMutation>;
 export type UploadVisualizationsMutationOptions = Apollo.BaseMutationOptions<UploadVisualizationsMutation, UploadVisualizationsMutationVariables>;
-export const ProjectDocument = gql`
-    query project($id: String!) {
-  screen {
-    projectScreen: project(id: $id) {
-      project {
-        __typename
-        ... on Project {
-          ...ProjectScreenProject
-        }
-        ... on Error {
-          message
-        }
-      }
-      menu {
-        __typename
-        ... on MenuItems {
-          items {
-            title
-            url
-          }
-        }
-      }
-      enums {
-        status {
-          items {
-            key
-            value
-          }
+export const ProjectScreenDocument = gql`
+    query projectScreen($id: String!) {
+  project(id: $id) {
+    __typename
+    ... on Project {
+      ...ProjectScreenProject
+    }
+    ... on Error {
+      message
+    }
+  }
+  enums {
+    project {
+      status {
+        items {
+          key
+          value
         }
       }
     }
@@ -2049,32 +2018,32 @@ export const ProjectDocument = gql`
     ${ProjectScreenProjectFragmentDoc}`;
 
 /**
- * __useProjectQuery__
+ * __useProjectScreenQuery__
  *
- * To run a query within a React component, call `useProjectQuery` and pass it any options that fit your needs.
- * When your component renders, `useProjectQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useProjectScreenQuery` and pass it any options that fit your needs.
+ * When your component renders, `useProjectScreenQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useProjectQuery({
+ * const { data, loading, error } = useProjectScreenQuery({
  *   variables: {
  *      id: // value for 'id'
  *   },
  * });
  */
-export function useProjectQuery(baseOptions: Apollo.QueryHookOptions<ProjectQuery, ProjectQueryVariables>) {
+export function useProjectScreenQuery(baseOptions: Apollo.QueryHookOptions<ProjectScreenQuery, ProjectScreenQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<ProjectQuery, ProjectQueryVariables>(ProjectDocument, options);
+        return Apollo.useQuery<ProjectScreenQuery, ProjectScreenQueryVariables>(ProjectScreenDocument, options);
       }
-export function useProjectLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ProjectQuery, ProjectQueryVariables>) {
+export function useProjectScreenLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ProjectScreenQuery, ProjectScreenQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<ProjectQuery, ProjectQueryVariables>(ProjectDocument, options);
+          return Apollo.useLazyQuery<ProjectScreenQuery, ProjectScreenQueryVariables>(ProjectScreenDocument, options);
         }
-export type ProjectQueryHookResult = ReturnType<typeof useProjectQuery>;
-export type ProjectLazyQueryHookResult = ReturnType<typeof useProjectLazyQuery>;
-export type ProjectQueryResult = Apollo.QueryResult<ProjectQuery, ProjectQueryVariables>;
+export type ProjectScreenQueryHookResult = ReturnType<typeof useProjectScreenQuery>;
+export type ProjectScreenLazyQueryHookResult = ReturnType<typeof useProjectScreenLazyQuery>;
+export type ProjectScreenQueryResult = Apollo.QueryResult<ProjectScreenQuery, ProjectScreenQueryVariables>;
 export const WorkspaceScreenDocument = gql`
     query workspaceScreen($id: String!, $timezone: String) {
   workspace(id: $id) {

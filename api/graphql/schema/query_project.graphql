@@ -1,3 +1,7 @@
+extend type Query {
+    project(id: String!): ProjectResult!
+}
+
 union ProjectResult = Project | NotFound | Forbidden | ServerError
 
 type Project {

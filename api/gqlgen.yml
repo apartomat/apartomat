@@ -86,18 +86,3 @@ models:
         resolver: true
       total:
         resolver: true
-
-  ScreenQuery:
-    fields:
-      project:
-        resolver: true
-      workspace:
-        resolver: true
-  ProjectScreen:
-    fields:
-      project:
-        resolver: true
-      menu:
-        resolver: true
-      enums:
-        resolver: true

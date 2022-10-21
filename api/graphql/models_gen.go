@@ -64,10 +64,6 @@ type LoginByEmailResult interface {
 	IsLoginByEmailResult()
 }
 
-type MenuResult interface {
-	IsMenuResult()
-}
-
 type ProjectContactsListResult interface {
 	IsProjectContactsListResult()
 }
@@ -225,6 +221,10 @@ type CreateProjectInput struct {
 	Name        string     `json:"name"`
 	StartAt     *time.Time `json:"startAt"`
 	EndAt       *time.Time `json:"endAt"`
+}
+
+type Enums struct {
+	Project *ProjectEnums `json:"project"`
 }
 
 type ExpiredToken struct {
@@ -388,17 +388,6 @@ func (LoginConfirmed) IsConfirmLoginLinkResult() {}
 
 func (LoginConfirmed) IsConfirmLoginPinResult() {}
 
-type MenuItem struct {
-	Title string `json:"title"`
-	URL   string `json:"url"`
-}
-
-type MenuItems struct {
-	Items []*MenuItem `json:"items"`
-}
-
-func (MenuItems) IsMenuResult() {}
-
 type NotFound struct {
 	Message string `json:"message"`
 }
@@ -543,12 +532,6 @@ type ProjectHousesTotal struct {
 
 func (ProjectHousesTotal) IsProjectHousesTotalResult() {}
 
-type ProjectScreen struct {
-	Project ProjectResult `json:"project"`
-	Menu    MenuResult    `json:"menu"`
-	Enums   *ProjectEnums `json:"enums"`
-}
-
 type ProjectStatusChanged struct {
 	Project *Project `json:"project"`
 }
@@ -612,11 +595,6 @@ type RoomUpdated struct {
 
 func (RoomUpdated) IsUpdateRoomResult() {}
 
-type ScreenQuery struct {
-	Version string         `json:"version"`
-	Project *ProjectScreen `json:"project"`
-}
-
 type ServerError struct {
 	Message string `json:"message"`
 }
@@ -670,8 +648,6 @@ func (ServerError) IsProjectVisualizationsTotalResult() {}
 func (ServerError) IsProjectFilesListResult() {}
 
 func (ServerError) IsProjectFilesTotalResult() {}
-
-func (ServerError) IsMenuResult() {}
 
 func (ServerError) IsWorkspaceResult() {}
 

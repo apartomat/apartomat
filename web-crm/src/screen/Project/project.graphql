@@ -1,32 +1,20 @@
-query project($id: String!) {
-    screen {
-        projectScreen: project(id: $id) {
-            project {
-                __typename
-                ...on Project {
-                    ...ProjectScreenProject
+query projectScreen($id: String!) {
+    project(id: $id) {
+        __typename
+        ...on Project {
+            ...ProjectScreenProject
+        }
+        ...on Error {
+            message
+        }
+    }
+    enums {
+        project {
+            status {
+                items {
+                    key
+                    value
                 }
-                ...on Error {
-                    message
-                }
-            }
-            menu {
-                __typename
-                ...on MenuItems {
-                    items {
-                        title
-                        url
-                    }
-                }
-            }
-            enums {
-                status {
-                    items {
-                        key
-                        value
-                    }
-                }
-
             }
         }
     }

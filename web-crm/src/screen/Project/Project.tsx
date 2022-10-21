@@ -77,13 +77,10 @@ export function Project () {
     }, [ fetchError ])
 
     useEffect(() => {
-        const screen = data?.screen.projectScreen
-
-        if (screen?.project) {
-            switch (screen.project.__typename) {
+        if (data?.project) {
+            switch (data.project.__typename) {
                 case "Project":
-                    setProject(screen.project)
-                    setProjectEnums(screen.enums)
+                    setProject(data.project)
                     break
                 case "NotFound":
                     setError("Проект не найден")
@@ -92,7 +89,11 @@ export function Project () {
                     setError("Доступ запрещен")
                     break
             }
-        }        
+        }
+
+        if (data?.enums) {
+            setProjectEnums(data.enums.project)
+        }
     }, [ data ])
 
     const [showUploadVisualizations, setShowUploadVisualizations] = useState(false);

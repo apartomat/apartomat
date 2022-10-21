@@ -1,11 +1,11 @@
 import { NetworkStatus, useApolloClient } from "@apollo/client"
-import { useProjectQuery } from "api/types.d"
+import { useProjectScreenQuery } from "api/types.d"
 
 import type { Contact, ProjectContactsTotal, Forbidden, ServerError } from "api/types.d"
 
 export function useProject(id: string) {
     const client = useApolloClient();
-    const result = useProjectQuery({ client, errorPolicy: "all", variables: { id }, notifyOnNetworkStatusChange: true })
+    const result = useProjectScreenQuery({ client, errorPolicy: "all", variables: { id }, notifyOnNetworkStatusChange: true })
 
     return { ...result, refetching: result.networkStatus === NetworkStatus.refetch }
 }
