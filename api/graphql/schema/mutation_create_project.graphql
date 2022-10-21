@@ -4,7 +4,7 @@ extend type Mutation {
 
 input CreateProjectInput {
     workspaceId: String!
-    title: String!
+    name: String!
     startAt: Time
     endAt: Time
 }

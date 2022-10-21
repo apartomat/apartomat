@@ -51,9 +51,9 @@ type ResolverRoot interface {
 	UserProfile() UserProfileResolver
 	Visualization() VisualizationResolver
 	Workspace() WorkspaceResolver
-	WorkspaceProject() WorkspaceProjectResolver
 	WorkspaceProjects() WorkspaceProjectsResolver
 	WorkspaceUser() WorkspaceUserResolver
+	WorkspaceUsers() WorkspaceUsersResolver
 }
 
 type DirectiveRoot struct {
@@ -197,9 +197,10 @@ type ComplexityRoot struct {
 		Files          func(childComplexity int) int
 		Houses         func(childComplexity int) int
 		ID             func(childComplexity int) int
+		Name           func(childComplexity int) int
+		Period         func(childComplexity int, timezone *string) int
 		StartAt        func(childComplexity int) int
 		Status         func(childComplexity int) int
-		Title          func(childComplexity int) int
 		Visualizations func(childComplexity int) int
 	}
 
@@ -374,19 +375,9 @@ type ComplexityRoot struct {
 		Users    func(childComplexity int) int
 	}
 
-	WorkspaceProject struct {
-		EndAt   func(childComplexity int) int
-		ID      func(childComplexity int) int
-		Name    func(childComplexity int) int
-		Period  func(childComplexity int, timezone *string) int
-		StartAt func(childComplexity int) int
-		Status  func(childComplexity int) int
-	}
-
 	WorkspaceProjects struct {
-		List      func(childComplexity int, filter WorkspaceProjectsFilter, limit int) int
-		Total     func(childComplexity int, filter WorkspaceProjectsFilter) int
-		Workspace func(childComplexity int) int
+		List  func(childComplexity int, filter WorkspaceProjectsFilter, limit int) int
+		Total func(childComplexity int, filter WorkspaceProjectsFilter) int
 	}
 
 	WorkspaceProjectsList struct {
@@ -404,16 +395,17 @@ type ComplexityRoot struct {
 		Workspace func(childComplexity int) int
 	}
 
-	WorkspaceUserProfile struct {
-		Abbr     func(childComplexity int) int
-		Email    func(childComplexity int) int
-		FullName func(childComplexity int) int
-		Gravatar func(childComplexity int) int
-		ID       func(childComplexity int) int
+	WorkspaceUsers struct {
+		List  func(childComplexity int, filter WorkspaceUsersFilter, limit int) int
+		Total func(childComplexity int, filter WorkspaceUsersFilter) int
 	}
 
-	WorkspaceUsers struct {
+	WorkspaceUsersList struct {
 		Items func(childComplexity int) int
+	}
+
+	WorkspaceUsersTotal struct {
+		Total func(childComplexity int) int
 	}
 }
 
@@ -444,6 +436,7 @@ type MutationResolver interface {
 	UploadVisualizations(ctx context.Context, projectID string, files []*graphql.Upload, roomID *string) (UploadVisualizationsResult, error)
 }
 type ProjectResolver interface {
+	Period(ctx context.Context, obj *Project, timezone *string) (*string, error)
 	Contacts(ctx context.Context, obj *Project) (*ProjectContacts, error)
 	Houses(ctx context.Context, obj *Project) (*ProjectHouses, error)
 	Visualizations(ctx context.Context, obj *Project) (*ProjectVisualizations, error)
@@ -487,18 +480,19 @@ type VisualizationResolver interface {
 	Room(ctx context.Context, obj *Visualization) (*Room, error)
 }
 type WorkspaceResolver interface {
-	Users(ctx context.Context, obj *Workspace) (WorkspaceUsersResult, error)
 	Projects(ctx context.Context, obj *Workspace) (*WorkspaceProjects, error)
-}
-type WorkspaceProjectResolver interface {
-	Period(ctx context.Context, obj *WorkspaceProject, timezone *string) (*string, error)
+	Users(ctx context.Context, obj *Workspace) (*WorkspaceUsers, error)
 }
 type WorkspaceProjectsResolver interface {
 	List(ctx context.Context, obj *WorkspaceProjects, filter WorkspaceProjectsFilter, limit int) (WorkspaceProjectsListResult, error)
 	Total(ctx context.Context, obj *WorkspaceProjects, filter WorkspaceProjectsFilter) (WorkspaceProjectsTotalResult, error)
 }
 type WorkspaceUserResolver interface {
-	Profile(ctx context.Context, obj *WorkspaceUser) (*WorkspaceUserProfile, error)
+	Profile(ctx context.Context, obj *WorkspaceUser) (*UserProfile, error)
+}
+type WorkspaceUsersResolver interface {
+	List(ctx context.Context, obj *WorkspaceUsers, filter WorkspaceUsersFilter, limit int) (WorkspaceUsersListResult, error)
+	Total(ctx context.Context, obj *WorkspaceUsers, filter WorkspaceUsersFilter) (WorkspaceUsersTotalResult, error)
 }
 
 type executableSchema struct {
@@ -1033,6 +1027,25 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Project.ID(childComplexity), true
 
+	case "Project.name":
+		if e.complexity.Project.Name == nil {
+			break
+		}
+
+		return e.complexity.Project.Name(childComplexity), true
+
+	case "Project.period":
+		if e.complexity.Project.Period == nil {
+			break
+		}
+
+		args, err := ec.field_Project_period_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Project.Period(childComplexity, args["timezone"].(*string)), true
+
 	case "Project.startAt":
 		if e.complexity.Project.StartAt == nil {
 			break
@@ -1046,13 +1059,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Project.Status(childComplexity), true
-
-	case "Project.title":
-		if e.complexity.Project.Title == nil {
-			break
-		}
-
-		return e.complexity.Project.Title(childComplexity), true
 
 	case "Project.visualizations":
 		if e.complexity.Project.Visualizations == nil {
@@ -1594,53 +1600,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Workspace.Users(childComplexity), true
 
-	case "WorkspaceProject.endAt":
-		if e.complexity.WorkspaceProject.EndAt == nil {
-			break
-		}
-
-		return e.complexity.WorkspaceProject.EndAt(childComplexity), true
-
-	case "WorkspaceProject.id":
-		if e.complexity.WorkspaceProject.ID == nil {
-			break
-		}
-
-		return e.complexity.WorkspaceProject.ID(childComplexity), true
-
-	case "WorkspaceProject.name":
-		if e.complexity.WorkspaceProject.Name == nil {
-			break
-		}
-
-		return e.complexity.WorkspaceProject.Name(childComplexity), true
-
-	case "WorkspaceProject.period":
-		if e.complexity.WorkspaceProject.Period == nil {
-			break
-		}
-
-		args, err := ec.field_WorkspaceProject_period_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.WorkspaceProject.Period(childComplexity, args["timezone"].(*string)), true
-
-	case "WorkspaceProject.startAt":
-		if e.complexity.WorkspaceProject.StartAt == nil {
-			break
-		}
-
-		return e.complexity.WorkspaceProject.StartAt(childComplexity), true
-
-	case "WorkspaceProject.status":
-		if e.complexity.WorkspaceProject.Status == nil {
-			break
-		}
-
-		return e.complexity.WorkspaceProject.Status(childComplexity), true
-
 	case "WorkspaceProjects.list":
 		if e.complexity.WorkspaceProjects.List == nil {
 			break
@@ -1664,13 +1623,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.WorkspaceProjects.Total(childComplexity, args["filter"].(WorkspaceProjectsFilter)), true
-
-	case "WorkspaceProjects.workspace":
-		if e.complexity.WorkspaceProjects.Workspace == nil {
-			break
-		}
-
-		return e.complexity.WorkspaceProjects.Workspace(childComplexity), true
 
 	case "WorkspaceProjectsList.items":
 		if e.complexity.WorkspaceProjectsList.Items == nil {
@@ -1714,47 +1666,43 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.WorkspaceUser.Workspace(childComplexity), true
 
-	case "WorkspaceUserProfile.abbr":
-		if e.complexity.WorkspaceUserProfile.Abbr == nil {
+	case "WorkspaceUsers.list":
+		if e.complexity.WorkspaceUsers.List == nil {
 			break
 		}
 
-		return e.complexity.WorkspaceUserProfile.Abbr(childComplexity), true
+		args, err := ec.field_WorkspaceUsers_list_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
 
-	case "WorkspaceUserProfile.email":
-		if e.complexity.WorkspaceUserProfile.Email == nil {
+		return e.complexity.WorkspaceUsers.List(childComplexity, args["filter"].(WorkspaceUsersFilter), args["limit"].(int)), true
+
+	case "WorkspaceUsers.total":
+		if e.complexity.WorkspaceUsers.Total == nil {
 			break
 		}
 
-		return e.complexity.WorkspaceUserProfile.Email(childComplexity), true
+		args, err := ec.field_WorkspaceUsers_total_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
 
-	case "WorkspaceUserProfile.fullName":
-		if e.complexity.WorkspaceUserProfile.FullName == nil {
+		return e.complexity.WorkspaceUsers.Total(childComplexity, args["filter"].(WorkspaceUsersFilter)), true
+
+	case "WorkspaceUsersList.items":
+		if e.complexity.WorkspaceUsersList.Items == nil {
 			break
 		}
 
-		return e.complexity.WorkspaceUserProfile.FullName(childComplexity), true
+		return e.complexity.WorkspaceUsersList.Items(childComplexity), true
 
-	case "WorkspaceUserProfile.gravatar":
-		if e.complexity.WorkspaceUserProfile.Gravatar == nil {
+	case "WorkspaceUsersTotal.total":
+		if e.complexity.WorkspaceUsersTotal.Total == nil {
 			break
 		}
 
-		return e.complexity.WorkspaceUserProfile.Gravatar(childComplexity), true
-
-	case "WorkspaceUserProfile.id":
-		if e.complexity.WorkspaceUserProfile.ID == nil {
-			break
-		}
-
-		return e.complexity.WorkspaceUserProfile.ID(childComplexity), true
-
-	case "WorkspaceUsers.items":
-		if e.complexity.WorkspaceUsers.Items == nil {
-			break
-		}
-
-		return e.complexity.WorkspaceUsers.Items(childComplexity), true
+		return e.complexity.WorkspaceUsersTotal.Total(childComplexity), true
 
 	}
 	return 0, false
@@ -1779,6 +1727,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputUpdateRoomInput,
 		ec.unmarshalInputUploadProjectFileInput,
 		ec.unmarshalInputWorkspaceProjectsFilter,
+		ec.unmarshalInputWorkspaceUsersFilter,
 	)
 	first := true
 
@@ -2478,6 +2427,21 @@ func (ec *executionContext) field_ProjectVisualizations_total_args(ctx context.C
 	return args, nil
 }
 
+func (ec *executionContext) field_Project_period_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *string
+	if tmp, ok := rawArgs["timezone"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("timezone"))
+		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["timezone"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -2523,21 +2487,6 @@ func (ec *executionContext) field_ScreenQuery_project_args(ctx context.Context, 
 	return args, nil
 }
 
-func (ec *executionContext) field_WorkspaceProject_period_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *string
-	if tmp, ok := rawArgs["timezone"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("timezone"))
-		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["timezone"] = arg0
-	return args, nil
-}
-
 func (ec *executionContext) field_WorkspaceProjects_list_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -2569,6 +2518,45 @@ func (ec *executionContext) field_WorkspaceProjects_total_args(ctx context.Conte
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
 		arg0, err = ec.unmarshalNWorkspaceProjectsFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceProjectsFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_WorkspaceUsers_list_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 WorkspaceUsersFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalNWorkspaceUsersFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUsersFilter(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["filter"] = arg0
+	var arg1 int
+	if tmp, ok := rawArgs["limit"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+		arg1, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["limit"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_WorkspaceUsers_total_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 WorkspaceUsersFilter
+	if tmp, ok := rawArgs["filter"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+		arg0, err = ec.unmarshalNWorkspaceUsersFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUsersFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -5425,8 +5413,8 @@ func (ec *executionContext) fieldContext_Project_id(ctx context.Context, field g
 	return fc, nil
 }
 
-func (ec *executionContext) _Project_title(ctx context.Context, field graphql.CollectedField, obj *Project) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Project_title(ctx, field)
+func (ec *executionContext) _Project_name(ctx context.Context, field graphql.CollectedField, obj *Project) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Project_name(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -5439,7 +5427,7 @@ func (ec *executionContext) _Project_title(ctx context.Context, field graphql.Co
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Title, nil
+		return obj.Name, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -5456,7 +5444,7 @@ func (ec *executionContext) _Project_title(ctx context.Context, field graphql.Co
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Project_title(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Project_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Project",
 		Field:      field,
@@ -5591,6 +5579,58 @@ func (ec *executionContext) fieldContext_Project_endAt(ctx context.Context, fiel
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Time does not have child fields")
 		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Project_period(ctx context.Context, field graphql.CollectedField, obj *Project) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Project_period(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Project().Period(rctx, obj, fc.Args["timezone"].(*string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Project_period(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Project",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Project_period_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
 	}
 	return fc, nil
 }
@@ -6048,14 +6088,16 @@ func (ec *executionContext) fieldContext_ProjectCreated_project(ctx context.Cont
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Project_id(ctx, field)
-			case "title":
-				return ec.fieldContext_Project_title(ctx, field)
+			case "name":
+				return ec.fieldContext_Project_name(ctx, field)
 			case "status":
 				return ec.fieldContext_Project_status(ctx, field)
 			case "startAt":
 				return ec.fieldContext_Project_startAt(ctx, field)
 			case "endAt":
 				return ec.fieldContext_Project_endAt(ctx, field)
+			case "period":
+				return ec.fieldContext_Project_period(ctx, field)
 			case "contacts":
 				return ec.fieldContext_Project_contacts(ctx, field)
 			case "houses":
@@ -6112,14 +6154,16 @@ func (ec *executionContext) fieldContext_ProjectDatesChanged_project(ctx context
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Project_id(ctx, field)
-			case "title":
-				return ec.fieldContext_Project_title(ctx, field)
+			case "name":
+				return ec.fieldContext_Project_name(ctx, field)
 			case "status":
 				return ec.fieldContext_Project_status(ctx, field)
 			case "startAt":
 				return ec.fieldContext_Project_startAt(ctx, field)
 			case "endAt":
 				return ec.fieldContext_Project_endAt(ctx, field)
+			case "period":
+				return ec.fieldContext_Project_period(ctx, field)
 			case "contacts":
 				return ec.fieldContext_Project_contacts(ctx, field)
 			case "houses":
@@ -7060,14 +7104,16 @@ func (ec *executionContext) fieldContext_ProjectStatusChanged_project(ctx contex
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Project_id(ctx, field)
-			case "title":
-				return ec.fieldContext_Project_title(ctx, field)
+			case "name":
+				return ec.fieldContext_Project_name(ctx, field)
 			case "status":
 				return ec.fieldContext_Project_status(ctx, field)
 			case "startAt":
 				return ec.fieldContext_Project_startAt(ctx, field)
 			case "endAt":
 				return ec.fieldContext_Project_endAt(ctx, field)
+			case "period":
+				return ec.fieldContext_Project_period(ctx, field)
 			case "contacts":
 				return ec.fieldContext_Project_contacts(ctx, field)
 			case "houses":
@@ -8668,10 +8714,10 @@ func (ec *executionContext) fieldContext_UserProfile_defaultWorkspace(ctx contex
 				return ec.fieldContext_Workspace_id(ctx, field)
 			case "name":
 				return ec.fieldContext_Workspace_name(ctx, field)
-			case "users":
-				return ec.fieldContext_Workspace_users(ctx, field)
 			case "projects":
 				return ec.fieldContext_Workspace_projects(ctx, field)
+			case "users":
+				return ec.fieldContext_Workspace_users(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Workspace", field.Name)
 		},
@@ -9266,50 +9312,6 @@ func (ec *executionContext) fieldContext_Workspace_name(ctx context.Context, fie
 	return fc, nil
 }
 
-func (ec *executionContext) _Workspace_users(ctx context.Context, field graphql.CollectedField, obj *Workspace) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Workspace_users(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Workspace().Users(rctx, obj)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(WorkspaceUsersResult)
-	fc.Result = res
-	return ec.marshalNWorkspaceUsersResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUsersResult(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Workspace_users(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Workspace",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type WorkspaceUsersResult does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Workspace_projects(ctx context.Context, field graphql.CollectedField, obj *Workspace) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Workspace_projects(ctx, field)
 	if err != nil {
@@ -9349,8 +9351,6 @@ func (ec *executionContext) fieldContext_Workspace_projects(ctx context.Context,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "workspace":
-				return ec.fieldContext_WorkspaceProjects_workspace(ctx, field)
 			case "list":
 				return ec.fieldContext_WorkspaceProjects_list(ctx, field)
 			case "total":
@@ -9362,8 +9362,8 @@ func (ec *executionContext) fieldContext_Workspace_projects(ctx context.Context,
 	return fc, nil
 }
 
-func (ec *executionContext) _WorkspaceProject_id(ctx context.Context, field graphql.CollectedField, obj *WorkspaceProject) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_WorkspaceProject_id(ctx, field)
+func (ec *executionContext) _Workspace_users(ctx context.Context, field graphql.CollectedField, obj *Workspace) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Workspace_users(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -9376,7 +9376,7 @@ func (ec *executionContext) _WorkspaceProject_id(ctx context.Context, field grap
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.ID, nil
+		return ec.resolvers.Workspace().Users(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -9388,286 +9388,25 @@ func (ec *executionContext) _WorkspaceProject_id(ctx context.Context, field grap
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*WorkspaceUsers)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalNWorkspaceUsers2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUsers(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_WorkspaceProject_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Workspace_users(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "WorkspaceProject",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _WorkspaceProject_name(ctx context.Context, field graphql.CollectedField, obj *WorkspaceProject) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_WorkspaceProject_name(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Name, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_WorkspaceProject_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "WorkspaceProject",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _WorkspaceProject_status(ctx context.Context, field graphql.CollectedField, obj *WorkspaceProject) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_WorkspaceProject_status(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Status, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(ProjectStatus)
-	fc.Result = res
-	return ec.marshalNProjectStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectStatus(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_WorkspaceProject_status(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "WorkspaceProject",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ProjectStatus does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _WorkspaceProject_startAt(ctx context.Context, field graphql.CollectedField, obj *WorkspaceProject) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_WorkspaceProject_startAt(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.StartAt, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*time.Time)
-	fc.Result = res
-	return ec.marshalOTime2ᚖtimeᚐTime(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_WorkspaceProject_startAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "WorkspaceProject",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Time does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _WorkspaceProject_endAt(ctx context.Context, field graphql.CollectedField, obj *WorkspaceProject) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_WorkspaceProject_endAt(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.EndAt, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*time.Time)
-	fc.Result = res
-	return ec.marshalOTime2ᚖtimeᚐTime(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_WorkspaceProject_endAt(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "WorkspaceProject",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Time does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _WorkspaceProject_period(ctx context.Context, field graphql.CollectedField, obj *WorkspaceProject) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_WorkspaceProject_period(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.WorkspaceProject().Period(rctx, obj, fc.Args["timezone"].(*string))
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*string)
-	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_WorkspaceProject_period(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "WorkspaceProject",
+		Object:     "Workspace",
 		Field:      field,
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_WorkspaceProject_period_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _WorkspaceProjects_workspace(ctx context.Context, field graphql.CollectedField, obj *WorkspaceProjects) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_WorkspaceProjects_workspace(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Workspace, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*ID)
-	fc.Result = res
-	return ec.marshalOId2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐID(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_WorkspaceProjects_workspace(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "WorkspaceProjects",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "id":
-				return ec.fieldContext_Id_id(ctx, field)
+			case "list":
+				return ec.fieldContext_WorkspaceUsers_list(ctx, field)
+			case "total":
+				return ec.fieldContext_WorkspaceUsers_total(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type Id", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type WorkspaceUsers", field.Name)
 		},
 	}
 	return fc, nil
@@ -9809,9 +9548,9 @@ func (ec *executionContext) _WorkspaceProjectsList_items(ctx context.Context, fi
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*WorkspaceProject)
+	res := resTmp.([]*Project)
 	fc.Result = res
-	return ec.marshalNWorkspaceProject2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceProjectᚄ(ctx, field.Selections, res)
+	return ec.marshalNProject2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_WorkspaceProjectsList_items(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -9823,19 +9562,27 @@ func (ec *executionContext) fieldContext_WorkspaceProjectsList_items(ctx context
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
-				return ec.fieldContext_WorkspaceProject_id(ctx, field)
+				return ec.fieldContext_Project_id(ctx, field)
 			case "name":
-				return ec.fieldContext_WorkspaceProject_name(ctx, field)
+				return ec.fieldContext_Project_name(ctx, field)
 			case "status":
-				return ec.fieldContext_WorkspaceProject_status(ctx, field)
+				return ec.fieldContext_Project_status(ctx, field)
 			case "startAt":
-				return ec.fieldContext_WorkspaceProject_startAt(ctx, field)
+				return ec.fieldContext_Project_startAt(ctx, field)
 			case "endAt":
-				return ec.fieldContext_WorkspaceProject_endAt(ctx, field)
+				return ec.fieldContext_Project_endAt(ctx, field)
 			case "period":
-				return ec.fieldContext_WorkspaceProject_period(ctx, field)
+				return ec.fieldContext_Project_period(ctx, field)
+			case "contacts":
+				return ec.fieldContext_Project_contacts(ctx, field)
+			case "houses":
+				return ec.fieldContext_Project_houses(ctx, field)
+			case "visualizations":
+				return ec.fieldContext_Project_visualizations(ctx, field)
+			case "files":
+				return ec.fieldContext_Project_files(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type WorkspaceProject", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type Project", field.Name)
 		},
 	}
 	return fc, nil
@@ -10047,9 +9794,9 @@ func (ec *executionContext) _WorkspaceUser_profile(ctx context.Context, field gr
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*WorkspaceUserProfile)
+	res := resTmp.(*UserProfile)
 	fc.Result = res
-	return ec.marshalNWorkspaceUserProfile2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserProfile(ctx, field.Selections, res)
+	return ec.marshalNUserProfile2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐUserProfile(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_WorkspaceUser_profile(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -10061,24 +9808,26 @@ func (ec *executionContext) fieldContext_WorkspaceUser_profile(ctx context.Conte
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
-				return ec.fieldContext_WorkspaceUserProfile_id(ctx, field)
+				return ec.fieldContext_UserProfile_id(ctx, field)
 			case "email":
-				return ec.fieldContext_WorkspaceUserProfile_email(ctx, field)
+				return ec.fieldContext_UserProfile_email(ctx, field)
 			case "fullName":
-				return ec.fieldContext_WorkspaceUserProfile_fullName(ctx, field)
+				return ec.fieldContext_UserProfile_fullName(ctx, field)
 			case "abbr":
-				return ec.fieldContext_WorkspaceUserProfile_abbr(ctx, field)
+				return ec.fieldContext_UserProfile_abbr(ctx, field)
 			case "gravatar":
-				return ec.fieldContext_WorkspaceUserProfile_gravatar(ctx, field)
+				return ec.fieldContext_UserProfile_gravatar(ctx, field)
+			case "defaultWorkspace":
+				return ec.fieldContext_UserProfile_defaultWorkspace(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type WorkspaceUserProfile", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type UserProfile", field.Name)
 		},
 	}
 	return fc, nil
 }
 
-func (ec *executionContext) _WorkspaceUserProfile_id(ctx context.Context, field graphql.CollectedField, obj *WorkspaceUserProfile) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_WorkspaceUserProfile_id(ctx, field)
+func (ec *executionContext) _WorkspaceUsers_list(ctx context.Context, field graphql.CollectedField, obj *WorkspaceUsers) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_WorkspaceUsers_list(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -10091,7 +9840,7 @@ func (ec *executionContext) _WorkspaceUserProfile_id(ctx context.Context, field 
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.ID, nil
+		return ec.resolvers.WorkspaceUsers().List(rctx, obj, fc.Args["filter"].(WorkspaceUsersFilter), fc.Args["limit"].(int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10103,26 +9852,37 @@ func (ec *executionContext) _WorkspaceUserProfile_id(ctx context.Context, field 
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(WorkspaceUsersListResult)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalNWorkspaceUsersListResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUsersListResult(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_WorkspaceUserProfile_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_WorkspaceUsers_list(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "WorkspaceUserProfile",
+		Object:     "WorkspaceUsers",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
+			return nil, errors.New("field of type WorkspaceUsersListResult does not have child fields")
 		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_WorkspaceUsers_list_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
 	}
 	return fc, nil
 }
 
-func (ec *executionContext) _WorkspaceUserProfile_email(ctx context.Context, field graphql.CollectedField, obj *WorkspaceUserProfile) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_WorkspaceUserProfile_email(ctx, field)
+func (ec *executionContext) _WorkspaceUsers_total(ctx context.Context, field graphql.CollectedField, obj *WorkspaceUsers) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_WorkspaceUsers_total(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -10135,7 +9895,7 @@ func (ec *executionContext) _WorkspaceUserProfile_email(ctx context.Context, fie
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Email, nil
+		return ec.resolvers.WorkspaceUsers().Total(rctx, obj, fc.Args["filter"].(WorkspaceUsersFilter))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10147,159 +9907,37 @@ func (ec *executionContext) _WorkspaceUserProfile_email(ctx context.Context, fie
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(WorkspaceUsersTotalResult)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalNWorkspaceUsersTotalResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUsersTotalResult(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_WorkspaceUserProfile_email(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_WorkspaceUsers_total(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "WorkspaceUserProfile",
+		Object:     "WorkspaceUsers",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
+			return nil, errors.New("field of type WorkspaceUsersTotalResult does not have child fields")
 		},
 	}
-	return fc, nil
-}
-
-func (ec *executionContext) _WorkspaceUserProfile_fullName(ctx context.Context, field graphql.CollectedField, obj *WorkspaceUserProfile) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_WorkspaceUserProfile_fullName(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
 	defer func() {
 		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.FullName, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_WorkspaceUserProfile_fullName(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "WorkspaceUserProfile",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _WorkspaceUserProfile_abbr(ctx context.Context, field graphql.CollectedField, obj *WorkspaceUserProfile) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_WorkspaceUserProfile_abbr(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
 	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Abbr, nil
-	})
-	if err != nil {
+	if fc.Args, err = ec.field_WorkspaceUsers_total_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_WorkspaceUserProfile_abbr(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "WorkspaceUserProfile",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
+		return
 	}
 	return fc, nil
 }
 
-func (ec *executionContext) _WorkspaceUserProfile_gravatar(ctx context.Context, field graphql.CollectedField, obj *WorkspaceUserProfile) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_WorkspaceUserProfile_gravatar(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Gravatar, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*Gravatar)
-	fc.Result = res
-	return ec.marshalOGravatar2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐGravatar(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_WorkspaceUserProfile_gravatar(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "WorkspaceUserProfile",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "url":
-				return ec.fieldContext_Gravatar_url(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Gravatar", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _WorkspaceUsers_items(ctx context.Context, field graphql.CollectedField, obj *WorkspaceUsers) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_WorkspaceUsers_items(ctx, field)
+func (ec *executionContext) _WorkspaceUsersList_items(ctx context.Context, field graphql.CollectedField, obj *WorkspaceUsersList) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_WorkspaceUsersList_items(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -10329,9 +9967,9 @@ func (ec *executionContext) _WorkspaceUsers_items(ctx context.Context, field gra
 	return ec.marshalNWorkspaceUser2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_WorkspaceUsers_items(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_WorkspaceUsersList_items(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "WorkspaceUsers",
+		Object:     "WorkspaceUsersList",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -10347,6 +9985,50 @@ func (ec *executionContext) fieldContext_WorkspaceUsers_items(ctx context.Contex
 				return ec.fieldContext_WorkspaceUser_profile(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type WorkspaceUser", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _WorkspaceUsersTotal_total(ctx context.Context, field graphql.CollectedField, obj *WorkspaceUsersTotal) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_WorkspaceUsersTotal_total(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Total, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_WorkspaceUsersTotal_total(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "WorkspaceUsersTotal",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
@@ -12328,7 +12010,7 @@ func (ec *executionContext) unmarshalInputCreateProjectInput(ctx context.Context
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"workspaceId", "title", "startAt", "endAt"}
+	fieldsInOrder := [...]string{"workspaceId", "name", "startAt", "endAt"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -12343,11 +12025,11 @@ func (ec *executionContext) unmarshalInputCreateProjectInput(ctx context.Context
 			if err != nil {
 				return it, err
 			}
-		case "title":
+		case "name":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
-			it.Title, err = ec.unmarshalNString2string(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			it.Name, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -12672,6 +12354,34 @@ func (ec *executionContext) unmarshalInputWorkspaceProjectsFilter(ctx context.Co
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
 			it.Status, err = ec.unmarshalOProjectStatus2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectStatusᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputWorkspaceUsersFilter(ctx context.Context, obj interface{}) (WorkspaceUsersFilter, error) {
+	var it WorkspaceUsersFilter
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"role"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "role":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role"))
+			it.Role, err = ec.unmarshalOWorkspaceUserRole2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserRoleᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -13801,17 +13511,47 @@ func (ec *executionContext) _WorkspaceResult(ctx context.Context, sel ast.Select
 	}
 }
 
-func (ec *executionContext) _WorkspaceUsersResult(ctx context.Context, sel ast.SelectionSet, obj WorkspaceUsersResult) graphql.Marshaler {
+func (ec *executionContext) _WorkspaceUsersListResult(ctx context.Context, sel ast.SelectionSet, obj WorkspaceUsersListResult) graphql.Marshaler {
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
-	case WorkspaceUsers:
-		return ec._WorkspaceUsers(ctx, sel, &obj)
-	case *WorkspaceUsers:
+	case WorkspaceUsersList:
+		return ec._WorkspaceUsersList(ctx, sel, &obj)
+	case *WorkspaceUsersList:
 		if obj == nil {
 			return graphql.Null
 		}
-		return ec._WorkspaceUsers(ctx, sel, obj)
+		return ec._WorkspaceUsersList(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
+func (ec *executionContext) _WorkspaceUsersTotalResult(ctx context.Context, sel ast.SelectionSet, obj WorkspaceUsersTotalResult) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case WorkspaceUsersTotal:
+		return ec._WorkspaceUsersTotal(ctx, sel, &obj)
+	case *WorkspaceUsersTotal:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._WorkspaceUsersTotal(ctx, sel, obj)
 	case Forbidden:
 		return ec._Forbidden(ctx, sel, &obj)
 	case *Forbidden:
@@ -14073,7 +13813,7 @@ func (ec *executionContext) _ExpiredToken(ctx context.Context, sel ast.Selection
 	return out
 }
 
-var forbiddenImplementors = []string{"Forbidden", "AddContactResult", "AddHouseResult", "AddRoomResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "CreateProjectResult", "DeleteContactResult", "DeleteRoomResult", "UpdateContactResult", "UpdateHouseResult", "UpdateRoomResult", "UploadProjectFileResult", "UploadVisualizationResult", "UploadVisualizationsResult", "UserProfileResult", "ProjectResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "ProjectVisualizationsListResult", "ProjectVisualizationsTotalResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "WorkspaceResult", "WorkspaceUsersResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "Error"}
+var forbiddenImplementors = []string{"Forbidden", "AddContactResult", "AddHouseResult", "AddRoomResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "CreateProjectResult", "DeleteContactResult", "DeleteRoomResult", "UpdateContactResult", "UpdateHouseResult", "UpdateRoomResult", "UploadProjectFileResult", "UploadVisualizationResult", "UploadVisualizationsResult", "UserProfileResult", "ProjectResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "ProjectVisualizationsListResult", "ProjectVisualizationsTotalResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "WorkspaceResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "WorkspaceUsersListResult", "WorkspaceUsersTotalResult", "Error"}
 
 func (ec *executionContext) _Forbidden(ctx context.Context, sel ast.SelectionSet, obj *Forbidden) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, forbiddenImplementors)
@@ -14840,9 +14580,9 @@ func (ec *executionContext) _Project(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
-		case "title":
+		case "name":
 
-			out.Values[i] = ec._Project_title(ctx, field, obj)
+			out.Values[i] = ec._Project_name(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
@@ -14862,6 +14602,23 @@ func (ec *executionContext) _Project(ctx context.Context, sel ast.SelectionSet, 
 
 			out.Values[i] = ec._Project_endAt(ctx, field, obj)
 
+		case "period":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Project_period(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
 		case "contacts":
 			field := field
 
@@ -16084,7 +15841,7 @@ func (ec *executionContext) _ScreenQuery(ctx context.Context, sel ast.SelectionS
 	return out
 }
 
-var serverErrorImplementors = []string{"ServerError", "AddContactResult", "AddHouseResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "ConfirmLoginLinkResult", "ConfirmLoginPinResult", "CreateProjectResult", "DeleteContactResult", "LoginByEmailResult", "UpdateContactResult", "UpdateHouseResult", "UploadProjectFileResult", "UploadVisualizationResult", "UploadVisualizationsResult", "UserProfileResult", "ProjectResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "ProjectVisualizationsListResult", "ProjectVisualizationsTotalResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "MenuResult", "WorkspaceResult", "WorkspaceUsersResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "Error"}
+var serverErrorImplementors = []string{"ServerError", "AddContactResult", "AddHouseResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "ConfirmLoginLinkResult", "ConfirmLoginPinResult", "CreateProjectResult", "DeleteContactResult", "LoginByEmailResult", "UpdateContactResult", "UpdateHouseResult", "UploadProjectFileResult", "UploadVisualizationResult", "UploadVisualizationsResult", "UserProfileResult", "ProjectResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "ProjectVisualizationsListResult", "ProjectVisualizationsTotalResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "MenuResult", "WorkspaceResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "WorkspaceUsersListResult", "WorkspaceUsersTotalResult", "Error"}
 
 func (ec *executionContext) _ServerError(ctx context.Context, sel ast.SelectionSet, obj *ServerError) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, serverErrorImplementors)
@@ -16393,26 +16150,6 @@ func (ec *executionContext) _Workspace(ctx context.Context, sel ast.SelectionSet
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
-		case "users":
-			field := field
-
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Workspace_users(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
-				return res
-			}
-
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
-
-			})
 		case "projects":
 			field := field
 
@@ -16433,57 +16170,7 @@ func (ec *executionContext) _Workspace(ctx context.Context, sel ast.SelectionSet
 				return innerFunc(ctx)
 
 			})
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
-var workspaceProjectImplementors = []string{"WorkspaceProject"}
-
-func (ec *executionContext) _WorkspaceProject(ctx context.Context, sel ast.SelectionSet, obj *WorkspaceProject) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, workspaceProjectImplementors)
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("WorkspaceProject")
-		case "id":
-
-			out.Values[i] = ec._WorkspaceProject_id(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
-		case "name":
-
-			out.Values[i] = ec._WorkspaceProject_name(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
-		case "status":
-
-			out.Values[i] = ec._WorkspaceProject_status(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
-		case "startAt":
-
-			out.Values[i] = ec._WorkspaceProject_startAt(ctx, field, obj)
-
-		case "endAt":
-
-			out.Values[i] = ec._WorkspaceProject_endAt(ctx, field, obj)
-
-		case "period":
+		case "users":
 			field := field
 
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
@@ -16492,7 +16179,10 @@ func (ec *executionContext) _WorkspaceProject(ctx context.Context, sel ast.Selec
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._WorkspaceProject_period(ctx, field, obj)
+				res = ec._Workspace_users(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
 				return res
 			}
 
@@ -16521,10 +16211,6 @@ func (ec *executionContext) _WorkspaceProjects(ctx context.Context, sel ast.Sele
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("WorkspaceProjects")
-		case "workspace":
-
-			out.Values[i] = ec._WorkspaceProjects_workspace(ctx, field, obj)
-
 		case "list":
 			field := field
 
@@ -16694,48 +16380,56 @@ func (ec *executionContext) _WorkspaceUser(ctx context.Context, sel ast.Selectio
 	return out
 }
 
-var workspaceUserProfileImplementors = []string{"WorkspaceUserProfile"}
+var workspaceUsersImplementors = []string{"WorkspaceUsers"}
 
-func (ec *executionContext) _WorkspaceUserProfile(ctx context.Context, sel ast.SelectionSet, obj *WorkspaceUserProfile) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, workspaceUserProfileImplementors)
+func (ec *executionContext) _WorkspaceUsers(ctx context.Context, sel ast.SelectionSet, obj *WorkspaceUsers) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, workspaceUsersImplementors)
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
-			out.Values[i] = graphql.MarshalString("WorkspaceUserProfile")
-		case "id":
+			out.Values[i] = graphql.MarshalString("WorkspaceUsers")
+		case "list":
+			field := field
 
-			out.Values[i] = ec._WorkspaceUserProfile_id(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._WorkspaceUsers_list(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
 			}
-		case "email":
 
-			out.Values[i] = ec._WorkspaceUserProfile_email(ctx, field, obj)
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
 
-			if out.Values[i] == graphql.Null {
-				invalids++
+			})
+		case "total":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._WorkspaceUsers_total(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
 			}
-		case "fullName":
 
-			out.Values[i] = ec._WorkspaceUserProfile_fullName(ctx, field, obj)
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
 
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "abbr":
-
-			out.Values[i] = ec._WorkspaceUserProfile_abbr(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "gravatar":
-
-			out.Values[i] = ec._WorkspaceUserProfile_gravatar(ctx, field, obj)
-
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -16747,19 +16441,47 @@ func (ec *executionContext) _WorkspaceUserProfile(ctx context.Context, sel ast.S
 	return out
 }
 
-var workspaceUsersImplementors = []string{"WorkspaceUsers", "WorkspaceUsersResult"}
+var workspaceUsersListImplementors = []string{"WorkspaceUsersList", "WorkspaceUsersListResult"}
 
-func (ec *executionContext) _WorkspaceUsers(ctx context.Context, sel ast.SelectionSet, obj *WorkspaceUsers) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, workspaceUsersImplementors)
+func (ec *executionContext) _WorkspaceUsersList(ctx context.Context, sel ast.SelectionSet, obj *WorkspaceUsersList) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, workspaceUsersListImplementors)
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
-			out.Values[i] = graphql.MarshalString("WorkspaceUsers")
+			out.Values[i] = graphql.MarshalString("WorkspaceUsersList")
 		case "items":
 
-			out.Values[i] = ec._WorkspaceUsers_items(ctx, field, obj)
+			out.Values[i] = ec._WorkspaceUsersList_items(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var workspaceUsersTotalImplementors = []string{"WorkspaceUsersTotal", "WorkspaceUsersTotalResult"}
+
+func (ec *executionContext) _WorkspaceUsersTotal(ctx context.Context, sel ast.SelectionSet, obj *WorkspaceUsersTotal) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, workspaceUsersTotalImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("WorkspaceUsersTotal")
+		case "total":
+
+			out.Values[i] = ec._WorkspaceUsersTotal_total(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
@@ -17550,6 +17272,50 @@ func (ec *executionContext) marshalNMenuResult2githubᚗcomᚋapartomatᚋaparto
 	return ec._MenuResult(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNProject2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectᚄ(ctx context.Context, sel ast.SelectionSet, v []*Project) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNProject2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProject(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
 func (ec *executionContext) marshalNProject2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProject(ctx context.Context, sel ast.SelectionSet, v *Project) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -18157,6 +17923,20 @@ func (ec *executionContext) marshalNUrl2string(ctx context.Context, sel ast.Sele
 	return res
 }
 
+func (ec *executionContext) marshalNUserProfile2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐUserProfile(ctx context.Context, sel ast.SelectionSet, v UserProfile) graphql.Marshaler {
+	return ec._UserProfile(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNUserProfile2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐUserProfile(ctx context.Context, sel ast.SelectionSet, v *UserProfile) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._UserProfile(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNUserProfileResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐUserProfileResult(ctx context.Context, sel ast.SelectionSet, v UserProfileResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -18233,60 +18013,6 @@ func (ec *executionContext) marshalNWorkspace2ᚖgithubᚗcomᚋapartomatᚋapar
 		return graphql.Null
 	}
 	return ec._Workspace(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalNWorkspaceProject2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceProjectᚄ(ctx context.Context, sel ast.SelectionSet, v []*WorkspaceProject) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNWorkspaceProject2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceProject(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	for _, e := range ret {
-		if e == graphql.Null {
-			return graphql.Null
-		}
-	}
-
-	return ret
-}
-
-func (ec *executionContext) marshalNWorkspaceProject2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceProject(ctx context.Context, sel ast.SelectionSet, v *WorkspaceProject) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._WorkspaceProject(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNWorkspaceProjects2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceProjects(ctx context.Context, sel ast.SelectionSet, v WorkspaceProjects) graphql.Marshaler {
@@ -18392,20 +18118,6 @@ func (ec *executionContext) marshalNWorkspaceUser2ᚖgithubᚗcomᚋapartomatᚋ
 	return ec._WorkspaceUser(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNWorkspaceUserProfile2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserProfile(ctx context.Context, sel ast.SelectionSet, v WorkspaceUserProfile) graphql.Marshaler {
-	return ec._WorkspaceUserProfile(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNWorkspaceUserProfile2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserProfile(ctx context.Context, sel ast.SelectionSet, v *WorkspaceUserProfile) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._WorkspaceUserProfile(ctx, sel, v)
-}
-
 func (ec *executionContext) unmarshalNWorkspaceUserRole2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserRole(ctx context.Context, v interface{}) (WorkspaceUserRole, error) {
 	var res WorkspaceUserRole
 	err := res.UnmarshalGQL(v)
@@ -18416,14 +18128,43 @@ func (ec *executionContext) marshalNWorkspaceUserRole2githubᚗcomᚋapartomat�
 	return v
 }
 
-func (ec *executionContext) marshalNWorkspaceUsersResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUsersResult(ctx context.Context, sel ast.SelectionSet, v WorkspaceUsersResult) graphql.Marshaler {
+func (ec *executionContext) marshalNWorkspaceUsers2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUsers(ctx context.Context, sel ast.SelectionSet, v WorkspaceUsers) graphql.Marshaler {
+	return ec._WorkspaceUsers(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNWorkspaceUsers2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUsers(ctx context.Context, sel ast.SelectionSet, v *WorkspaceUsers) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
 		}
 		return graphql.Null
 	}
-	return ec._WorkspaceUsersResult(ctx, sel, v)
+	return ec._WorkspaceUsers(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNWorkspaceUsersFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUsersFilter(ctx context.Context, v interface{}) (WorkspaceUsersFilter, error) {
+	res, err := ec.unmarshalInputWorkspaceUsersFilter(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNWorkspaceUsersListResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUsersListResult(ctx context.Context, sel ast.SelectionSet, v WorkspaceUsersListResult) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._WorkspaceUsersListResult(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNWorkspaceUsersTotalResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUsersTotalResult(ctx context.Context, sel ast.SelectionSet, v WorkspaceUsersTotalResult) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._WorkspaceUsersTotalResult(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {
@@ -18795,13 +18536,6 @@ func (ec *executionContext) marshalOGravatar2ᚖgithubᚗcomᚋapartomatᚋapart
 	return ec._Gravatar(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOId2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐID(ctx context.Context, sel ast.SelectionSet, v *ID) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._Id(ctx, sel, v)
-}
-
 func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v interface{}) (*int, error) {
 	if v == nil {
 		return nil, nil
@@ -19027,6 +18761,73 @@ func (ec *executionContext) marshalOTime2ᚖtimeᚐTime(ctx context.Context, sel
 	}
 	res := graphql.MarshalTime(*v)
 	return res
+}
+
+func (ec *executionContext) unmarshalOWorkspaceUserRole2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserRoleᚄ(ctx context.Context, v interface{}) ([]WorkspaceUserRole, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]WorkspaceUserRole, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNWorkspaceUserRole2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserRole(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOWorkspaceUserRole2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserRoleᚄ(ctx context.Context, sel ast.SelectionSet, v []WorkspaceUserRole) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNWorkspaceUserRole2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserRole(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
 func (ec *executionContext) marshalO__EnumValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐEnumValueᚄ(ctx context.Context, sel ast.SelectionSet, v []introspection.EnumValue) graphql.Marshaler {

@@ -16,7 +16,6 @@ require (
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
 	github.com/go-pg/migrations/v8 v8.1.0
 	github.com/go-pg/pg/v10 v10.10.6
-	github.com/jackc/pgconn v1.8.0
 	github.com/jackc/pgx/v4 v4.10.0
 	github.com/jung-kurt/gofpdf v1.4.2
 	github.com/matoous/go-nanoid/v2 v2.0.0
@@ -54,6 +53,7 @@ require (
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
+	github.com/jackc/pgconn v1.8.0 // indirect
 	github.com/jackc/pgio v1.0.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgproto3/v2 v2.0.6 // indirect

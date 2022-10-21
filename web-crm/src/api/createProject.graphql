@@ -4,7 +4,7 @@ mutation createProject($input: CreateProjectInput!) {
         ...on ProjectCreated {
             project {
                 id
-                title
+                name
                 startAt
                 endAt
             }

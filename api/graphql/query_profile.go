@@ -21,14 +21,20 @@ func (r *queryResolver) Profile(ctx context.Context) (UserProfileResult, error) 
 			return ServerError{}, nil
 		}
 
+		var (
+			grava *Gravatar
+		)
+
+		if user.UseGravatar {
+			grava = &Gravatar{URL: gravatar.Url(user.Email)}
+		}
+
 		return UserProfile{
 			ID:       user.ID,
 			Email:    user.Email,
 			FullName: user.FullName,
-			Abbr:     abbr(user.FullName),
-			Gravatar: &Gravatar{
-				URL: gravatar.Url(user.Email),
-			},
+			Gravatar: grava,
+			Abbr:     userAbbr(user.FullName, user.Email),
 		}, nil
 	}
 

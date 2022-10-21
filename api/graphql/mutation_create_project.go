@@ -8,7 +8,7 @@ import (
 )
 
 func (r *mutationResolver) CreateProject(ctx context.Context, input CreateProjectInput) (CreateProjectResult, error) {
-	project, err := r.useCases.CreateProject(ctx, input.WorkspaceID, input.Title, input.StartAt, input.EndAt)
+	project, err := r.useCases.CreateProject(ctx, input.WorkspaceID, input.Name, input.StartAt, input.EndAt)
 	if err != nil {
 		if errors.Is(err, apartomat.ErrForbidden) {
 			return forbidden()

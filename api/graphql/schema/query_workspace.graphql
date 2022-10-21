@@ -7,38 +7,12 @@ union WorkspaceResult = Workspace | NotFound | Forbidden | ServerError
 type Workspace {
     id: String!
     name: String!
-    users: WorkspaceUsersResult!
-    projects: WorkspaceProjects!
+	projects: WorkspaceProjects!
+	users: WorkspaceUsers!
 }
 
-union WorkspaceUsersResult = WorkspaceUsers | Forbidden | ServerError
-
-type WorkspaceUsers {
-	items: [WorkspaceUser!]!
-}
-
-type WorkspaceUser {
-	id: String!
-	workspace: Id!
-	role: WorkspaceUserRole!
-	profile: WorkspaceUserProfile!
-}
-
-enum WorkspaceUserRole {
-	ADMIN
-	USER
-}
-
-type WorkspaceUserProfile {
-    id: String!
-    email: String!
-	fullName: String!
-	abbr: String!
-    gravatar: Gravatar
-}
 
 type WorkspaceProjects {
-	workspace: Id
 	list(filter: WorkspaceProjectsFilter! = {} limit: Int! = 10): WorkspaceProjectsListResult!
 	total(filter: WorkspaceProjectsFilter! = {}): WorkspaceProjectsTotalResult!
 }
@@ -50,7 +24,7 @@ input WorkspaceProjectsFilter {
 union WorkspaceProjectsListResult = WorkspaceProjectsList | Forbidden | ServerError
 
 type WorkspaceProjectsList {
-	items: [WorkspaceProject!]!
+	items: [Project!]!
 }
 
 union WorkspaceProjectsTotalResult = WorkspaceProjectsTotal | Forbidden | ServerError
@@ -59,11 +33,36 @@ type WorkspaceProjectsTotal {
 	total: Int!
 }
 
-type WorkspaceProject {
+
+type WorkspaceUsers {
+	list(filter: WorkspaceUsersFilter! = {} limit: Int! = 10): WorkspaceUsersListResult!
+	total(filter: WorkspaceUsersFilter! = {}): WorkspaceUsersTotalResult!
+}
+
+input WorkspaceUsersFilter {
+	role: [WorkspaceUserRole!]
+}
+
+union WorkspaceUsersListResult = WorkspaceUsersList | Forbidden | ServerError
+
+type WorkspaceUsersList {
+	items: [WorkspaceUser!]!
+}
+
+type WorkspaceUser {
 	id: String!
-	name: String!
-	status: ProjectStatus!
-	startAt: Time
-	endAt: Time
-	period(timezone: String): String
+	workspace: Id!
+	role: WorkspaceUserRole!
+	profile: UserProfile!
+}
+
+enum WorkspaceUserRole {
+	ADMIN
+	USER
+}
+
+union WorkspaceUsersTotalResult = WorkspaceUsersTotal | Forbidden | ServerError
+
+type WorkspaceUsersTotal {
+	total: Int!
 }

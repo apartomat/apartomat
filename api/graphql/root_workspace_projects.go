@@ -2,6 +2,7 @@ package graphql
 
 import (
 	"context"
+	"github.com/99designs/gqlgen/graphql"
 	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/store"
 	"github.com/pkg/errors"
@@ -22,9 +23,17 @@ func (r *workspaceProjectsResolver) List(
 	filter WorkspaceProjectsFilter,
 	limit int,
 ) (WorkspaceProjectsListResult, error) {
+	workspace, ok := graphql.GetFieldContext(ctx).Parent.Parent.Result.(*Workspace)
+
+	if !ok {
+		log.Printf("can't resolve workspace projects: %s", errors.New("unknown workspace"))
+
+		return serverError()
+	}
+
 	projects, err := r.useCases.GetWorkspaceProjects(
 		ctx,
-		obj.Workspace.ID,
+		workspace.ID,
 		apartomat.GetWorkspaceProjectsFilter{
 			Status: store.ProjectStatusExpr{
 				Eq: toProjectStatuses(filter.Status),
@@ -38,12 +47,12 @@ func (r *workspaceProjectsResolver) List(
 			return Forbidden{}, nil
 		}
 
-		log.Printf("can't resolve workspace (id=%d) projects: %s", obj.Workspace.ID, err)
+		log.Printf("can't resolve workspace (id=%s) projects: %s", workspace.ID, err)
 
 		return ServerError{Message: "internal server error"}, nil
 	}
 
-	return WorkspaceProjectsList{Items: projectsToGraphQLWorkspaceProjects(projects)}, nil
+	return WorkspaceProjectsList{Items: projectsToGraphQL(projects)}, nil
 }
 
 func (r *workspaceProjectsResolver) Total(
@@ -54,28 +63,12 @@ func (r *workspaceProjectsResolver) Total(
 	return notImplementedYetError() // TODO
 }
 
-func projectToGraphQLWorkspaceProject(project *store.Project) *WorkspaceProject {
-	wp := &WorkspaceProject{
-		ID:      project.ID,
-		Name:    project.Name,
-		Status:  projectStatusToGraphQL(project.Status),
-		StartAt: project.StartAt,
-		EndAt:   project.EndAt,
-	}
+func projectsToGraphQL(projects []*store.Project) []*Project {
+	result := make([]*Project, 0, len(projects))
 
-	return wp
-}
-
-func projectsToGraphQLWorkspaceProjects(projects []*store.Project) []*WorkspaceProject {
-	result := make([]*WorkspaceProject, 0, len(projects))
-
-	for _, u := range projects {
-		result = append(result, projectToGraphQLWorkspaceProject(u))
+	for _, p := range projects {
+		result = append(result, projectToGraphQL(p))
 	}
 
 	return result
-}
-
-func pstring(str string) *string {
-	return &str
 }

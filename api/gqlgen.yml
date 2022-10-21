@@ -20,6 +20,8 @@ models:
         resolver: true
   Project:
     fields:
+      period:
+        resolver: true
       files:
         resolver: true
       contacts:
@@ -64,13 +66,9 @@ models:
         resolver: true
   Workspace:
     fields:
-      users:
-        resolver: true
       projects:
         resolver: true
-  WorkspaceProject:
-    fields:
-      period:
+      users:
         resolver: true
   WorkspaceProjects:
     fields:
@@ -82,16 +80,18 @@ models:
     fields:
       profile:
         resolver: true
-
-  ShoppinglistQuery:
+  WorkspaceUsers:
     fields:
-      productOnPage:
+      list:
         resolver: true
+      total:
+        resolver: true
+
   ScreenQuery:
     fields:
       project:
         resolver: true
-      spec:
+      workspace:
         resolver: true
   ProjectScreen:
     fields:
@@ -100,16 +100,4 @@ models:
       menu:
         resolver: true
       enums:
-        resolver: true
-  FilesScreen:
-    fields:
-      project:
-        resolver: true
-      menu:
-        resolver: true
-  SpecScreen:
-    fields:
-      project:
-        resolver: true
-      menu:
         resolver: true

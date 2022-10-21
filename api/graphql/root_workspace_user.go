@@ -16,15 +16,17 @@ func (r *rootResolver) WorkspaceUser() WorkspaceUserResolver {
 	return &workspaceUserResolver{r}
 }
 
-func (r *workspaceUserResolver) Profile(ctx context.Context, obj *WorkspaceUser) (*WorkspaceUserProfile, error) {
+func (r *workspaceUserResolver) Profile(ctx context.Context, obj *WorkspaceUser) (*UserProfile, error) {
 	user, err := r.useCases.GetWorkspaceUserProfile(ctx, obj.Workspace.ID, obj.ID)
 	if err != nil {
-		log.Printf("workspaceUserResolver.Profile: %s", err) // TODO: add more context
+		log.Printf("can't resolve workspace user (id=%s) profile: %s", obj.ID, err)
+
 		return nil, errors.New("internal server error")
 	}
 
 	if user == nil {
-		log.Print("workspaceUserResolver.Profile: user not found") // TODO: add more context
+		log.Printf("can't resolve workspace user profile: user (id=%s) not found", obj.ID)
+
 		return nil, errors.New("internal server error")
 	}
 
@@ -36,12 +38,12 @@ func (r *workspaceUserResolver) Profile(ctx context.Context, obj *WorkspaceUser)
 		grava = &Gravatar{URL: gravatar.Url(user.Email)}
 	}
 
-	return &WorkspaceUserProfile{
+	return &UserProfile{
 		ID:       obj.ID,
 		Email:    user.Email,
 		Gravatar: grava,
 		FullName: user.FullName,
-		Abbr:     abbr(user.FullName),
+		Abbr:     userAbbr(user.FullName, user.Email),
 	}, nil
 }
 
@@ -64,4 +66,12 @@ func abbr(str string) string {
 	}
 
 	return strings.Join(f, "")
+}
+
+func userAbbr(name, email string) string {
+	if ab := abbr(name); ab != "" {
+		return strings.ToUpper(ab)
+	}
+
+	return strings.ToUpper(email[0:2])
 }

@@ -110,12 +110,12 @@ export function Project () {
 
     if (error) {
         return (
-        <Main pad="large">
-            <Heading level={2}>Ошибка</Heading>
-            <Box>
-                <Text>{error}</Text>
-            </Box>
-        </Main>
+            <Main pad="large">
+                <Heading level={2}>Ошибка</Heading>
+                <Box>
+                    <Text>{error}</Text>
+                </Box>
+            </Main>
         )
     }
 
@@ -164,7 +164,7 @@ export function Project () {
             <Box>
                 <Box direction="row" justify="between" margin={{vertical: "medium"}}>
                     <Box direction="row" justify="center">
-                        <Heading level={2} margin="none">{project.title}</Heading>
+                        <Heading level={2} margin="none">{project.name}</Heading>
                         <ChangeStatus
                             margin={{ horizontal: "medium"}}
                             projectId={project.id}

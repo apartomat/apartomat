@@ -105,8 +105,8 @@ export type ContactUpdated = {
 
 export type CreateProjectInput = {
   endAt?: Maybe<Scalars['Time']>;
+  name: Scalars['String'];
   startAt?: Maybe<Scalars['Time']>;
-  title: Scalars['String'];
   workspaceId: Scalars['String'];
 };
 
@@ -358,10 +358,16 @@ export type Project = {
   files: ProjectFiles;
   houses: ProjectHouses;
   id: Scalars['String'];
+  name: Scalars['String'];
+  period?: Maybe<Scalars['String']>;
   startAt?: Maybe<Scalars['Time']>;
   status: ProjectStatus;
-  title: Scalars['String'];
   visualizations: ProjectVisualizations;
+};
+
+
+export type ProjectPeriodArgs = {
+  timezone?: Maybe<Scalars['String']>;
 };
 
 export type ProjectContacts = {
@@ -707,29 +713,13 @@ export type Workspace = {
   id: Scalars['String'];
   name: Scalars['String'];
   projects: WorkspaceProjects;
-  users: WorkspaceUsersResult;
-};
-
-export type WorkspaceProject = {
-  __typename?: 'WorkspaceProject';
-  endAt?: Maybe<Scalars['Time']>;
-  id: Scalars['String'];
-  name: Scalars['String'];
-  period?: Maybe<Scalars['String']>;
-  startAt?: Maybe<Scalars['Time']>;
-  status: ProjectStatus;
-};
-
-
-export type WorkspaceProjectPeriodArgs = {
-  timezone?: Maybe<Scalars['String']>;
+  users: WorkspaceUsers;
 };
 
 export type WorkspaceProjects = {
   __typename?: 'WorkspaceProjects';
   list: WorkspaceProjectsListResult;
   total: WorkspaceProjectsTotalResult;
-  workspace?: Maybe<Id>;
 };
 
 
@@ -749,7 +739,7 @@ export type WorkspaceProjectsFilter = {
 
 export type WorkspaceProjectsList = {
   __typename?: 'WorkspaceProjectsList';
-  items: Array<WorkspaceProject>;
+  items: Array<Project>;
 };
 
 export type WorkspaceProjectsListResult = Forbidden | ServerError | WorkspaceProjectsList;
@@ -766,18 +756,9 @@ export type WorkspaceResult = Forbidden | NotFound | ServerError | Workspace;
 export type WorkspaceUser = {
   __typename?: 'WorkspaceUser';
   id: Scalars['String'];
-  profile: WorkspaceUserProfile;
+  profile: UserProfile;
   role: WorkspaceUserRole;
   workspace: Id;
-};
-
-export type WorkspaceUserProfile = {
-  __typename?: 'WorkspaceUserProfile';
-  abbr: Scalars['String'];
-  email: Scalars['String'];
-  fullName: Scalars['String'];
-  gravatar?: Maybe<Gravatar>;
-  id: Scalars['String'];
 };
 
 export enum WorkspaceUserRole {
@@ -787,10 +768,38 @@ export enum WorkspaceUserRole {
 
 export type WorkspaceUsers = {
   __typename?: 'WorkspaceUsers';
+  list: WorkspaceUsersListResult;
+  total: WorkspaceUsersTotalResult;
+};
+
+
+export type WorkspaceUsersListArgs = {
+  filter?: WorkspaceUsersFilter;
+  limit?: Scalars['Int'];
+};
+
+
+export type WorkspaceUsersTotalArgs = {
+  filter?: WorkspaceUsersFilter;
+};
+
+export type WorkspaceUsersFilter = {
+  role?: Maybe<Array<WorkspaceUserRole>>;
+};
+
+export type WorkspaceUsersList = {
+  __typename?: 'WorkspaceUsersList';
   items: Array<WorkspaceUser>;
 };
 
-export type WorkspaceUsersResult = Forbidden | ServerError | WorkspaceUsers;
+export type WorkspaceUsersListResult = Forbidden | ServerError | WorkspaceUsersList;
+
+export type WorkspaceUsersTotal = {
+  __typename?: 'WorkspaceUsersTotal';
+  total: Scalars['Int'];
+};
+
+export type WorkspaceUsersTotalResult = Forbidden | ServerError | WorkspaceUsersTotal;
 
 export type AddContactMutationVariables = Exact<{
   projectId: Scalars['String'];
@@ -846,7 +855,7 @@ export type CreateProjectMutationVariables = Exact<{
 }>;
 
 
-export type CreateProjectMutation = { __typename?: 'Mutation', createProject: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectCreated', project: { __typename?: 'Project', id: string, title: string, startAt?: any | null | undefined, endAt?: any | null | undefined } } | { __typename: 'ServerError', message: string } };
+export type CreateProjectMutation = { __typename?: 'Mutation', createProject: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectCreated', project: { __typename?: 'Project', id: string, name: string, startAt?: any | null | undefined, endAt?: any | null | undefined } } | { __typename: 'ServerError', message: string } };
 
 export type DeleteContactMutationVariables = Exact<{
   id: Scalars['String'];
@@ -892,14 +901,6 @@ export type UploadProjectFileMutationVariables = Exact<{
 
 export type UploadProjectFileMutation = { __typename?: 'Mutation', uploadProjectFile: { __typename: 'AlreadyExists', message: string } | { __typename: 'Forbidden', message: string } | { __typename: 'ProjectFileUploaded', file: { __typename?: 'ProjectFile', id: string, url: any } } | { __typename: 'ServerError', message: string } };
 
-export type WorkspaceQueryVariables = Exact<{
-  id: Scalars['String'];
-  timezone?: Maybe<Scalars['String']>;
-}>;
-
-
-export type WorkspaceQuery = { __typename?: 'Query', workspace: { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'ServerError', message: string } | { __typename: 'Workspace', id: string, name: string, users: { __typename: 'Forbidden', message: string } | { __typename: 'ServerError', message: string } | { __typename: 'WorkspaceUsers', items: Array<{ __typename?: 'WorkspaceUser', id: string, role: WorkspaceUserRole, workspace: { __typename?: 'Id', id: string }, profile: { __typename?: 'WorkspaceUserProfile', id: string, email: string, fullName: string, abbr: string, gravatar?: { __typename?: 'Gravatar', url: string } | null | undefined } }> }, projects: { __typename: 'WorkspaceProjects', current: { __typename: 'Forbidden', message: string } | { __typename: 'ServerError', message: string } | { __typename: 'WorkspaceProjectsList', items: Array<{ __typename?: 'WorkspaceProject', id: string, name: string, status: ProjectStatus, startAt?: any | null | undefined, endAt?: any | null | undefined, period?: string | null | undefined }> }, done: { __typename: 'Forbidden', message: string } | { __typename: 'ServerError', message: string } | { __typename: 'WorkspaceProjectsList', items: Array<{ __typename?: 'WorkspaceProject', id: string, name: string, status: ProjectStatus, startAt?: any | null | undefined, endAt?: any | null | undefined, period?: string | null | undefined }> } } } };
-
 export type AddRoomMutationVariables = Exact<{
   houseId: Scalars['String'];
   room: AddRoomInput;
@@ -937,9 +938,9 @@ export type ProjectQueryVariables = Exact<{
 }>;
 
 
-export type ProjectQuery = { __typename?: 'Query', screen: { __typename?: 'ScreenQuery', projectScreen: { __typename?: 'ProjectScreen', project: { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'Project', id: string, title: string, startAt?: any | null | undefined, endAt?: any | null | undefined, status: ProjectStatus, contacts: { __typename?: 'ProjectContacts', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectContactsList', items: Array<{ __typename?: 'Contact', id: string, fullName: string, photo: string, details: Array<{ __typename?: 'ContactDetails', type: ContactType, value: string }> }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectContactsTotal', total: number } | { __typename: 'ServerError' } }, houses: { __typename?: 'ProjectHouses', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectHousesList', items: Array<{ __typename?: 'House', id: string, city: string, address: string, housingComplex: string, createdAt: any, modifiedAt: any, rooms: { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined }> } | { __typename?: 'ServerError', message: string } } }> } | { __typename: 'ServerError', message: string } }, visualizations: { __typename?: 'ProjectVisualizations', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectVisualizationsList', items: Array<{ __typename?: 'Visualization', id: string, name: string, description: string, version: number, file: { __typename?: 'ProjectFile', id: string, name: string, url: any, type: ProjectFileType, mimeType: string }, room?: { __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined } | null | undefined }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectVisualizationsTotal', total: number } | { __typename: 'ServerError' } } } | { __typename: 'ServerError', message: string }, menu: { __typename: 'MenuItems', items: Array<{ __typename?: 'MenuItem', title: string, url: string }> } | { __typename: 'ServerError' }, enums: { __typename?: 'ProjectEnums', status: { __typename?: 'ProjectStatusEnum', items: Array<{ __typename?: 'ProjectStatusEnumItem', key: ProjectStatus, value: string }> } } } } };
+export type ProjectQuery = { __typename?: 'Query', screen: { __typename?: 'ScreenQuery', projectScreen: { __typename?: 'ProjectScreen', project: { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'Project', id: string, name: string, startAt?: any | null | undefined, endAt?: any | null | undefined, status: ProjectStatus, contacts: { __typename?: 'ProjectContacts', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectContactsList', items: Array<{ __typename?: 'Contact', id: string, fullName: string, photo: string, details: Array<{ __typename?: 'ContactDetails', type: ContactType, value: string }> }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectContactsTotal', total: number } | { __typename: 'ServerError' } }, houses: { __typename?: 'ProjectHouses', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectHousesList', items: Array<{ __typename?: 'House', id: string, city: string, address: string, housingComplex: string, createdAt: any, modifiedAt: any, rooms: { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined }> } | { __typename?: 'ServerError', message: string } } }> } | { __typename: 'ServerError', message: string } }, visualizations: { __typename?: 'ProjectVisualizations', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectVisualizationsList', items: Array<{ __typename?: 'Visualization', id: string, name: string, description: string, version: number, file: { __typename?: 'ProjectFile', id: string, name: string, url: any, type: ProjectFileType, mimeType: string }, room?: { __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined } | null | undefined }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectVisualizationsTotal', total: number } | { __typename: 'ServerError' } } } | { __typename: 'ServerError', message: string }, menu: { __typename: 'MenuItems', items: Array<{ __typename?: 'MenuItem', title: string, url: string }> } | { __typename: 'ServerError' }, enums: { __typename?: 'ProjectEnums', status: { __typename?: 'ProjectStatusEnum', items: Array<{ __typename?: 'ProjectStatusEnumItem', key: ProjectStatus, value: string }> } } } } };
 
-export type ProjectScreenProjectFragment = { __typename?: 'Project', id: string, title: string, startAt?: any | null | undefined, endAt?: any | null | undefined, status: ProjectStatus, contacts: { __typename?: 'ProjectContacts', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectContactsList', items: Array<{ __typename?: 'Contact', id: string, fullName: string, photo: string, details: Array<{ __typename?: 'ContactDetails', type: ContactType, value: string }> }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectContactsTotal', total: number } | { __typename: 'ServerError' } }, houses: { __typename?: 'ProjectHouses', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectHousesList', items: Array<{ __typename?: 'House', id: string, city: string, address: string, housingComplex: string, createdAt: any, modifiedAt: any, rooms: { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined }> } | { __typename?: 'ServerError', message: string } } }> } | { __typename: 'ServerError', message: string } }, visualizations: { __typename?: 'ProjectVisualizations', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectVisualizationsList', items: Array<{ __typename?: 'Visualization', id: string, name: string, description: string, version: number, file: { __typename?: 'ProjectFile', id: string, name: string, url: any, type: ProjectFileType, mimeType: string }, room?: { __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined } | null | undefined }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectVisualizationsTotal', total: number } | { __typename: 'ServerError' } } };
+export type ProjectScreenProjectFragment = { __typename?: 'Project', id: string, name: string, startAt?: any | null | undefined, endAt?: any | null | undefined, status: ProjectStatus, contacts: { __typename?: 'ProjectContacts', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectContactsList', items: Array<{ __typename?: 'Contact', id: string, fullName: string, photo: string, details: Array<{ __typename?: 'ContactDetails', type: ContactType, value: string }> }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectContactsTotal', total: number } | { __typename: 'ServerError' } }, houses: { __typename?: 'ProjectHouses', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectHousesList', items: Array<{ __typename?: 'House', id: string, city: string, address: string, housingComplex: string, createdAt: any, modifiedAt: any, rooms: { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined }> } | { __typename?: 'ServerError', message: string } } }> } | { __typename: 'ServerError', message: string } }, visualizations: { __typename?: 'ProjectVisualizations', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectVisualizationsList', items: Array<{ __typename?: 'Visualization', id: string, name: string, description: string, version: number, file: { __typename?: 'ProjectFile', id: string, name: string, url: any, type: ProjectFileType, mimeType: string }, room?: { __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined } | null | undefined }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectVisualizationsTotal', total: number } | { __typename: 'ServerError' } } };
 
 export type ProjectScreenVisualizationsFragment = { __typename?: 'ProjectVisualizations', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectVisualizationsList', items: Array<{ __typename?: 'Visualization', id: string, name: string, description: string, version: number, file: { __typename?: 'ProjectFile', id: string, name: string, url: any, type: ProjectFileType, mimeType: string }, room?: { __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined } | null | undefined }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectVisualizationsTotal', total: number } | { __typename: 'ServerError' } };
 
@@ -952,6 +953,26 @@ export type ProjectScreenHouseFragment = { __typename?: 'House', id: string, cit
 export type ProjectScreenHouseRoomsFragment = { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined }> } | { __typename?: 'ServerError', message: string } };
 
 export type ProjectScreenHouseRoomFragment = { __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined };
+
+export type WorkspaceScreenQueryVariables = Exact<{
+  id: Scalars['String'];
+  timezone?: Maybe<Scalars['String']>;
+}>;
+
+
+export type WorkspaceScreenQuery = { __typename?: 'Query', workspace: { __typename?: 'Forbidden', message: string } | { __typename?: 'NotFound', message: string } | { __typename?: 'ServerError', message: string } | { __typename?: 'Workspace', id: string, name: string, users: { __typename?: 'WorkspaceUsers', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'ServerError', message: string } | { __typename?: 'WorkspaceUsersList', items: Array<{ __typename?: 'WorkspaceUser', id: string, role: WorkspaceUserRole, workspace: { __typename?: 'Id', id: string }, profile: { __typename?: 'UserProfile', id: string, email: string, fullName: string, abbr: string, gravatar?: { __typename?: 'Gravatar', url: string } | null | undefined } }> } }, projects: { __typename?: 'WorkspaceProjects', current: { __typename?: 'Forbidden', message: string } | { __typename?: 'ServerError', message: string } | { __typename?: 'WorkspaceProjectsList', items: Array<{ __typename?: 'Project', id: string, name: string, status: ProjectStatus, startAt?: any | null | undefined, endAt?: any | null | undefined, period?: string | null | undefined }> }, done: { __typename: 'Forbidden', message: string } | { __typename: 'ServerError', message: string } | { __typename: 'WorkspaceProjectsList', items: Array<{ __typename?: 'Project', id: string, name: string, status: ProjectStatus, startAt?: any | null | undefined, endAt?: any | null | undefined, period?: string | null | undefined }> } } } };
+
+export type WorkspaceScreenFragment = { __typename?: 'Workspace', id: string, name: string, users: { __typename?: 'WorkspaceUsers', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'ServerError', message: string } | { __typename?: 'WorkspaceUsersList', items: Array<{ __typename?: 'WorkspaceUser', id: string, role: WorkspaceUserRole, workspace: { __typename?: 'Id', id: string }, profile: { __typename?: 'UserProfile', id: string, email: string, fullName: string, abbr: string, gravatar?: { __typename?: 'Gravatar', url: string } | null | undefined } }> } }, projects: { __typename?: 'WorkspaceProjects', current: { __typename?: 'Forbidden', message: string } | { __typename?: 'ServerError', message: string } | { __typename?: 'WorkspaceProjectsList', items: Array<{ __typename?: 'Project', id: string, name: string, status: ProjectStatus, startAt?: any | null | undefined, endAt?: any | null | undefined, period?: string | null | undefined }> }, done: { __typename: 'Forbidden', message: string } | { __typename: 'ServerError', message: string } | { __typename: 'WorkspaceProjectsList', items: Array<{ __typename?: 'Project', id: string, name: string, status: ProjectStatus, startAt?: any | null | undefined, endAt?: any | null | undefined, period?: string | null | undefined }> } } };
+
+export type WorkspaceScreenUsersFragment = { __typename?: 'WorkspaceUsers', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'ServerError', message: string } | { __typename?: 'WorkspaceUsersList', items: Array<{ __typename?: 'WorkspaceUser', id: string, role: WorkspaceUserRole, workspace: { __typename?: 'Id', id: string }, profile: { __typename?: 'UserProfile', id: string, email: string, fullName: string, abbr: string, gravatar?: { __typename?: 'Gravatar', url: string } | null | undefined } }> } };
+
+export type WorkspaceScreenUserFragment = { __typename?: 'WorkspaceUser', id: string, role: WorkspaceUserRole, workspace: { __typename?: 'Id', id: string }, profile: { __typename?: 'UserProfile', id: string, email: string, fullName: string, abbr: string, gravatar?: { __typename?: 'Gravatar', url: string } | null | undefined } };
+
+export type WorkspaceScreenCurrentProjectsFragment = { __typename?: 'WorkspaceProjects', current: { __typename?: 'Forbidden', message: string } | { __typename?: 'ServerError', message: string } | { __typename?: 'WorkspaceProjectsList', items: Array<{ __typename?: 'Project', id: string, name: string, status: ProjectStatus, startAt?: any | null | undefined, endAt?: any | null | undefined, period?: string | null | undefined }> } };
+
+export type WorkspaceScreenArchiveProjectsFragment = { __typename?: 'WorkspaceProjects', done: { __typename: 'Forbidden', message: string } | { __typename: 'ServerError', message: string } | { __typename: 'WorkspaceProjectsList', items: Array<{ __typename?: 'Project', id: string, name: string, status: ProjectStatus, startAt?: any | null | undefined, endAt?: any | null | undefined, period?: string | null | undefined }> } };
+
+export type WorkspaceScreenProjectFragment = { __typename?: 'Project', id: string, name: string, status: ProjectStatus, startAt?: any | null | undefined, endAt?: any | null | undefined, period?: string | null | undefined };
 
 export const AddHouseFragmentDoc = gql`
     fragment AddHouse on House {
@@ -1066,7 +1087,7 @@ export const ProjectScreenVisualizationsFragmentDoc = gql`
 export const ProjectScreenProjectFragmentDoc = gql`
     fragment ProjectScreenProject on Project {
   id
-  title
+  name
   startAt
   endAt
   status
@@ -1104,6 +1125,92 @@ export const ProjectScreenProjectFragmentDoc = gql`
 }
     ${ProjectScreenHousesFragmentDoc}
 ${ProjectScreenVisualizationsFragmentDoc}`;
+export const WorkspaceScreenUserFragmentDoc = gql`
+    fragment WorkspaceScreenUser on WorkspaceUser {
+  id
+  workspace {
+    id
+  }
+  role
+  profile {
+    id
+    email
+    fullName
+    abbr
+    gravatar {
+      url
+    }
+  }
+}
+    `;
+export const WorkspaceScreenUsersFragmentDoc = gql`
+    fragment WorkspaceScreenUsers on WorkspaceUsers {
+  list {
+    ... on WorkspaceUsersList {
+      items {
+        ...WorkspaceScreenUser
+      }
+    }
+    ... on Error {
+      message
+    }
+  }
+}
+    ${WorkspaceScreenUserFragmentDoc}`;
+export const WorkspaceScreenProjectFragmentDoc = gql`
+    fragment WorkspaceScreenProject on Project {
+  id
+  name
+  status
+  startAt
+  endAt
+  period(timezone: $timezone)
+}
+    `;
+export const WorkspaceScreenCurrentProjectsFragmentDoc = gql`
+    fragment WorkspaceScreenCurrentProjects on WorkspaceProjects {
+  current: list(filter: {status: [NEW, IN_PROGRESS]}, limit: 10) {
+    ... on WorkspaceProjectsList {
+      items {
+        ...WorkspaceScreenProject
+      }
+    }
+    ... on Error {
+      message
+    }
+  }
+}
+    ${WorkspaceScreenProjectFragmentDoc}`;
+export const WorkspaceScreenArchiveProjectsFragmentDoc = gql`
+    fragment WorkspaceScreenArchiveProjects on WorkspaceProjects {
+  done: list(filter: {status: [DONE, CANCELED]}, limit: 10) {
+    __typename
+    ... on WorkspaceProjectsList {
+      items {
+        ...WorkspaceScreenProject
+      }
+    }
+    ... on Error {
+      message
+    }
+  }
+}
+    ${WorkspaceScreenProjectFragmentDoc}`;
+export const WorkspaceScreenFragmentDoc = gql`
+    fragment WorkspaceScreen on Workspace {
+  id
+  name
+  users {
+    ...WorkspaceScreenUsers
+  }
+  projects {
+    ...WorkspaceScreenCurrentProjects
+    ...WorkspaceScreenArchiveProjects
+  }
+}
+    ${WorkspaceScreenUsersFragmentDoc}
+${WorkspaceScreenCurrentProjectsFragmentDoc}
+${WorkspaceScreenArchiveProjectsFragmentDoc}`;
 export const AddContactDocument = gql`
     mutation addContact($projectId: String!, $contact: AddContactInput!) {
   addContact(projectId: $projectId, contact: $contact) {
@@ -1396,7 +1503,7 @@ export const CreateProjectDocument = gql`
     ... on ProjectCreated {
       project {
         id
-        title
+        name
         startAt
         endAt
       }
@@ -1719,108 +1826,6 @@ export function useUploadProjectFileMutation(baseOptions?: Apollo.MutationHookOp
 export type UploadProjectFileMutationHookResult = ReturnType<typeof useUploadProjectFileMutation>;
 export type UploadProjectFileMutationResult = Apollo.MutationResult<UploadProjectFileMutation>;
 export type UploadProjectFileMutationOptions = Apollo.BaseMutationOptions<UploadProjectFileMutation, UploadProjectFileMutationVariables>;
-export const WorkspaceDocument = gql`
-    query workspace($id: String!, $timezone: String) {
-  workspace(id: $id) {
-    __typename
-    ... on Workspace {
-      id
-      name
-      users {
-        __typename
-        ... on WorkspaceUsers {
-          items {
-            id
-            role
-            workspace {
-              id
-            }
-            profile {
-              id
-              email
-              fullName
-              abbr
-              gravatar {
-                url
-              }
-            }
-          }
-        }
-        ... on Error {
-          message
-        }
-      }
-      projects {
-        __typename
-        current: list(filter: {status: [NEW, IN_PROGRESS]}, limit: 10) {
-          __typename
-          ... on WorkspaceProjectsList {
-            items {
-              id
-              name
-              status
-              startAt
-              endAt
-              period(timezone: $timezone)
-            }
-          }
-          ... on Error {
-            message
-          }
-        }
-        done: list(filter: {status: [DONE, CANCELED]}, limit: 10) {
-          __typename
-          ... on WorkspaceProjectsList {
-            items {
-              id
-              name
-              status
-              startAt
-              endAt
-              period(timezone: $timezone)
-            }
-          }
-          ... on Error {
-            message
-          }
-        }
-      }
-    }
-    ... on Error {
-      message
-    }
-  }
-}
-    `;
-
-/**
- * __useWorkspaceQuery__
- *
- * To run a query within a React component, call `useWorkspaceQuery` and pass it any options that fit your needs.
- * When your component renders, `useWorkspaceQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useWorkspaceQuery({
- *   variables: {
- *      id: // value for 'id'
- *      timezone: // value for 'timezone'
- *   },
- * });
- */
-export function useWorkspaceQuery(baseOptions: Apollo.QueryHookOptions<WorkspaceQuery, WorkspaceQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<WorkspaceQuery, WorkspaceQueryVariables>(WorkspaceDocument, options);
-      }
-export function useWorkspaceLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<WorkspaceQuery, WorkspaceQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<WorkspaceQuery, WorkspaceQueryVariables>(WorkspaceDocument, options);
-        }
-export type WorkspaceQueryHookResult = ReturnType<typeof useWorkspaceQuery>;
-export type WorkspaceLazyQueryHookResult = ReturnType<typeof useWorkspaceLazyQuery>;
-export type WorkspaceQueryResult = Apollo.QueryResult<WorkspaceQuery, WorkspaceQueryVariables>;
 export const AddRoomDocument = gql`
     mutation addRoom($houseId: String!, $room: AddRoomInput!) {
   addRoom(houseId: $houseId, room: $room) {
@@ -2070,3 +2075,44 @@ export function useProjectLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Pr
 export type ProjectQueryHookResult = ReturnType<typeof useProjectQuery>;
 export type ProjectLazyQueryHookResult = ReturnType<typeof useProjectLazyQuery>;
 export type ProjectQueryResult = Apollo.QueryResult<ProjectQuery, ProjectQueryVariables>;
+export const WorkspaceScreenDocument = gql`
+    query workspaceScreen($id: String!, $timezone: String) {
+  workspace(id: $id) {
+    ... on Workspace {
+      ...WorkspaceScreen
+    }
+    ... on Error {
+      message
+    }
+  }
+}
+    ${WorkspaceScreenFragmentDoc}`;
+
+/**
+ * __useWorkspaceScreenQuery__
+ *
+ * To run a query within a React component, call `useWorkspaceScreenQuery` and pass it any options that fit your needs.
+ * When your component renders, `useWorkspaceScreenQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useWorkspaceScreenQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *      timezone: // value for 'timezone'
+ *   },
+ * });
+ */
+export function useWorkspaceScreenQuery(baseOptions: Apollo.QueryHookOptions<WorkspaceScreenQuery, WorkspaceScreenQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<WorkspaceScreenQuery, WorkspaceScreenQueryVariables>(WorkspaceScreenDocument, options);
+      }
+export function useWorkspaceScreenLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<WorkspaceScreenQuery, WorkspaceScreenQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<WorkspaceScreenQuery, WorkspaceScreenQueryVariables>(WorkspaceScreenDocument, options);
+        }
+export type WorkspaceScreenQueryHookResult = ReturnType<typeof useWorkspaceScreenQuery>;
+export type WorkspaceScreenLazyQueryHookResult = ReturnType<typeof useWorkspaceScreenLazyQuery>;
+export type WorkspaceScreenQueryResult = Apollo.QueryResult<WorkspaceScreenQuery, WorkspaceScreenQueryVariables>;

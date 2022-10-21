@@ -34,7 +34,7 @@ query project($id: String!) {
 
 fragment ProjectScreenProject on Project {
     id
-    title
+    name
     startAt
     endAt
     status

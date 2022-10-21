@@ -1,7 +1,7 @@
 import { FetchResult, useApolloClient } from "@apollo/client"
 import { useCreateProjectMutation, CreateProjectMutation, CreateProjectMutationResult, Project, Forbidden, ServerError } from "api/types.d"
 
-export type CreateProjectFn = ({workspaceId, title, startAt, endAt }:{workspaceId: string, title: string, startAt?: Date, endAt?: Date })
+export type CreateProjectFn = ({workspaceId, name, startAt, endAt }:{workspaceId: string, name: string, startAt?: Date, endAt?: Date })
     => Promise<FetchResult<CreateProjectMutation>>;
 
 export enum State {
@@ -28,7 +28,7 @@ type Creating = {
 
 type Done = {
     state: State.DONE
-    project: Pick<Project, 'id' | 'title'>
+    project: Pick<Project, 'id' | 'name'>
 }
 
 type Failed = {
@@ -88,7 +88,7 @@ export function useCreateProject(): [
         }
     })
 
-    return [({ workspaceId, title, startAt, endAt }) => create({ variables: { input: { workspaceId, title, startAt, endAt }} }), result, state as Result]
+    return [({ workspaceId, name, startAt, endAt }) => create({ variables: { input: { workspaceId, name, startAt, endAt }} }), result, state as Result]
 }
 
 export default useCreateProject;

@@ -2,10 +2,11 @@ union ProjectResult = Project | NotFound | Forbidden | ServerError
 
 type Project {
     id: String!
-    title: String!
+    name: String!
     status: ProjectStatus!
     startAt: Time
     endAt: Time
+    period(timezone: String): String
     contacts: ProjectContacts!
     houses: ProjectHouses!
     visualizations: ProjectVisualizations!

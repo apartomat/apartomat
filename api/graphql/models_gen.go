@@ -144,8 +144,12 @@ type WorkspaceResult interface {
 	IsWorkspaceResult()
 }
 
-type WorkspaceUsersResult interface {
-	IsWorkspaceUsersResult()
+type WorkspaceUsersListResult interface {
+	IsWorkspaceUsersListResult()
+}
+
+type WorkspaceUsersTotalResult interface {
+	IsWorkspaceUsersTotalResult()
 }
 
 type AddContactInput struct {
@@ -218,7 +222,7 @@ func (ContactUpdated) IsUpdateContactResult() {}
 
 type CreateProjectInput struct {
 	WorkspaceID string     `json:"workspaceId"`
-	Title       string     `json:"title"`
+	Name        string     `json:"name"`
 	StartAt     *time.Time `json:"startAt"`
 	EndAt       *time.Time `json:"endAt"`
 }
@@ -290,11 +294,13 @@ func (Forbidden) IsProjectFilesTotalResult() {}
 
 func (Forbidden) IsWorkspaceResult() {}
 
-func (Forbidden) IsWorkspaceUsersResult() {}
-
 func (Forbidden) IsWorkspaceProjectsListResult() {}
 
 func (Forbidden) IsWorkspaceProjectsTotalResult() {}
+
+func (Forbidden) IsWorkspaceUsersListResult() {}
+
+func (Forbidden) IsWorkspaceUsersTotalResult() {}
 
 func (Forbidden) IsError()                {}
 func (this Forbidden) GetMessage() string { return this.Message }
@@ -431,10 +437,11 @@ func (PinSentByEmail) IsLoginByEmailResult() {}
 
 type Project struct {
 	ID             string                 `json:"id"`
-	Title          string                 `json:"title"`
+	Name           string                 `json:"name"`
 	Status         ProjectStatus          `json:"status"`
 	StartAt        *time.Time             `json:"startAt"`
 	EndAt          *time.Time             `json:"endAt"`
+	Period         *string                `json:"period"`
 	Contacts       *ProjectContacts       `json:"contacts"`
 	Houses         *ProjectHouses         `json:"houses"`
 	Visualizations *ProjectVisualizations `json:"visualizations"`
@@ -668,11 +675,13 @@ func (ServerError) IsMenuResult() {}
 
 func (ServerError) IsWorkspaceResult() {}
 
-func (ServerError) IsWorkspaceUsersResult() {}
-
 func (ServerError) IsWorkspaceProjectsListResult() {}
 
 func (ServerError) IsWorkspaceProjectsTotalResult() {}
+
+func (ServerError) IsWorkspaceUsersListResult() {}
+
+func (ServerError) IsWorkspaceUsersTotalResult() {}
 
 func (ServerError) IsError()                {}
 func (this ServerError) GetMessage() string { return this.Message }
@@ -741,27 +750,17 @@ type VisualizationsUploaded struct {
 func (VisualizationsUploaded) IsUploadVisualizationsResult() {}
 
 type Workspace struct {
-	ID       string               `json:"id"`
-	Name     string               `json:"name"`
-	Users    WorkspaceUsersResult `json:"users"`
-	Projects *WorkspaceProjects   `json:"projects"`
+	ID       string             `json:"id"`
+	Name     string             `json:"name"`
+	Projects *WorkspaceProjects `json:"projects"`
+	Users    *WorkspaceUsers    `json:"users"`
 }
 
 func (Workspace) IsWorkspaceResult() {}
 
-type WorkspaceProject struct {
-	ID      string        `json:"id"`
-	Name    string        `json:"name"`
-	Status  ProjectStatus `json:"status"`
-	StartAt *time.Time    `json:"startAt"`
-	EndAt   *time.Time    `json:"endAt"`
-	Period  *string       `json:"period"`
-}
-
 type WorkspaceProjects struct {
-	Workspace *ID                          `json:"workspace"`
-	List      WorkspaceProjectsListResult  `json:"list"`
-	Total     WorkspaceProjectsTotalResult `json:"total"`
+	List  WorkspaceProjectsListResult  `json:"list"`
+	Total WorkspaceProjectsTotalResult `json:"total"`
 }
 
 type WorkspaceProjectsFilter struct {
@@ -769,7 +768,7 @@ type WorkspaceProjectsFilter struct {
 }
 
 type WorkspaceProjectsList struct {
-	Items []*WorkspaceProject `json:"items"`
+	Items []*Project `json:"items"`
 }
 
 func (WorkspaceProjectsList) IsWorkspaceProjectsListResult() {}
@@ -781,25 +780,32 @@ type WorkspaceProjectsTotal struct {
 func (WorkspaceProjectsTotal) IsWorkspaceProjectsTotalResult() {}
 
 type WorkspaceUser struct {
-	ID        string                `json:"id"`
-	Workspace *ID                   `json:"workspace"`
-	Role      WorkspaceUserRole     `json:"role"`
-	Profile   *WorkspaceUserProfile `json:"profile"`
-}
-
-type WorkspaceUserProfile struct {
-	ID       string    `json:"id"`
-	Email    string    `json:"email"`
-	FullName string    `json:"fullName"`
-	Abbr     string    `json:"abbr"`
-	Gravatar *Gravatar `json:"gravatar"`
+	ID        string            `json:"id"`
+	Workspace *ID               `json:"workspace"`
+	Role      WorkspaceUserRole `json:"role"`
+	Profile   *UserProfile      `json:"profile"`
 }
 
 type WorkspaceUsers struct {
+	List  WorkspaceUsersListResult  `json:"list"`
+	Total WorkspaceUsersTotalResult `json:"total"`
+}
+
+type WorkspaceUsersFilter struct {
+	Role []WorkspaceUserRole `json:"role"`
+}
+
+type WorkspaceUsersList struct {
 	Items []*WorkspaceUser `json:"items"`
 }
 
-func (WorkspaceUsers) IsWorkspaceUsersResult() {}
+func (WorkspaceUsersList) IsWorkspaceUsersListResult() {}
+
+type WorkspaceUsersTotal struct {
+	Total int `json:"total"`
+}
+
+func (WorkspaceUsersTotal) IsWorkspaceUsersTotalResult() {}
 
 type ContactType string
 

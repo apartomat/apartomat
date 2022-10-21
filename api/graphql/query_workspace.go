@@ -2,9 +2,9 @@ package graphql
 
 import (
 	"context"
+	"errors"
 	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/store"
-	"github.com/pkg/errors"
 	"log"
 )
 
@@ -23,7 +23,6 @@ func (r *queryResolver) Workspace(ctx context.Context, id string) (WorkspaceResu
 
 		return ServerError{}, nil
 	}
-
 	return workspaceToGraphQL(ws), nil
 }
 
