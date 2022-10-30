@@ -24,23 +24,12 @@ var (
 	_ Store = (*store)(nil)
 )
 
-func (s *store) Save(ctx context.Context, visualization *Visualization) (*Visualization, error) {
-	if visualization.CreatedAt.IsZero() {
-		visualization.CreatedAt = time.Now()
-	}
+func (s *store) Save(ctx context.Context, visualizations ...*Visualization) error {
+	recs := toVisualizationsRecords(visualizations)
 
-	if visualization.ModifiedAt.IsZero() {
-		visualization.ModifiedAt = visualization.CreatedAt
-	}
+	_, err := s.db.ModelContext(ctx, &recs).Returning("NULL").OnConflict("(id) DO UPDATE").Insert()
 
-	rec := toVisualizationsRecord(visualization)
-
-	_, err := s.db.ModelContext(ctx, rec).Returning("NULL").OnConflict("(id) DO UPDATE").Insert()
-	if err != nil {
-		return nil, err
-	}
-
-	return visualization, nil
+	return err
 }
 
 func (s *store) List(ctx context.Context, spec Spec, limit, offset int) ([]*Visualization, error) {
@@ -66,7 +55,7 @@ func (s *store) List(ctx context.Context, spec Spec, limit, offset int) ([]*Visu
 		return nil, err
 	}
 
-	return fromHousesRecords(rows), nil
+	return fromVisualizationsRecords(rows), nil
 }
 
 func (s *store) Delete(ctx context.Context, visualization *Visualization) error {
@@ -79,16 +68,18 @@ func (s *store) Delete(ctx context.Context, visualization *Visualization) error 
 }
 
 type visualizationsRecord struct {
-	tableName     struct{}  `pg:"apartomat.visualizations,alias:visualizations"`
-	ID            string    `pg:"id,pk"`
-	Name          string    `pg:"name,use_zero"`
-	Description   string    `pg:"description,use_zero"`
-	Version       int       `pg:"version,use_zero"`
-	CreatedAt     time.Time `pg:"created_at"`
-	ModifiedAt    time.Time `pg:"modified_at"`
-	ProjectID     string    `pg:"project_id"`
-	ProjectFileID string    `pg:"project_file_id"`
-	RoomID        *string   `pg:"room_id"`
+	tableName     struct{}   `pg:"apartomat.visualizations,alias:visualizations"`
+	ID            string     `pg:"id,pk"`
+	Name          string     `pg:"name,use_zero"`
+	Description   string     `pg:"description,use_zero"`
+	Version       int        `pg:"version,use_zero"`
+	Status        string     `pg:"status"`
+	CreatedAt     time.Time  `pg:"created_at"`
+	ModifiedAt    time.Time  `pg:"modified_at"`
+	DeletedAt     *time.Time `pg:"deleted_at"`
+	ProjectID     string     `pg:"project_id"`
+	ProjectFileID string     `pg:"project_file_id"`
+	RoomID        *string    `pg:"room_id"`
 }
 
 func toVisualizationsRecord(visualization *Visualization) *visualizationsRecord {
@@ -97,15 +88,29 @@ func toVisualizationsRecord(visualization *Visualization) *visualizationsRecord 
 		Name:          visualization.Name,
 		Description:   visualization.Description,
 		Version:       visualization.Version,
+		Status:        string(visualization.Status),
 		CreatedAt:     visualization.CreatedAt,
 		ModifiedAt:    visualization.ModifiedAt,
+		DeletedAt:     visualization.DeletedAt,
 		ProjectID:     visualization.ProjectID,
 		ProjectFileID: visualization.ProjectFileID,
 		RoomID:        visualization.RoomID,
 	}
 }
 
-func fromHousesRecords(records []*visualizationsRecord) []*Visualization {
+func toVisualizationsRecords(visualizations []*Visualization) []*visualizationsRecord {
+	var (
+		res = make([]*visualizationsRecord, len(visualizations))
+	)
+
+	for i, v := range visualizations {
+		res[i] = toVisualizationsRecord(v)
+	}
+
+	return res
+}
+
+func fromVisualizationsRecords(records []*visualizationsRecord) []*Visualization {
 	visualizations := make([]*Visualization, len(records))
 
 	for i, r := range records {
@@ -114,8 +119,10 @@ func fromHousesRecords(records []*visualizationsRecord) []*Visualization {
 			Name:          r.Name,
 			Description:   r.Description,
 			Version:       r.Version,
+			Status:        VisualizationStatus(r.Status),
 			CreatedAt:     r.CreatedAt,
 			ModifiedAt:    r.ModifiedAt,
+			DeletedAt:     r.DeletedAt,
 			ProjectID:     r.ProjectID,
 			ProjectFileID: r.ProjectFileID,
 			RoomID:        r.RoomID,

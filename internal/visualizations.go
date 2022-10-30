@@ -26,19 +26,13 @@ func (u *Apartomat) UploadVisualization(
 		return nil, nil, err
 	}
 
-	vis := &Visualization{
-		ID:            id,
-		ProjectID:     projectID,
-		ProjectFileID: file.ID,
-		RoomID:        roomID,
-	}
+	vis := NewVisualization(id, projectID, file.ID, roomID)
 
-	vis, err = u.Visualizations.Save(ctx, vis)
-	if err != nil {
+	if err = u.Visualizations.Save(ctx, vis); err != nil {
 		return nil, nil, err
 	}
 
-	return file, vis, err
+	return file, vis, nil
 }
 
 type VisualizationWithFile struct {
@@ -100,20 +94,14 @@ func (u *Apartomat) UploadVisualizations(
 			return nil, err
 		}
 
-		visID, err := NewNanoID()
+		id, err := NewNanoID()
 		if err != nil {
 			return nil, err
 		}
 
-		vis := &Visualization{
-			ID:            visID,
-			ProjectID:     projectID,
-			ProjectFileID: f.ID,
-			RoomID:        roomID,
-		}
+		vis := NewVisualization(id, projectID, f.ID, roomID)
 
-		vis, err = u.Visualizations.Save(ctx, vis)
-		if err != nil {
+		if err := u.Visualizations.Save(ctx, vis); err != nil {
 			return nil, err
 		}
 
@@ -126,6 +114,7 @@ func (u *Apartomat) UploadVisualizations(
 func (u *Apartomat) GetVisualizations(
 	ctx context.Context,
 	projectID string,
+	spec Spec,
 	limit, offset int,
 ) ([]*Visualization, error) {
 	projects, err := u.Projects.List(ctx, store.ProjectStoreQuery{ID: expr.StrEq(projectID)})
@@ -147,9 +136,52 @@ func (u *Apartomat) GetVisualizations(
 		return nil, errors.Wrapf(ErrForbidden, "can't get project (id=%s) visualizations", project.ID)
 	}
 
-	return u.Visualizations.List(ctx, ProjectIDIn(project.ID), limit, offset)
+	return u.Visualizations.List(ctx, And(spec, ProjectIDIn(project.ID)), limit, offset)
 }
 
 func (u *Apartomat) CanGetVisualizations(ctx context.Context, subj *UserCtx, obj *store.Project) (bool, error) {
 	return u.isProjectUser(ctx, subj, obj)
+}
+
+func (u *Apartomat) DeleteVisualizations(
+	ctx context.Context,
+	id []string,
+) ([]*Visualization, error) {
+	vis, err := u.Visualizations.List(ctx, IDIn(id...), len(id), 0)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, v := range vis {
+		if ok, err := u.CanDeleteVisualization(ctx, UserFromCtx(ctx), v); err != nil {
+			return nil, err
+		} else if !ok {
+			return nil, fmt.Errorf("can't delete visualization (id=%s): %w", v.ID, ErrForbidden)
+		}
+
+		v.Delete()
+	}
+
+	if err := u.Visualizations.Save(ctx, vis...); err != nil {
+		return nil, err
+	}
+
+	return vis, err
+}
+
+func (u *Apartomat) CanDeleteVisualization(ctx context.Context, subj *UserCtx, obj *Visualization) (bool, error) {
+	projects, err := u.Projects.List(ctx, store.ProjectStoreQuery{ID: expr.StrEq(obj.ProjectID)})
+	if err != nil {
+		return false, err
+	}
+
+	var (
+		project *store.Project
+	)
+
+	if len(projects) > 0 {
+		project = projects[0]
+	}
+
+	return u.isProjectUser(ctx, subj, project)
 }

@@ -33,7 +33,7 @@ func (r *mutationResolver) UploadVisualizations(
 			return Forbidden{}, nil
 		}
 
-		log.Printf("can't upload file to project (id=%d): %s", projectID, err)
+		log.Printf("can't upload file to project (id=%s): %s", projectID, err)
 
 		return nil, err
 	}

@@ -165,6 +165,7 @@ type ComplexityRoot struct {
 		CreateProject        func(childComplexity int, input CreateProjectInput) int
 		DeleteContact        func(childComplexity int, id string) int
 		DeleteRoom           func(childComplexity int, id string) int
+		DeleteVisualizations func(childComplexity int, id []string) int
 		LoginByEmail         func(childComplexity int, email string, workspaceName string) int
 		Ping                 func(childComplexity int) int
 		UpdateContact        func(childComplexity int, contactID string, data UpdateContactInput) int
@@ -319,6 +320,10 @@ type ComplexityRoot struct {
 		Message func(childComplexity int) int
 	}
 
+	SomeVisualizationsDeleted struct {
+		Visualizations func(childComplexity int) int
+	}
+
 	SomeVisualizationsUploaded struct {
 		Visualizations func(childComplexity int) int
 	}
@@ -340,11 +345,16 @@ type ComplexityRoot struct {
 		ModifiedAt  func(childComplexity int) int
 		Name        func(childComplexity int) int
 		Room        func(childComplexity int) int
+		Status      func(childComplexity int) int
 		Version     func(childComplexity int) int
 	}
 
 	VisualizationUploaded struct {
 		Visualization func(childComplexity int) int
+	}
+
+	VisualizationsDeleted struct {
+		Visualizations func(childComplexity int) int
 	}
 
 	VisualizationsUploaded struct {
@@ -410,6 +420,7 @@ type MutationResolver interface {
 	CreateProject(ctx context.Context, input CreateProjectInput) (CreateProjectResult, error)
 	DeleteContact(ctx context.Context, id string) (DeleteContactResult, error)
 	DeleteRoom(ctx context.Context, id string) (DeleteRoomResult, error)
+	DeleteVisualizations(ctx context.Context, id []string) (DeleteVisualizationsResult, error)
 	LoginByEmail(ctx context.Context, email string, workspaceName string) (LoginByEmailResult, error)
 	UpdateContact(ctx context.Context, contactID string, data UpdateContactInput) (UpdateContactResult, error)
 	UpdateHouse(ctx context.Context, houseID string, data UpdateHouseInput) (UpdateHouseResult, error)
@@ -841,6 +852,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.DeleteRoom(childComplexity, args["id"].(string)), true
+
+	case "Mutation.deleteVisualizations":
+		if e.complexity.Mutation.DeleteVisualizations == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteVisualizations_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteVisualizations(childComplexity, args["id"].([]string)), true
 
 	case "Mutation.loginByEmail":
 		if e.complexity.Mutation.LoginByEmail == nil {
@@ -1387,6 +1410,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ServerError.Message(childComplexity), true
 
+	case "SomeVisualizationsDeleted.visualizations":
+		if e.complexity.SomeVisualizationsDeleted.Visualizations == nil {
+			break
+		}
+
+		return e.complexity.SomeVisualizationsDeleted.Visualizations(childComplexity), true
+
 	case "SomeVisualizationsUploaded.visualizations":
 		if e.complexity.SomeVisualizationsUploaded.Visualizations == nil {
 			break
@@ -1485,6 +1515,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Visualization.Room(childComplexity), true
 
+	case "Visualization.status":
+		if e.complexity.Visualization.Status == nil {
+			break
+		}
+
+		return e.complexity.Visualization.Status(childComplexity), true
+
 	case "Visualization.version":
 		if e.complexity.Visualization.Version == nil {
 			break
@@ -1498,6 +1535,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.VisualizationUploaded.Visualization(childComplexity), true
+
+	case "VisualizationsDeleted.visualizations":
+		if e.complexity.VisualizationsDeleted.Visualizations == nil {
+			break
+		}
+
+		return e.complexity.VisualizationsDeleted.Visualizations(childComplexity), true
 
 	case "VisualizationsUploaded.visualizations":
 		if e.complexity.VisualizationsUploaded.Visualizations == nil {
@@ -1655,7 +1699,9 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputProjectContactsFilter,
 		ec.unmarshalInputProjectFilesListFilter,
 		ec.unmarshalInputProjectHousesFilter,
+		ec.unmarshalInputProjectVisualizationRoomIdFilter,
 		ec.unmarshalInputProjectVisualizationsListFilter,
+		ec.unmarshalInputProjectVisualizationsStatusFilter,
 		ec.unmarshalInputUpdateContactInput,
 		ec.unmarshalInputUpdateHouseInput,
 		ec.unmarshalInputUpdateRoomInput,
@@ -1721,7 +1767,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 	return introspection.WrapTypeFromDef(parsedSchema, parsedSchema.Types[name]), nil
 }
 
-//go:embed "schema/mutation.graphql" "schema/mutation_add_contact.graphql" "schema/mutation_add_house.graphql" "schema/mutation_add_room.graphql" "schema/mutation_change_project_dates.graphql" "schema/mutation_change_project_status.graphql" "schema/mutation_confirm_login.graphql" "schema/mutation_create_project.graphql" "schema/mutation_delete_contact.graphql" "schema/mutation_delete_room.graphql" "schema/mutation_login_by_email.graphql" "schema/mutation_update_contact.graphql" "schema/mutation_update_house.graphql" "schema/mutation_update_room.graphql" "schema/mutation_upload_project_file.graphql" "schema/mutation_upload_visualization.graphql" "schema/mutation_upload_visualizations.graphql" "schema/query.graphql" "schema/query_enums.graphql" "schema/query_profile.graphql" "schema/query_project.graphql" "schema/query_workspace.graphql" "schema/root.graphql"
+//go:embed "schema/mutation.graphql" "schema/mutation_add_contact.graphql" "schema/mutation_add_house.graphql" "schema/mutation_add_room.graphql" "schema/mutation_change_project_dates.graphql" "schema/mutation_change_project_status.graphql" "schema/mutation_confirm_login.graphql" "schema/mutation_create_project.graphql" "schema/mutation_delete_contact.graphql" "schema/mutation_delete_room.graphql" "schema/mutation_delete_visualizations.graphql" "schema/mutation_login_by_email.graphql" "schema/mutation_update_contact.graphql" "schema/mutation_update_house.graphql" "schema/mutation_update_room.graphql" "schema/mutation_upload_project_file.graphql" "schema/mutation_upload_visualization.graphql" "schema/mutation_upload_visualizations.graphql" "schema/query.graphql" "schema/query_enums.graphql" "schema/query_profile.graphql" "schema/query_project.graphql" "schema/query_workspace.graphql" "schema/root.graphql"
 var sourcesFS embed.FS
 
 func sourceData(filename string) string {
@@ -1743,6 +1789,7 @@ var sources = []*ast.Source{
 	{Name: "schema/mutation_create_project.graphql", Input: sourceData("schema/mutation_create_project.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_delete_contact.graphql", Input: sourceData("schema/mutation_delete_contact.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_delete_room.graphql", Input: sourceData("schema/mutation_delete_room.graphql"), BuiltIn: false},
+	{Name: "schema/mutation_delete_visualizations.graphql", Input: sourceData("schema/mutation_delete_visualizations.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_login_by_email.graphql", Input: sourceData("schema/mutation_login_by_email.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_update_contact.graphql", Input: sourceData("schema/mutation_update_contact.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_update_house.graphql", Input: sourceData("schema/mutation_update_house.graphql"), BuiltIn: false},
@@ -1983,6 +2030,21 @@ func (ec *executionContext) field_Mutation_deleteRoom_args(ctx context.Context, 
 	if tmp, ok := rawArgs["id"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
 		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteVisualizations_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 []string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNString2ᚕstringᚄ(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -4695,6 +4757,61 @@ func (ec *executionContext) fieldContext_Mutation_deleteRoom(ctx context.Context
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_deleteVisualizations(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteVisualizations(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteVisualizations(rctx, fc.Args["id"].([]string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(DeleteVisualizationsResult)
+	fc.Result = res
+	return ec.marshalNDeleteVisualizationsResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐDeleteVisualizationsResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteVisualizations(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DeleteVisualizationsResult does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteVisualizations_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_loginByEmail(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_loginByEmail(ctx, field)
 	if err != nil {
@@ -7131,6 +7248,8 @@ func (ec *executionContext) fieldContext_ProjectVisualizationsList_items(ctx con
 				return ec.fieldContext_Visualization_description(ctx, field)
 			case "version":
 				return ec.fieldContext_Visualization_version(ctx, field)
+			case "status":
+				return ec.fieldContext_Visualization_status(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Visualization_createdAt(ctx, field)
 			case "modifiedAt":
@@ -8038,6 +8157,70 @@ func (ec *executionContext) fieldContext_ServerError_message(ctx context.Context
 	return fc, nil
 }
 
+func (ec *executionContext) _SomeVisualizationsDeleted_visualizations(ctx context.Context, field graphql.CollectedField, obj *SomeVisualizationsDeleted) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SomeVisualizationsDeleted_visualizations(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Visualizations, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*Visualization)
+	fc.Result = res
+	return ec.marshalNVisualization2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐVisualizationᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SomeVisualizationsDeleted_visualizations(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SomeVisualizationsDeleted",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Visualization_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Visualization_name(ctx, field)
+			case "description":
+				return ec.fieldContext_Visualization_description(ctx, field)
+			case "version":
+				return ec.fieldContext_Visualization_version(ctx, field)
+			case "status":
+				return ec.fieldContext_Visualization_status(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Visualization_createdAt(ctx, field)
+			case "modifiedAt":
+				return ec.fieldContext_Visualization_modifiedAt(ctx, field)
+			case "file":
+				return ec.fieldContext_Visualization_file(ctx, field)
+			case "room":
+				return ec.fieldContext_Visualization_room(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Visualization", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _SomeVisualizationsUploaded_visualizations(ctx context.Context, field graphql.CollectedField, obj *SomeVisualizationsUploaded) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_SomeVisualizationsUploaded_visualizations(ctx, field)
 	if err != nil {
@@ -8085,6 +8268,8 @@ func (ec *executionContext) fieldContext_SomeVisualizationsUploaded_visualizatio
 				return ec.fieldContext_Visualization_description(ctx, field)
 			case "version":
 				return ec.fieldContext_Visualization_version(ctx, field)
+			case "status":
+				return ec.fieldContext_Visualization_status(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Visualization_createdAt(ctx, field)
 			case "modifiedAt":
@@ -8551,6 +8736,50 @@ func (ec *executionContext) fieldContext_Visualization_version(ctx context.Conte
 	return fc, nil
 }
 
+func (ec *executionContext) _Visualization_status(ctx context.Context, field graphql.CollectedField, obj *Visualization) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Visualization_status(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(VisualizationStatus)
+	fc.Result = res
+	return ec.marshalNVisualizationStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐVisualizationStatus(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Visualization_status(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Visualization",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type VisualizationStatus does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Visualization_createdAt(ctx context.Context, field graphql.CollectedField, obj *Visualization) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Visualization_createdAt(ctx, field)
 	if err != nil {
@@ -8797,6 +9026,72 @@ func (ec *executionContext) fieldContext_VisualizationUploaded_visualization(ctx
 				return ec.fieldContext_Visualization_description(ctx, field)
 			case "version":
 				return ec.fieldContext_Visualization_version(ctx, field)
+			case "status":
+				return ec.fieldContext_Visualization_status(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Visualization_createdAt(ctx, field)
+			case "modifiedAt":
+				return ec.fieldContext_Visualization_modifiedAt(ctx, field)
+			case "file":
+				return ec.fieldContext_Visualization_file(ctx, field)
+			case "room":
+				return ec.fieldContext_Visualization_room(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Visualization", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _VisualizationsDeleted_visualizations(ctx context.Context, field graphql.CollectedField, obj *VisualizationsDeleted) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_VisualizationsDeleted_visualizations(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Visualizations, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*Visualization)
+	fc.Result = res
+	return ec.marshalNVisualization2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐVisualizationᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_VisualizationsDeleted_visualizations(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "VisualizationsDeleted",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Visualization_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Visualization_name(ctx, field)
+			case "description":
+				return ec.fieldContext_Visualization_description(ctx, field)
+			case "version":
+				return ec.fieldContext_Visualization_version(ctx, field)
+			case "status":
+				return ec.fieldContext_Visualization_status(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Visualization_createdAt(ctx, field)
 			case "modifiedAt":
@@ -8859,6 +9154,8 @@ func (ec *executionContext) fieldContext_VisualizationsUploaded_visualizations(c
 				return ec.fieldContext_Visualization_description(ctx, field)
 			case "version":
 				return ec.fieldContext_Visualization_version(ctx, field)
+			case "status":
+				return ec.fieldContext_Visualization_status(ctx, field)
 			case "createdAt":
 				return ec.fieldContext_Visualization_createdAt(ctx, field)
 			case "modifiedAt":
@@ -11789,6 +12086,34 @@ func (ec *executionContext) unmarshalInputProjectHousesFilter(ctx context.Contex
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputProjectVisualizationRoomIdFilter(ctx context.Context, obj interface{}) (ProjectVisualizationRoomIDFilter, error) {
+	var it ProjectVisualizationRoomIDFilter
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"eq"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "eq":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("eq"))
+			it.Eq, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputProjectVisualizationsListFilter(ctx context.Context, obj interface{}) (ProjectVisualizationsListFilter, error) {
 	var it ProjectVisualizationsListFilter
 	asMap := map[string]interface{}{}
@@ -11796,7 +12121,7 @@ func (ec *executionContext) unmarshalInputProjectVisualizationsListFilter(ctx co
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"roomID"}
+	fieldsInOrder := [...]string{"roomID", "status"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -11807,7 +12132,43 @@ func (ec *executionContext) unmarshalInputProjectVisualizationsListFilter(ctx co
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("roomID"))
-			it.RoomID, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			it.RoomID, err = ec.unmarshalOProjectVisualizationRoomIdFilter2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectVisualizationRoomIDFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "status":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
+			it.Status, err = ec.unmarshalOProjectVisualizationsStatusFilter2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectVisualizationsStatusFilter(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputProjectVisualizationsStatusFilter(ctx context.Context, obj interface{}) (ProjectVisualizationsStatusFilter, error) {
+	var it ProjectVisualizationsStatusFilter
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"eq"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "eq":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("eq"))
+			it.Eq, err = ec.unmarshalOVisualizationStatus2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐVisualizationStatusᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -12389,6 +12750,50 @@ func (ec *executionContext) _DeleteRoomResult(ctx context.Context, sel ast.Selec
 			return graphql.Null
 		}
 		return ec._Forbidden(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
+func (ec *executionContext) _DeleteVisualizationsResult(ctx context.Context, sel ast.SelectionSet, obj DeleteVisualizationsResult) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case VisualizationsDeleted:
+		return ec._VisualizationsDeleted(ctx, sel, &obj)
+	case *VisualizationsDeleted:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._VisualizationsDeleted(ctx, sel, obj)
+	case SomeVisualizationsDeleted:
+		return ec._SomeVisualizationsDeleted(ctx, sel, &obj)
+	case *SomeVisualizationsDeleted:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._SomeVisualizationsDeleted(ctx, sel, obj)
+	case NotFound:
+		return ec._NotFound(ctx, sel, &obj)
+	case *NotFound:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._NotFound(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
 	default:
 		panic(fmt.Errorf("unexpected type %T", obj))
 	}
@@ -13468,7 +13873,7 @@ func (ec *executionContext) _ExpiredToken(ctx context.Context, sel ast.Selection
 	return out
 }
 
-var forbiddenImplementors = []string{"Forbidden", "AddContactResult", "AddHouseResult", "AddRoomResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "CreateProjectResult", "DeleteContactResult", "DeleteRoomResult", "UpdateContactResult", "UpdateHouseResult", "UpdateRoomResult", "UploadProjectFileResult", "UploadVisualizationResult", "UploadVisualizationsResult", "UserProfileResult", "ProjectResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "ProjectVisualizationsListResult", "ProjectVisualizationsTotalResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "WorkspaceResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "WorkspaceUsersListResult", "WorkspaceUsersTotalResult", "Error"}
+var forbiddenImplementors = []string{"Forbidden", "AddContactResult", "AddHouseResult", "AddRoomResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "CreateProjectResult", "DeleteContactResult", "DeleteRoomResult", "DeleteVisualizationsResult", "UpdateContactResult", "UpdateHouseResult", "UpdateRoomResult", "UploadProjectFileResult", "UploadVisualizationResult", "UploadVisualizationsResult", "UserProfileResult", "ProjectResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "ProjectVisualizationsListResult", "ProjectVisualizationsTotalResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "WorkspaceResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "WorkspaceUsersListResult", "WorkspaceUsersTotalResult", "Error"}
 
 func (ec *executionContext) _Forbidden(ctx context.Context, sel ast.SelectionSet, obj *Forbidden) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, forbiddenImplementors)
@@ -14018,6 +14423,15 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "deleteVisualizations":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteVisualizations(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "loginByEmail":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
@@ -14092,7 +14506,7 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 	return out
 }
 
-var notFoundImplementors = []string{"NotFound", "AddHouseResult", "AddRoomResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "DeleteContactResult", "DeleteRoomResult", "UpdateContactResult", "UpdateHouseResult", "UpdateRoomResult", "ProjectResult", "WorkspaceResult", "Error"}
+var notFoundImplementors = []string{"NotFound", "AddHouseResult", "AddRoomResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "DeleteContactResult", "DeleteRoomResult", "DeleteVisualizationsResult", "UpdateContactResult", "UpdateHouseResult", "UpdateRoomResult", "ProjectResult", "WorkspaceResult", "Error"}
 
 func (ec *executionContext) _NotFound(ctx context.Context, sel ast.SelectionSet, obj *NotFound) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, notFoundImplementors)
@@ -15324,7 +15738,7 @@ func (ec *executionContext) _RoomUpdated(ctx context.Context, sel ast.SelectionS
 	return out
 }
 
-var serverErrorImplementors = []string{"ServerError", "AddContactResult", "AddHouseResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "ConfirmLoginLinkResult", "ConfirmLoginPinResult", "CreateProjectResult", "DeleteContactResult", "LoginByEmailResult", "UpdateContactResult", "UpdateHouseResult", "UploadProjectFileResult", "UploadVisualizationResult", "UploadVisualizationsResult", "UserProfileResult", "ProjectResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "ProjectVisualizationsListResult", "ProjectVisualizationsTotalResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "WorkspaceResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "WorkspaceUsersListResult", "WorkspaceUsersTotalResult", "Error"}
+var serverErrorImplementors = []string{"ServerError", "AddContactResult", "AddHouseResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "ConfirmLoginLinkResult", "ConfirmLoginPinResult", "CreateProjectResult", "DeleteContactResult", "DeleteVisualizationsResult", "LoginByEmailResult", "UpdateContactResult", "UpdateHouseResult", "UploadProjectFileResult", "UploadVisualizationResult", "UploadVisualizationsResult", "UserProfileResult", "ProjectResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "ProjectVisualizationsListResult", "ProjectVisualizationsTotalResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "WorkspaceResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "WorkspaceUsersListResult", "WorkspaceUsersTotalResult", "Error"}
 
 func (ec *executionContext) _ServerError(ctx context.Context, sel ast.SelectionSet, obj *ServerError) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, serverErrorImplementors)
@@ -15337,6 +15751,34 @@ func (ec *executionContext) _ServerError(ctx context.Context, sel ast.SelectionS
 		case "message":
 
 			out.Values[i] = ec._ServerError_message(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var someVisualizationsDeletedImplementors = []string{"SomeVisualizationsDeleted", "DeleteVisualizationsResult"}
+
+func (ec *executionContext) _SomeVisualizationsDeleted(ctx context.Context, sel ast.SelectionSet, obj *SomeVisualizationsDeleted) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, someVisualizationsDeletedImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("SomeVisualizationsDeleted")
+		case "visualizations":
+
+			out.Values[i] = ec._SomeVisualizationsDeleted_visualizations(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
@@ -15491,6 +15933,13 @@ func (ec *executionContext) _Visualization(ctx context.Context, sel ast.Selectio
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
+		case "status":
+
+			out.Values[i] = ec._Visualization_status(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
 		case "createdAt":
 
 			out.Values[i] = ec._Visualization_createdAt(ctx, field, obj)
@@ -15566,6 +16015,34 @@ func (ec *executionContext) _VisualizationUploaded(ctx context.Context, sel ast.
 		case "visualization":
 
 			out.Values[i] = ec._VisualizationUploaded_visualization(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var visualizationsDeletedImplementors = []string{"VisualizationsDeleted", "DeleteVisualizationsResult"}
+
+func (ec *executionContext) _VisualizationsDeleted(ctx context.Context, sel ast.SelectionSet, obj *VisualizationsDeleted) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, visualizationsDeletedImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("VisualizationsDeleted")
+		case "visualizations":
+
+			out.Values[i] = ec._VisualizationsDeleted_visualizations(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
@@ -16578,6 +17055,16 @@ func (ec *executionContext) marshalNDeleteRoomResult2githubᚗcomᚋapartomatᚋ
 	return ec._DeleteRoomResult(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNDeleteVisualizationsResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐDeleteVisualizationsResult(ctx context.Context, sel ast.SelectionSet, v DeleteVisualizationsResult) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._DeleteVisualizationsResult(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNHouse2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐHouseᚄ(ctx context.Context, sel ast.SelectionSet, v []*House) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
@@ -17132,6 +17619,38 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 	return res
 }
 
+func (ec *executionContext) unmarshalNString2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]string, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNString2string(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalNString2ᚕstringᚄ(ctx context.Context, sel ast.SelectionSet, v []string) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNString2string(ctx, sel, v[i])
+	}
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
 func (ec *executionContext) unmarshalNTime2timeᚐTime(ctx context.Context, v interface{}) (time.Time, error) {
 	res, err := graphql.UnmarshalTime(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -17386,6 +17905,16 @@ func (ec *executionContext) marshalNVisualization2ᚖgithubᚗcomᚋapartomatᚋ
 		return graphql.Null
 	}
 	return ec._Visualization(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNVisualizationStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐVisualizationStatus(ctx context.Context, v interface{}) (VisualizationStatus, error) {
+	var res VisualizationStatus
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNVisualizationStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐVisualizationStatus(ctx context.Context, sel ast.SelectionSet, v VisualizationStatus) graphql.Marshaler {
+	return v
 }
 
 func (ec *executionContext) marshalNWorkspace2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspace(ctx context.Context, sel ast.SelectionSet, v Workspace) graphql.Marshaler {
@@ -18080,6 +18609,22 @@ func (ec *executionContext) marshalOProjectStatus2ᚕgithubᚗcomᚋapartomatᚋ
 	return ret
 }
 
+func (ec *executionContext) unmarshalOProjectVisualizationRoomIdFilter2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectVisualizationRoomIDFilter(ctx context.Context, v interface{}) (*ProjectVisualizationRoomIDFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputProjectVisualizationRoomIdFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOProjectVisualizationsStatusFilter2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectVisualizationsStatusFilter(ctx context.Context, v interface{}) (*ProjectVisualizationsStatusFilter, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputProjectVisualizationsStatusFilter(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) marshalORoom2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐRoom(ctx context.Context, sel ast.SelectionSet, v *Room) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -18155,6 +18700,73 @@ func (ec *executionContext) marshalOTime2ᚖtimeᚐTime(ctx context.Context, sel
 	}
 	res := graphql.MarshalTime(*v)
 	return res
+}
+
+func (ec *executionContext) unmarshalOVisualizationStatus2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐVisualizationStatusᚄ(ctx context.Context, v interface{}) ([]VisualizationStatus, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]VisualizationStatus, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNVisualizationStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐVisualizationStatus(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOVisualizationStatus2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐVisualizationStatusᚄ(ctx context.Context, sel ast.SelectionSet, v []VisualizationStatus) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNVisualizationStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐVisualizationStatus(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
 func (ec *executionContext) unmarshalOWorkspaceUserRole2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserRoleᚄ(ctx context.Context, v interface{}) ([]WorkspaceUserRole, error) {

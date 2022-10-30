@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/99designs/gqlgen/graphql"
 	apartomat "github.com/apartomat/apartomat/internal"
+	"github.com/apartomat/apartomat/internal/store/visualizations"
 	"log"
 )
 
@@ -28,9 +29,10 @@ func (r *projectVisualizationsResolver) List(
 
 		return serverError()
 	} else {
-		visualizations, err := r.useCases.GetVisualizations(
+		res, err := r.useCases.GetVisualizations(
 			ctx,
 			project.ID,
+			filter.ToSpec(),
 			limit,
 			offset,
 		)
@@ -44,8 +46,47 @@ func (r *projectVisualizationsResolver) List(
 			return ServerError{Message: "internal server error"}, nil
 		}
 
-		return ProjectVisualizationsList{Items: visualizationsToGraphQL(visualizations)}, nil
+		return ProjectVisualizationsList{Items: visualizationsToGraphQL(res)}, nil
 	}
+}
+
+func (f ProjectVisualizationsListFilter) ToSpec() visualizations.Spec {
+	var (
+		s visualizations.Spec
+	)
+
+	if f.RoomID != nil && len(f.RoomID.Eq) > 0 {
+		s = visualizations.And(s, visualizations.RoomIDIn(f.RoomID.Eq...))
+	}
+
+	if f.Status != nil && len(f.Status.Eq) > 0 {
+		s = visualizations.And(s, visualizations.StatusIn(mapf(f.Status.Eq, visualizationStatusFromGraphQL)...))
+	}
+
+	return s
+}
+
+func visualizationStatusFromGraphQL(status VisualizationStatus) visualizations.VisualizationStatus {
+	switch status {
+	case VisualizationStatusApproved:
+		return visualizations.VisualizationStatusApproved
+	case VisualizationStatusDeleted:
+		return visualizations.VisualizationStatusDeleted
+	default:
+		return visualizations.VisualizationStatusUnknown
+	}
+}
+
+func mapf[T any, V any](vals []T, mapfn func(T) V) []V {
+	var (
+		res = make([]V, len(vals))
+	)
+
+	for i, val := range vals {
+		res[i] = mapfn(val)
+	}
+
+	return res
 }
 
 func (r *projectVisualizationsResolver) Total(

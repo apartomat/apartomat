@@ -124,7 +124,16 @@ type ProjectVisualizations {
 }
 
 input ProjectVisualizationsListFilter {
-    roomID: [String!]
+    roomID: ProjectVisualizationRoomIdFilter
+    status: ProjectVisualizationsStatusFilter
+}
+
+input ProjectVisualizationRoomIdFilter {
+    eq: [String!]
+}
+
+input ProjectVisualizationsStatusFilter {
+    eq: [VisualizationStatus!]
 }
 
 union ProjectVisualizationsListResult = ProjectVisualizationsList | Forbidden | ServerError
@@ -144,10 +153,17 @@ type Visualization {
     name: String!
     description: String!
     version: Int!
+    status: VisualizationStatus!
     createdAt:  Time!
     modifiedAt: Time!
     file: ProjectFile!
     room: Room
+}
+
+enum VisualizationStatus {
+    UNKNOWN
+    APPROVED
+    DELETED
 }
 
 type ProjectFiles {

@@ -11,6 +11,10 @@ type visualizationSpecQuery interface {
 }
 
 func toVisualizationSpecQuery(spec Spec) (visualizationSpecQuery, error) {
+	if spec == nil {
+		return nil, nil
+	}
+
 	if s, ok := spec.(visualizationSpecQuery); ok {
 		return s, nil
 	}
@@ -20,6 +24,10 @@ func toVisualizationSpecQuery(spec Spec) (visualizationSpecQuery, error) {
 		return visualizationIDInSpecQuery{s}, nil
 	case ProjectIDInSpec:
 		return visualizationProjectIDInSpecQuery{s}, nil
+	case RoomIDInSpec:
+		return visualizationRoomIDInSpecQuery{s}, nil
+	case StatusInSpec:
+		return visualizationStatusInSpecQuery{s}, nil
 	case AndSpec:
 		return andSpecQuery{spec: s}, nil
 	case OrSpec:
@@ -37,12 +45,31 @@ func (s visualizationIDInSpecQuery) Expression() (goqu.Expression, error) {
 	return goqu.Ex{"id": s.spec.ID}, nil
 }
 
+//
 type visualizationProjectIDInSpecQuery struct {
 	spec ProjectIDInSpec
 }
 
 func (s visualizationProjectIDInSpecQuery) Expression() (goqu.Expression, error) {
 	return goqu.Ex{"project_id": s.spec.ProjectID}, nil
+}
+
+//
+type visualizationRoomIDInSpecQuery struct {
+	spec RoomIDInSpec
+}
+
+func (s visualizationRoomIDInSpecQuery) Expression() (goqu.Expression, error) {
+	return goqu.Ex{"room_id": s.spec.RoomID}, nil
+}
+
+//
+type visualizationStatusInSpecQuery struct {
+	spec StatusInSpec
+}
+
+func (s visualizationStatusInSpecQuery) Expression() (goqu.Expression, error) {
+	return goqu.Ex{"status": s.spec.Status}, nil
 }
 
 //
@@ -56,7 +83,7 @@ func (s andSpecQuery) Expression() (goqu.Expression, error) {
 	for _, spec := range s.spec.Specs {
 		if ps, err := toVisualizationSpecQuery(spec); err != nil {
 			return nil, err
-		} else {
+		} else if ps != nil {
 			expr, err := ps.Expression()
 			if err != nil {
 				return nil, err
@@ -80,7 +107,7 @@ func (s orSpecQuery) Expression() (goqu.Expression, error) {
 	for _, spec := range s.spec.Specs {
 		if ps, err := toVisualizationSpecQuery(spec); err != nil {
 			return nil, err
-		} else {
+		} else if ps != nil {
 			expr, err := ps.Expression()
 			if err != nil {
 				return nil, err

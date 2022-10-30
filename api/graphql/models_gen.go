@@ -51,6 +51,10 @@ type DeleteRoomResult interface {
 	IsDeleteRoomResult()
 }
 
+type DeleteVisualizationsResult interface {
+	IsDeleteVisualizationsResult()
+}
+
 type Error interface {
 	IsError()
 	GetMessage() string
@@ -258,6 +262,8 @@ func (Forbidden) IsDeleteContactResult() {}
 
 func (Forbidden) IsDeleteRoomResult() {}
 
+func (Forbidden) IsDeleteVisualizationsResult() {}
+
 func (Forbidden) IsUpdateContactResult() {}
 
 func (Forbidden) IsUpdateHouseResult() {}
@@ -404,6 +410,8 @@ func (NotFound) IsDeleteContactResult() {}
 
 func (NotFound) IsDeleteRoomResult() {}
 
+func (NotFound) IsDeleteVisualizationsResult() {}
+
 func (NotFound) IsUpdateContactResult() {}
 
 func (NotFound) IsUpdateHouseResult() {}
@@ -547,6 +555,10 @@ type ProjectStatusEnumItem struct {
 	Value string        `json:"value"`
 }
 
+type ProjectVisualizationRoomIDFilter struct {
+	Eq []string `json:"eq"`
+}
+
 type ProjectVisualizations struct {
 	List  ProjectVisualizationsListResult  `json:"list"`
 	Total ProjectVisualizationsTotalResult `json:"total"`
@@ -559,7 +571,12 @@ type ProjectVisualizationsList struct {
 func (ProjectVisualizationsList) IsProjectVisualizationsListResult() {}
 
 type ProjectVisualizationsListFilter struct {
-	RoomID []string `json:"roomID"`
+	RoomID *ProjectVisualizationRoomIDFilter  `json:"roomID"`
+	Status *ProjectVisualizationsStatusFilter `json:"status"`
+}
+
+type ProjectVisualizationsStatusFilter struct {
+	Eq []VisualizationStatus `json:"eq"`
 }
 
 type ProjectVisualizationsTotal struct {
@@ -615,6 +632,8 @@ func (ServerError) IsCreateProjectResult() {}
 
 func (ServerError) IsDeleteContactResult() {}
 
+func (ServerError) IsDeleteVisualizationsResult() {}
+
 func (ServerError) IsLoginByEmailResult() {}
 
 func (ServerError) IsUpdateContactResult() {}
@@ -662,6 +681,12 @@ func (ServerError) IsWorkspaceUsersTotalResult() {}
 func (ServerError) IsError()                {}
 func (this ServerError) GetMessage() string { return this.Message }
 
+type SomeVisualizationsDeleted struct {
+	Visualizations []*Visualization `json:"visualizations"`
+}
+
+func (SomeVisualizationsDeleted) IsDeleteVisualizationsResult() {}
+
 type SomeVisualizationsUploaded struct {
 	Visualizations []*Visualization `json:"visualizations"`
 }
@@ -703,14 +728,15 @@ type UserProfile struct {
 func (UserProfile) IsUserProfileResult() {}
 
 type Visualization struct {
-	ID          string       `json:"id"`
-	Name        string       `json:"name"`
-	Description string       `json:"description"`
-	Version     int          `json:"version"`
-	CreatedAt   time.Time    `json:"createdAt"`
-	ModifiedAt  time.Time    `json:"modifiedAt"`
-	File        *ProjectFile `json:"file"`
-	Room        *Room        `json:"room"`
+	ID          string              `json:"id"`
+	Name        string              `json:"name"`
+	Description string              `json:"description"`
+	Version     int                 `json:"version"`
+	Status      VisualizationStatus `json:"status"`
+	CreatedAt   time.Time           `json:"createdAt"`
+	ModifiedAt  time.Time           `json:"modifiedAt"`
+	File        *ProjectFile        `json:"file"`
+	Room        *Room               `json:"room"`
 }
 
 type VisualizationUploaded struct {
@@ -718,6 +744,12 @@ type VisualizationUploaded struct {
 }
 
 func (VisualizationUploaded) IsUploadVisualizationResult() {}
+
+type VisualizationsDeleted struct {
+	Visualizations []*Visualization `json:"visualizations"`
+}
+
+func (VisualizationsDeleted) IsDeleteVisualizationsResult() {}
 
 type VisualizationsUploaded struct {
 	Visualizations []*Visualization `json:"visualizations"`
@@ -915,6 +947,49 @@ func (e *ProjectStatus) UnmarshalGQL(v interface{}) error {
 }
 
 func (e ProjectStatus) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type VisualizationStatus string
+
+const (
+	VisualizationStatusUnknown  VisualizationStatus = "UNKNOWN"
+	VisualizationStatusApproved VisualizationStatus = "APPROVED"
+	VisualizationStatusDeleted  VisualizationStatus = "DELETED"
+)
+
+var AllVisualizationStatus = []VisualizationStatus{
+	VisualizationStatusUnknown,
+	VisualizationStatusApproved,
+	VisualizationStatusDeleted,
+}
+
+func (e VisualizationStatus) IsValid() bool {
+	switch e {
+	case VisualizationStatusUnknown, VisualizationStatusApproved, VisualizationStatusDeleted:
+		return true
+	}
+	return false
+}
+
+func (e VisualizationStatus) String() string {
+	return string(e)
+}
+
+func (e *VisualizationStatus) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = VisualizationStatus(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid VisualizationStatus", str)
+	}
+	return nil
+}
+
+func (e VisualizationStatus) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 

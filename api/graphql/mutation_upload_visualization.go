@@ -50,6 +50,7 @@ func visualizationToGraphQL(vis *visualizations.Visualization, file *store.Proje
 		Name:        vis.Name,
 		Description: vis.Description,
 		Version:     vis.Version,
+		Status:      visualizationStatusToGraphQL(vis.Status),
 		CreatedAt:   vis.CreatedAt,
 		ModifiedAt:  vis.ModifiedAt,
 		File: &ProjectFile{
@@ -80,4 +81,15 @@ func visualizationsToGraphQL(visualizations []*visualizations.Visualization) []*
 	}
 
 	return res
+}
+
+func visualizationStatusToGraphQL(status visualizations.VisualizationStatus) VisualizationStatus {
+	switch status {
+	case visualizations.VisualizationStatusApproved:
+		return VisualizationStatusApproved
+	case visualizations.VisualizationStatusDeleted:
+		return VisualizationStatusDeleted
+	default:
+		return VisualizationStatusUnknown
+	}
 }

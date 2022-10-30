@@ -1,0 +1,13 @@
+extend type Mutation {
+    deleteVisualizations(id: [String!]!): DeleteVisualizationsResult!
+}
+
+union DeleteVisualizationsResult = VisualizationsDeleted | SomeVisualizationsDeleted | NotFound | Forbidden | ServerError
+
+type VisualizationsDeleted {
+    visualizations: [Visualization!]!
+}
+
+type SomeVisualizationsDeleted {
+    visualizations: [Visualization!]!
+}

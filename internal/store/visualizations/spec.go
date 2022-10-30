@@ -40,6 +40,44 @@ func ProjectIDIn(vals ...string) Spec {
 	return ProjectIDInSpec{ProjectID: vals}
 }
 
+type RoomIDInSpec struct {
+	RoomID []string
+}
+
+func (s RoomIDInSpec) Is(c *Visualization) bool {
+	for _, val := range s.RoomID {
+		if c.ProjectID == val {
+			return true
+		}
+	}
+
+	return false
+}
+
+func RoomIDIn(vals ...string) Spec {
+	return RoomIDInSpec{RoomID: vals}
+}
+
+//
+type StatusInSpec struct {
+	Status []VisualizationStatus
+}
+
+func (s StatusInSpec) Is(c *Visualization) bool {
+	for _, val := range s.Status {
+		if c.Status == val {
+			return true
+		}
+	}
+
+	return false
+}
+
+func StatusIn(vals ...VisualizationStatus) Spec {
+	return StatusInSpec{Status: vals}
+}
+
+//
 type AndSpec struct {
 	Specs []Spec
 }
