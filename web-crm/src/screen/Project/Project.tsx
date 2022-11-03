@@ -233,7 +233,7 @@ export function Project () {
                 {project.visualizations.list.__typename === "ProjectVisualizationsList" && project.visualizations.list.items.length > 0 &&
                     <Box margin={{vertical: "large"}}>
                         <Box direction="row" justify="between">
-                            <Heading level={3}>Визуализации</Heading>
+                            <Heading level={3}><AnchorLink to={`/p/${id}/vis`}>Визуализации</AnchorLink></Heading>
                             <Box justify="center">
                                 <Button color="brand" label="Загрузить" onClick={() => setShowUploadVisualizations(true)} />
                             </Box>

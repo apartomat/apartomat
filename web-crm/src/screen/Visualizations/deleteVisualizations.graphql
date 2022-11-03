@@ -1,0 +1,24 @@
+mutation deleteVisualizations($id: [String!]!) {
+    deleteVisualizations(id: $id) {
+        __typename
+        ...on VisualizationsDeleted {
+            visualizations {
+                id
+            }
+        }
+        ...on SomeVisualizationsDeleted {
+            visualizations {
+                id
+            }
+        }
+        ...on NotFound {
+            message
+        }
+        ...on Forbidden {
+            message
+        }
+        ...on ServerError {
+            message
+        }
+    }
+}

@@ -116,6 +116,8 @@ export type DeleteContactResult = ContactDeleted | Forbidden | NotFound | Server
 
 export type DeleteRoomResult = Forbidden | NotFound | RoomDeleted;
 
+export type DeleteVisualizationsResult = Forbidden | NotFound | ServerError | SomeVisualizationsDeleted | VisualizationsDeleted;
+
 export type Enums = {
   __typename?: 'Enums';
   project: ProjectEnums;
@@ -223,6 +225,7 @@ export type Mutation = {
   createProject: CreateProjectResult;
   deleteContact: DeleteContactResult;
   deleteRoom: DeleteRoomResult;
+  deleteVisualizations: DeleteVisualizationsResult;
   loginByEmail: LoginByEmailResult;
   ping: Scalars['String'];
   updateContact: UpdateContactResult;
@@ -287,6 +290,11 @@ export type MutationDeleteContactArgs = {
 
 export type MutationDeleteRoomArgs = {
   id: Scalars['String'];
+};
+
+
+export type MutationDeleteVisualizationsArgs = {
+  id: Array<Scalars['String']>;
 };
 
 
@@ -529,6 +537,10 @@ export type ProjectStatusEnumItem = {
   value: Scalars['String'];
 };
 
+export type ProjectVisualizationRoomIdFilter = {
+  eq?: Maybe<Array<Scalars['String']>>;
+};
+
 export type ProjectVisualizations = {
   __typename?: 'ProjectVisualizations';
   list: ProjectVisualizationsListResult;
@@ -553,10 +565,15 @@ export type ProjectVisualizationsList = {
 };
 
 export type ProjectVisualizationsListFilter = {
-  roomID?: Maybe<Array<Scalars['String']>>;
+  roomID?: Maybe<ProjectVisualizationRoomIdFilter>;
+  status?: Maybe<ProjectVisualizationsStatusFilter>;
 };
 
 export type ProjectVisualizationsListResult = Forbidden | ProjectVisualizationsList | ServerError;
+
+export type ProjectVisualizationsStatusFilter = {
+  eq?: Maybe<Array<VisualizationStatus>>;
+};
 
 export type ProjectVisualizationsTotal = {
   __typename?: 'ProjectVisualizationsTotal';
@@ -612,6 +629,11 @@ export type RoomUpdated = {
 export type ServerError = Error & {
   __typename?: 'ServerError';
   message: Scalars['String'];
+};
+
+export type SomeVisualizationsDeleted = {
+  __typename?: 'SomeVisualizationsDeleted';
+  visualizations: Array<Visualization>;
 };
 
 export type SomeVisualizationsUploaded = {
@@ -675,12 +697,24 @@ export type Visualization = {
   modifiedAt: Scalars['Time'];
   name: Scalars['String'];
   room?: Maybe<Room>;
+  status: VisualizationStatus;
   version: Scalars['Int'];
 };
+
+export enum VisualizationStatus {
+  Approved = 'APPROVED',
+  Deleted = 'DELETED',
+  Unknown = 'UNKNOWN'
+}
 
 export type VisualizationUploaded = {
   __typename?: 'VisualizationUploaded';
   visualization: Visualization;
+};
+
+export type VisualizationsDeleted = {
+  __typename?: 'VisualizationsDeleted';
+  visualizations: Array<Visualization>;
 };
 
 export type VisualizationsUploaded = {
@@ -927,6 +961,29 @@ export type ProjectScreenHouseRoomsFragment = { __typename?: 'HouseRooms', list:
 
 export type ProjectScreenHouseRoomFragment = { __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined };
 
+export type DeleteVisualizationsMutationVariables = Exact<{
+  id: Array<Scalars['String']> | Scalars['String'];
+}>;
+
+
+export type DeleteVisualizationsMutation = { __typename?: 'Mutation', deleteVisualizations: { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'ServerError', message: string } | { __typename: 'SomeVisualizationsDeleted', visualizations: Array<{ __typename?: 'Visualization', id: string }> } | { __typename: 'VisualizationsDeleted', visualizations: Array<{ __typename?: 'Visualization', id: string }> } };
+
+export type VisualizationsScreenQueryVariables = Exact<{
+  id: Scalars['String'];
+  filter: ProjectVisualizationsListFilter;
+}>;
+
+
+export type VisualizationsScreenQuery = { __typename?: 'Query', project: { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'Project', id: string, name: string, visualizations: { __typename?: 'ProjectVisualizations', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'ProjectVisualizationsList', items: Array<{ __typename?: 'Visualization', id: string, name: string, description: string, version: number, file: { __typename?: 'ProjectFile', id: string, name: string, url: any, type: ProjectFileType, mimeType: string }, room?: { __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined } | null | undefined }> } | { __typename?: 'ServerError', message: string } }, houses: { __typename?: 'ProjectHouses', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectHousesList', items: Array<{ __typename?: 'House', rooms: { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined }> } | { __typename?: 'ServerError', message: string } } }> } | { __typename: 'ServerError', message: string } } } | { __typename: 'ServerError', message: string } };
+
+export type VisualizationsScreenVisualizationFragment = { __typename?: 'Visualization', id: string, name: string, description: string, version: number, file: { __typename?: 'ProjectFile', id: string, name: string, url: any, type: ProjectFileType, mimeType: string }, room?: { __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined } | null | undefined };
+
+export type VisualizationsScreenHouseRoomFragment = { __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined };
+
+export type VisualizationsScreenHousesFragment = { __typename?: 'ProjectHouses', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectHousesList', items: Array<{ __typename?: 'House', rooms: { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined }> } | { __typename?: 'ServerError', message: string } } }> } | { __typename: 'ServerError', message: string } };
+
+export type VisualizationsScreenHouseRoomsFragment = { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined }> } | { __typename?: 'ServerError', message: string } };
+
 export type WorkspaceScreenQueryVariables = Exact<{
   id: Scalars['String'];
   timezone?: Maybe<Scalars['String']>;
@@ -1038,7 +1095,7 @@ export const ProjectScreenVisualizationFragmentDoc = gql`
     ${ProjectScreenHouseRoomFragmentDoc}`;
 export const ProjectScreenVisualizationsFragmentDoc = gql`
     fragment ProjectScreenVisualizations on ProjectVisualizations {
-  list(filter: {}, limit: 100, offset: 0) {
+  list(filter: {status: {eq: [UNKNOWN, APPROVED]}}, limit: 20, offset: 0) {
     __typename
     ... on ProjectVisualizationsList {
       items {
@@ -1098,6 +1155,63 @@ export const ProjectScreenProjectFragmentDoc = gql`
 }
     ${ProjectScreenHousesFragmentDoc}
 ${ProjectScreenVisualizationsFragmentDoc}`;
+export const VisualizationsScreenHouseRoomFragmentDoc = gql`
+    fragment VisualizationsScreenHouseRoom on Room {
+  id
+  name
+  square
+  level
+}
+    `;
+export const VisualizationsScreenVisualizationFragmentDoc = gql`
+    fragment VisualizationsScreenVisualization on Visualization {
+  id
+  name
+  description
+  version
+  file {
+    id
+    name
+    url
+    type
+    mimeType
+  }
+  room {
+    ...VisualizationsScreenHouseRoom
+  }
+}
+    ${VisualizationsScreenHouseRoomFragmentDoc}`;
+export const VisualizationsScreenHouseRoomsFragmentDoc = gql`
+    fragment VisualizationsScreenHouseRooms on HouseRooms {
+  list {
+    ... on HouseRoomsList {
+      items {
+        ...VisualizationsScreenHouseRoom
+      }
+    }
+    ... on Error {
+      message
+    }
+  }
+}
+    ${VisualizationsScreenHouseRoomFragmentDoc}`;
+export const VisualizationsScreenHousesFragmentDoc = gql`
+    fragment VisualizationsScreenHouses on ProjectHouses {
+  list(filter: {}, limit: 1, offset: 0) {
+    __typename
+    ... on ProjectHousesList {
+      items {
+        rooms {
+          ...VisualizationsScreenHouseRooms
+        }
+      }
+    }
+    ... on Error {
+      message
+    }
+  }
+}
+    ${VisualizationsScreenHouseRoomsFragmentDoc}`;
 export const WorkspaceScreenUserFragmentDoc = gql`
     fragment WorkspaceScreenUser on WorkspaceUser {
   id
@@ -1995,6 +2109,117 @@ export function useProjectScreenLazyQuery(baseOptions?: Apollo.LazyQueryHookOpti
 export type ProjectScreenQueryHookResult = ReturnType<typeof useProjectScreenQuery>;
 export type ProjectScreenLazyQueryHookResult = ReturnType<typeof useProjectScreenLazyQuery>;
 export type ProjectScreenQueryResult = Apollo.QueryResult<ProjectScreenQuery, ProjectScreenQueryVariables>;
+export const DeleteVisualizationsDocument = gql`
+    mutation deleteVisualizations($id: [String!]!) {
+  deleteVisualizations(id: $id) {
+    __typename
+    ... on VisualizationsDeleted {
+      visualizations {
+        id
+      }
+    }
+    ... on SomeVisualizationsDeleted {
+      visualizations {
+        id
+      }
+    }
+    ... on NotFound {
+      message
+    }
+    ... on Forbidden {
+      message
+    }
+    ... on ServerError {
+      message
+    }
+  }
+}
+    `;
+export type DeleteVisualizationsMutationFn = Apollo.MutationFunction<DeleteVisualizationsMutation, DeleteVisualizationsMutationVariables>;
+
+/**
+ * __useDeleteVisualizationsMutation__
+ *
+ * To run a mutation, you first call `useDeleteVisualizationsMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteVisualizationsMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteVisualizationsMutation, { data, loading, error }] = useDeleteVisualizationsMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useDeleteVisualizationsMutation(baseOptions?: Apollo.MutationHookOptions<DeleteVisualizationsMutation, DeleteVisualizationsMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteVisualizationsMutation, DeleteVisualizationsMutationVariables>(DeleteVisualizationsDocument, options);
+      }
+export type DeleteVisualizationsMutationHookResult = ReturnType<typeof useDeleteVisualizationsMutation>;
+export type DeleteVisualizationsMutationResult = Apollo.MutationResult<DeleteVisualizationsMutation>;
+export type DeleteVisualizationsMutationOptions = Apollo.BaseMutationOptions<DeleteVisualizationsMutation, DeleteVisualizationsMutationVariables>;
+export const VisualizationsScreenDocument = gql`
+    query visualizationsScreen($id: String!, $filter: ProjectVisualizationsListFilter!) {
+  project(id: $id) {
+    __typename
+    ... on Project {
+      id
+      name
+      visualizations {
+        list(filter: $filter, limit: 100, offset: 0) {
+          ... on ProjectVisualizationsList {
+            items {
+              ...VisualizationsScreenVisualization
+            }
+          }
+          ... on Error {
+            message
+          }
+        }
+      }
+      houses {
+        ...VisualizationsScreenHouses
+      }
+    }
+    ... on Error {
+      message
+    }
+  }
+}
+    ${VisualizationsScreenVisualizationFragmentDoc}
+${VisualizationsScreenHousesFragmentDoc}`;
+
+/**
+ * __useVisualizationsScreenQuery__
+ *
+ * To run a query within a React component, call `useVisualizationsScreenQuery` and pass it any options that fit your needs.
+ * When your component renders, `useVisualizationsScreenQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useVisualizationsScreenQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *      filter: // value for 'filter'
+ *   },
+ * });
+ */
+export function useVisualizationsScreenQuery(baseOptions: Apollo.QueryHookOptions<VisualizationsScreenQuery, VisualizationsScreenQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<VisualizationsScreenQuery, VisualizationsScreenQueryVariables>(VisualizationsScreenDocument, options);
+      }
+export function useVisualizationsScreenLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<VisualizationsScreenQuery, VisualizationsScreenQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<VisualizationsScreenQuery, VisualizationsScreenQueryVariables>(VisualizationsScreenDocument, options);
+        }
+export type VisualizationsScreenQueryHookResult = ReturnType<typeof useVisualizationsScreenQuery>;
+export type VisualizationsScreenLazyQueryHookResult = ReturnType<typeof useVisualizationsScreenLazyQuery>;
+export type VisualizationsScreenQueryResult = Apollo.QueryResult<VisualizationsScreenQuery, VisualizationsScreenQueryVariables>;
 export const WorkspaceScreenDocument = gql`
     query workspaceScreen($id: String!, $timezone: String) {
   workspace(id: $id) {

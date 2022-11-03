@@ -16,6 +16,7 @@ import Project from "screen/Project/Project"
 import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client"
 import { setContext } from "@apollo/client/link/context"
 import { createUploadLink } from "apollo-upload-client"
+import Visualizations from "screen/Visualizations/Visualizations"
 
 const authLink = setContext((_, { headers }) => {
   const token = JSON.parse(localStorage.getItem("token") || `""`);
@@ -67,6 +68,9 @@ ReactDOM.render(
                             </PrivateRoute>
                             <PrivateRoute exact path="/p/:id">
                                 <Project/>
+                            </PrivateRoute>
+                            <PrivateRoute exact path="/p/:id/vis">
+                                <Visualizations/>
                             </PrivateRoute>
                         </Switch>
                     </Router>

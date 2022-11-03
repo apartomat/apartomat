@@ -1,0 +1,83 @@
+query visualizationsScreen($id: String! $filter: ProjectVisualizationsListFilter!) {
+    project(id: $id) {
+        __typename
+        ...on Project {
+            id
+            name
+            visualizations {
+                list(filter: $filter limit: 100 offset: 0) {
+                    ... on ProjectVisualizationsList {
+                        items {
+                            ...VisualizationsScreenVisualization
+                        }
+                    }
+                    ... on Error {
+                        message
+                    }
+                }
+
+            }
+            houses {
+                ...VisualizationsScreenHouses
+            }
+        }
+        ...on Error {
+            message
+        }
+    }
+}
+
+fragment VisualizationsScreenVisualization on Visualization {
+    id
+    name
+    description
+    version
+    file {
+        id
+        name
+        url
+        type
+        mimeType
+    }
+    room {
+        ...VisualizationsScreenHouseRoom
+    }
+}
+
+
+fragment VisualizationsScreenHouseRoom on Room {
+    id
+    name
+    square
+    level
+}
+
+
+fragment VisualizationsScreenHouses on ProjectHouses {
+    list(filter: {} limit: 1 offset: 0) {
+        __typename
+        ...on ProjectHousesList {
+            items {
+                rooms {
+                    ...VisualizationsScreenHouseRooms
+                }
+            }
+        }
+        ...on Error {
+            message
+        }
+    }
+}
+
+fragment VisualizationsScreenHouseRooms on HouseRooms {
+    list {
+        ...on HouseRoomsList {
+            items {
+                ...VisualizationsScreenHouseRoom
+            }
+        }
+        ...on Error {
+            message
+        }
+    }
+}
