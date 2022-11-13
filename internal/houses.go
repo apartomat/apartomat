@@ -2,10 +2,10 @@ package apartomat
 
 import (
 	"context"
+	"fmt"
 	"github.com/apartomat/apartomat/internal/pkg/expr"
 	"github.com/apartomat/apartomat/internal/store"
 	. "github.com/apartomat/apartomat/internal/store/houses"
-	"github.com/pkg/errors"
 	"time"
 )
 
@@ -16,7 +16,7 @@ func (u *Apartomat) GetHouses(ctx context.Context, projectID string, limit, offs
 	}
 
 	if len(projects) == 0 {
-		return nil, errors.Wrapf(ErrNotFound, "project %d", projectID)
+		return nil, fmt.Errorf("project (id=%s): %w", projectID, ErrNotFound)
 	}
 
 	project := projects[0]
@@ -24,7 +24,7 @@ func (u *Apartomat) GetHouses(ctx context.Context, projectID string, limit, offs
 	if ok, err := u.CanGetHouses(ctx, UserFromCtx(ctx), project); err != nil {
 		return nil, err
 	} else if !ok {
-		return nil, errors.Wrapf(ErrForbidden, "can't get project (id=%s) houses", project.ID)
+		return nil, fmt.Errorf("can't get project (id=%s) houses: %w", project.ID, ErrForbidden)
 	}
 
 	return u.Houses.List(ctx, ProjectIDIn(project.ID), limit, offset)
@@ -61,7 +61,7 @@ func (u *Apartomat) AddHouse(
 	}
 
 	if len(projects) == 0 {
-		return nil, errors.Wrapf(ErrNotFound, "project %d", projectID)
+		return nil, fmt.Errorf("project (id=%s): %w", projectID, ErrNotFound)
 	}
 
 	project := projects[0]
@@ -69,7 +69,7 @@ func (u *Apartomat) AddHouse(
 	if ok, err := u.CanAddHouse(ctx, UserFromCtx(ctx), project); err != nil {
 		return nil, err
 	} else if !ok {
-		return nil, errors.Wrapf(ErrForbidden, "can't add house to project (id=%s)", project.ID)
+		return nil, fmt.Errorf("can't add house to project (id=%s): %w", project.ID, ErrForbidden)
 	}
 
 	id, err := NewNanoID()
@@ -119,7 +119,7 @@ func (u *Apartomat) UpdateHouse(
 	}
 
 	if len(houses) == 0 {
-		return nil, errors.Wrapf(ErrNotFound, "house (id=%s)", houseID)
+		return nil, fmt.Errorf("house (id=%s): %w", houseID, ErrNotFound)
 	}
 
 	var (
@@ -129,7 +129,7 @@ func (u *Apartomat) UpdateHouse(
 	if ok, err := u.CanUpdateHouse(ctx, UserFromCtx(ctx), house); err != nil {
 		return nil, err
 	} else if !ok {
-		return nil, errors.Wrapf(ErrForbidden, "can't update house (id=%s)", houseID)
+		return nil, fmt.Errorf("can't update house (id=%s): %w", houseID, ErrForbidden)
 	}
 
 	house = &House{
@@ -156,7 +156,7 @@ func (u *Apartomat) CanUpdateHouse(ctx context.Context, subj *UserCtx, obj *Hous
 	}
 
 	if len(projects) == 0 {
-		return false, errors.Wrapf(ErrNotFound, "project %s", obj.ProjectID)
+		return false, fmt.Errorf("project (id=%s): %w", obj.ProjectID, ErrNotFound)
 	}
 
 	var (

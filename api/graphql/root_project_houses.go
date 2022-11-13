@@ -40,7 +40,7 @@ func (r *projectHousesResolver) List(
 				return Forbidden{}, nil
 			}
 
-			log.Printf("can't resolve project (id=%d) houses: %s", project.ID, err)
+			log.Printf("can't resolve project (id=%s) houses: %s", project.ID, err)
 
 			return ServerError{Message: "internal server error"}, nil
 		}

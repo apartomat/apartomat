@@ -43,7 +43,7 @@ func (r *projectFilesResolver) List(
 				return Forbidden{}, nil
 			}
 
-			log.Printf("can't resolve project (id=%d) files: %s", project.ID, err)
+			log.Printf("can't resolve project (id=%s) files: %s", project.ID, err)
 
 			return ServerError{Message: "internal server error"}, nil
 		}
@@ -94,7 +94,7 @@ func (r *projectFilesResolver) Total(
 				return Forbidden{}, nil
 			}
 
-			log.Printf("can't resolve project (id=%d) files: %s", project.ID, err)
+			log.Printf("can't resolve project (id=%s) files: %s", project.ID, err)
 
 			return nil, errors.New("server error: can't resolver project files")
 		}

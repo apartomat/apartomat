@@ -2,9 +2,9 @@ package apartomat
 
 import (
 	"context"
+	"fmt"
 	"github.com/apartomat/apartomat/internal/pkg/expr"
 	"github.com/apartomat/apartomat/internal/store"
-	"github.com/pkg/errors"
 )
 
 func (u *Apartomat) GetUserProfile(ctx context.Context, id string) (*store.User, error) {
@@ -14,7 +14,7 @@ func (u *Apartomat) GetUserProfile(ctx context.Context, id string) (*store.User,
 	}
 
 	if len(users) == 0 {
-		return nil, errors.Wrapf(ErrNotFound, "user id=%s", id)
+		return nil, fmt.Errorf("user (id=%s): %w", id, ErrNotFound)
 	}
 
 	var (
@@ -24,7 +24,7 @@ func (u *Apartomat) GetUserProfile(ctx context.Context, id string) (*store.User,
 	if ok, err := u.CanGetUserProfile(ctx, UserFromCtx(ctx), user); err != nil {
 		return nil, err
 	} else if !ok {
-		return nil, errors.Wrapf(ErrForbidden, "can't get user profile (id=%d)", user.ID)
+		return nil, fmt.Errorf("can't get user profile (id=%s): %w", user.ID, ErrForbidden)
 	}
 
 	return user, nil

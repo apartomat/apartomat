@@ -2,8 +2,8 @@ package apartomat
 
 import (
 	"context"
+	"errors"
 	"github.com/apartomat/apartomat/internal/dataloader"
-	"github.com/pkg/errors"
 )
 
 const dataLoadersCtxKey = "dataloaders"

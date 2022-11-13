@@ -2,10 +2,10 @@ package apartomat
 
 import (
 	"context"
+	"fmt"
 	"github.com/apartomat/apartomat/internal/pkg/expr"
 	"github.com/apartomat/apartomat/internal/store"
 	. "github.com/apartomat/apartomat/internal/store/contacts"
-	"github.com/pkg/errors"
 )
 
 type AddContactParams struct {
@@ -21,7 +21,7 @@ func (u *Apartomat) AddContact(ctx context.Context, projectID string, params Add
 	}
 
 	if len(projects) == 0 {
-		return nil, errors.Wrapf(ErrNotFound, "project %s", projectID)
+		return nil, fmt.Errorf("project (id=%s): %w", projectID, ErrNotFound)
 	}
 
 	project := projects[0]
@@ -29,7 +29,7 @@ func (u *Apartomat) AddContact(ctx context.Context, projectID string, params Add
 	if ok, err := u.CanAddContact(ctx, UserFromCtx(ctx), project); err != nil {
 		return nil, err
 	} else if !ok {
-		return nil, errors.Wrapf(ErrForbidden, "can't add contact to project (id=%d)", project.ID)
+		return nil, fmt.Errorf("can't add contact to project (id=%s): %w", project.ID, ErrForbidden)
 	}
 
 	id, err := NewNanoID()
@@ -81,7 +81,7 @@ func (u *Apartomat) UpdateContact(ctx context.Context, contactID string, params 
 	}
 
 	if len(contacts) == 0 {
-		return nil, errors.Wrapf(ErrNotFound, "contact %s", contactID)
+		return nil, fmt.Errorf("contact (id=%s): %w", contactID, ErrNotFound)
 	}
 
 	var (
@@ -91,7 +91,7 @@ func (u *Apartomat) UpdateContact(ctx context.Context, contactID string, params 
 	if ok, err := u.CanUpdateContact(ctx, UserFromCtx(ctx), contact); err != nil {
 		return nil, err
 	} else if !ok {
-		return nil, errors.Wrapf(ErrForbidden, "can't update contact (id=%s)", contact.ID)
+		return nil, fmt.Errorf("can't update contact (id=%s): %w", contact.ID, ErrForbidden)
 	}
 
 	contact = &Contact{
@@ -116,7 +116,7 @@ func (u *Apartomat) CanUpdateContact(ctx context.Context, subj *UserCtx, obj *Co
 	}
 
 	if len(projects) == 0 {
-		return false, errors.Wrapf(ErrNotFound, "project %s", obj.ProjectID)
+		return false, fmt.Errorf("project (id=%s): %w", obj.ProjectID, ErrNotFound)
 	}
 
 	var (
@@ -145,7 +145,7 @@ func (u *Apartomat) DeleteContact(ctx context.Context, contactID string) (*Conta
 	}
 
 	if len(contacts) == 0 {
-		return nil, errors.Wrapf(ErrNotFound, "contact %s", contactID)
+		return nil, fmt.Errorf("contact (id=%s): %w", contactID, ErrNotFound)
 	}
 
 	var (
@@ -155,7 +155,7 @@ func (u *Apartomat) DeleteContact(ctx context.Context, contactID string) (*Conta
 	if ok, err := u.CanDeleteContact(ctx, UserFromCtx(ctx), contact); err != nil {
 		return nil, err
 	} else if !ok {
-		return nil, errors.Wrapf(ErrForbidden, "can't delete contact (id=%s)", contact.ID)
+		return nil, fmt.Errorf("can't delete contact (id=%s): %w", contact.ID, ErrForbidden)
 	}
 
 	err = u.Contacts.Delete(ctx, contact)

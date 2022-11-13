@@ -14,7 +14,7 @@ func (r *mutationResolver) CreateProject(ctx context.Context, input CreateProjec
 			return forbidden()
 		}
 
-		log.Printf("can't create project in workspace (id=%d): %s", input.WorkspaceID, err)
+		log.Printf("can't create project in workspace (id=%s): %s", input.WorkspaceID, err)
 
 		return serverError()
 	}

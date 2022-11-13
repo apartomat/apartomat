@@ -2,9 +2,9 @@ package apartomat
 
 import (
 	"context"
+	"fmt"
 	"github.com/apartomat/apartomat/internal/pkg/expr"
 	"github.com/apartomat/apartomat/internal/store"
-	"github.com/pkg/errors"
 	"time"
 )
 
@@ -15,7 +15,7 @@ func (u *Apartomat) ChangeProjectStatus(ctx context.Context, projectID string, s
 	}
 
 	if len(projects) == 0 {
-		return nil, errors.Wrapf(ErrNotFound, "project %s", projectID)
+		return nil, fmt.Errorf("project (id=%s): %w", projectID, ErrNotFound)
 	}
 
 	var (
@@ -25,7 +25,7 @@ func (u *Apartomat) ChangeProjectStatus(ctx context.Context, projectID string, s
 	if ok, err := u.CanUpdateProject(ctx, UserFromCtx(ctx), project); err != nil {
 		return nil, err
 	} else if !ok {
-		return nil, errors.Wrapf(ErrForbidden, "can't update project (id=%s)", project.ID)
+		return nil, fmt.Errorf("can't update project (id=%s): %w", project.ID, ErrForbidden)
 	}
 
 	if project.Status != status {
@@ -43,7 +43,7 @@ func (u *Apartomat) ChangeProjectDates(ctx context.Context, projectID string, st
 	}
 
 	if len(projects) == 0 {
-		return nil, errors.Wrapf(ErrNotFound, "project %s", projectID)
+		return nil, fmt.Errorf("project (id=%s): %w", projectID, ErrNotFound)
 	}
 
 	var (
@@ -53,7 +53,7 @@ func (u *Apartomat) ChangeProjectDates(ctx context.Context, projectID string, st
 	if ok, err := u.CanUpdateProject(ctx, UserFromCtx(ctx), project); err != nil {
 		return nil, err
 	} else if !ok {
-		return nil, errors.Wrapf(ErrForbidden, "can't update project (id=%s)", project.ID)
+		return nil, fmt.Errorf("can't update project (id=%s): %w", project.ID, ErrForbidden)
 	}
 
 	project.StartAt = startAt

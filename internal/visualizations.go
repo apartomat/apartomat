@@ -6,7 +6,6 @@ import (
 	"github.com/apartomat/apartomat/internal/pkg/expr"
 	"github.com/apartomat/apartomat/internal/store"
 	. "github.com/apartomat/apartomat/internal/store/visualizations"
-	"github.com/pkg/errors"
 	"path/filepath"
 )
 
@@ -123,7 +122,7 @@ func (u *Apartomat) GetVisualizations(
 	}
 
 	if len(projects) == 0 {
-		return nil, errors.Wrapf(ErrNotFound, "project %d", projectID)
+		return nil, fmt.Errorf("project (id=%s): %w", projectID, ErrNotFound)
 	}
 
 	var (
@@ -133,7 +132,7 @@ func (u *Apartomat) GetVisualizations(
 	if ok, err := u.CanGetVisualizations(ctx, UserFromCtx(ctx), project); err != nil {
 		return nil, err
 	} else if !ok {
-		return nil, errors.Wrapf(ErrForbidden, "can't get project (id=%s) visualizations", project.ID)
+		return nil, fmt.Errorf("can't get project (id=%s) visualizations: %w", project.ID, ErrForbidden)
 	}
 
 	return u.Visualizations.List(ctx, And(spec, ProjectIDIn(project.ID)), limit, offset)

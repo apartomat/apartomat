@@ -7,7 +7,6 @@ import (
 	"github.com/apartomat/apartomat/internal/store"
 	"github.com/apartomat/apartomat/internal/store/houses"
 	. "github.com/apartomat/apartomat/internal/store/rooms"
-	"github.com/pkg/errors"
 )
 
 func (u *Apartomat) GetRooms(ctx context.Context, houseID string, limit, offset int) ([]*Room, error) {
@@ -19,7 +18,7 @@ func (u *Apartomat) GetRooms(ctx context.Context, houseID string, limit, offset 
 		return nil, err
 	} else {
 		if len(h) == 0 {
-			return nil, fmt.Errorf("%w: house id=%s", ErrNotFound, houseID)
+			return nil, fmt.Errorf("house (id=%s): %w", houseID, ErrNotFound)
 		}
 
 		house = h[0]
@@ -28,7 +27,7 @@ func (u *Apartomat) GetRooms(ctx context.Context, houseID string, limit, offset 
 	if ok, err := u.CanGetRooms(ctx, UserFromCtx(ctx), house); err != nil {
 		return nil, err
 	} else if !ok {
-		return nil, fmt.Errorf("%w: can't get rooms of house id=%s", ErrForbidden, houseID)
+		return nil, fmt.Errorf("can't get rooms of house (id=%s): %w", houseID, ErrForbidden)
 	}
 
 	return u.Rooms.List(ctx, HouseIDIn(houseID), limit, offset)
@@ -46,7 +45,7 @@ func (u *Apartomat) CanGetRooms(ctx context.Context, subj *UserCtx, obj *houses.
 	if p, err := u.Projects.List(ctx, store.ProjectStoreQuery{ID: expr.StrEq(obj.ProjectID)}); err != nil {
 		return false, err
 	} else if len(p) == 0 {
-		return false, fmt.Errorf("%w: project id=%s", ErrNotFound, obj.ProjectID)
+		return false, fmt.Errorf("project (id=%s): %w", obj.ProjectID, ErrNotFound)
 	} else {
 		project = p[0]
 	}
@@ -81,7 +80,7 @@ func (u *Apartomat) AddRoom(
 		return nil, err
 	} else {
 		if len(h) == 0 {
-			return nil, fmt.Errorf("%w: house id=%s", ErrNotFound, houseID)
+			return nil, fmt.Errorf("house (id=%s): %w", houseID, ErrNotFound)
 		}
 
 		house = h[0]
@@ -90,7 +89,7 @@ func (u *Apartomat) AddRoom(
 	if ok, err := u.CanAddRoom(ctx, UserFromCtx(ctx), house); err != nil {
 		return nil, err
 	} else if !ok {
-		return nil, fmt.Errorf("%w: can't add room to house id=%s", ErrForbidden, house.ID)
+		return nil, fmt.Errorf("can't add room to house (id=%s): %w", house.ID, ErrForbidden)
 	}
 
 	id, err := NewNanoID()
@@ -128,7 +127,7 @@ func (u *Apartomat) UpdateRoom(
 		return nil, err
 	} else {
 		if len(r) == 0 {
-			return nil, fmt.Errorf("%w: room id=%s", ErrNotFound, roomID)
+			return nil, fmt.Errorf("room (id=%s): %w", roomID, ErrNotFound)
 		}
 
 		room = r[0]
@@ -137,7 +136,7 @@ func (u *Apartomat) UpdateRoom(
 	if ok, err := u.CanUpdateRoom(ctx, UserFromCtx(ctx), room); err != nil {
 		return nil, err
 	} else if !ok {
-		return nil, fmt.Errorf("%w: can't update room id=%s", ErrForbidden, room.ID)
+		return nil, fmt.Errorf("can't update room (id=%s): %w", room.ID, ErrForbidden)
 	}
 
 	room = &Room{
@@ -165,7 +164,7 @@ func (u *Apartomat) CanUpdateRoom(ctx context.Context, subj *UserCtx, obj *Room)
 		return false, err
 	} else {
 		if len(h) == 0 {
-			return false, fmt.Errorf("%w: house id=%s", ErrNotFound, obj.HouseID)
+			return false, fmt.Errorf("house (id=%s): %w", obj.HouseID, ErrNotFound)
 		}
 
 		house = h[0]
@@ -174,7 +173,7 @@ func (u *Apartomat) CanUpdateRoom(ctx context.Context, subj *UserCtx, obj *Room)
 	if p, err := u.Projects.List(ctx, store.ProjectStoreQuery{ID: expr.StrEq(house.ProjectID)}); err != nil {
 		return false, err
 	} else if len(p) == 0 {
-		return false, fmt.Errorf("%w: project id=%s", ErrNotFound, house.ProjectID)
+		return false, fmt.Errorf("project (id=%s): %w", house.ProjectID, ErrNotFound)
 	} else {
 		project = p[0]
 	}
@@ -201,7 +200,7 @@ func (u *Apartomat) DeleteRoom(ctx context.Context, roomID string) (*Room, error
 	}
 
 	if len(rooms) == 0 {
-		return nil, errors.Wrapf(ErrNotFound, "room id=%s", roomID)
+		return nil, fmt.Errorf("room (id=%s): %w", roomID, ErrNotFound)
 	}
 
 	var (
@@ -211,7 +210,7 @@ func (u *Apartomat) DeleteRoom(ctx context.Context, roomID string) (*Room, error
 	if ok, err := u.CanDeleteRoom(ctx, UserFromCtx(ctx), room); err != nil {
 		return nil, err
 	} else if !ok {
-		return nil, errors.Wrapf(ErrForbidden, "can't delete room (id=%s)", room.ID)
+		return nil, fmt.Errorf("can't delete room (id=%s): %w", room.ID, ErrForbidden)
 	}
 
 	err = u.Rooms.Delete(ctx, room)

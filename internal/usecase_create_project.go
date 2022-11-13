@@ -2,9 +2,9 @@ package apartomat
 
 import (
 	"context"
+	"fmt"
 	"github.com/apartomat/apartomat/internal/pkg/expr"
 	"github.com/apartomat/apartomat/internal/store"
-	"github.com/pkg/errors"
 	"time"
 )
 
@@ -20,7 +20,7 @@ func (u *Apartomat) CreateProject(
 	}
 
 	if len(workspaces) == 0 {
-		return nil, errors.Wrapf(ErrNotFound, "workspace (id=%d)", workspaceID)
+		return nil, fmt.Errorf("workspace (id=%s): %w", workspaceID, ErrNotFound)
 	}
 
 	var (
@@ -30,7 +30,7 @@ func (u *Apartomat) CreateProject(
 	if ok, err := u.CanCreateProject(ctx, UserFromCtx(ctx), workspace); err != nil {
 		return nil, err
 	} else if !ok {
-		return nil, errors.Wrapf(ErrForbidden, "can't create project in workspace (id=%d)", workspace.ID)
+		return nil, fmt.Errorf("can't create project in workspace (id=%s): %w", workspace.ID, ErrForbidden)
 	}
 
 	id, err := NewNanoID()

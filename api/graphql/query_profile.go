@@ -16,7 +16,7 @@ func (r *queryResolver) Profile(ctx context.Context) (UserProfileResult, error) 
 				return Forbidden{}, nil
 			}
 
-			log.Printf("can't get profile (id=%d): %s", userCtx.ID, err)
+			log.Printf("can't get profile (id=%s): %s", userCtx.ID, err)
 
 			return ServerError{}, nil
 		}

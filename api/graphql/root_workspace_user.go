@@ -2,8 +2,8 @@ package graphql
 
 import (
 	"context"
+	"errors"
 	"github.com/apartomat/apartomat/internal/pkg/gravatar"
-	"github.com/pkg/errors"
 	"log"
 	"strings"
 )

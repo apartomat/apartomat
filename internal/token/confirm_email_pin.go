@@ -5,7 +5,6 @@ import (
 	"fmt"
 	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/o1egl/paseto"
-	"github.com/pkg/errors"
 	"time"
 )
 
@@ -77,12 +76,12 @@ func (p *pasetoConfirmEmailPINTokenIssuerVerifier) Verify(str, pin string) (apar
 
 	err := paseto.NewV2().Decrypt(str, p.secret, &token, &footer)
 	if err != nil {
-		return nil, errors.Wrapf(ErrTokenVerificationError, "%s", err)
+		return nil, fmt.Errorf("%s: %w", err, ErrTokenVerificationError)
 	}
 
 	err = token.Validate(hasPIN(pin))
 	if err != nil {
-		return nil, errors.Wrapf(ErrTokenValidationError, "%s", err)
+		return nil, fmt.Errorf("%s: %w", err, ErrTokenValidationError)
 	}
 
 	return &token, nil

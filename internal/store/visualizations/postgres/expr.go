@@ -1,9 +1,9 @@
 package postgres
 
 import (
+	"errors"
 	. "github.com/apartomat/apartomat/internal/store/visualizations"
 	"github.com/doug-martin/goqu/v9"
-	"github.com/pkg/errors"
 )
 
 type visualizationSpecQuery interface {

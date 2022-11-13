@@ -2,11 +2,11 @@ package graphql
 
 import (
 	"context"
+	"errors"
 	"github.com/99designs/gqlgen/graphql"
 	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/store"
 	"github.com/apartomat/apartomat/internal/store/visualizations"
-	"github.com/pkg/errors"
 	"log"
 )
 
@@ -32,7 +32,7 @@ func (r *mutationResolver) UploadVisualization(
 			return Forbidden{}, nil
 		}
 
-		log.Printf("can't upload file to project (id=%d): %s", projectID, err)
+		log.Printf("can't upload file to project (id=%s): %s", projectID, err)
 
 		return nil, err
 	}

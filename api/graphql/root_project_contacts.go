@@ -2,10 +2,10 @@ package graphql
 
 import (
 	"context"
+	"errors"
 	"github.com/99designs/gqlgen/graphql"
 	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/store/contacts"
-	"github.com/pkg/errors"
 	"log"
 )
 
@@ -40,7 +40,7 @@ func (r *projectContactsResolver) List(
 				return Forbidden{}, nil
 			}
 
-			log.Printf("can't resolve project (id=%d) contacts: %s", project.ID, err)
+			log.Printf("can't resolve project (id=%s) contacts: %s", project.ID, err)
 
 			return ServerError{Message: "internal server error"}, nil
 		}

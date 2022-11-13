@@ -1,6 +1,7 @@
 package apartomat
 
 import (
+	"errors"
 	"github.com/apartomat/apartomat/internal/image"
 	"github.com/apartomat/apartomat/internal/mail"
 	"github.com/apartomat/apartomat/internal/store"
@@ -9,7 +10,6 @@ import (
 	"github.com/apartomat/apartomat/internal/store/rooms"
 	"github.com/apartomat/apartomat/internal/store/visualizations"
 	nanoid "github.com/matoous/go-nanoid/v2"
-	"github.com/pkg/errors"
 )
 
 type Apartomat struct {

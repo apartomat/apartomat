@@ -1,8 +1,9 @@
 package token
 
 import (
+	"errors"
+	"fmt"
 	"github.com/o1egl/paseto"
-	"github.com/pkg/errors"
 )
 
 var (
@@ -24,7 +25,7 @@ var (
 func hasClaim(key, value string) paseto.Validator {
 	return func(token *paseto.JSONToken) error {
 		if token.Get(key) != value {
-			return errors.Wrapf(paseto.ErrTokenValidationError, "incorrect token claim %s", value)
+			return fmt.Errorf("incorrect token claim %s: %w", value, paseto.ErrTokenValidationError)
 		}
 
 		return nil

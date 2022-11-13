@@ -2,9 +2,9 @@ package apartomat
 
 import (
 	"context"
+	"fmt"
 	"github.com/apartomat/apartomat/internal/pkg/expr"
 	"github.com/apartomat/apartomat/internal/store"
-	"github.com/pkg/errors"
 )
 
 func (u *Apartomat) GetDefaultWorkspace(ctx context.Context, userID string) (*store.Workspace, error) {
@@ -14,7 +14,7 @@ func (u *Apartomat) GetDefaultWorkspace(ctx context.Context, userID string) (*st
 	}
 
 	if len(workspaces) == 0 {
-		return nil, errors.Wrapf(ErrNotFound, "workspace of user %d", userID)
+		return nil, fmt.Errorf("workspace of user (id=%s): %w", userID, ErrNotFound)
 	}
 
 	return workspaces[0], nil

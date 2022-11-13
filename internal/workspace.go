@@ -2,9 +2,9 @@ package apartomat
 
 import (
 	"context"
+	"fmt"
 	"github.com/apartomat/apartomat/internal/pkg/expr"
 	"github.com/apartomat/apartomat/internal/store"
-	"github.com/pkg/errors"
 )
 
 func (u *Apartomat) GetWorkspace(ctx context.Context, id string) (*store.Workspace, error) {
@@ -14,7 +14,7 @@ func (u *Apartomat) GetWorkspace(ctx context.Context, id string) (*store.Workspa
 	}
 
 	if len(workspaces) == 0 {
-		return nil, errors.Wrapf(ErrNotFound, "workspace %d", id)
+		return nil, fmt.Errorf("workspace (id=%s): %w", id, ErrNotFound)
 	}
 
 	workspace := workspaces[0]
@@ -22,7 +22,7 @@ func (u *Apartomat) GetWorkspace(ctx context.Context, id string) (*store.Workspa
 	if ok, err := u.CanGetWorkspace(ctx, UserFromCtx(ctx), workspace); err != nil {
 		return nil, err
 	} else if !ok {
-		return nil, errors.Wrapf(ErrForbidden, "can't get workspace (id=%d)", workspace.ID)
+		return nil, fmt.Errorf("can't get workspace (id=%s): %w", workspace.ID, ErrForbidden)
 	}
 
 	return workspaces[0], nil
@@ -61,13 +61,13 @@ func (u *Apartomat) GetWorkspaceProjects(
 	}
 
 	if len(workspaces) == 0 {
-		return nil, errors.Wrapf(ErrNotFound, "workspace %d", workspaceID)
+		return nil, fmt.Errorf("workspace (id=%s): %w", workspaceID, ErrNotFound)
 	}
 
 	workspace := workspaces[0]
 
 	if !u.CanGetWorkspaceProjects(ctx, UserFromCtx(ctx), workspace) {
-		return nil, errors.Wrapf(ErrForbidden, "can't get workspace %d projects", workspace.ID)
+		return nil, fmt.Errorf("can't get workspace (id=%s) projects: %w", workspace.ID, ErrForbidden)
 	}
 
 	p, err := u.Projects.List(
@@ -102,7 +102,7 @@ func (u *Apartomat) GetWorkspaceUserProfile(ctx context.Context, workspaceID, us
 	}
 
 	if len(workspaces) == 0 {
-		return nil, errors.Wrapf(ErrNotFound, "workspace (id=%s)", workspaceID)
+		return nil, fmt.Errorf("workspace (id=%s): %w", workspaceID, ErrNotFound)
 	}
 
 	workspace := workspaces[0]
@@ -110,12 +110,12 @@ func (u *Apartomat) GetWorkspaceUserProfile(ctx context.Context, workspaceID, us
 	if ok, err := u.CanGetWorkspaceUsers(ctx, UserFromCtx(ctx), workspace); err != nil {
 		return nil, err
 	} else if !ok {
-		return nil, errors.Wrapf(ErrForbidden, "can't get workspace (id=%s) users", workspace.ID)
+		return nil, fmt.Errorf("can't get workspace (id=%s) users: %w", workspace.ID, ErrForbidden)
 	}
 
 	loader, err := UserLoaderFromCtx(ctx)
 	if err != nil {
-		return nil, errors.Wrap(err, "can't get workspace user profile")
+		return nil, fmt.Errorf("can't get workspace user profile: %w", err)
 	}
 
 	user, err := loader.Load(userID)
@@ -138,7 +138,7 @@ func (u *Apartomat) GetWorkspaceUsers(ctx context.Context, id string, limit, off
 	}
 
 	if len(workspaces) == 0 {
-		return nil, errors.Wrapf(ErrNotFound, "workspace (id=%s)", id)
+		return nil, fmt.Errorf("workspace (id=%s): %w", id, ErrNotFound)
 	}
 
 	workspace := workspaces[0]
@@ -146,7 +146,7 @@ func (u *Apartomat) GetWorkspaceUsers(ctx context.Context, id string, limit, off
 	if ok, err := u.CanGetWorkspaceUsers(ctx, UserFromCtx(ctx), workspace); err != nil {
 		return nil, err
 	} else if !ok {
-		return nil, errors.Wrapf(ErrForbidden, "can't get workspace (id=%s) users", workspace.ID)
+		return nil, fmt.Errorf("can't get workspace (id=%s) users: %w", workspace.ID, ErrForbidden)
 	}
 
 	wu, err := u.WorkspaceUsers.List(ctx, store.WorkspaceUserStoreQuery{WorkspaceID: expr.StrEq(id)})

@@ -2,10 +2,10 @@ package apartomat
 
 import (
 	"context"
+	"fmt"
 	"github.com/apartomat/apartomat/internal/pkg/expr"
 	"github.com/apartomat/apartomat/internal/store"
 	. "github.com/apartomat/apartomat/internal/store/contacts"
-	"github.com/pkg/errors"
 )
 
 func (u *Apartomat) GetContacts(ctx context.Context, projectID string, limit, offset int) ([]*Contact, error) {
@@ -15,7 +15,7 @@ func (u *Apartomat) GetContacts(ctx context.Context, projectID string, limit, of
 	}
 
 	if len(projects) == 0 {
-		return nil, errors.Wrapf(ErrNotFound, "project %d", projectID)
+		return nil, fmt.Errorf("project (id=%s): %w", projectID, ErrNotFound)
 	}
 
 	project := projects[0]
@@ -23,7 +23,7 @@ func (u *Apartomat) GetContacts(ctx context.Context, projectID string, limit, of
 	if ok, err := u.CanGetContacts(ctx, UserFromCtx(ctx), project); err != nil {
 		return nil, err
 	} else if !ok {
-		return nil, errors.Wrapf(ErrForbidden, "can't get project (id=%d) contacts", project.ID)
+		return nil, fmt.Errorf("can't get project (id=%s) contacts: %w", project.ID, ErrForbidden)
 	}
 
 	return u.Contacts.List(ctx, ProjectIDIn(project.ID), limit, offset)

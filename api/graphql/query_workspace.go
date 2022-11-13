@@ -19,7 +19,7 @@ func (r *queryResolver) Workspace(ctx context.Context, id string) (WorkspaceResu
 			return NotFound{}, nil
 		}
 
-		log.Printf("can't resolve workspace (id=%d): %s", id, err)
+		log.Printf("can't resolve workspace (id=%s): %s", id, err)
 
 		return ServerError{}, nil
 	}

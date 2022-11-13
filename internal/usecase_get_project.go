@@ -2,9 +2,9 @@ package apartomat
 
 import (
 	"context"
+	"fmt"
 	. "github.com/apartomat/apartomat/internal/pkg/expr"
 	"github.com/apartomat/apartomat/internal/store"
-	"github.com/pkg/errors"
 )
 
 func (u *Apartomat) GetProject(ctx context.Context, id string) (*store.Project, error) {
@@ -14,13 +14,13 @@ func (u *Apartomat) GetProject(ctx context.Context, id string) (*store.Project, 
 	}
 
 	if len(projects) == 0 {
-		return nil, errors.Wrapf(ErrNotFound, "project %d", id)
+		return nil, fmt.Errorf("project (id=%s): %w", id, ErrNotFound)
 	}
 
 	project := projects[0]
 
 	if !u.CanGetProject(ctx, UserFromCtx(ctx), project) {
-		return nil, errors.Wrapf(ErrForbidden, "can't get project %d", id)
+		return nil, fmt.Errorf("can't get project (id=%s): %w", id, ErrForbidden)
 	}
 
 	return project, nil

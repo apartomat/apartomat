@@ -25,5 +25,4 @@ func (r *queryResolver) Project(ctx context.Context, id string) (ProjectResult, 
 	}
 
 	return projectToGraphQL(project), nil
-
 }

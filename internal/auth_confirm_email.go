@@ -2,9 +2,9 @@ package apartomat
 
 import (
 	"context"
+	"fmt"
 	"github.com/apartomat/apartomat/internal/pkg/expr"
 	"github.com/apartomat/apartomat/internal/store"
-	"github.com/pkg/errors"
 )
 
 type EmailConfirmToken interface {
@@ -33,7 +33,7 @@ func (u *Apartomat) ConfirmEmailByToken(ctx context.Context, str string) (string
 	}
 
 	if len(users) == 0 {
-		return "", errors.Wrapf(ErrNotFound, "user %s", str)
+		return "", fmt.Errorf("user (email=%s): %w", email, ErrNotFound)
 	}
 
 	return u.AuthTokenIssuer.Issue(users[0].ID)

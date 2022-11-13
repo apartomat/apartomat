@@ -5,7 +5,6 @@ import (
 	"fmt"
 	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/o1egl/paseto"
-	"github.com/pkg/errors"
 	"time"
 )
 
@@ -56,7 +55,7 @@ func (p *pasetoMailConfirmTokenIssuerVerifier) Issue(email string) (string, erro
 	str, err := paseto.NewV2().Sign(p.privateKey, token, "")
 
 	if err != nil {
-		return "", fmt.Errorf("can't sign: %s", err)
+		return "", fmt.Errorf("can't sign: %w", err)
 	}
 
 	return str, nil
@@ -70,12 +69,12 @@ func (p *pasetoMailConfirmTokenIssuerVerifier) Verify(str string) (apartomat.Ema
 
 	err := paseto.NewV2().Verify(str, p.privateKey.Public(), &token, &footer)
 	if err != nil {
-		return nil, errors.Wrapf(ErrTokenVerificationError, "%s", err)
+		return nil, fmt.Errorf("%s: %w", err, ErrTokenVerificationError)
 	}
 
 	err = token.Validate()
 	if err != nil {
-		return nil, errors.Wrapf(ErrTokenValidationError, "%s", err)
+		return nil, fmt.Errorf("%s: %w", err, ErrTokenValidationError)
 	}
 
 	return &token, nil

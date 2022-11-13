@@ -27,7 +27,7 @@ func (r *mutationResolver) UploadProjectFile(
 			return Forbidden{}, nil
 		}
 
-		log.Printf("can't upload file to project (id=%d): %s", input.ProjectID, err)
+		log.Printf("can't upload file to project (id=%s): %s", input.ProjectID, err)
 
 		return serverError()
 	}
