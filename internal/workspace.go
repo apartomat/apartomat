@@ -80,7 +80,9 @@ func (u *Apartomat) GetWorkspaceProjects(
 
 	workspace := workspaces[0]
 
-	if !u.CanGetWorkspaceProjects(ctx, UserFromCtx(ctx), workspace) {
+	if ok, err := u.CanGetWorkspaceProjects(ctx, UserFromCtx(ctx), workspace); err != nil {
+		return nil, err
+	} else if !ok {
 		return nil, fmt.Errorf("can't get workspace (id=%s) projects: %w", workspace.ID, ErrForbidden)
 	}
 
@@ -104,9 +106,8 @@ type GetWorkspaceProjectsFilter struct {
 	Status store.ProjectStatusExpr
 }
 
-func (u *Apartomat) CanGetWorkspaceProjects(ctx context.Context, subj *UserCtx, obj *store.Workspace) bool {
-	// todo check subj is workspace owner or admin
-	return true
+func (u *Apartomat) CanGetWorkspaceProjects(ctx context.Context, subj *UserCtx, obj *store.Workspace) (bool, error) {
+	return u.isWorkspaceUser(ctx, subj, obj)
 }
 
 func (u *Apartomat) GetWorkspaceUserProfile(ctx context.Context, workspaceID, userID string) (*store.User, error) {
@@ -138,11 +139,6 @@ func (u *Apartomat) GetWorkspaceUserProfile(ctx context.Context, workspaceID, us
 	}
 
 	return user, nil
-}
-
-func (u *Apartomat) CanGetWorkspaceUserProfile(ctx context.Context, subj *UserCtx, obj struct{ WorkspaceID, UserID string }) bool {
-	// todo check subj has access to workspace
-	return true
 }
 
 func (u *Apartomat) GetWorkspaceUsers(ctx context.Context, id string, limit, offset int) ([]*store.WorkspaceUser, error) {

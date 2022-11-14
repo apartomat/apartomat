@@ -156,14 +156,15 @@ func (u *Apartomat) GetProject(ctx context.Context, id string) (*store.Project, 
 
 	project := projects[0]
 
-	if !u.CanGetProject(ctx, UserFromCtx(ctx), project) {
-		return nil, fmt.Errorf("can't get project (id=%s): %w", id, ErrForbidden)
+	if ok, err := u.CanGetProject(ctx, UserFromCtx(ctx), project); err != nil {
+		return nil, err
+	} else if !ok {
+		return nil, fmt.Errorf("can't get project (id=%s): %w", project.ID, ErrForbidden)
 	}
 
 	return project, nil
 }
 
-func (u *Apartomat) CanGetProject(ctx context.Context, subj *UserCtx, obj *store.Project) bool {
-	// todo check subj is workspace owner or admin
-	return true
+func (u *Apartomat) CanGetProject(ctx context.Context, subj *UserCtx, obj *store.Project) (bool, error) {
+	return u.isProjectUser(ctx, subj, obj)
 }
