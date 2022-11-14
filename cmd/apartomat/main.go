@@ -126,7 +126,7 @@ func main() {
 
 		NewServer(
 			usecases,
-			&apartomat.DataLoaders{
+			&dataloader.DataLoaders{
 				Users: usersLoader,
 			},
 		).Run(serverOpts...)

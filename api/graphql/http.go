@@ -4,6 +4,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
 	apartomat "github.com/apartomat/apartomat/internal"
+	"github.com/apartomat/apartomat/internal/dataloader"
 	"net/http"
 	"strings"
 )
@@ -12,7 +13,7 @@ type CheckAuthTokenFn func(str string) (apartomat.AuthToken, error)
 
 func Handler(
 	ch CheckAuthTokenFn,
-	loaders *apartomat.DataLoaders,
+	loaders *dataloader.DataLoaders,
 	resolver ResolverRoot,
 	complexityLimit int,
 ) http.Handler {
@@ -47,9 +48,9 @@ func WithUserHandler(checkAuthToken CheckAuthTokenFn, next http.Handler) http.Ha
 	})
 }
 
-func WithDataLoadersHandler(loaders *apartomat.DataLoaders, next http.Handler) http.Handler {
+func WithDataLoadersHandler(loaders *dataloader.DataLoaders, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		r = r.WithContext(apartomat.WithDataLoadersCtx(r.Context(), loaders))
+		r = r.WithContext(dataloader.WithDataLoadersCtx(r.Context(), loaders))
 		next.ServeHTTP(w, r)
 	})
 }

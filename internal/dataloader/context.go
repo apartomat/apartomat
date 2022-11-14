@@ -1,15 +1,14 @@
-package apartomat
+package dataloader
 
 import (
 	"context"
 	"errors"
-	"github.com/apartomat/apartomat/internal/dataloader"
 )
 
 const dataLoadersCtxKey = "dataloaders"
 
 type DataLoaders struct {
-	Users *dataloader.UserLoader
+	Users *UserLoader
 }
 
 func WithDataLoadersCtx(ctx context.Context, dataLoaders *DataLoaders) context.Context {
@@ -20,7 +19,7 @@ func DataLoadersFromCtx(ctx context.Context) *DataLoaders {
 	return ctx.Value(dataLoadersCtxKey).(*DataLoaders)
 }
 
-func UserLoaderFromCtx(ctx context.Context) (*dataloader.UserLoader, error) {
+func UserLoaderFromCtx(ctx context.Context) (*UserLoader, error) {
 	loaders := DataLoadersFromCtx(ctx)
 	if loaders == nil {
 		return nil, errors.New("there are no data loaders in context")

@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"github.com/apartomat/apartomat/internal/image"
+	"github.com/apartomat/apartomat/internal/image/minio"
 	"github.com/apartomat/apartomat/internal/resizer"
 	"io"
 	"log"
@@ -39,6 +41,35 @@ func params(values url.Values) resizer.Params {
 	return p
 }
 
+func opts(values url.Values) image.ResizeOptions {
+	var (
+		p image.ResizeOptions
+	)
+
+	for k, v := range values {
+		if len(v) == 0 {
+			continue
+		}
+
+		switch k {
+		case "w", "width":
+			if w, err := strconv.Atoi(v[0]); err == nil {
+				p.Width = uint(w)
+			}
+		case "h", "height":
+			if h, err := strconv.Atoi(v[0]); err == nil {
+				p.Height = uint(h)
+			}
+		case "f", "fit":
+			if f, err := strconv.Atoi(v[0]); err == nil {
+				p.Fit = uint(f)
+			}
+		}
+	}
+
+	return p
+}
+
 func handler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		w.WriteHeader(http.StatusBadRequest)
@@ -67,12 +98,35 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func mhandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	res := minio.NewUploader("apartomat")
+
+	img, err := res.Resize(context.TODO(), r.URL.Path, opts(r.URL.Query()))
+	if err != nil {
+		log.Printf("can't resize: %s", err)
+		w.WriteHeader(http.StatusUnsupportedMediaType)
+		return
+	}
+
+	_, err = io.Copy(w, img)
+	if err != nil {
+		log.Printf("can't write: %s", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+}
+
 func main() {
 	addr := "localhost:8080"
 
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/", handler)
+	mux.HandleFunc("/", mhandler)
 
 	s := http.Server{
 		Addr:         addr,

@@ -5,8 +5,16 @@ import (
 	"fmt"
 	"github.com/apartomat/apartomat/internal/pkg/expr"
 	"github.com/apartomat/apartomat/internal/store"
+	"io"
 	"path/filepath"
 )
+
+type Upload struct {
+	Name     string
+	MimeType string
+	Data     io.Reader
+	Size     int64
+}
 
 type GetProjectFilesFilter struct {
 	Type store.ProjectFileTypeExpr

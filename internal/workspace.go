@@ -3,6 +3,7 @@ package apartomat
 import (
 	"context"
 	"fmt"
+	"github.com/apartomat/apartomat/internal/dataloader"
 	"github.com/apartomat/apartomat/internal/pkg/expr"
 	"github.com/apartomat/apartomat/internal/store"
 )
@@ -46,6 +47,19 @@ func (u *Apartomat) CanGetWorkspace(ctx context.Context, subj *UserCtx, obj *sto
 	}
 
 	return wu[0].UserID == subj.ID, nil
+}
+
+func (u *Apartomat) GetDefaultWorkspace(ctx context.Context, userID string) (*store.Workspace, error) {
+	workspaces, err := u.Workspaces.List(ctx, store.WorkspaceStoreQuery{UserID: expr.StrEq(userID), Limit: 1})
+	if err != nil {
+		return nil, err
+	}
+
+	if len(workspaces) == 0 {
+		return nil, fmt.Errorf("workspace of user (id=%s): %w", userID, ErrNotFound)
+	}
+
+	return workspaces[0], nil
 }
 
 func (u *Apartomat) GetWorkspaceProjects(
@@ -113,7 +127,7 @@ func (u *Apartomat) GetWorkspaceUserProfile(ctx context.Context, workspaceID, us
 		return nil, fmt.Errorf("can't get workspace (id=%s) users: %w", workspace.ID, ErrForbidden)
 	}
 
-	loader, err := UserLoaderFromCtx(ctx)
+	loader, err := dataloader.UserLoaderFromCtx(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("can't get workspace user profile: %w", err)
 	}
