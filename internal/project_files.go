@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/apartomat/apartomat/internal/pkg/expr"
 	"github.com/apartomat/apartomat/internal/store"
+	"github.com/apartomat/apartomat/internal/store/projects"
 	"io"
 	"path/filepath"
 )
@@ -26,17 +27,17 @@ func (u *Apartomat) GetProjectFiles(
 	filter GetProjectFilesFilter,
 	limit, offset int,
 ) ([]*store.ProjectFile, error) {
-	projects, err := u.Projects.List(ctx, store.ProjectStoreQuery{ID: expr.StrEq(projectID)})
+	prjs, err := u.Projects.List(ctx, projects.IDIn(projectID), 1, 0)
 	if err != nil {
 		return nil, err
 	}
 
-	if len(projects) == 0 {
+	if len(prjs) == 0 {
 		return nil, fmt.Errorf("project (id=%s): %w", projectID, ErrNotFound)
 	}
 
 	var (
-		project = projects[0]
+		project = prjs[0]
 	)
 
 	if ok, err := u.CanGetProjectFiles(ctx, UserFromCtx(ctx), project); err != nil {
@@ -61,7 +62,7 @@ func (u *Apartomat) GetProjectFiles(
 	return p, nil
 }
 
-func (u *Apartomat) CanGetProjectFiles(ctx context.Context, subj *UserCtx, obj *store.Project) (bool, error) {
+func (u *Apartomat) CanGetProjectFiles(ctx context.Context, subj *UserCtx, obj *projects.Project) (bool, error) {
 	return u.isProjectUser(ctx, subj, obj)
 }
 
@@ -70,17 +71,17 @@ func (u *Apartomat) CountProjectFiles(
 	projectID string,
 	filter GetProjectFilesFilter,
 ) (int, error) {
-	projects, err := u.Projects.List(ctx, store.ProjectStoreQuery{ID: expr.StrEq(projectID)})
+	prjs, err := u.Projects.List(ctx, projects.IDIn(projectID), 1, 0)
 	if err != nil {
 		return 0, err
 	}
 
-	if len(projects) == 0 {
+	if len(prjs) == 0 {
 		return 0, fmt.Errorf("project (id=%s): %w", projectID, ErrNotFound)
 	}
 
 	var (
-		project = projects[0]
+		project = prjs[0]
 	)
 
 	if ok, err := u.CanCountProjectFiles(ctx, UserFromCtx(ctx), project); err != nil {
@@ -98,7 +99,7 @@ func (u *Apartomat) CountProjectFiles(
 	)
 }
 
-func (u *Apartomat) CanCountProjectFiles(ctx context.Context, subj *UserCtx, obj *store.Project) (bool, error) {
+func (u *Apartomat) CanCountProjectFiles(ctx context.Context, subj *UserCtx, obj *projects.Project) (bool, error) {
 	return u.isProjectUser(ctx, subj, obj)
 }
 
@@ -108,16 +109,18 @@ func (u *Apartomat) UploadFile(
 	upload Upload,
 	fileType store.ProjectFileType,
 ) (*store.ProjectFile, error) {
-	projects, err := u.Projects.List(ctx, store.ProjectStoreQuery{ID: expr.StrEq(projectID)})
+	prjs, err := u.Projects.List(ctx, projects.IDIn(projectID), 1, 0)
 	if err != nil {
 		return nil, err
 	}
 
-	if len(projects) == 0 {
+	if len(prjs) == 0 {
 		return nil, fmt.Errorf("project (id=%s): %w", projectID, ErrNotFound)
 	}
 
-	project := projects[0]
+	var (
+		project = prjs[0]
+	)
 
 	if ok, err := u.CanUploadProjectFile(ctx, UserFromCtx(ctx), project); err != nil {
 		return nil, err
@@ -154,6 +157,6 @@ func (u *Apartomat) UploadFile(
 	return f, nil
 }
 
-func (u *Apartomat) CanUploadProjectFile(ctx context.Context, subj *UserCtx, obj *store.Project) (bool, error) {
+func (u *Apartomat) CanUploadProjectFile(ctx context.Context, subj *UserCtx, obj *projects.Project) (bool, error) {
 	return u.isProjectUser(ctx, subj, obj)
 }

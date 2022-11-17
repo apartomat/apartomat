@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/apartomat/apartomat/internal/pkg/expr"
 	"github.com/apartomat/apartomat/internal/store"
+	"github.com/apartomat/apartomat/internal/store/projects"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
 	"math/rand"
@@ -189,7 +190,7 @@ func (u *Apartomat) isWorkspaceUser(ctx context.Context, subj *UserCtx, obj *sto
 	return wu[0].UserID == subj.ID, nil
 }
 
-func (u *Apartomat) isProjectUser(ctx context.Context, subj *UserCtx, obj *store.Project) (bool, error) {
+func (u *Apartomat) isProjectUser(ctx context.Context, subj *UserCtx, obj *projects.Project) (bool, error) {
 	if subj == nil {
 		return false, nil
 	}

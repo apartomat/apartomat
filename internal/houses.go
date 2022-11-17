@@ -6,20 +6,23 @@ import (
 	"github.com/apartomat/apartomat/internal/pkg/expr"
 	"github.com/apartomat/apartomat/internal/store"
 	. "github.com/apartomat/apartomat/internal/store/houses"
+	"github.com/apartomat/apartomat/internal/store/projects"
 	"time"
 )
 
 func (u *Apartomat) GetHouses(ctx context.Context, projectID string, limit, offset int) ([]*House, error) {
-	projects, err := u.Projects.List(ctx, store.ProjectStoreQuery{ID: expr.StrEq(projectID)})
+	prjs, err := u.Projects.List(ctx, projects.IDIn(projectID), 1, 0)
 	if err != nil {
 		return nil, err
 	}
 
-	if len(projects) == 0 {
+	if len(prjs) == 0 {
 		return nil, fmt.Errorf("project (id=%s): %w", projectID, ErrNotFound)
 	}
 
-	project := projects[0]
+	var (
+		project = prjs[0]
+	)
 
 	if ok, err := u.CanGetHouses(ctx, UserFromCtx(ctx), project); err != nil {
 		return nil, err
@@ -30,7 +33,7 @@ func (u *Apartomat) GetHouses(ctx context.Context, projectID string, limit, offs
 	return u.Houses.List(ctx, ProjectIDIn(project.ID), limit, offset)
 }
 
-func (u *Apartomat) CanGetHouses(ctx context.Context, subj *UserCtx, obj *store.Project) (bool, error) {
+func (u *Apartomat) CanGetHouses(ctx context.Context, subj *UserCtx, obj *projects.Project) (bool, error) {
 	if subj == nil {
 		return false, nil
 	}
@@ -55,16 +58,18 @@ func (u *Apartomat) AddHouse(
 	projectID string,
 	city, address, housingComplex string,
 ) (*House, error) {
-	projects, err := u.Projects.List(ctx, store.ProjectStoreQuery{ID: expr.StrEq(projectID)})
+	prjs, err := u.Projects.List(ctx, projects.IDIn(projectID), 1, 0)
 	if err != nil {
 		return nil, err
 	}
 
-	if len(projects) == 0 {
+	if len(prjs) == 0 {
 		return nil, fmt.Errorf("project (id=%s): %w", projectID, ErrNotFound)
 	}
 
-	project := projects[0]
+	var (
+		project = prjs[0]
+	)
 
 	if ok, err := u.CanAddHouse(ctx, UserFromCtx(ctx), project); err != nil {
 		return nil, err
@@ -88,7 +93,7 @@ func (u *Apartomat) AddHouse(
 	return u.Houses.Save(ctx, house)
 }
 
-func (u *Apartomat) CanAddHouse(ctx context.Context, subj *UserCtx, obj *store.Project) (bool, error) {
+func (u *Apartomat) CanAddHouse(ctx context.Context, subj *UserCtx, obj *projects.Project) (bool, error) {
 	if subj == nil {
 		return false, nil
 	}
@@ -150,17 +155,17 @@ func (u *Apartomat) CanUpdateHouse(ctx context.Context, subj *UserCtx, obj *Hous
 		return false, nil
 	}
 
-	projects, err := u.Projects.List(ctx, store.ProjectStoreQuery{ID: expr.StrEq(obj.ProjectID)})
+	prjs, err := u.Projects.List(ctx, projects.IDIn(obj.ProjectID), 1, 0)
 	if err != nil {
 		return false, err
 	}
 
-	if len(projects) == 0 {
+	if len(prjs) == 0 {
 		return false, fmt.Errorf("project (id=%s): %w", obj.ProjectID, ErrNotFound)
 	}
 
 	var (
-		project = projects[0]
+		project = prjs[0]
 	)
 
 	wu, err := u.WorkspaceUsers.List(

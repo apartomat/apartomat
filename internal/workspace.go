@@ -6,6 +6,7 @@ import (
 	"github.com/apartomat/apartomat/internal/dataloader"
 	"github.com/apartomat/apartomat/internal/pkg/expr"
 	"github.com/apartomat/apartomat/internal/store"
+	"github.com/apartomat/apartomat/internal/store/projects"
 )
 
 func (u *Apartomat) GetWorkspace(ctx context.Context, id string) (*store.Workspace, error) {
@@ -65,10 +66,10 @@ func (u *Apartomat) GetDefaultWorkspace(ctx context.Context, userID string) (*st
 func (u *Apartomat) GetWorkspaceProjects(
 	ctx context.Context,
 	workspaceID string,
-	filter GetWorkspaceProjectsFilter,
+	status []projects.Status,
 	limit,
 	offset int,
-) ([]*store.Project, error) {
+) ([]*projects.Project, error) {
 	workspaces, err := u.Workspaces.List(ctx, store.WorkspaceStoreQuery{ID: expr.StrEq(workspaceID)})
 	if err != nil {
 		return nil, err
@@ -86,24 +87,19 @@ func (u *Apartomat) GetWorkspaceProjects(
 		return nil, fmt.Errorf("can't get workspace (id=%s) projects: %w", workspace.ID, ErrForbidden)
 	}
 
-	p, err := u.Projects.List(
-		ctx,
-		store.ProjectStoreQuery{
-			WorkspaceID: expr.StrEq(workspaceID),
-			Status:      filter.Status,
-			Limit:       limit,
-			Offset:      offset,
-		},
+	p, err := u.Projects.List(ctx,
+		projects.And(
+			projects.WorkspaceIDIn(workspaceID),
+			projects.StatusIn(status...),
+		),
+		limit,
+		offset,
 	)
 	if err != nil {
 		return nil, err
 	}
 
 	return p, nil
-}
-
-type GetWorkspaceProjectsFilter struct {
-	Status store.ProjectStatusExpr
 }
 
 func (u *Apartomat) CanGetWorkspaceProjects(ctx context.Context, subj *UserCtx, obj *store.Workspace) (bool, error) {

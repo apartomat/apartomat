@@ -7,6 +7,7 @@ import (
 	"github.com/apartomat/apartomat/internal/store"
 	"github.com/apartomat/apartomat/internal/store/contacts"
 	"github.com/apartomat/apartomat/internal/store/houses"
+	"github.com/apartomat/apartomat/internal/store/projects"
 	"github.com/apartomat/apartomat/internal/store/rooms"
 	"github.com/apartomat/apartomat/internal/store/visualizations"
 	nanoid "github.com/matoous/go-nanoid/v2"
@@ -29,7 +30,7 @@ type Apartomat struct {
 
 	Contacts       contacts.Store
 	Houses         houses.Store
-	Projects       store.ProjectStore
+	Projects       projects.Store
 	ProjectFiles   store.ProjectFileStore
 	Rooms          rooms.Store
 	Users          store.UserStore

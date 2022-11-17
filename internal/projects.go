@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/apartomat/apartomat/internal/pkg/expr"
 	"github.com/apartomat/apartomat/internal/store"
+	. "github.com/apartomat/apartomat/internal/store/projects"
 	"time"
 )
 
@@ -13,7 +14,7 @@ func (u *Apartomat) CreateProject(
 	workspaceID string,
 	name string,
 	startAt, endAt *time.Time,
-) (*store.Project, error) {
+) (*Project, error) {
 	workspaces, err := u.Workspaces.List(ctx, store.WorkspaceStoreQuery{ID: expr.StrEq(workspaceID)})
 	if err != nil {
 		return nil, err
@@ -38,16 +39,13 @@ func (u *Apartomat) CreateProject(
 		return nil, err
 	}
 
-	project := &store.Project{
-		ID:          id,
-		Name:        name,
-		WorkspaceID: workspaceID,
-		Status:      store.ProjectStatusNew,
-		StartAt:     startAt,
-		EndAt:       endAt,
+	project := New(id, name, startAt, endAt, workspaceID)
+
+	if err := u.Projects.Save(ctx, project); err != nil {
+		return nil, err
 	}
 
-	return u.Projects.Save(ctx, project)
+	return project, nil
 }
 
 func (u *Apartomat) CanCreateProject(ctx context.Context, subj *UserCtx, obj *store.Workspace) (bool, error) {
@@ -70,8 +68,8 @@ func (u *Apartomat) CanCreateProject(ctx context.Context, subj *UserCtx, obj *st
 	return true, nil
 }
 
-func (u *Apartomat) ChangeProjectStatus(ctx context.Context, projectID string, status store.ProjectStatus) (*store.Project, error) {
-	projects, err := u.Projects.List(ctx, store.ProjectStoreQuery{ID: expr.StrEq(projectID), Limit: 1, Offset: 0})
+func (u *Apartomat) ChangeProjectStatus(ctx context.Context, projectID string, status Status) (*Project, error) {
+	projects, err := u.Projects.List(ctx, IDIn(projectID), 1, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -90,16 +88,17 @@ func (u *Apartomat) ChangeProjectStatus(ctx context.Context, projectID string, s
 		return nil, fmt.Errorf("can't update project (id=%s): %w", project.ID, ErrForbidden)
 	}
 
-	if project.Status != status {
-		project.Status = status
-		return u.Projects.Save(ctx, project)
+	project.ChangeStatus(status)
+
+	if err := u.Projects.Save(ctx, project); err != nil {
+		return nil, err
 	}
 
 	return project, nil
 }
 
-func (u *Apartomat) ChangeProjectDates(ctx context.Context, projectID string, startAt, endAt *time.Time) (*store.Project, error) {
-	projects, err := u.Projects.List(ctx, store.ProjectStoreQuery{ID: expr.StrEq(projectID), Limit: 1, Offset: 0})
+func (u *Apartomat) ChangeProjectDates(ctx context.Context, projectID string, startAt, endAt *time.Time) (*Project, error) {
+	projects, err := u.Projects.List(ctx, IDIn(projectID), 1, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -118,13 +117,16 @@ func (u *Apartomat) ChangeProjectDates(ctx context.Context, projectID string, st
 		return nil, fmt.Errorf("can't update project (id=%s): %w", project.ID, ErrForbidden)
 	}
 
-	project.StartAt = startAt
-	project.EndAt = endAt
+	project.ChangeDates(startAt, endAt)
 
-	return u.Projects.Save(ctx, project)
+	if err := u.Projects.Save(ctx, project); err != nil {
+		return nil, err
+	}
+
+	return project, nil
 }
 
-func (u *Apartomat) CanUpdateProject(ctx context.Context, subj *UserCtx, obj *store.Project) (bool, error) {
+func (u *Apartomat) CanUpdateProject(ctx context.Context, subj *UserCtx, obj *Project) (bool, error) {
 	if subj == nil {
 		return false, nil
 	}
@@ -144,17 +146,19 @@ func (u *Apartomat) CanUpdateProject(ctx context.Context, subj *UserCtx, obj *st
 	return wu[0].UserID == subj.ID, nil
 }
 
-func (u *Apartomat) GetProject(ctx context.Context, id string) (*store.Project, error) {
-	projects, err := u.Projects.List(ctx, store.ProjectStoreQuery{ID: expr.StrEq(id)})
+func (u *Apartomat) GetProject(ctx context.Context, id string) (*Project, error) {
+	prjs, err := u.Projects.List(ctx, IDIn(id), 1, 0)
 	if err != nil {
 		return nil, err
 	}
 
-	if len(projects) == 0 {
+	if len(prjs) == 0 {
 		return nil, fmt.Errorf("project (id=%s): %w", id, ErrNotFound)
 	}
 
-	project := projects[0]
+	var (
+		project = prjs[0]
+	)
 
 	if ok, err := u.CanGetProject(ctx, UserFromCtx(ctx), project); err != nil {
 		return nil, err
@@ -165,6 +169,6 @@ func (u *Apartomat) GetProject(ctx context.Context, id string) (*store.Project, 
 	return project, nil
 }
 
-func (u *Apartomat) CanGetProject(ctx context.Context, subj *UserCtx, obj *store.Project) (bool, error) {
+func (u *Apartomat) CanGetProject(ctx context.Context, subj *UserCtx, obj *Project) (bool, error) {
 	return u.isProjectUser(ctx, subj, obj)
 }

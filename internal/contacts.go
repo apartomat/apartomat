@@ -6,6 +6,7 @@ import (
 	"github.com/apartomat/apartomat/internal/pkg/expr"
 	"github.com/apartomat/apartomat/internal/store"
 	. "github.com/apartomat/apartomat/internal/store/contacts"
+	"github.com/apartomat/apartomat/internal/store/projects"
 )
 
 type AddContactParams struct {
@@ -15,16 +16,18 @@ type AddContactParams struct {
 }
 
 func (u *Apartomat) AddContact(ctx context.Context, projectID string, params AddContactParams) (*Contact, error) {
-	projects, err := u.Projects.List(ctx, store.ProjectStoreQuery{ID: expr.StrEq(projectID)})
+	prjs, err := u.Projects.List(ctx, projects.IDIn(projectID), 1, 0)
 	if err != nil {
 		return nil, err
 	}
 
-	if len(projects) == 0 {
+	if len(prjs) == 0 {
 		return nil, fmt.Errorf("project (id=%s): %w", projectID, ErrNotFound)
 	}
 
-	project := projects[0]
+	var (
+		project = prjs[0]
+	)
 
 	if ok, err := u.CanAddContact(ctx, UserFromCtx(ctx), project); err != nil {
 		return nil, err
@@ -48,7 +51,7 @@ func (u *Apartomat) AddContact(ctx context.Context, projectID string, params Add
 	return u.Contacts.Save(ctx, contact)
 }
 
-func (u *Apartomat) CanAddContact(ctx context.Context, subj *UserCtx, obj *store.Project) (bool, error) {
+func (u *Apartomat) CanAddContact(ctx context.Context, subj *UserCtx, obj *projects.Project) (bool, error) {
 	if subj == nil {
 		return false, nil
 	}
@@ -69,16 +72,18 @@ func (u *Apartomat) CanAddContact(ctx context.Context, subj *UserCtx, obj *store
 }
 
 func (u *Apartomat) GetContacts(ctx context.Context, projectID string, limit, offset int) ([]*Contact, error) {
-	projects, err := u.Projects.List(ctx, store.ProjectStoreQuery{ID: expr.StrEq(projectID)})
+	prjs, err := u.Projects.List(ctx, projects.IDIn(projectID), 1, 0)
 	if err != nil {
 		return nil, err
 	}
 
-	if len(projects) == 0 {
+	if len(prjs) == 0 {
 		return nil, fmt.Errorf("project (id=%s): %w", projectID, ErrNotFound)
 	}
 
-	project := projects[0]
+	var (
+		project = prjs[0]
+	)
 
 	if ok, err := u.CanGetContacts(ctx, UserFromCtx(ctx), project); err != nil {
 		return nil, err
@@ -89,7 +94,7 @@ func (u *Apartomat) GetContacts(ctx context.Context, projectID string, limit, of
 	return u.Contacts.List(ctx, ProjectIDIn(project.ID), limit, offset)
 }
 
-func (u *Apartomat) CanGetContacts(ctx context.Context, subj *UserCtx, obj *store.Project) (bool, error) {
+func (u *Apartomat) CanGetContacts(ctx context.Context, subj *UserCtx, obj *projects.Project) (bool, error) {
 	if subj == nil {
 		return false, nil
 	}
@@ -151,17 +156,17 @@ func (u *Apartomat) CanUpdateContact(ctx context.Context, subj *UserCtx, obj *Co
 		return false, nil
 	}
 
-	projects, err := u.Projects.List(ctx, store.ProjectStoreQuery{ID: expr.StrEq(obj.ProjectID)})
+	prjs, err := u.Projects.List(ctx, projects.IDIn(obj.ProjectID), 1, 0)
 	if err != nil {
 		return false, err
 	}
 
-	if len(projects) == 0 {
+	if len(prjs) == 0 {
 		return false, fmt.Errorf("project (id=%s): %w", obj.ProjectID, ErrNotFound)
 	}
 
 	var (
-		project = projects[0]
+		project = prjs[0]
 	)
 
 	wu, err := u.WorkspaceUsers.List(
@@ -209,14 +214,17 @@ func (u *Apartomat) CanDeleteContact(ctx context.Context, subj *UserCtx, obj *Co
 		return false, nil
 	}
 
-	projects, err := u.Projects.List(ctx, store.ProjectStoreQuery{ID: expr.StrEq(obj.ProjectID), Limit: 1, Offset: 0})
+	prjs, err := u.Projects.List(ctx, projects.IDIn(obj.ProjectID), 1, 0)
+	if err != nil {
+		return false, err
+	}
 
-	if len(projects) == 0 {
+	if len(prjs) == 0 {
 		return false, nil
 	}
 
 	var (
-		project = projects[0]
+		project = prjs[0]
 	)
 
 	wu, err := u.WorkspaceUsers.List(

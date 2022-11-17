@@ -12,6 +12,7 @@ import (
 	"github.com/apartomat/apartomat/internal/mail"
 	"github.com/apartomat/apartomat/internal/mail/smtp"
 	"github.com/apartomat/apartomat/internal/postgres/store"
+	projects "github.com/apartomat/apartomat/internal/store/projects/postgres"
 	visualizations "github.com/apartomat/apartomat/internal/store/visualizations/postgres"
 	"github.com/apartomat/apartomat/internal/token"
 	"github.com/go-pg/pg/v10"
@@ -77,7 +78,7 @@ func main() {
 		users := store.NewUserStore(pool)
 		workspaces := store.NewWorkspaceStore(pool)
 		workspaceUsers := store.NewWorkspaceUserStore(pool)
-		projects := store.NewProjectStore(pool)
+		projectsStore := projects.NewStore(pgdb)
 		projectFiles := store.NewProjectFileStore(pool)
 		contactsStore := store.NewContactsStore(pgdb)
 		housesStore := store.NewHousesStore(pgdb)
@@ -111,7 +112,7 @@ func main() {
 			Uploader:                     uploader,
 			Contacts:                     contactsStore,
 			Houses:                       housesStore,
-			Projects:                     projects,
+			Projects:                     projectsStore,
 			ProjectFiles:                 projectFiles,
 			Rooms:                        roomsStore,
 			Users:                        users,

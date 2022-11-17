@@ -3,7 +3,7 @@ package graphql
 import (
 	"context"
 	"fmt"
-	"github.com/apartomat/apartomat/internal/store"
+	"github.com/apartomat/apartomat/internal/store/projects"
 	"time"
 )
 
@@ -33,7 +33,7 @@ func (r *projectResolver) Visualizations(ctx context.Context, obj *Project) (*Pr
 	return &ProjectVisualizations{}, nil
 }
 
-func projectToGraphQL(p *store.Project) *Project {
+func projectToGraphQL(p *projects.Project) *Project {
 	if p == nil {
 		return nil
 	}
@@ -47,38 +47,38 @@ func projectToGraphQL(p *store.Project) *Project {
 	}
 }
 
-func projectStatusToGraphQL(s store.ProjectStatus) ProjectStatus {
+func projectStatusToGraphQL(s projects.Status) ProjectStatus {
 	switch s {
-	case store.ProjectStatusNew:
+	case projects.StatusNew:
 		return ProjectStatusNew
-	case store.ProjectStatusInProgress:
+	case projects.StatusInProgress:
 		return ProjectStatusInProgress
-	case store.ProjectStatusDone:
+	case projects.StatusDone:
 		return ProjectStatusDone
-	case store.ProjectStatusCanceled:
+	case projects.StatusCanceled:
 		return ProjectStatusCanceled
 	default:
 		return ""
 	}
 }
 
-func toProjectStatus(status ProjectStatus) store.ProjectStatus {
+func toProjectStatus(status ProjectStatus) projects.Status {
 	switch status {
 	case ProjectStatusNew:
-		return store.ProjectStatusNew
+		return projects.StatusNew
 	case ProjectStatusInProgress:
-		return store.ProjectStatusInProgress
+		return projects.StatusInProgress
 	case ProjectStatusDone:
-		return store.ProjectStatusDone
+		return projects.StatusDone
 	case ProjectStatusCanceled:
-		return store.ProjectStatusCanceled
+		return projects.StatusCanceled
 	default:
 		return ""
 	}
 }
 
-func toProjectStatuses(l []ProjectStatus) []store.ProjectStatus {
-	res := make([]store.ProjectStatus, len(l))
+func toProjectStatuses(l []ProjectStatus) []projects.Status {
+	res := make([]projects.Status, len(l))
 
 	for i, status := range l {
 		res[i] = toProjectStatus(status)

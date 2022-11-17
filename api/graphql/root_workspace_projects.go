@@ -5,7 +5,7 @@ import (
 	"errors"
 	"github.com/99designs/gqlgen/graphql"
 	apartomat "github.com/apartomat/apartomat/internal"
-	"github.com/apartomat/apartomat/internal/store"
+	"github.com/apartomat/apartomat/internal/store/projects"
 	"log"
 )
 
@@ -34,11 +34,7 @@ func (r *workspaceProjectsResolver) List(
 	projects, err := r.useCases.GetWorkspaceProjects(
 		ctx,
 		workspace.ID,
-		apartomat.GetWorkspaceProjectsFilter{
-			Status: store.ProjectStatusExpr{
-				Eq: toProjectStatuses(filter.Status),
-			},
-		},
+		toProjectStatuses(filter.Status),
 		limit,
 		0,
 	)
@@ -63,7 +59,7 @@ func (r *workspaceProjectsResolver) Total(
 	return notImplementedYetError() // TODO
 }
 
-func projectsToGraphQL(projects []*store.Project) []*Project {
+func projectsToGraphQL(projects []*projects.Project) []*Project {
 	result := make([]*Project, 0, len(projects))
 
 	for _, p := range projects {

@@ -3,8 +3,8 @@ package apartomat
 import (
 	"context"
 	"fmt"
-	"github.com/apartomat/apartomat/internal/pkg/expr"
 	"github.com/apartomat/apartomat/internal/store"
+	"github.com/apartomat/apartomat/internal/store/projects"
 	. "github.com/apartomat/apartomat/internal/store/visualizations"
 	"path/filepath"
 )
@@ -49,16 +49,18 @@ func (u *Apartomat) UploadVisualizations(
 		res = make([]*VisualizationWithFile, 0, len(files))
 	)
 
-	projects, err := u.Projects.List(ctx, store.ProjectStoreQuery{ID: expr.StrEq(projectID)})
+	prjs, err := u.Projects.List(ctx, projects.IDIn(projectID), 1, 0)
 	if err != nil {
 		return nil, err
 	}
 
-	if len(projects) == 0 {
+	if len(prjs) == 0 {
 		return nil, fmt.Errorf("project (id=%s): %w", projectID, ErrNotFound)
 	}
 
-	project := projects[0]
+	var (
+		project = prjs[0]
+	)
 
 	if ok, err := u.CanUploadProjectFile(ctx, UserFromCtx(ctx), project); err != nil {
 		return nil, err
@@ -116,17 +118,17 @@ func (u *Apartomat) GetVisualizations(
 	spec Spec,
 	limit, offset int,
 ) ([]*Visualization, error) {
-	projects, err := u.Projects.List(ctx, store.ProjectStoreQuery{ID: expr.StrEq(projectID)})
+	prjs, err := u.Projects.List(ctx, projects.IDIn(projectID), 1, 0)
 	if err != nil {
 		return nil, err
 	}
 
-	if len(projects) == 0 {
+	if len(prjs) == 0 {
 		return nil, fmt.Errorf("project (id=%s): %w", projectID, ErrNotFound)
 	}
 
 	var (
-		project = projects[0]
+		project = prjs[0]
 	)
 
 	if ok, err := u.CanGetVisualizations(ctx, UserFromCtx(ctx), project); err != nil {
@@ -138,7 +140,7 @@ func (u *Apartomat) GetVisualizations(
 	return u.Visualizations.List(ctx, And(spec, ProjectIDIn(project.ID)), limit, offset)
 }
 
-func (u *Apartomat) CanGetVisualizations(ctx context.Context, subj *UserCtx, obj *store.Project) (bool, error) {
+func (u *Apartomat) CanGetVisualizations(ctx context.Context, subj *UserCtx, obj *projects.Project) (bool, error) {
 	return u.isProjectUser(ctx, subj, obj)
 }
 
@@ -169,17 +171,17 @@ func (u *Apartomat) DeleteVisualizations(
 }
 
 func (u *Apartomat) CanDeleteVisualization(ctx context.Context, subj *UserCtx, obj *Visualization) (bool, error) {
-	projects, err := u.Projects.List(ctx, store.ProjectStoreQuery{ID: expr.StrEq(obj.ProjectID)})
+	var (
+		project *projects.Project
+	)
+
+	prjs, err := u.Projects.List(ctx, projects.IDIn(obj.ProjectID), 1, 0)
 	if err != nil {
 		return false, err
 	}
 
-	var (
-		project *store.Project
-	)
-
-	if len(projects) > 0 {
-		project = projects[0]
+	if len(prjs) > 0 {
+		project = prjs[0]
 	}
 
 	return u.isProjectUser(ctx, subj, project)
