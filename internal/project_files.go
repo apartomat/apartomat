@@ -3,11 +3,11 @@ package apartomat
 import (
 	"context"
 	"fmt"
-	"github.com/apartomat/apartomat/internal/pkg/expr"
-	"github.com/apartomat/apartomat/internal/store"
-	"github.com/apartomat/apartomat/internal/store/projects"
 	"io"
 	"path/filepath"
+
+	. "github.com/apartomat/apartomat/internal/store/files"
+	"github.com/apartomat/apartomat/internal/store/projects"
 )
 
 type Upload struct {
@@ -17,16 +17,12 @@ type Upload struct {
 	Size     int64
 }
 
-type GetProjectFilesFilter struct {
-	Type store.ProjectFileTypeExpr
-}
-
 func (u *Apartomat) GetProjectFiles(
 	ctx context.Context,
 	projectID string,
-	filter GetProjectFilesFilter,
+	fileType []FileType,
 	limit, offset int,
-) ([]*store.ProjectFile, error) {
+) ([]*File, error) {
 	prjs, err := u.Projects.List(ctx, projects.IDIn(projectID), 1, 0)
 	if err != nil {
 		return nil, err
@@ -46,14 +42,11 @@ func (u *Apartomat) GetProjectFiles(
 		return nil, fmt.Errorf("can't get project (id=%s) files: %w", project.ID, ErrForbidden)
 	}
 
-	p, err := u.ProjectFiles.List(
+	p, err := u.Files.List(
 		ctx,
-		store.ProjectFileStoreQuery{
-			ProjectID: expr.StrEq(projectID),
-			Type:      filter.Type,
-			Limit:     limit,
-			Offset:    offset,
-		},
+		And(ProjectIDIn(projectID), FileTypeIn(fileType...)),
+		limit,
+		offset,
 	)
 	if err != nil {
 		return nil, err
@@ -69,7 +62,7 @@ func (u *Apartomat) CanGetProjectFiles(ctx context.Context, subj *UserCtx, obj *
 func (u *Apartomat) CountProjectFiles(
 	ctx context.Context,
 	projectID string,
-	filter GetProjectFilesFilter,
+	fileType []FileType,
 ) (int, error) {
 	prjs, err := u.Projects.List(ctx, projects.IDIn(projectID), 1, 0)
 	if err != nil {
@@ -90,12 +83,9 @@ func (u *Apartomat) CountProjectFiles(
 		return 0, fmt.Errorf("can't get project (id=%s) files: %w", project.ID, ErrForbidden)
 	}
 
-	return u.ProjectFiles.Count(
+	return u.Files.Count(
 		ctx,
-		store.ProjectFileStoreQuery{
-			ProjectID: expr.StrEq(projectID),
-			Type:      filter.Type,
-		},
+		And(ProjectIDIn(projectID), FileTypeIn(fileType...)),
 	)
 }
 
@@ -107,8 +97,8 @@ func (u *Apartomat) UploadFile(
 	ctx context.Context,
 	projectID string,
 	upload Upload,
-	fileType store.ProjectFileType,
-) (*store.ProjectFile, error) {
+	fileType FileType,
+) (*File, error) {
 	prjs, err := u.Projects.List(ctx, projects.IDIn(projectID), 1, 0)
 	if err != nil {
 		return nil, err
@@ -140,17 +130,9 @@ func (u *Apartomat) UploadFile(
 		return nil, err
 	}
 
-	f := &store.ProjectFile{
-		ID:        id,
-		ProjectID: projectID,
-		Name:      upload.Name,
-		URL:       url,
-		Type:      fileType,
-		MimeType:  upload.MimeType,
-	}
+	f := New(id, upload.Name, url, fileType, upload.MimeType, projectID)
 
-	f, err = u.ProjectFiles.Save(ctx, f)
-	if err != nil {
+	if err := u.Files.Save(ctx, f); err != nil {
 		return nil, err
 	}
 

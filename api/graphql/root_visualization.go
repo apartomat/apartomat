@@ -2,8 +2,8 @@ package graphql
 
 import (
 	"context"
-	"github.com/apartomat/apartomat/internal/pkg/expr"
-	"github.com/apartomat/apartomat/internal/store"
+
+	. "github.com/apartomat/apartomat/internal/store/files"
 	"github.com/apartomat/apartomat/internal/store/rooms"
 )
 
@@ -16,7 +16,7 @@ type visualizationResolver struct {
 }
 
 func (r *visualizationResolver) File(ctx context.Context, obj *Visualization) (*ProjectFile, error) {
-	res, err := r.useCases.ProjectFiles.List(ctx, store.ProjectFileStoreQuery{ID: expr.StrEq(obj.File.ID), Limit: 1})
+	res, err := r.useCases.Files.List(ctx, IDIn(obj.File.ID), 1, 0)
 	if err != nil {
 		return nil, err
 	}

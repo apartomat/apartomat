@@ -5,7 +5,7 @@ import (
 	"errors"
 	"github.com/99designs/gqlgen/graphql"
 	apartomat "github.com/apartomat/apartomat/internal"
-	"github.com/apartomat/apartomat/internal/store"
+	"github.com/apartomat/apartomat/internal/store/files"
 	"log"
 )
 
@@ -32,9 +32,7 @@ func (r *projectFilesResolver) List(
 		files, err := r.useCases.GetProjectFiles(
 			ctx,
 			project.ID,
-			apartomat.GetProjectFilesFilter{
-				Type: store.ProjectFileTypeExpr{Eq: toProjectFileTypes(filter.Type)},
-			},
+			toProjectFileTypes(filter.Type),
 			limit,
 			offset,
 		)
@@ -52,7 +50,7 @@ func (r *projectFilesResolver) List(
 	}
 }
 
-func projectFilesToGraphQL(projects []*store.ProjectFile) []*ProjectFile {
+func projectFilesToGraphQL(projects []*files.File) []*ProjectFile {
 	result := make([]*ProjectFile, 0, len(projects))
 
 	for _, u := range projects {
@@ -62,7 +60,7 @@ func projectFilesToGraphQL(projects []*store.ProjectFile) []*ProjectFile {
 	return result
 }
 
-func projectFileToGraphQL(file *store.ProjectFile) *ProjectFile {
+func projectFileToGraphQL(file *files.File) *ProjectFile {
 	return &ProjectFile{
 		ID:       file.ID,
 		Name:     file.Name,
@@ -85,9 +83,7 @@ func (r *projectFilesResolver) Total(
 		tot, err := r.useCases.CountProjectFiles(
 			ctx,
 			project.ID,
-			apartomat.GetProjectFilesFilter{
-				Type: store.ProjectFileTypeExpr{Eq: toProjectFileTypes(filter.Type)},
-			},
+			toProjectFileTypes(filter.Type),
 		)
 		if err != nil {
 			if errors.Is(err, apartomat.ErrForbidden) {
@@ -103,30 +99,30 @@ func (r *projectFilesResolver) Total(
 	}
 }
 
-func projectFileTypeToGraphQL(t store.ProjectFileType) ProjectFileType {
+func projectFileTypeToGraphQL(t files.FileType) ProjectFileType {
 	switch t {
-	case store.ProjectFileTypeVisualization:
+	case files.FileTypeVisualization:
 		return ProjectFileTypeVisualization
-	case store.ProjectFileTypeNone:
+	case files.FileTypeNone:
 		return ProjectFileTypeNone
 	default:
 		return ProjectFileTypeNone
 	}
 }
 
-func toProjectFileType(t ProjectFileType) store.ProjectFileType {
+func toProjectFileType(t ProjectFileType) files.FileType {
 	switch t {
 	case ProjectFileTypeVisualization:
-		return store.ProjectFileTypeVisualization
+		return files.FileTypeVisualization
 	case ProjectFileTypeNone:
-		return store.ProjectFileTypeNone
+		return files.FileTypeNone
 	default:
-		return store.ProjectFileTypeNone
+		return files.FileTypeNone
 	}
 }
 
-func toProjectFileTypes(l []ProjectFileType) []store.ProjectFileType {
-	res := make([]store.ProjectFileType, len(l))
+func toProjectFileTypes(l []ProjectFileType) []files.FileType {
+	res := make([]files.FileType, len(l))
 
 	for i, t := range l {
 		res[i] = toProjectFileType(t)

@@ -3,7 +3,7 @@ package apartomat
 import (
 	"context"
 	"fmt"
-	"github.com/apartomat/apartomat/internal/store"
+	"github.com/apartomat/apartomat/internal/store/files"
 	"github.com/apartomat/apartomat/internal/store/projects"
 	. "github.com/apartomat/apartomat/internal/store/visualizations"
 	"path/filepath"
@@ -14,8 +14,8 @@ func (u *Apartomat) UploadVisualization(
 	projectID string,
 	upload Upload,
 	roomID *string,
-) (*store.ProjectFile, *Visualization, error) {
-	file, err := u.UploadFile(ctx, projectID, upload, store.ProjectFileTypeVisualization)
+) (*files.File, *Visualization, error) {
+	file, err := u.UploadFile(ctx, projectID, upload, files.FileTypeVisualization)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -36,17 +36,17 @@ func (u *Apartomat) UploadVisualization(
 
 type VisualizationWithFile struct {
 	Visualization *Visualization
-	File          *store.ProjectFile
+	File          *files.File
 }
 
 func (u *Apartomat) UploadVisualizations(
 	ctx context.Context,
 	projectID string,
-	files []Upload,
+	uploads []Upload,
 	roomID *string,
 ) ([]*VisualizationWithFile, error) {
 	var (
-		res = make([]*VisualizationWithFile, 0, len(files))
+		res = make([]*VisualizationWithFile, 0, len(uploads))
 	)
 
 	prjs, err := u.Projects.List(ctx, projects.IDIn(projectID), 1, 0)
@@ -68,7 +68,7 @@ func (u *Apartomat) UploadVisualizations(
 		return nil, fmt.Errorf("can't get project (id=%s) files: %w", project.ID, ErrForbidden)
 	}
 
-	for _, file := range files {
+	for _, file := range uploads {
 		fileID, err := NewNanoID()
 		if err != nil {
 			return nil, err
@@ -81,17 +81,9 @@ func (u *Apartomat) UploadVisualizations(
 			return nil, err
 		}
 
-		f := &store.ProjectFile{
-			ID:        fileID,
-			ProjectID: projectID,
-			Name:      file.Name,
-			URL:       url,
-			Type:      store.ProjectFileTypeVisualization,
-			MimeType:  file.MimeType,
-		}
+		f := files.New(fileID, file.Name, url, files.FileTypeVisualization, file.MimeType, projectID)
 
-		f, err = u.ProjectFiles.Save(ctx, f)
-		if err != nil {
+		if err := u.Files.Save(ctx, f); err != nil {
 			return nil, err
 		}
 

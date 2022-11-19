@@ -6,7 +6,7 @@ import (
 	"github.com/apartomat/apartomat/internal/pkg/expr"
 	"github.com/apartomat/apartomat/internal/store"
 	"github.com/apartomat/apartomat/internal/store/houses"
-	project2 "github.com/apartomat/apartomat/internal/store/projects"
+	projects "github.com/apartomat/apartomat/internal/store/projects"
 	. "github.com/apartomat/apartomat/internal/store/rooms"
 )
 
@@ -40,10 +40,10 @@ func (u *Apartomat) CanGetRooms(ctx context.Context, subj *UserCtx, obj *houses.
 	}
 
 	var (
-		project *project2.Project
+		project *projects.Project
 	)
 
-	if p, err := u.Projects.List(ctx, project2.IDIn(obj.ProjectID), 1, 0); err != nil {
+	if p, err := u.Projects.List(ctx, projects.IDIn(obj.ProjectID), 1, 0); err != nil {
 		return false, err
 	} else if len(p) == 0 {
 		return false, fmt.Errorf("project (id=%s): %w", obj.ProjectID, ErrNotFound)
@@ -158,7 +158,7 @@ func (u *Apartomat) CanUpdateRoom(ctx context.Context, subj *UserCtx, obj *Room)
 
 	var (
 		house   *houses.House
-		project *project2.Project
+		project *projects.Project
 	)
 
 	if h, err := u.Houses.List(ctx, houses.IDIn(obj.HouseID), 1, 0); err != nil {
@@ -171,7 +171,7 @@ func (u *Apartomat) CanUpdateRoom(ctx context.Context, subj *UserCtx, obj *Room)
 		house = h[0]
 	}
 
-	if p, err := u.Projects.List(ctx, project2.IDIn(house.ProjectID), 1, 0); err != nil {
+	if p, err := u.Projects.List(ctx, projects.IDIn(house.ProjectID), 1, 0); err != nil {
 		return false, err
 	} else if len(p) == 0 {
 		return false, fmt.Errorf("project (id=%s): %w", house.ProjectID, ErrNotFound)

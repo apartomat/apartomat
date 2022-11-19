@@ -5,7 +5,7 @@ import (
 	"errors"
 	"github.com/99designs/gqlgen/graphql"
 	apartomat "github.com/apartomat/apartomat/internal"
-	"github.com/apartomat/apartomat/internal/store"
+	"github.com/apartomat/apartomat/internal/store/files"
 	"github.com/apartomat/apartomat/internal/store/visualizations"
 	"log"
 )
@@ -40,7 +40,7 @@ func (r *mutationResolver) UploadVisualization(
 	return VisualizationUploaded{Visualization: visualizationToGraphQL(vis, uploaded)}, nil
 }
 
-func visualizationToGraphQL(vis *visualizations.Visualization, file *store.ProjectFile) *Visualization {
+func visualizationToGraphQL(vis *visualizations.Visualization, file *files.File) *Visualization {
 	if vis == nil {
 		return nil
 	}
