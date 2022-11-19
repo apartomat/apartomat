@@ -6,9 +6,9 @@ import (
 )
 
 type Store interface {
-	Save(context.Context, ...*File) error
 	List(ctx context.Context, spec Spec, limit, offset int) ([]*File, error)
 	Count(context.Context, Spec) (int, error)
+	Save(context.Context, ...*File) error
 }
 
 type ProjectFileStoreQuery struct {

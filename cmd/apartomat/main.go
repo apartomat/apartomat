@@ -14,6 +14,7 @@ import (
 	"github.com/apartomat/apartomat/internal/postgres/store"
 	files "github.com/apartomat/apartomat/internal/store/files/postgres"
 	projects "github.com/apartomat/apartomat/internal/store/projects/postgres"
+	users "github.com/apartomat/apartomat/internal/store/users/postgres"
 	visualizations "github.com/apartomat/apartomat/internal/store/visualizations/postgres"
 	"github.com/apartomat/apartomat/internal/token"
 	"github.com/go-pg/pg/v10"
@@ -76,7 +77,7 @@ func main() {
 
 		pgdb.AddQueryHook(loggerHook{"postgres", logger})
 
-		users := store.NewUserStore(pool)
+		usersStore := users.NewStore(pgdb)
 		workspaces := store.NewWorkspaceStore(pool)
 		workspaceUsers := store.NewWorkspaceUserStore(pool)
 		projectsStore := projects.NewStore(pgdb)
@@ -86,7 +87,7 @@ func main() {
 		roomsStore := store.NewRoomsStore(pgdb)
 		visualizationsStore := visualizations.NewStore(pgdb)
 
-		usersLoader := dataloader.NewUserLoader(dataloader.NewUserLoaderConfig(ctx, users))
+		usersLoader := dataloader.NewUserLoader(dataloader.NewUserLoaderConfig(ctx, usersStore))
 
 		//uploader, err := s3.NewS3ImageUploaderWithCred(
 		//	ctx,
@@ -116,7 +117,7 @@ func main() {
 			Projects:                     projectsStore,
 			Files:                        filesStore,
 			Rooms:                        roomsStore,
-			Users:                        users,
+			Users:                        usersStore,
 			Visualizations:               visualizationsStore,
 			Workspaces:                   workspaces,
 			WorkspaceUsers:               workspaceUsers,

@@ -2,22 +2,21 @@ package dataloader
 
 import (
 	"context"
-	"github.com/apartomat/apartomat/internal/pkg/expr"
-	"github.com/apartomat/apartomat/internal/store"
+	. "github.com/apartomat/apartomat/internal/store/users"
 )
 
-func NewUserLoaderConfig(ctx context.Context, userStore store.UserStore) UserLoaderConfig {
+func NewUserLoaderConfig(ctx context.Context, userStore Store) UserLoaderConfig {
 	return UserLoaderConfig{
-		Fetch: func(keys []string) ([]*store.User, []error) {
-			result := make([]*store.User, len(keys))
+		Fetch: func(keys []string) ([]*User, []error) {
+			result := make([]*User, len(keys))
 			errors := make([]error, len(keys))
 
-			users, err := userStore.List(ctx, store.UserStoreQuery{ID: expr.Str{Eq: keys}})
+			users, err := userStore.List(ctx, IDIn(keys...), len(keys), 0)
 			if err != nil {
 				return nil, []error{err}
 			}
 
-			usersByID := make(map[string]*store.User)
+			usersByID := make(map[string]*User)
 			for _, u := range users {
 				usersByID[u.ID] = u
 			}

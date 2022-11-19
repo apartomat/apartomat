@@ -7,6 +7,7 @@ import (
 	"github.com/apartomat/apartomat/internal/pkg/expr"
 	"github.com/apartomat/apartomat/internal/store"
 	"github.com/apartomat/apartomat/internal/store/projects"
+	"github.com/apartomat/apartomat/internal/store/users"
 )
 
 func (u *Apartomat) GetWorkspace(ctx context.Context, id string) (*store.Workspace, error) {
@@ -106,7 +107,7 @@ func (u *Apartomat) CanGetWorkspaceProjects(ctx context.Context, subj *UserCtx, 
 	return u.isWorkspaceUser(ctx, subj, obj)
 }
 
-func (u *Apartomat) GetWorkspaceUserProfile(ctx context.Context, workspaceID, userID string) (*store.User, error) {
+func (u *Apartomat) GetWorkspaceUserProfile(ctx context.Context, workspaceID, userID string) (*users.User, error) {
 	workspaces, err := u.Workspaces.List(ctx, store.WorkspaceStoreQuery{ID: expr.StrEq(workspaceID)})
 	if err != nil {
 		return nil, err

@@ -7,6 +7,7 @@ import (
 	"github.com/apartomat/apartomat/internal/pkg/expr"
 	"github.com/apartomat/apartomat/internal/store"
 	"github.com/apartomat/apartomat/internal/store/projects"
+	. "github.com/apartomat/apartomat/internal/store/users"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
 	"math/rand"
@@ -64,7 +65,7 @@ func (u *Apartomat) ConfirmEmailByToken(ctx context.Context, str string) (string
 
 	email := confirmToken.Email()
 
-	users, err := u.Users.List(ctx, store.UserStoreQuery{Email: expr.StrEq(email)})
+	users, err := u.Users.List(ctx, EmailIn(email), 1, 0)
 	if err != nil {
 		return "", err
 	}
@@ -97,11 +98,11 @@ func (u *Apartomat) LoginByEmail(ctx context.Context, email string, workspaceNam
 	}
 
 	var (
-		user      *store.User
+		user      *User
 		workspace *store.Workspace
 	)
 
-	users, err := u.Users.List(ctx, store.UserStoreQuery{Email: expr.StrEq(email)})
+	users, err := u.Users.List(ctx, EmailIn(email), 1, 0)
 	if err != nil {
 		return "", err
 	}
@@ -112,14 +113,9 @@ func (u *Apartomat) LoginByEmail(ctx context.Context, email string, workspaceNam
 			return "", err
 		}
 
-		user = &store.User{
-			ID:       id,
-			Email:    email,
-			IsActive: true,
-		}
+		user = New(id, email, "", true, false)
 
-		user, err = u.Users.Save(ctx, user)
-		if err != nil {
+		if err := u.Users.Save(ctx, user); err != nil {
 			return "", err
 		}
 	} else {
@@ -228,11 +224,11 @@ func (u *Apartomat) LoginEmailPIN(ctx context.Context, email string, workspaceNa
 	}
 
 	var (
-		user      *store.User
+		user      *User
 		workspace *store.Workspace
 	)
 
-	users, err := u.Users.List(ctx, store.UserStoreQuery{Email: expr.StrEq(email)})
+	users, err := u.Users.List(ctx, EmailIn(email), 1, 0)
 	if err != nil {
 		return "", "", err
 	}
@@ -243,14 +239,9 @@ func (u *Apartomat) LoginEmailPIN(ctx context.Context, email string, workspaceNa
 			return "", "", err
 		}
 
-		user = &store.User{
-			ID:       id,
-			Email:    email,
-			IsActive: true,
-		}
+		user = New(id, email, "", true, false)
 
-		user, err = u.Users.Save(ctx, user)
-		if err != nil {
+		if err := u.Users.Save(ctx, user); err != nil {
 			return "", "", err
 		}
 	} else {
@@ -340,7 +331,7 @@ func (u *Apartomat) CheckConfirmEmailPINToken(ctx context.Context, str, pin stri
 
 	email := confirmToken.Email()
 
-	users, err := u.Users.List(ctx, store.UserStoreQuery{Email: expr.StrEq(email)})
+	users, err := u.Users.List(ctx, EmailIn(email), 1, 0)
 	if err != nil {
 		return "", err
 	}

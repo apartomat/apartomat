@@ -3,12 +3,11 @@ package apartomat
 import (
 	"context"
 	"fmt"
-	"github.com/apartomat/apartomat/internal/pkg/expr"
-	"github.com/apartomat/apartomat/internal/store"
+	. "github.com/apartomat/apartomat/internal/store/users"
 )
 
-func (u *Apartomat) GetUserProfile(ctx context.Context, id string) (*store.User, error) {
-	users, err := u.Users.List(ctx, store.UserStoreQuery{ID: expr.StrEq(id)})
+func (u *Apartomat) GetUserProfile(ctx context.Context, id string) (*User, error) {
+	users, err := u.Users.List(ctx, IDIn(id), 1, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -30,7 +29,7 @@ func (u *Apartomat) GetUserProfile(ctx context.Context, id string) (*store.User,
 	return user, nil
 }
 
-func (u *Apartomat) CanGetUserProfile(ctx context.Context, subj *UserCtx, obj *store.User) (bool, error) {
+func (u *Apartomat) CanGetUserProfile(ctx context.Context, subj *UserCtx, obj *User) (bool, error) {
 	if subj == nil {
 		return false, nil
 	}
