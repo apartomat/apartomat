@@ -16,6 +16,7 @@ import (
 	projects "github.com/apartomat/apartomat/internal/store/projects/postgres"
 	users "github.com/apartomat/apartomat/internal/store/users/postgres"
 	visualizations "github.com/apartomat/apartomat/internal/store/visualizations/postgres"
+	workspaces "github.com/apartomat/apartomat/internal/store/workspaces/postgres"
 	"github.com/apartomat/apartomat/internal/token"
 	"github.com/go-pg/pg/v10"
 	"github.com/jackc/pgx/v4/pgxpool"
@@ -78,7 +79,7 @@ func main() {
 		pgdb.AddQueryHook(loggerHook{"postgres", logger})
 
 		usersStore := users.NewStore(pgdb)
-		workspaces := store.NewWorkspaceStore(pool)
+		workspacesStore := workspaces.NewStore(pgdb)
 		workspaceUsers := store.NewWorkspaceUserStore(pool)
 		projectsStore := projects.NewStore(pgdb)
 		filesStore := files.NewStore(pgdb)
@@ -119,7 +120,7 @@ func main() {
 			Rooms:                        roomsStore,
 			Users:                        usersStore,
 			Visualizations:               visualizationsStore,
-			Workspaces:                   workspaces,
+			Workspaces:                   workspacesStore,
 			WorkspaceUsers:               workspaceUsers,
 		}
 

@@ -6,6 +6,7 @@ import (
 	"github.com/apartomat/apartomat/internal/pkg/expr"
 	"github.com/apartomat/apartomat/internal/store"
 	. "github.com/apartomat/apartomat/internal/store/projects"
+	"github.com/apartomat/apartomat/internal/store/workspaces"
 	"time"
 )
 
@@ -15,17 +16,17 @@ func (u *Apartomat) CreateProject(
 	name string,
 	startAt, endAt *time.Time,
 ) (*Project, error) {
-	workspaces, err := u.Workspaces.List(ctx, store.WorkspaceStoreQuery{ID: expr.StrEq(workspaceID)})
+	ws, err := u.Workspaces.List(ctx, workspaces.IDIn(workspaceID), 1, 0)
 	if err != nil {
 		return nil, err
 	}
 
-	if len(workspaces) == 0 {
+	if len(ws) == 0 {
 		return nil, fmt.Errorf("workspace (id=%s): %w", workspaceID, ErrNotFound)
 	}
 
 	var (
-		workspace = workspaces[0]
+		workspace = ws[0]
 	)
 
 	if ok, err := u.CanCreateProject(ctx, UserFromCtx(ctx), workspace); err != nil {
@@ -48,7 +49,7 @@ func (u *Apartomat) CreateProject(
 	return project, nil
 }
 
-func (u *Apartomat) CanCreateProject(ctx context.Context, subj *UserCtx, obj *store.Workspace) (bool, error) {
+func (u *Apartomat) CanCreateProject(ctx context.Context, subj *UserCtx, obj *workspaces.Workspace) (bool, error) {
 	if subj == nil {
 		return false, nil
 	}

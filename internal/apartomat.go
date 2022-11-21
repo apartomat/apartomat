@@ -12,6 +12,7 @@ import (
 	"github.com/apartomat/apartomat/internal/store/rooms"
 	"github.com/apartomat/apartomat/internal/store/users"
 	"github.com/apartomat/apartomat/internal/store/visualizations"
+	"github.com/apartomat/apartomat/internal/store/workspaces"
 	nanoid "github.com/matoous/go-nanoid/v2"
 )
 
@@ -37,7 +38,7 @@ type Apartomat struct {
 	Rooms          rooms.Store
 	Users          users.Store
 	Visualizations visualizations.Store
-	Workspaces     store.WorkspaceStore
+	Workspaces     workspaces.Store
 	WorkspaceUsers store.WorkspaceUserStore
 }
 

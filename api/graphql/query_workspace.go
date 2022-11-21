@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	apartomat "github.com/apartomat/apartomat/internal"
-	"github.com/apartomat/apartomat/internal/store"
+	"github.com/apartomat/apartomat/internal/store/workspaces"
 	"log"
 )
 
@@ -26,7 +26,7 @@ func (r *queryResolver) Workspace(ctx context.Context, id string) (WorkspaceResu
 	return workspaceToGraphQL(ws), nil
 }
 
-func workspaceToGraphQL(w *store.Workspace) *Workspace {
+func workspaceToGraphQL(w *workspaces.Workspace) *Workspace {
 	return &Workspace{
 		ID:   w.ID,
 		Name: w.Name,

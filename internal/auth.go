@@ -8,6 +8,7 @@ import (
 	"github.com/apartomat/apartomat/internal/store"
 	"github.com/apartomat/apartomat/internal/store/projects"
 	. "github.com/apartomat/apartomat/internal/store/users"
+	"github.com/apartomat/apartomat/internal/store/workspaces"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
 	"math/rand"
@@ -99,7 +100,7 @@ func (u *Apartomat) LoginByEmail(ctx context.Context, email string, workspaceNam
 
 	var (
 		user      *User
-		workspace *store.Workspace
+		workspace *workspaces.Workspace
 	)
 
 	users, err := u.Users.List(ctx, EmailIn(email), 1, 0)
@@ -122,26 +123,20 @@ func (u *Apartomat) LoginByEmail(ctx context.Context, email string, workspaceNam
 		user = users[0]
 	}
 
-	workspaces, err := u.Workspaces.List(ctx, store.WorkspaceStoreQuery{UserID: expr.StrEq(user.ID)})
+	ws, err := u.Workspaces.List(ctx, workspaces.UserIDIn(user.ID), 1, 0)
 	if err != nil {
 		return "", err
 	}
 
-	if len(workspaces) == 0 {
+	if len(ws) == 0 {
 		id, err := NewNanoID()
 		if err != nil {
 			return "", err
 		}
 
-		workspace = &store.Workspace{
-			ID:       id,
-			Name:     workspaceName,
-			IsActive: true,
-			UserID:   user.ID,
-		}
+		workspace = workspaces.New(id, workspaceName, true, user.ID)
 
-		workspace, err = u.Workspaces.Save(ctx, workspace)
-		if err != nil {
+		if err := u.Workspaces.Save(ctx, workspace); err != nil {
 			return "", err
 		}
 
@@ -166,7 +161,7 @@ func (u *Apartomat) LoginByEmail(ctx context.Context, email string, workspaceNam
 	return email, nil
 }
 
-func (u *Apartomat) isWorkspaceUser(ctx context.Context, subj *UserCtx, obj *store.Workspace) (bool, error) {
+func (u *Apartomat) isWorkspaceUser(ctx context.Context, subj *UserCtx, obj *workspaces.Workspace) (bool, error) {
 	if subj == nil {
 		return false, nil
 	}
@@ -225,7 +220,7 @@ func (u *Apartomat) LoginEmailPIN(ctx context.Context, email string, workspaceNa
 
 	var (
 		user      *User
-		workspace *store.Workspace
+		workspace *workspaces.Workspace
 	)
 
 	users, err := u.Users.List(ctx, EmailIn(email), 1, 0)
@@ -248,26 +243,20 @@ func (u *Apartomat) LoginEmailPIN(ctx context.Context, email string, workspaceNa
 		user = users[0]
 	}
 
-	workspaces, err := u.Workspaces.List(ctx, store.WorkspaceStoreQuery{UserID: expr.StrEq(user.ID)})
+	ws, err := u.Workspaces.List(ctx, workspaces.UserIDIn(user.ID), 1, 0)
 	if err != nil {
 		return "", "", err
 	}
 
-	if len(workspaces) == 0 {
+	if len(ws) == 0 {
 		id, err := NewNanoID()
 		if err != nil {
 			return "", "", err
 		}
 
-		workspace = &store.Workspace{
-			ID:       id,
-			Name:     workspaceName,
-			IsActive: true,
-			UserID:   user.ID,
-		}
+		workspace = workspaces.New(id, workspaceName, true, user.ID)
 
-		workspace, err = u.Workspaces.Save(ctx, workspace)
-		if err != nil {
+		if err := u.Workspaces.Save(ctx, workspace); err != nil {
 			return "", "", err
 		}
 
