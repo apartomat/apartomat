@@ -3,11 +3,10 @@ package apartomat
 import (
 	"context"
 	"fmt"
-	"github.com/apartomat/apartomat/internal/pkg/expr"
-	"github.com/apartomat/apartomat/internal/store"
 	"github.com/apartomat/apartomat/internal/store/houses"
 	projects "github.com/apartomat/apartomat/internal/store/projects"
 	. "github.com/apartomat/apartomat/internal/store/rooms"
+	"github.com/apartomat/apartomat/internal/store/workspace_users"
 )
 
 func (u *Apartomat) GetRooms(ctx context.Context, houseID string, limit, offset int) ([]*Room, error) {
@@ -53,7 +52,12 @@ func (u *Apartomat) CanGetRooms(ctx context.Context, subj *UserCtx, obj *houses.
 
 	wu, err := u.WorkspaceUsers.List(
 		ctx,
-		store.WorkspaceUserStoreQuery{WorkspaceID: expr.StrEq(project.WorkspaceID), UserID: expr.StrEq(subj.ID)},
+		workspace_users.And(
+			workspace_users.WorkspaceIDIn(project.WorkspaceID),
+			workspace_users.UserIDIn(subj.ID),
+		),
+		1,
+		0,
 	)
 	if err != nil {
 		return false, err
@@ -181,7 +185,12 @@ func (u *Apartomat) CanUpdateRoom(ctx context.Context, subj *UserCtx, obj *Room)
 
 	wu, err := u.WorkspaceUsers.List(
 		ctx,
-		store.WorkspaceUserStoreQuery{WorkspaceID: expr.StrEq(project.WorkspaceID), UserID: expr.StrEq(subj.ID)},
+		workspace_users.And(
+			workspace_users.WorkspaceIDIn(project.WorkspaceID),
+			workspace_users.UserIDIn(subj.ID),
+		),
+		1,
+		0,
 	)
 	if err != nil {
 		return false, err

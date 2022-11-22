@@ -4,7 +4,6 @@ import (
 	"errors"
 	"github.com/apartomat/apartomat/internal/image"
 	"github.com/apartomat/apartomat/internal/mail"
-	"github.com/apartomat/apartomat/internal/store"
 	"github.com/apartomat/apartomat/internal/store/contacts"
 	"github.com/apartomat/apartomat/internal/store/files"
 	"github.com/apartomat/apartomat/internal/store/houses"
@@ -12,6 +11,7 @@ import (
 	"github.com/apartomat/apartomat/internal/store/rooms"
 	"github.com/apartomat/apartomat/internal/store/users"
 	"github.com/apartomat/apartomat/internal/store/visualizations"
+	"github.com/apartomat/apartomat/internal/store/workspace_users"
 	"github.com/apartomat/apartomat/internal/store/workspaces"
 	nanoid "github.com/matoous/go-nanoid/v2"
 )
@@ -39,7 +39,7 @@ type Apartomat struct {
 	Users          users.Store
 	Visualizations visualizations.Store
 	Workspaces     workspaces.Store
-	WorkspaceUsers store.WorkspaceUserStore
+	WorkspaceUsers workspace_users.Store
 }
 
 var (

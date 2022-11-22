@@ -6,6 +6,10 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
+	"io/ioutil"
+	"log"
+	"os"
+
 	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/dataloader"
 	"github.com/apartomat/apartomat/internal/image/minio"
@@ -16,13 +20,10 @@ import (
 	projects "github.com/apartomat/apartomat/internal/store/projects/postgres"
 	users "github.com/apartomat/apartomat/internal/store/users/postgres"
 	visualizations "github.com/apartomat/apartomat/internal/store/visualizations/postgres"
+	workspace_users "github.com/apartomat/apartomat/internal/store/workspace_users/postgres"
 	workspaces "github.com/apartomat/apartomat/internal/store/workspaces/postgres"
 	"github.com/apartomat/apartomat/internal/token"
 	"github.com/go-pg/pg/v10"
-	"github.com/jackc/pgx/v4/pgxpool"
-	"io/ioutil"
-	"log"
-	"os"
 )
 
 func main() {
@@ -59,11 +60,6 @@ func main() {
 			Password: os.Getenv("SMTP_PASSWORD"),
 		})
 
-		pool, err := pgxpool.Connect(ctx, os.Getenv("POSTGRES_DSN"))
-		if err != nil {
-			log.Fatalf("can't connect to postgres: %s", err)
-		}
-
 		pgopts, err := pg.ParseURL(os.Getenv("POSTGRES_DSN"))
 		if err != nil {
 			log.Fatalf("can't parse POSTGRES_DSN %s", err)
@@ -80,7 +76,7 @@ func main() {
 
 		usersStore := users.NewStore(pgdb)
 		workspacesStore := workspaces.NewStore(pgdb)
-		workspaceUsers := store.NewWorkspaceUserStore(pool)
+		workspaceUsersStore := workspace_users.NewStore(pgdb)
 		projectsStore := projects.NewStore(pgdb)
 		filesStore := files.NewStore(pgdb)
 		contactsStore := store.NewContactsStore(pgdb)
@@ -121,7 +117,7 @@ func main() {
 			Users:                        usersStore,
 			Visualizations:               visualizationsStore,
 			Workspaces:                   workspacesStore,
-			WorkspaceUsers:               workspaceUsers,
+			WorkspaceUsers:               workspaceUsersStore,
 		}
 
 		serverOpts := []Option{

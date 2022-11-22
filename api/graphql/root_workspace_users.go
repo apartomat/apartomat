@@ -5,7 +5,7 @@ import (
 	"errors"
 	"github.com/99designs/gqlgen/graphql"
 	apartomat "github.com/apartomat/apartomat/internal"
-	"github.com/apartomat/apartomat/internal/store"
+	"github.com/apartomat/apartomat/internal/store/workspace_users"
 	"log"
 )
 
@@ -57,7 +57,7 @@ func (r *workspaceUsersResolver) Total(
 	return nil, errors.New("not implemented yet")
 }
 
-func workspaceUsersToGraphQL(users []*store.WorkspaceUser) []*WorkspaceUser {
+func workspaceUsersToGraphQL(users []*workspace_users.WorkspaceUser) []*WorkspaceUser {
 	result := make([]*WorkspaceUser, 0, len(users))
 
 	for _, u := range users {
@@ -67,7 +67,7 @@ func workspaceUsersToGraphQL(users []*store.WorkspaceUser) []*WorkspaceUser {
 	return result
 }
 
-func workspaceUserToGraphQL(wu *store.WorkspaceUser) *WorkspaceUser {
+func workspaceUserToGraphQL(wu *workspace_users.WorkspaceUser) *WorkspaceUser {
 	return &WorkspaceUser{
 		ID:        wu.UserID,
 		Workspace: &ID{ID: wu.WorkspaceID},
@@ -75,11 +75,11 @@ func workspaceUserToGraphQL(wu *store.WorkspaceUser) *WorkspaceUser {
 	}
 }
 
-func workspaceUserRoleToGraphQL(role store.WorkspaceUserRole) WorkspaceUserRole {
+func workspaceUserRoleToGraphQL(role workspace_users.WorkspaceUserRole) WorkspaceUserRole {
 	switch role {
-	case store.WorkspaceUserRoleAdmin:
+	case workspace_users.WorkspaceUserRoleAdmin:
 		return WorkspaceUserRoleAdmin
-	case store.WorkspaceUserRoleUser:
+	case workspace_users.WorkspaceUserRoleUser:
 		return WorkspaceUserRoleUser
 	}
 

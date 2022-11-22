@@ -4,10 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/apartomat/apartomat/internal/pkg/expr"
-	"github.com/apartomat/apartomat/internal/store"
 	"github.com/apartomat/apartomat/internal/store/projects"
 	. "github.com/apartomat/apartomat/internal/store/users"
+	"github.com/apartomat/apartomat/internal/store/workspace_users"
 	"github.com/apartomat/apartomat/internal/store/workspaces"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
@@ -145,15 +144,14 @@ func (u *Apartomat) LoginByEmail(ctx context.Context, email string, workspaceNam
 			return "", err
 		}
 
-		wu := &store.WorkspaceUser{
+		wu := &workspace_users.WorkspaceUser{
 			ID:          wid,
 			WorkspaceID: workspace.ID,
 			UserID:      user.ID,
-			Role:        store.WorkspaceUserRoleAdmin,
+			Role:        workspace_users.WorkspaceUserRoleAdmin,
 		}
 
-		_, err = u.WorkspaceUsers.Save(ctx, wu)
-		if err != nil {
+		if err := u.WorkspaceUsers.Save(ctx, wu); err != nil {
 			return "", err
 		}
 	}
@@ -168,7 +166,12 @@ func (u *Apartomat) isWorkspaceUser(ctx context.Context, subj *UserCtx, obj *wor
 
 	wu, err := u.WorkspaceUsers.List(
 		ctx,
-		store.WorkspaceUserStoreQuery{WorkspaceID: expr.StrEq(obj.ID), UserID: expr.StrEq(subj.ID)},
+		workspace_users.And(
+			workspace_users.WorkspaceIDIn(obj.ID),
+			workspace_users.UserIDIn(subj.ID),
+		),
+		1,
+		0,
 	)
 	if err != nil {
 		return false, err
@@ -188,7 +191,12 @@ func (u *Apartomat) isProjectUser(ctx context.Context, subj *UserCtx, obj *proje
 
 	wu, err := u.WorkspaceUsers.List(
 		ctx,
-		store.WorkspaceUserStoreQuery{WorkspaceID: expr.StrEq(obj.WorkspaceID), UserID: expr.StrEq(subj.ID)},
+		workspace_users.And(
+			workspace_users.WorkspaceIDIn(obj.WorkspaceID),
+			workspace_users.UserIDIn(subj.ID),
+		),
+		1,
+		0,
 	)
 	if err != nil {
 		return false, err
@@ -265,15 +273,14 @@ func (u *Apartomat) LoginEmailPIN(ctx context.Context, email string, workspaceNa
 			return "", "", err
 		}
 
-		wu := &store.WorkspaceUser{
+		wu := &workspace_users.WorkspaceUser{
 			ID:          wid,
 			WorkspaceID: workspace.ID,
 			UserID:      user.ID,
-			Role:        store.WorkspaceUserRoleAdmin,
+			Role:        workspace_users.WorkspaceUserRoleAdmin,
 		}
 
-		_, err = u.WorkspaceUsers.Save(ctx, wu)
-		if err != nil {
+		if err := u.WorkspaceUsers.Save(ctx, wu); err != nil {
 			return "", "", err
 		}
 	}

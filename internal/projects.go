@@ -3,9 +3,8 @@ package apartomat
 import (
 	"context"
 	"fmt"
-	"github.com/apartomat/apartomat/internal/pkg/expr"
-	"github.com/apartomat/apartomat/internal/store"
 	. "github.com/apartomat/apartomat/internal/store/projects"
+	"github.com/apartomat/apartomat/internal/store/workspace_users"
 	"github.com/apartomat/apartomat/internal/store/workspaces"
 	"time"
 )
@@ -56,7 +55,12 @@ func (u *Apartomat) CanCreateProject(ctx context.Context, subj *UserCtx, obj *wo
 
 	wu, err := u.WorkspaceUsers.List(
 		ctx,
-		store.WorkspaceUserStoreQuery{WorkspaceID: expr.StrEq(obj.ID), UserID: expr.StrEq(subj.ID)},
+		workspace_users.And(
+			workspace_users.WorkspaceIDIn(obj.ID),
+			workspace_users.UserIDIn(subj.ID),
+		),
+		1,
+		0,
 	)
 	if err != nil {
 		return false, err
@@ -134,7 +138,12 @@ func (u *Apartomat) CanUpdateProject(ctx context.Context, subj *UserCtx, obj *Pr
 
 	wu, err := u.WorkspaceUsers.List(
 		ctx,
-		store.WorkspaceUserStoreQuery{WorkspaceID: expr.StrEq(obj.WorkspaceID), UserID: expr.StrEq(subj.ID)},
+		workspace_users.And(
+			workspace_users.WorkspaceIDIn(obj.WorkspaceID),
+			workspace_users.UserIDIn(subj.ID),
+		),
+		1,
+		0,
 	)
 	if err != nil {
 		return false, err

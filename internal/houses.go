@@ -3,10 +3,9 @@ package apartomat
 import (
 	"context"
 	"fmt"
-	"github.com/apartomat/apartomat/internal/pkg/expr"
-	"github.com/apartomat/apartomat/internal/store"
 	. "github.com/apartomat/apartomat/internal/store/houses"
 	"github.com/apartomat/apartomat/internal/store/projects"
+	"github.com/apartomat/apartomat/internal/store/workspace_users"
 	"time"
 )
 
@@ -40,7 +39,12 @@ func (u *Apartomat) CanGetHouses(ctx context.Context, subj *UserCtx, obj *projec
 
 	wu, err := u.WorkspaceUsers.List(
 		ctx,
-		store.WorkspaceUserStoreQuery{WorkspaceID: expr.StrEq(obj.WorkspaceID), UserID: expr.StrEq(subj.ID)},
+		workspace_users.And(
+			workspace_users.WorkspaceIDIn(obj.WorkspaceID),
+			workspace_users.UserIDIn(subj.ID),
+		),
+		1,
+		0,
 	)
 	if err != nil {
 		return false, err
@@ -100,7 +104,12 @@ func (u *Apartomat) CanAddHouse(ctx context.Context, subj *UserCtx, obj *project
 
 	wu, err := u.WorkspaceUsers.List(
 		ctx,
-		store.WorkspaceUserStoreQuery{WorkspaceID: expr.StrEq(obj.WorkspaceID), UserID: expr.StrEq(subj.ID)},
+		workspace_users.And(
+			workspace_users.WorkspaceIDIn(obj.WorkspaceID),
+			workspace_users.UserIDIn(subj.ID),
+		),
+		1,
+		0,
 	)
 	if err != nil {
 		return false, err
@@ -170,7 +179,12 @@ func (u *Apartomat) CanUpdateHouse(ctx context.Context, subj *UserCtx, obj *Hous
 
 	wu, err := u.WorkspaceUsers.List(
 		ctx,
-		store.WorkspaceUserStoreQuery{WorkspaceID: expr.StrEq(project.WorkspaceID), UserID: expr.StrEq(subj.ID)},
+		workspace_users.And(
+			workspace_users.WorkspaceIDIn(project.WorkspaceID),
+			workspace_users.UserIDIn(subj.ID),
+		),
+		1,
+		0,
 	)
 	if err != nil {
 		return false, err

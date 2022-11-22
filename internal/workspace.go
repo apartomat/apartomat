@@ -4,10 +4,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/apartomat/apartomat/internal/dataloader"
-	"github.com/apartomat/apartomat/internal/pkg/expr"
-	"github.com/apartomat/apartomat/internal/store"
 	"github.com/apartomat/apartomat/internal/store/projects"
 	"github.com/apartomat/apartomat/internal/store/users"
+	"github.com/apartomat/apartomat/internal/store/workspace_users"
 	"github.com/apartomat/apartomat/internal/store/workspaces"
 )
 
@@ -39,7 +38,12 @@ func (u *Apartomat) CanGetWorkspace(ctx context.Context, subj *UserCtx, obj *wor
 
 	wu, err := u.WorkspaceUsers.List(
 		ctx,
-		store.WorkspaceUserStoreQuery{WorkspaceID: expr.StrEq(obj.ID), UserID: expr.StrEq(subj.ID)},
+		workspace_users.And(
+			workspace_users.WorkspaceIDIn(obj.ID),
+			workspace_users.UserIDIn(subj.ID),
+		),
+		1,
+		0,
 	)
 	if err != nil {
 		return false, err
@@ -139,7 +143,7 @@ func (u *Apartomat) GetWorkspaceUserProfile(ctx context.Context, workspaceID, us
 	return user, nil
 }
 
-func (u *Apartomat) GetWorkspaceUsers(ctx context.Context, id string, limit, offset int) ([]*store.WorkspaceUser, error) {
+func (u *Apartomat) GetWorkspaceUsers(ctx context.Context, id string, limit, offset int) ([]*workspace_users.WorkspaceUser, error) {
 	ws, err := u.Workspaces.List(ctx, workspaces.IDIn(id), 1, 0)
 	if err != nil {
 		return nil, err
@@ -157,7 +161,12 @@ func (u *Apartomat) GetWorkspaceUsers(ctx context.Context, id string, limit, off
 		return nil, fmt.Errorf("can't get workspace (id=%s) users: %w", workspace.ID, ErrForbidden)
 	}
 
-	wu, err := u.WorkspaceUsers.List(ctx, store.WorkspaceUserStoreQuery{WorkspaceID: expr.StrEq(id)})
+	wu, err := u.WorkspaceUsers.List(
+		ctx,
+		workspace_users.WorkspaceIDIn(id),
+		1,
+		0,
+	)
 	if err != nil {
 		return nil, err
 	}

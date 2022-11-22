@@ -3,10 +3,9 @@ package apartomat
 import (
 	"context"
 	"fmt"
-	"github.com/apartomat/apartomat/internal/pkg/expr"
-	"github.com/apartomat/apartomat/internal/store"
 	. "github.com/apartomat/apartomat/internal/store/contacts"
 	"github.com/apartomat/apartomat/internal/store/projects"
+	"github.com/apartomat/apartomat/internal/store/workspace_users"
 )
 
 type AddContactParams struct {
@@ -58,7 +57,12 @@ func (u *Apartomat) CanAddContact(ctx context.Context, subj *UserCtx, obj *proje
 
 	wu, err := u.WorkspaceUsers.List(
 		ctx,
-		store.WorkspaceUserStoreQuery{WorkspaceID: expr.StrEq(obj.WorkspaceID), UserID: expr.StrEq(subj.ID)},
+		workspace_users.And(
+			workspace_users.WorkspaceIDIn(obj.WorkspaceID),
+			workspace_users.UserIDIn(subj.ID),
+		),
+		1,
+		0,
 	)
 	if err != nil {
 		return false, err
@@ -101,7 +105,12 @@ func (u *Apartomat) CanGetContacts(ctx context.Context, subj *UserCtx, obj *proj
 
 	wu, err := u.WorkspaceUsers.List(
 		ctx,
-		store.WorkspaceUserStoreQuery{WorkspaceID: expr.StrEq(obj.WorkspaceID), UserID: expr.StrEq(subj.ID)},
+		workspace_users.And(
+			workspace_users.WorkspaceIDIn(obj.WorkspaceID),
+			workspace_users.UserIDIn(subj.ID),
+		),
+		1,
+		0,
 	)
 	if err != nil {
 		return false, err
@@ -171,7 +180,12 @@ func (u *Apartomat) CanUpdateContact(ctx context.Context, subj *UserCtx, obj *Co
 
 	wu, err := u.WorkspaceUsers.List(
 		ctx,
-		store.WorkspaceUserStoreQuery{WorkspaceID: expr.StrEq(project.WorkspaceID), UserID: expr.StrEq(subj.ID)},
+		workspace_users.And(
+			workspace_users.WorkspaceIDIn(project.WorkspaceID),
+			workspace_users.UserIDIn(subj.ID),
+		),
+		1,
+		0,
 	)
 	if err != nil {
 		return false, err
@@ -229,7 +243,12 @@ func (u *Apartomat) CanDeleteContact(ctx context.Context, subj *UserCtx, obj *Co
 
 	wu, err := u.WorkspaceUsers.List(
 		ctx,
-		store.WorkspaceUserStoreQuery{WorkspaceID: expr.StrEq(project.WorkspaceID), UserID: expr.StrEq(subj.ID)},
+		workspace_users.And(
+			workspace_users.WorkspaceIDIn(project.WorkspaceID),
+			workspace_users.UserIDIn(subj.ID),
+		),
+		1,
+		0,
 	)
 	if err != nil {
 		return false, err
