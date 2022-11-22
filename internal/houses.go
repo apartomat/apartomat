@@ -6,7 +6,6 @@ import (
 	. "github.com/apartomat/apartomat/internal/store/houses"
 	"github.com/apartomat/apartomat/internal/store/projects"
 	"github.com/apartomat/apartomat/internal/store/workspace_users"
-	"time"
 )
 
 func (u *Apartomat) GetHouses(ctx context.Context, projectID string, limit, offset int) ([]*House, error) {
@@ -86,15 +85,13 @@ func (u *Apartomat) AddHouse(
 		return nil, err
 	}
 
-	house := &House{
-		ID:             id,
-		City:           city,
-		Address:        address,
-		HousingComplex: housingComplex,
-		ProjectID:      project.ID,
+	house := New(id, city, address, housingComplex, project.ID)
+
+	if err := u.Houses.Save(ctx, house); err != nil {
+		return nil, err
 	}
 
-	return u.Houses.Save(ctx, house)
+	return house, nil
 }
 
 func (u *Apartomat) CanAddHouse(ctx context.Context, subj *UserCtx, obj *projects.Project) (bool, error) {
@@ -146,17 +143,13 @@ func (u *Apartomat) UpdateHouse(
 		return nil, fmt.Errorf("can't update house (id=%s): %w", houseID, ErrForbidden)
 	}
 
-	house = &House{
-		ID:             house.ID,
-		City:           city,
-		Address:        address,
-		HousingComplex: housingComplex,
-		ProjectID:      house.ProjectID,
-		CreatedAt:      house.CreatedAt,
-		ModifiedAt:     time.Now(),
+	house.Change(city, address, housingComplex)
+
+	if err := u.Houses.Save(ctx, house); err != nil {
+		return nil, err
 	}
 
-	return u.Houses.Save(ctx, house)
+	return house, nil
 }
 
 func (u *Apartomat) CanUpdateHouse(ctx context.Context, subj *UserCtx, obj *House) (bool, error) {

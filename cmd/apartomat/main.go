@@ -18,6 +18,7 @@ import (
 	"github.com/apartomat/apartomat/internal/postgres/store"
 	contacts "github.com/apartomat/apartomat/internal/store/contacts/postgres"
 	files "github.com/apartomat/apartomat/internal/store/files/postgres"
+	houses "github.com/apartomat/apartomat/internal/store/houses/postgres"
 	projects "github.com/apartomat/apartomat/internal/store/projects/postgres"
 	users "github.com/apartomat/apartomat/internal/store/users/postgres"
 	visualizations "github.com/apartomat/apartomat/internal/store/visualizations/postgres"
@@ -81,7 +82,7 @@ func main() {
 		projectsStore := projects.NewStore(pgdb)
 		filesStore := files.NewStore(pgdb)
 		contactsStore := contacts.NewStore(pgdb)
-		housesStore := store.NewHousesStore(pgdb)
+		housesStore := houses.NewHousesStore(pgdb)
 		roomsStore := store.NewRoomsStore(pgdb)
 		visualizationsStore := visualizations.NewStore(pgdb)
 

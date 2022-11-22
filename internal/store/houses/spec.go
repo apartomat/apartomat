@@ -1,25 +1,5 @@
 package houses
 
-import (
-	"context"
-	"time"
-)
-
-type House struct {
-	ID             string
-	City           string
-	Address        string
-	HousingComplex string
-	CreatedAt      time.Time
-	ModifiedAt     time.Time
-	ProjectID      string
-}
-
-type Store interface {
-	Save(context.Context, *House) (*House, error)
-	List(ctx context.Context, spec Spec, limit, offset int) ([]*House, error)
-}
-
 type Spec interface {
 	Is(*House) bool
 }

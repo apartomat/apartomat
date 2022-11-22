@@ -1,12 +1,12 @@
-package store
+package postgres
 
 import (
 	"context"
-	"errors"
+	"time"
+
 	. "github.com/apartomat/apartomat/internal/store/houses"
 	"github.com/doug-martin/goqu/v9"
 	"github.com/go-pg/pg/v10"
-	"time"
 )
 
 const (
@@ -25,27 +25,16 @@ var (
 	_ Store = (*housesStore)(nil)
 )
 
-func (s *housesStore) Save(ctx context.Context, house *House) (*House, error) {
-	if house.CreatedAt.IsZero() {
-		house.CreatedAt = time.Now()
-	}
+func (s *housesStore) Save(ctx context.Context, houses ...*House) error {
+	recs := toRecords(houses)
 
-	if house.ModifiedAt.IsZero() {
-		house.ModifiedAt = house.CreatedAt
-	}
+	_, err := s.db.ModelContext(ctx, &recs).Returning("NULL").OnConflict("(id) DO UPDATE").Insert()
 
-	rec := toHousesRecord(house)
-
-	_, err := s.db.ModelContext(ctx, rec).Returning("NULL").OnConflict("(id) DO UPDATE").Insert()
-	if err != nil {
-		return nil, err
-	}
-
-	return house, nil
+	return err
 }
 
 func (s *housesStore) List(ctx context.Context, spec Spec, limit, offset int) ([]*House, error) {
-	qs, err := toHouseSpecQuery(spec)
+	qs, err := toSpecQuery(spec)
 	if err != nil {
 		return nil, err
 	}
@@ -67,53 +56,17 @@ func (s *housesStore) List(ctx context.Context, spec Spec, limit, offset int) ([
 		return nil, err
 	}
 
-	houses := make([]*housesRecord, 0)
+	houses := make([]*record, 0)
 
 	_, err = s.db.QueryContext(ctx, &houses, sql, args...)
 	if err != nil {
 		return nil, err
 	}
 
-	return fromHousesRecords(houses), nil
+	return fromRecords(houses), nil
 }
 
-type houseSpecQuery interface {
-	Expression() (goqu.Expression, error)
-}
-
-func toHouseSpecQuery(spec Spec) (houseSpecQuery, error) {
-	if s, ok := spec.(houseSpecQuery); ok {
-		return s, nil
-	}
-
-	switch s := spec.(type) {
-	case IDInSpec:
-		return houseIDInSpecQuery{s}, nil
-	case ProjectIDInSpec:
-		return houseProjectIDInSpecQuery{s}, nil
-	}
-
-	return nil, errors.New("unknown spec")
-}
-
-type houseIDInSpecQuery struct {
-	spec IDInSpec
-}
-
-func (s houseIDInSpecQuery) Expression() (goqu.Expression, error) {
-	return goqu.Ex{"id": s.spec.IDs}, nil
-}
-
-//
-type houseProjectIDInSpecQuery struct {
-	spec ProjectIDInSpec
-}
-
-func (s houseProjectIDInSpecQuery) Expression() (goqu.Expression, error) {
-	return goqu.Ex{"project_id": s.spec.IDs}, nil
-}
-
-type housesRecord struct {
+type record struct {
 	tableName      struct{}  `pg:"apartomat.houses,alias:houses"`
 	ID             string    `pg:"id,pk"`
 	City           string    `pg:"city,use_zero"`
@@ -124,8 +77,8 @@ type housesRecord struct {
 	ProjectID      string    `pg:"project_id"`
 }
 
-func toHousesRecord(house *House) *housesRecord {
-	return &housesRecord{
+func toRecord(house *House) *record {
+	return &record{
 		ID:             house.ID,
 		City:           house.City,
 		Address:        house.Address,
@@ -136,7 +89,19 @@ func toHousesRecord(house *House) *housesRecord {
 	}
 }
 
-func fromHousesRecords(records []*housesRecord) []*House {
+func toRecords(houses []*House) []*record {
+	var (
+		res = make([]*record, len(houses))
+	)
+
+	for i, p := range houses {
+		res[i] = toRecord(p)
+	}
+
+	return res
+}
+
+func fromRecords(records []*record) []*House {
 	houses := make([]*House, len(records))
 
 	for i, r := range records {
