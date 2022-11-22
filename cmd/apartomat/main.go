@@ -16,6 +16,7 @@ import (
 	"github.com/apartomat/apartomat/internal/mail"
 	"github.com/apartomat/apartomat/internal/mail/smtp"
 	"github.com/apartomat/apartomat/internal/postgres/store"
+	contacts "github.com/apartomat/apartomat/internal/store/contacts/postgres"
 	files "github.com/apartomat/apartomat/internal/store/files/postgres"
 	projects "github.com/apartomat/apartomat/internal/store/projects/postgres"
 	users "github.com/apartomat/apartomat/internal/store/users/postgres"
@@ -79,7 +80,7 @@ func main() {
 		workspaceUsersStore := workspace_users.NewStore(pgdb)
 		projectsStore := projects.NewStore(pgdb)
 		filesStore := files.NewStore(pgdb)
-		contactsStore := store.NewContactsStore(pgdb)
+		contactsStore := contacts.NewStore(pgdb)
 		housesStore := store.NewHousesStore(pgdb)
 		roomsStore := store.NewRoomsStore(pgdb)
 		visualizationsStore := visualizations.NewStore(pgdb)

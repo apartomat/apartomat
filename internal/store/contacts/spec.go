@@ -1,42 +1,5 @@
 package contacts
 
-import (
-	"context"
-	"time"
-)
-
-type Contact struct {
-	ID         string
-	FullName   string
-	Photo      string
-	Details    []Details
-	CreatedAt  time.Time
-	ModifiedAt time.Time
-	ProjectID  string
-}
-
-type Details struct {
-	Type  Type
-	Value string
-}
-
-type Type string
-
-const (
-	TypeInstagram Type = "INSTAGRAM"
-	TypePhone     Type = "PHONE"
-	TypeEmail     Type = "EMAIL"
-	TypeWhatsApp  Type = "WHATSAPP"
-	TypeTelegram  Type = "TELEGRAM"
-	TypeUnknown   Type = "UNKNOWN"
-)
-
-type Store interface {
-	Save(context.Context, *Contact) (*Contact, error)
-	Delete(context.Context, *Contact) error
-	List(ctx context.Context, spec Spec, limit, offset int) ([]*Contact, error)
-}
-
 // Spec is a specification for Contact
 type Spec interface {
 	Is(*Contact) bool

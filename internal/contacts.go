@@ -39,15 +39,13 @@ func (u *Apartomat) AddContact(ctx context.Context, projectID string, params Add
 		return nil, err
 	}
 
-	contact := &Contact{
-		ID:        id,
-		FullName:  params.FullName,
-		Photo:     params.Photo,
-		Details:   params.Details,
-		ProjectID: projectID,
+	contact := New(id, params.FullName, params.Photo, params.Details, projectID)
+
+	if err := u.Contacts.Save(ctx, contact); err != nil {
+		return nil, err
 	}
 
-	return u.Contacts.Save(ctx, contact)
+	return contact, nil
 }
 
 func (u *Apartomat) CanAddContact(ctx context.Context, subj *UserCtx, obj *projects.Project) (bool, error) {
@@ -149,15 +147,13 @@ func (u *Apartomat) UpdateContact(ctx context.Context, contactID string, params 
 		return nil, fmt.Errorf("can't update contact (id=%s): %w", contact.ID, ErrForbidden)
 	}
 
-	contact = &Contact{
-		ID:        contact.ID,
-		FullName:  params.FullName,
-		Photo:     params.Photo,
-		Details:   params.Details,
-		ProjectID: contact.ProjectID,
+	contact.Change(params.FullName, params.Photo, params.Details)
+
+	if err := u.Contacts.Save(ctx, contact); err != nil {
+		return nil, err
 	}
 
-	return u.Contacts.Save(ctx, contact)
+	return contact, nil
 }
 
 func (u *Apartomat) CanUpdateContact(ctx context.Context, subj *UserCtx, obj *Contact) (bool, error) {
