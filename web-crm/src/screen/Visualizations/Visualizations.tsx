@@ -21,8 +21,9 @@ export default function Visualizations() {
 
     const { user } = useAuthContext()
 
-
     const [ error, setError ] = useState<string | undefined>(undefined)
+
+    const [ loading, setLoading ] = useState(false)
 
     const [ notification, setNotification ] = useState<string | undefined>(undefined)
 
@@ -49,10 +50,23 @@ export default function Visualizations() {
     }
 
 
-    const { data, loading, refetch, first } = useVisualizations(
+    const { data, loading: fetchLoading, refetch, first } = useVisualizations(
         id,
         { status: { eq: [VisualizationStatus.Approved, VisualizationStatus.Unknown] },
     })
+
+    useEffect(() => {
+        if (loading && !fetchLoading) {
+            const timer = setTimeout(() => {
+                setLoading(false)
+            }, 350)
+
+            return () => clearTimeout(timer)
+        }
+
+        setLoading(fetchLoading)
+
+    }, [ fetchLoading ])
 
     const [ project, setProject ] = useState<{ id: string, name: string }>()
 
@@ -179,7 +193,7 @@ export default function Visualizations() {
         <Main pad={{vertical: "medium", horizontal: "large"}}>
 
             {loading && !first &&
-                <Layer position="top" margin="medium" plain animate={false}>
+                <Layer position="top" margin="medium" animate={false} modal={false}>
                     <Box direction="row" gap="small">
                         <Loading message="Загрузка..."/>
                         <Text>Загрузка...</Text>
