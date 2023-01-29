@@ -7,13 +7,14 @@ import { useVisualizations, VisualizationStatus } from "./useVisualizations"
 import { useDeleteVisualizations } from "./useDeleteVisualizations"
 import { VisualizationsScreenVisualizationFragment, VisualizationsScreenHouseRoomFragment } from "api/types"
 
-import { Box, Button, CheckBox, Header, Heading, Grid, Image, Layer, Main, Text } from "grommet"
+import { Box, Button, Header, Heading, Grid, Image, Layer, Main, Text } from "grommet"
 import Loading from "./Loading/Loading"
 import AnchorLink from "common/AnchorLink"
 import UserAvatar from "./UserAvatar/UserAvatar"
 import ConfirmDelete from "./ConfirmDelete/ConfirmDelete"
 import { Trash } from "grommet-icons"
 import Notification from "./Notification/Notifications"
+import RoomsFilter from "./RoomsFilter/RoomsFilter"
 
 export default function Visualizations() {
     const { id } = useParams<{ id: string }>()
@@ -214,31 +215,12 @@ export default function Visualizations() {
             <Box margin={{bottom: "medium"}}>
                 <Box direction="row" justify="between">
                 {rooms &&
-                    <Box direction="row" wrap margin={{ vertical: "medium" }} gap="small">
-                        {rooms.map((room) => {
-                            return (
-                                <CheckBox
-                                    key={room.id}
-                                    onChange={({ target: { checked }}) => {
-                                        if (checked) {
-                                            setRoomsfilter([...roomsFilter, room.id])
-                                        } else {
-                                            setRoomsfilter(roomsFilter.filter(item => item !== room.id))
-                                        }
-                                    }}
-                                    checked={roomsFilter.includes(room.id)}
-                                >
-                                    {({ checked }: { checked: boolean }) => (
-                                        <Box
-                                            pad={{horizontal: "small", vertical: "xsmall"}}
-                                            background={checked ? "brand" : "light-1"}
-                                            round="medium"
-                                        >{room.name}</Box>
-                                    )}
-                                </CheckBox>
-                            )
-                        })}
-                    </Box>
+                    <RoomsFilter
+                        rooms={rooms}
+                        margin={{ vertical: "medium" }}
+                        gap="small"
+                        onSelectRooms={(id: string[]) => setRoomsfilter(id)}
+                    />
                 }
                     {selected.length > 1 &&
                         <Box direction="row" gap="small" align="center">
