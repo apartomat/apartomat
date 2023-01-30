@@ -25,7 +25,7 @@ func (r *mutationResolver) AddHouse(
 			return Forbidden{}, nil
 		}
 
-		log.Printf("can't add contact: %s", err)
+		log.Printf("can't add house: %s", err)
 
 		return ServerError{Message: "can't add house"}, nil
 	}
