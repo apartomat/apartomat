@@ -178,3 +178,42 @@ func (u *Apartomat) CanDeleteVisualization(ctx context.Context, subj *UserCtx, o
 
 	return u.isProjectUser(ctx, subj, project)
 }
+
+func (u *Apartomat) GetVisualization(
+	ctx context.Context,
+	id string,
+) (*Visualization, error) {
+	res, err := u.Visualizations.List(ctx, IDIn(id), 1, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(res) == 0 {
+		return nil, fmt.Errorf("visualization (id=%s): %w", id, ErrNotFound)
+	}
+
+	var (
+		visualization = res[0]
+	)
+
+	prjs, err := u.Projects.List(ctx, projects.IDIn(visualization.ProjectID), 1, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(prjs) == 0 {
+		return nil, fmt.Errorf("project (id=%s): %w", visualization.ProjectID, ErrNotFound)
+	}
+
+	var (
+		project = prjs[0]
+	)
+
+	if ok, err := u.CanGetVisualizations(ctx, UserFromCtx(ctx), project); err != nil {
+		return nil, err
+	} else if !ok {
+		return nil, fmt.Errorf("can't get project (id=%s) visualizations: %w", project.ID, ErrForbidden)
+	}
+
+	return visualization, nil
+}

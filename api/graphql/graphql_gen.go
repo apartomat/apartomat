@@ -37,10 +37,13 @@ type Config struct {
 }
 
 type ResolverRoot interface {
+	Album() AlbumResolver
+	AlbumPageVisualization() AlbumPageVisualizationResolver
 	House() HouseResolver
 	HouseRooms() HouseRoomsResolver
 	Mutation() MutationResolver
 	Project() ProjectResolver
+	ProjectAlbums() ProjectAlbumsResolver
 	ProjectContacts() ProjectContactsResolver
 	ProjectFiles() ProjectFilesResolver
 	ProjectHouses() ProjectHousesResolver
@@ -58,6 +61,40 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
+	Album struct {
+		ID       func(childComplexity int) int
+		Name     func(childComplexity int) int
+		Pages    func(childComplexity int) int
+		Project  func(childComplexity int) int
+		Settings func(childComplexity int) int
+	}
+
+	AlbumCreated struct {
+		Album func(childComplexity int) int
+	}
+
+	AlbumDeleted struct {
+		Album func(childComplexity int) int
+	}
+
+	AlbumPageCover struct {
+		Position func(childComplexity int) int
+	}
+
+	AlbumPageVisualization struct {
+		Position      func(childComplexity int) int
+		Visualization func(childComplexity int) int
+	}
+
+	AlbumPages struct {
+		Items func(childComplexity int) int
+	}
+
+	AlbumSettings struct {
+		Orientation func(childComplexity int) int
+		PageSize    func(childComplexity int) int
+	}
+
 	AlreadyExists struct {
 		Message func(childComplexity int) int
 	}
@@ -155,25 +192,28 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		AddContact           func(childComplexity int, projectID string, contact AddContactInput) int
-		AddHouse             func(childComplexity int, projectID string, house AddHouseInput) int
-		AddRoom              func(childComplexity int, houseID string, room AddRoomInput) int
-		ChangeProjectDates   func(childComplexity int, projectID string, dates ChangeProjectDatesInput) int
-		ChangeProjectStatus  func(childComplexity int, projectID string, status ProjectStatus) int
-		ConfirmLoginLink     func(childComplexity int, token string) int
-		ConfirmLoginPin      func(childComplexity int, token string, pin string) int
-		CreateProject        func(childComplexity int, input CreateProjectInput) int
-		DeleteContact        func(childComplexity int, id string) int
-		DeleteRoom           func(childComplexity int, id string) int
-		DeleteVisualizations func(childComplexity int, id []string) int
-		LoginByEmail         func(childComplexity int, email string, workspaceName string) int
-		Ping                 func(childComplexity int) int
-		UpdateContact        func(childComplexity int, contactID string, data UpdateContactInput) int
-		UpdateHouse          func(childComplexity int, houseID string, data UpdateHouseInput) int
-		UpdateRoom           func(childComplexity int, roomID string, data UpdateRoomInput) int
-		UploadProjectFile    func(childComplexity int, input UploadProjectFileInput) int
-		UploadVisualization  func(childComplexity int, projectID string, file graphql.Upload, roomID *string) int
-		UploadVisualizations func(childComplexity int, projectID string, files []*graphql.Upload, roomID *string) int
+		AddContact               func(childComplexity int, projectID string, contact AddContactInput) int
+		AddHouse                 func(childComplexity int, projectID string, house AddHouseInput) int
+		AddRoom                  func(childComplexity int, houseID string, room AddRoomInput) int
+		AddVisualizationsToAlbum func(childComplexity int, albumID string, visualizations []string) int
+		ChangeProjectDates       func(childComplexity int, projectID string, dates ChangeProjectDatesInput) int
+		ChangeProjectStatus      func(childComplexity int, projectID string, status ProjectStatus) int
+		ConfirmLoginLink         func(childComplexity int, token string) int
+		ConfirmLoginPin          func(childComplexity int, token string, pin string) int
+		CreateAlbum              func(childComplexity int, projectID string, name string) int
+		CreateProject            func(childComplexity int, input CreateProjectInput) int
+		DeleteAlbum              func(childComplexity int, id string) int
+		DeleteContact            func(childComplexity int, id string) int
+		DeleteRoom               func(childComplexity int, id string) int
+		DeleteVisualizations     func(childComplexity int, id []string) int
+		LoginByEmail             func(childComplexity int, email string, workspaceName string) int
+		Ping                     func(childComplexity int) int
+		UpdateContact            func(childComplexity int, contactID string, data UpdateContactInput) int
+		UpdateHouse              func(childComplexity int, houseID string, data UpdateHouseInput) int
+		UpdateRoom               func(childComplexity int, roomID string, data UpdateRoomInput) int
+		UploadProjectFile        func(childComplexity int, input UploadProjectFileInput) int
+		UploadVisualization      func(childComplexity int, projectID string, file graphql.Upload, roomID *string) int
+		UploadVisualizations     func(childComplexity int, projectID string, files []*graphql.Upload, roomID *string) int
 	}
 
 	NotFound struct {
@@ -186,6 +226,7 @@ type ComplexityRoot struct {
 	}
 
 	Project struct {
+		Albums         func(childComplexity int) int
 		Contacts       func(childComplexity int) int
 		EndAt          func(childComplexity int) int
 		Files          func(childComplexity int) int
@@ -196,6 +237,19 @@ type ComplexityRoot struct {
 		StartAt        func(childComplexity int) int
 		Status         func(childComplexity int) int
 		Visualizations func(childComplexity int) int
+	}
+
+	ProjectAlbums struct {
+		List  func(childComplexity int, limit int, offset int) int
+		Total func(childComplexity int) int
+	}
+
+	ProjectAlbumsList struct {
+		Items func(childComplexity int) int
+	}
+
+	ProjectAlbumsTotal struct {
+		Total func(childComplexity int) int
 	}
 
 	ProjectContacts struct {
@@ -288,6 +342,7 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
+		Album     func(childComplexity int, id string) int
 		Enums     func(childComplexity int) int
 		Profile   func(childComplexity int) int
 		Project   func(childComplexity int, id string) int
@@ -353,6 +408,10 @@ type ComplexityRoot struct {
 		Visualization func(childComplexity int) int
 	}
 
+	VisualizationsAddedToAlbum struct {
+		Pages func(childComplexity int) int
+	}
+
 	VisualizationsDeleted struct {
 		Visualizations func(childComplexity int) int
 	}
@@ -402,6 +461,14 @@ type ComplexityRoot struct {
 	}
 }
 
+type AlbumResolver interface {
+	Project(ctx context.Context, obj *Album) (AlbumProjectResult, error)
+
+	Pages(ctx context.Context, obj *Album) (AlbumPagesResult, error)
+}
+type AlbumPageVisualizationResolver interface {
+	Visualization(ctx context.Context, obj *AlbumPageVisualization) (AlbumPageVisualizationResult, error)
+}
 type HouseResolver interface {
 	Rooms(ctx context.Context, obj *House) (*HouseRooms, error)
 }
@@ -413,11 +480,14 @@ type MutationResolver interface {
 	AddContact(ctx context.Context, projectID string, contact AddContactInput) (AddContactResult, error)
 	AddHouse(ctx context.Context, projectID string, house AddHouseInput) (AddHouseResult, error)
 	AddRoom(ctx context.Context, houseID string, room AddRoomInput) (AddRoomResult, error)
+	AddVisualizationsToAlbum(ctx context.Context, albumID string, visualizations []string) (AddVisualizationsToAlbumResult, error)
 	ChangeProjectDates(ctx context.Context, projectID string, dates ChangeProjectDatesInput) (ChangeProjectDatesResult, error)
 	ChangeProjectStatus(ctx context.Context, projectID string, status ProjectStatus) (ChangeProjectStatusResult, error)
 	ConfirmLoginLink(ctx context.Context, token string) (ConfirmLoginLinkResult, error)
 	ConfirmLoginPin(ctx context.Context, token string, pin string) (ConfirmLoginPinResult, error)
+	CreateAlbum(ctx context.Context, projectID string, name string) (CreateAlbumResult, error)
 	CreateProject(ctx context.Context, input CreateProjectInput) (CreateProjectResult, error)
+	DeleteAlbum(ctx context.Context, id string) (DeleteAlbumResult, error)
 	DeleteContact(ctx context.Context, id string) (DeleteContactResult, error)
 	DeleteRoom(ctx context.Context, id string) (DeleteRoomResult, error)
 	DeleteVisualizations(ctx context.Context, id []string) (DeleteVisualizationsResult, error)
@@ -435,6 +505,11 @@ type ProjectResolver interface {
 	Houses(ctx context.Context, obj *Project) (*ProjectHouses, error)
 	Visualizations(ctx context.Context, obj *Project) (*ProjectVisualizations, error)
 	Files(ctx context.Context, obj *Project) (*ProjectFiles, error)
+	Albums(ctx context.Context, obj *Project) (*ProjectAlbums, error)
+}
+type ProjectAlbumsResolver interface {
+	List(ctx context.Context, obj *ProjectAlbums, limit int, offset int) (ProjectAlbumsListResult, error)
+	Total(ctx context.Context, obj *ProjectAlbums) (ProjectAlbumsTotalResult, error)
 }
 type ProjectContactsResolver interface {
 	List(ctx context.Context, obj *ProjectContacts, filter ProjectContactsFilter, limit int, offset int) (ProjectContactsListResult, error)
@@ -454,6 +529,7 @@ type ProjectVisualizationsResolver interface {
 }
 type QueryResolver interface {
 	Version(ctx context.Context) (string, error)
+	Album(ctx context.Context, id string) (AlbumResult, error)
 	Enums(ctx context.Context) (*Enums, error)
 	Profile(ctx context.Context) (UserProfileResult, error)
 	Project(ctx context.Context, id string) (ProjectResult, error)
@@ -496,6 +572,97 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	ec := executionContext{nil, e}
 	_ = ec
 	switch typeName + "." + field {
+
+	case "Album.id":
+		if e.complexity.Album.ID == nil {
+			break
+		}
+
+		return e.complexity.Album.ID(childComplexity), true
+
+	case "Album.name":
+		if e.complexity.Album.Name == nil {
+			break
+		}
+
+		return e.complexity.Album.Name(childComplexity), true
+
+	case "Album.pages":
+		if e.complexity.Album.Pages == nil {
+			break
+		}
+
+		return e.complexity.Album.Pages(childComplexity), true
+
+	case "Album.project":
+		if e.complexity.Album.Project == nil {
+			break
+		}
+
+		return e.complexity.Album.Project(childComplexity), true
+
+	case "Album.settings":
+		if e.complexity.Album.Settings == nil {
+			break
+		}
+
+		return e.complexity.Album.Settings(childComplexity), true
+
+	case "AlbumCreated.album":
+		if e.complexity.AlbumCreated.Album == nil {
+			break
+		}
+
+		return e.complexity.AlbumCreated.Album(childComplexity), true
+
+	case "AlbumDeleted.album":
+		if e.complexity.AlbumDeleted.Album == nil {
+			break
+		}
+
+		return e.complexity.AlbumDeleted.Album(childComplexity), true
+
+	case "AlbumPageCover.position":
+		if e.complexity.AlbumPageCover.Position == nil {
+			break
+		}
+
+		return e.complexity.AlbumPageCover.Position(childComplexity), true
+
+	case "AlbumPageVisualization.position":
+		if e.complexity.AlbumPageVisualization.Position == nil {
+			break
+		}
+
+		return e.complexity.AlbumPageVisualization.Position(childComplexity), true
+
+	case "AlbumPageVisualization.visualization":
+		if e.complexity.AlbumPageVisualization.Visualization == nil {
+			break
+		}
+
+		return e.complexity.AlbumPageVisualization.Visualization(childComplexity), true
+
+	case "AlbumPages.items":
+		if e.complexity.AlbumPages.Items == nil {
+			break
+		}
+
+		return e.complexity.AlbumPages.Items(childComplexity), true
+
+	case "AlbumSettings.orientation":
+		if e.complexity.AlbumSettings.Orientation == nil {
+			break
+		}
+
+		return e.complexity.AlbumSettings.Orientation(childComplexity), true
+
+	case "AlbumSettings.pageSize":
+		if e.complexity.AlbumSettings.PageSize == nil {
+			break
+		}
+
+		return e.complexity.AlbumSettings.PageSize(childComplexity), true
 
 	case "AlreadyExists.message":
 		if e.complexity.AlreadyExists.Message == nil {
@@ -769,6 +936,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.AddRoom(childComplexity, args["houseId"].(string), args["room"].(AddRoomInput)), true
 
+	case "Mutation.addVisualizationsToAlbum":
+		if e.complexity.Mutation.AddVisualizationsToAlbum == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_addVisualizationsToAlbum_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AddVisualizationsToAlbum(childComplexity, args["albumId"].(string), args["visualizations"].([]string)), true
+
 	case "Mutation.changeProjectDates":
 		if e.complexity.Mutation.ChangeProjectDates == nil {
 			break
@@ -817,6 +996,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.ConfirmLoginPin(childComplexity, args["token"].(string), args["pin"].(string)), true
 
+	case "Mutation.createAlbum":
+		if e.complexity.Mutation.CreateAlbum == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createAlbum_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateAlbum(childComplexity, args["projectId"].(string), args["name"].(string)), true
+
 	case "Mutation.createProject":
 		if e.complexity.Mutation.CreateProject == nil {
 			break
@@ -828,6 +1019,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.CreateProject(childComplexity, args["input"].(CreateProjectInput)), true
+
+	case "Mutation.deleteAlbum":
+		if e.complexity.Mutation.DeleteAlbum == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteAlbum_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteAlbum(childComplexity, args["id"].(string)), true
 
 	case "Mutation.deleteContact":
 		if e.complexity.Mutation.DeleteContact == nil {
@@ -977,6 +1180,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.PinSentByEmail.Token(childComplexity), true
 
+	case "Project.albums":
+		if e.complexity.Project.Albums == nil {
+			break
+		}
+
+		return e.complexity.Project.Albums(childComplexity), true
+
 	case "Project.contacts":
 		if e.complexity.Project.Contacts == nil {
 			break
@@ -1051,6 +1261,39 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Project.Visualizations(childComplexity), true
+
+	case "ProjectAlbums.list":
+		if e.complexity.ProjectAlbums.List == nil {
+			break
+		}
+
+		args, err := ec.field_ProjectAlbums_list_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.ProjectAlbums.List(childComplexity, args["limit"].(int), args["offset"].(int)), true
+
+	case "ProjectAlbums.total":
+		if e.complexity.ProjectAlbums.Total == nil {
+			break
+		}
+
+		return e.complexity.ProjectAlbums.Total(childComplexity), true
+
+	case "ProjectAlbumsList.items":
+		if e.complexity.ProjectAlbumsList.Items == nil {
+			break
+		}
+
+		return e.complexity.ProjectAlbumsList.Items(childComplexity), true
+
+	case "ProjectAlbumsTotal.total":
+		if e.complexity.ProjectAlbumsTotal.Total == nil {
+			break
+		}
+
+		return e.complexity.ProjectAlbumsTotal.Total(childComplexity), true
 
 	case "ProjectContacts.list":
 		if e.complexity.ProjectContacts.List == nil {
@@ -1295,6 +1538,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ProjectVisualizationsTotal.Total(childComplexity), true
 
+	case "Query.album":
+		if e.complexity.Query.Album == nil {
+			break
+		}
+
+		args, err := ec.field_Query_album_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Album(childComplexity, args["id"].(string)), true
+
 	case "Query.enums":
 		if e.complexity.Query.Enums == nil {
 			break
@@ -1536,6 +1791,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.VisualizationUploaded.Visualization(childComplexity), true
 
+	case "VisualizationsAddedToAlbum.pages":
+		if e.complexity.VisualizationsAddedToAlbum.Pages == nil {
+			break
+		}
+
+		return e.complexity.VisualizationsAddedToAlbum.Pages(childComplexity), true
+
 	case "VisualizationsDeleted.visualizations":
 		if e.complexity.VisualizationsDeleted.Visualizations == nil {
 			break
@@ -1767,7 +2029,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 	return introspection.WrapTypeFromDef(parsedSchema, parsedSchema.Types[name]), nil
 }
 
-//go:embed "schema/mutation.graphql" "schema/mutation_add_contact.graphql" "schema/mutation_add_house.graphql" "schema/mutation_add_room.graphql" "schema/mutation_change_project_dates.graphql" "schema/mutation_change_project_status.graphql" "schema/mutation_confirm_login.graphql" "schema/mutation_create_project.graphql" "schema/mutation_delete_contact.graphql" "schema/mutation_delete_room.graphql" "schema/mutation_delete_visualizations.graphql" "schema/mutation_login_by_email.graphql" "schema/mutation_update_contact.graphql" "schema/mutation_update_house.graphql" "schema/mutation_update_room.graphql" "schema/mutation_upload_project_file.graphql" "schema/mutation_upload_visualization.graphql" "schema/mutation_upload_visualizations.graphql" "schema/query.graphql" "schema/query_enums.graphql" "schema/query_profile.graphql" "schema/query_project.graphql" "schema/query_workspace.graphql" "schema/root.graphql"
+//go:embed "schema/mutation.graphql" "schema/mutation_add_contact.graphql" "schema/mutation_add_house.graphql" "schema/mutation_add_room.graphql" "schema/mutation_add_visualizations_to_album.graphql" "schema/mutation_change_project_dates.graphql" "schema/mutation_change_project_status.graphql" "schema/mutation_confirm_login.graphql" "schema/mutation_create_album.graphql" "schema/mutation_create_project.graphql" "schema/mutation_delete_album.graphql" "schema/mutation_delete_contact.graphql" "schema/mutation_delete_room.graphql" "schema/mutation_delete_visualizations.graphql" "schema/mutation_login_by_email.graphql" "schema/mutation_update_contact.graphql" "schema/mutation_update_house.graphql" "schema/mutation_update_room.graphql" "schema/mutation_upload_project_file.graphql" "schema/mutation_upload_visualization.graphql" "schema/mutation_upload_visualizations.graphql" "schema/query.graphql" "schema/query_album.graphql" "schema/query_enums.graphql" "schema/query_profile.graphql" "schema/query_project.graphql" "schema/query_workspace.graphql" "schema/root.graphql"
 var sourcesFS embed.FS
 
 func sourceData(filename string) string {
@@ -1783,10 +2045,13 @@ var sources = []*ast.Source{
 	{Name: "schema/mutation_add_contact.graphql", Input: sourceData("schema/mutation_add_contact.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_add_house.graphql", Input: sourceData("schema/mutation_add_house.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_add_room.graphql", Input: sourceData("schema/mutation_add_room.graphql"), BuiltIn: false},
+	{Name: "schema/mutation_add_visualizations_to_album.graphql", Input: sourceData("schema/mutation_add_visualizations_to_album.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_change_project_dates.graphql", Input: sourceData("schema/mutation_change_project_dates.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_change_project_status.graphql", Input: sourceData("schema/mutation_change_project_status.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_confirm_login.graphql", Input: sourceData("schema/mutation_confirm_login.graphql"), BuiltIn: false},
+	{Name: "schema/mutation_create_album.graphql", Input: sourceData("schema/mutation_create_album.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_create_project.graphql", Input: sourceData("schema/mutation_create_project.graphql"), BuiltIn: false},
+	{Name: "schema/mutation_delete_album.graphql", Input: sourceData("schema/mutation_delete_album.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_delete_contact.graphql", Input: sourceData("schema/mutation_delete_contact.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_delete_room.graphql", Input: sourceData("schema/mutation_delete_room.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_delete_visualizations.graphql", Input: sourceData("schema/mutation_delete_visualizations.graphql"), BuiltIn: false},
@@ -1798,6 +2063,7 @@ var sources = []*ast.Source{
 	{Name: "schema/mutation_upload_visualization.graphql", Input: sourceData("schema/mutation_upload_visualization.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_upload_visualizations.graphql", Input: sourceData("schema/mutation_upload_visualizations.graphql"), BuiltIn: false},
 	{Name: "schema/query.graphql", Input: sourceData("schema/query.graphql"), BuiltIn: false},
+	{Name: "schema/query_album.graphql", Input: sourceData("schema/query_album.graphql"), BuiltIn: false},
 	{Name: "schema/query_enums.graphql", Input: sourceData("schema/query_enums.graphql"), BuiltIn: false},
 	{Name: "schema/query_profile.graphql", Input: sourceData("schema/query_profile.graphql"), BuiltIn: false},
 	{Name: "schema/query_project.graphql", Input: sourceData("schema/query_project.graphql"), BuiltIn: false},
@@ -1906,6 +2172,30 @@ func (ec *executionContext) field_Mutation_addRoom_args(ctx context.Context, raw
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_addVisualizationsToAlbum_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["albumId"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("albumId"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["albumId"] = arg0
+	var arg1 []string
+	if tmp, ok := rawArgs["visualizations"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("visualizations"))
+		arg1, err = ec.unmarshalNString2ᚕstringᚄ(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["visualizations"] = arg1
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_changeProjectDates_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -1993,6 +2283,30 @@ func (ec *executionContext) field_Mutation_confirmLoginPin_args(ctx context.Cont
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_createAlbum_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["projectId"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("projectId"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["projectId"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["name"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["name"] = arg1
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_createProject_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -2005,6 +2319,21 @@ func (ec *executionContext) field_Mutation_createProject_args(ctx context.Contex
 		}
 	}
 	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteAlbum_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
 	return args, nil
 }
 
@@ -2230,6 +2559,30 @@ func (ec *executionContext) field_Mutation_uploadVisualizations_args(ctx context
 	return args, nil
 }
 
+func (ec *executionContext) field_ProjectAlbums_list_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 int
+	if tmp, ok := rawArgs["limit"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["limit"] = arg0
+	var arg1 int
+	if tmp, ok := rawArgs["offset"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+		arg1, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["offset"] = arg1
+	return args, nil
+}
+
 func (ec *executionContext) field_ProjectContacts_list_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -2452,6 +2805,21 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_album_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["id"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Query_project_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -2597,6 +2965,608 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 // endregion ************************** directives.gotpl **************************
 
 // region    **************************** field.gotpl *****************************
+
+func (ec *executionContext) _Album_id(ctx context.Context, field graphql.CollectedField, obj *Album) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Album_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Album_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Album",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Album_name(ctx context.Context, field graphql.CollectedField, obj *Album) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Album_name(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Name, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Album_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Album",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Album_project(ctx context.Context, field graphql.CollectedField, obj *Album) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Album_project(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Album().Project(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(AlbumProjectResult)
+	fc.Result = res
+	return ec.marshalNAlbumProjectResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumProjectResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Album_project(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Album",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type AlbumProjectResult does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Album_settings(ctx context.Context, field graphql.CollectedField, obj *Album) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Album_settings(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Settings, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*AlbumSettings)
+	fc.Result = res
+	return ec.marshalNAlbumSettings2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumSettings(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Album_settings(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Album",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "pageSize":
+				return ec.fieldContext_AlbumSettings_pageSize(ctx, field)
+			case "orientation":
+				return ec.fieldContext_AlbumSettings_orientation(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type AlbumSettings", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Album_pages(ctx context.Context, field graphql.CollectedField, obj *Album) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Album_pages(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Album().Pages(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(AlbumPagesResult)
+	fc.Result = res
+	return ec.marshalNAlbumPagesResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumPagesResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Album_pages(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Album",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type AlbumPagesResult does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AlbumCreated_album(ctx context.Context, field graphql.CollectedField, obj *AlbumCreated) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AlbumCreated_album(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Album, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*Album)
+	fc.Result = res
+	return ec.marshalNAlbum2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbum(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AlbumCreated_album(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AlbumCreated",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Album_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Album_name(ctx, field)
+			case "project":
+				return ec.fieldContext_Album_project(ctx, field)
+			case "settings":
+				return ec.fieldContext_Album_settings(ctx, field)
+			case "pages":
+				return ec.fieldContext_Album_pages(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Album", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AlbumDeleted_album(ctx context.Context, field graphql.CollectedField, obj *AlbumDeleted) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AlbumDeleted_album(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Album, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*Album)
+	fc.Result = res
+	return ec.marshalNAlbum2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbum(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AlbumDeleted_album(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AlbumDeleted",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Album_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Album_name(ctx, field)
+			case "project":
+				return ec.fieldContext_Album_project(ctx, field)
+			case "settings":
+				return ec.fieldContext_Album_settings(ctx, field)
+			case "pages":
+				return ec.fieldContext_Album_pages(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Album", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AlbumPageCover_position(ctx context.Context, field graphql.CollectedField, obj *AlbumPageCover) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AlbumPageCover_position(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Position, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AlbumPageCover_position(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AlbumPageCover",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AlbumPageVisualization_position(ctx context.Context, field graphql.CollectedField, obj *AlbumPageVisualization) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AlbumPageVisualization_position(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Position, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AlbumPageVisualization_position(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AlbumPageVisualization",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AlbumPageVisualization_visualization(ctx context.Context, field graphql.CollectedField, obj *AlbumPageVisualization) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AlbumPageVisualization_visualization(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.AlbumPageVisualization().Visualization(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(AlbumPageVisualizationResult)
+	fc.Result = res
+	return ec.marshalNAlbumPageVisualizationResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumPageVisualizationResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AlbumPageVisualization_visualization(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AlbumPageVisualization",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type AlbumPageVisualizationResult does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AlbumPages_items(ctx context.Context, field graphql.CollectedField, obj *AlbumPages) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AlbumPages_items(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Items, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]AlbumPage)
+	fc.Result = res
+	return ec.marshalNAlbumPage2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumPageᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AlbumPages_items(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AlbumPages",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type AlbumPage does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AlbumSettings_pageSize(ctx context.Context, field graphql.CollectedField, obj *AlbumSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AlbumSettings_pageSize(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PageSize, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(PageSize)
+	fc.Result = res
+	return ec.marshalNPageSize2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐPageSize(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AlbumSettings_pageSize(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AlbumSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type PageSize does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AlbumSettings_orientation(ctx context.Context, field graphql.CollectedField, obj *AlbumSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AlbumSettings_orientation(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Orientation, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(Orientation)
+	fc.Result = res
+	return ec.marshalNOrientation2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐOrientation(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AlbumSettings_orientation(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AlbumSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Orientation does not have child fields")
+		},
+	}
+	return fc, nil
+}
 
 func (ec *executionContext) _AlreadyExists_message(ctx context.Context, field graphql.CollectedField, obj *AlreadyExists) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_AlreadyExists_message(ctx, field)
@@ -4181,7 +5151,6 @@ func (ec *executionContext) _Mutation_ping(ctx context.Context, field graphql.Co
 	})
 	if err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
 	}
 	if resTmp == nil {
 		if !graphql.HasFieldError(ctx, fc) {
@@ -4225,7 +5194,6 @@ func (ec *executionContext) _Mutation_addContact(ctx context.Context, field grap
 	})
 	if err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
 	}
 	if resTmp == nil {
 		if !graphql.HasFieldError(ctx, fc) {
@@ -4280,7 +5248,6 @@ func (ec *executionContext) _Mutation_addHouse(ctx context.Context, field graphq
 	})
 	if err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
 	}
 	if resTmp == nil {
 		if !graphql.HasFieldError(ctx, fc) {
@@ -4335,7 +5302,6 @@ func (ec *executionContext) _Mutation_addRoom(ctx context.Context, field graphql
 	})
 	if err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
 	}
 	if resTmp == nil {
 		if !graphql.HasFieldError(ctx, fc) {
@@ -4372,6 +5338,60 @@ func (ec *executionContext) fieldContext_Mutation_addRoom(ctx context.Context, f
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_addVisualizationsToAlbum(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_addVisualizationsToAlbum(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().AddVisualizationsToAlbum(rctx, fc.Args["albumId"].(string), fc.Args["visualizations"].([]string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(AddVisualizationsToAlbumResult)
+	fc.Result = res
+	return ec.marshalNAddVisualizationsToAlbumResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAddVisualizationsToAlbumResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_addVisualizationsToAlbum(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type AddVisualizationsToAlbumResult does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_addVisualizationsToAlbum_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_changeProjectDates(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_changeProjectDates(ctx, field)
 	if err != nil {
@@ -4390,7 +5410,6 @@ func (ec *executionContext) _Mutation_changeProjectDates(ctx context.Context, fi
 	})
 	if err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
 	}
 	if resTmp == nil {
 		if !graphql.HasFieldError(ctx, fc) {
@@ -4445,7 +5464,6 @@ func (ec *executionContext) _Mutation_changeProjectStatus(ctx context.Context, f
 	})
 	if err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
 	}
 	if resTmp == nil {
 		if !graphql.HasFieldError(ctx, fc) {
@@ -4500,7 +5518,6 @@ func (ec *executionContext) _Mutation_confirmLoginLink(ctx context.Context, fiel
 	})
 	if err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
 	}
 	if resTmp == nil {
 		if !graphql.HasFieldError(ctx, fc) {
@@ -4555,7 +5572,6 @@ func (ec *executionContext) _Mutation_confirmLoginPin(ctx context.Context, field
 	})
 	if err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
 	}
 	if resTmp == nil {
 		if !graphql.HasFieldError(ctx, fc) {
@@ -4592,6 +5608,60 @@ func (ec *executionContext) fieldContext_Mutation_confirmLoginPin(ctx context.Co
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_createAlbum(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_createAlbum(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateAlbum(rctx, fc.Args["projectId"].(string), fc.Args["name"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(CreateAlbumResult)
+	fc.Result = res
+	return ec.marshalNCreateAlbumResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐCreateAlbumResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createAlbum(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type CreateAlbumResult does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createAlbum_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_createProject(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_createProject(ctx, field)
 	if err != nil {
@@ -4610,7 +5680,6 @@ func (ec *executionContext) _Mutation_createProject(ctx context.Context, field g
 	})
 	if err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
 	}
 	if resTmp == nil {
 		if !graphql.HasFieldError(ctx, fc) {
@@ -4647,6 +5716,60 @@ func (ec *executionContext) fieldContext_Mutation_createProject(ctx context.Cont
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_deleteAlbum(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_deleteAlbum(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().DeleteAlbum(rctx, fc.Args["id"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(DeleteAlbumResult)
+	fc.Result = res
+	return ec.marshalNDeleteAlbumResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐDeleteAlbumResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteAlbum(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type DeleteAlbumResult does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteAlbum_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_deleteContact(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_deleteContact(ctx, field)
 	if err != nil {
@@ -4665,7 +5788,6 @@ func (ec *executionContext) _Mutation_deleteContact(ctx context.Context, field g
 	})
 	if err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
 	}
 	if resTmp == nil {
 		if !graphql.HasFieldError(ctx, fc) {
@@ -4720,7 +5842,6 @@ func (ec *executionContext) _Mutation_deleteRoom(ctx context.Context, field grap
 	})
 	if err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
 	}
 	if resTmp == nil {
 		if !graphql.HasFieldError(ctx, fc) {
@@ -4775,7 +5896,6 @@ func (ec *executionContext) _Mutation_deleteVisualizations(ctx context.Context, 
 	})
 	if err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
 	}
 	if resTmp == nil {
 		if !graphql.HasFieldError(ctx, fc) {
@@ -4830,7 +5950,6 @@ func (ec *executionContext) _Mutation_loginByEmail(ctx context.Context, field gr
 	})
 	if err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
 	}
 	if resTmp == nil {
 		if !graphql.HasFieldError(ctx, fc) {
@@ -4885,7 +6004,6 @@ func (ec *executionContext) _Mutation_updateContact(ctx context.Context, field g
 	})
 	if err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
 	}
 	if resTmp == nil {
 		if !graphql.HasFieldError(ctx, fc) {
@@ -4940,7 +6058,6 @@ func (ec *executionContext) _Mutation_updateHouse(ctx context.Context, field gra
 	})
 	if err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
 	}
 	if resTmp == nil {
 		if !graphql.HasFieldError(ctx, fc) {
@@ -4995,7 +6112,6 @@ func (ec *executionContext) _Mutation_updateRoom(ctx context.Context, field grap
 	})
 	if err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
 	}
 	if resTmp == nil {
 		if !graphql.HasFieldError(ctx, fc) {
@@ -5050,7 +6166,6 @@ func (ec *executionContext) _Mutation_uploadProjectFile(ctx context.Context, fie
 	})
 	if err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
 	}
 	if resTmp == nil {
 		if !graphql.HasFieldError(ctx, fc) {
@@ -5105,7 +6220,6 @@ func (ec *executionContext) _Mutation_uploadVisualization(ctx context.Context, f
 	})
 	if err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
 	}
 	if resTmp == nil {
 		if !graphql.HasFieldError(ctx, fc) {
@@ -5160,7 +6274,6 @@ func (ec *executionContext) _Mutation_uploadVisualizations(ctx context.Context, 
 	})
 	if err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
 	}
 	if resTmp == nil {
 		if !graphql.HasFieldError(ctx, fc) {
@@ -5795,6 +6908,255 @@ func (ec *executionContext) fieldContext_Project_files(ctx context.Context, fiel
 	return fc, nil
 }
 
+func (ec *executionContext) _Project_albums(ctx context.Context, field graphql.CollectedField, obj *Project) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Project_albums(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Project().Albums(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*ProjectAlbums)
+	fc.Result = res
+	return ec.marshalNProjectAlbums2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectAlbums(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Project_albums(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Project",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "list":
+				return ec.fieldContext_ProjectAlbums_list(ctx, field)
+			case "total":
+				return ec.fieldContext_ProjectAlbums_total(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProjectAlbums", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProjectAlbums_list(ctx context.Context, field graphql.CollectedField, obj *ProjectAlbums) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectAlbums_list(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.ProjectAlbums().List(rctx, obj, fc.Args["limit"].(int), fc.Args["offset"].(int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(ProjectAlbumsListResult)
+	fc.Result = res
+	return ec.marshalNProjectAlbumsListResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectAlbumsListResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectAlbums_list(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectAlbums",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ProjectAlbumsListResult does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_ProjectAlbums_list_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProjectAlbums_total(ctx context.Context, field graphql.CollectedField, obj *ProjectAlbums) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectAlbums_total(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.ProjectAlbums().Total(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(ProjectAlbumsTotalResult)
+	fc.Result = res
+	return ec.marshalNProjectAlbumsTotalResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectAlbumsTotalResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectAlbums_total(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectAlbums",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ProjectAlbumsTotalResult does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProjectAlbumsList_items(ctx context.Context, field graphql.CollectedField, obj *ProjectAlbumsList) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectAlbumsList_items(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Items, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*Album)
+	fc.Result = res
+	return ec.marshalNAlbum2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectAlbumsList_items(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectAlbumsList",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Album_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Album_name(ctx, field)
+			case "project":
+				return ec.fieldContext_Album_project(ctx, field)
+			case "settings":
+				return ec.fieldContext_Album_settings(ctx, field)
+			case "pages":
+				return ec.fieldContext_Album_pages(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Album", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProjectAlbumsTotal_total(ctx context.Context, field graphql.CollectedField, obj *ProjectAlbumsTotal) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectAlbumsTotal_total(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Total, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectAlbumsTotal_total(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectAlbumsTotal",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _ProjectContacts_list(ctx context.Context, field graphql.CollectedField, obj *ProjectContacts) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_ProjectContacts_list(ctx, field)
 	if err != nil {
@@ -6066,6 +7428,8 @@ func (ec *executionContext) fieldContext_ProjectCreated_project(ctx context.Cont
 				return ec.fieldContext_Project_visualizations(ctx, field)
 			case "files":
 				return ec.fieldContext_Project_files(ctx, field)
+			case "albums":
+				return ec.fieldContext_Project_albums(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Project", field.Name)
 		},
@@ -6132,6 +7496,8 @@ func (ec *executionContext) fieldContext_ProjectDatesChanged_project(ctx context
 				return ec.fieldContext_Project_visualizations(ctx, field)
 			case "files":
 				return ec.fieldContext_Project_files(ctx, field)
+			case "albums":
+				return ec.fieldContext_Project_albums(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Project", field.Name)
 		},
@@ -6946,6 +8312,8 @@ func (ec *executionContext) fieldContext_ProjectStatusChanged_project(ctx contex
 				return ec.fieldContext_Project_visualizations(ctx, field)
 			case "files":
 				return ec.fieldContext_Project_files(ctx, field)
+			case "albums":
+				return ec.fieldContext_Project_albums(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Project", field.Name)
 		},
@@ -7327,7 +8695,6 @@ func (ec *executionContext) _Query_version(ctx context.Context, field graphql.Co
 	})
 	if err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
 	}
 	if resTmp == nil {
 		if !graphql.HasFieldError(ctx, fc) {
@@ -7353,6 +8720,60 @@ func (ec *executionContext) fieldContext_Query_version(ctx context.Context, fiel
 	return fc, nil
 }
 
+func (ec *executionContext) _Query_album(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_album(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Album(rctx, fc.Args["id"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(AlbumResult)
+	fc.Result = res
+	return ec.marshalNAlbumResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_album(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type AlbumResult does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_album_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query_enums(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query_enums(ctx, field)
 	if err != nil {
@@ -7371,7 +8792,6 @@ func (ec *executionContext) _Query_enums(ctx context.Context, field graphql.Coll
 	})
 	if err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
 	}
 	if resTmp == nil {
 		return graphql.Null
@@ -7416,7 +8836,6 @@ func (ec *executionContext) _Query_profile(ctx context.Context, field graphql.Co
 	})
 	if err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
 	}
 	if resTmp == nil {
 		if !graphql.HasFieldError(ctx, fc) {
@@ -7460,7 +8879,6 @@ func (ec *executionContext) _Query_project(ctx context.Context, field graphql.Co
 	})
 	if err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
 	}
 	if resTmp == nil {
 		if !graphql.HasFieldError(ctx, fc) {
@@ -7515,7 +8933,6 @@ func (ec *executionContext) _Query_workspace(ctx context.Context, field graphql.
 	})
 	if err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
 	}
 	if resTmp == nil {
 		if !graphql.HasFieldError(ctx, fc) {
@@ -7570,7 +8987,6 @@ func (ec *executionContext) _Query___type(ctx context.Context, field graphql.Col
 	})
 	if err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
 	}
 	if resTmp == nil {
 		return graphql.Null
@@ -7644,7 +9060,6 @@ func (ec *executionContext) _Query___schema(ctx context.Context, field graphql.C
 	})
 	if err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
 	}
 	if resTmp == nil {
 		return graphql.Null
@@ -9043,6 +10458,56 @@ func (ec *executionContext) fieldContext_VisualizationUploaded_visualization(ctx
 	return fc, nil
 }
 
+func (ec *executionContext) _VisualizationsAddedToAlbum_pages(ctx context.Context, field graphql.CollectedField, obj *VisualizationsAddedToAlbum) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_VisualizationsAddedToAlbum_pages(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Pages, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*AlbumPageVisualization)
+	fc.Result = res
+	return ec.marshalNAlbumPageVisualization2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumPageVisualizationᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_VisualizationsAddedToAlbum_pages(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "VisualizationsAddedToAlbum",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "position":
+				return ec.fieldContext_AlbumPageVisualization_position(ctx, field)
+			case "visualization":
+				return ec.fieldContext_AlbumPageVisualization_visualization(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type AlbumPageVisualization", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _VisualizationsDeleted_visualizations(ctx context.Context, field graphql.CollectedField, obj *VisualizationsDeleted) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_VisualizationsDeleted_visualizations(ctx, field)
 	if err != nil {
@@ -9528,6 +10993,8 @@ func (ec *executionContext) fieldContext_WorkspaceProjectsList_items(ctx context
 				return ec.fieldContext_Project_visualizations(ctx, field)
 			case "files":
 				return ec.fieldContext_Project_files(ctx, field)
+			case "albums":
+				return ec.fieldContext_Project_albums(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Project", field.Name)
 		},
@@ -12503,6 +13970,186 @@ func (ec *executionContext) _AddRoomResult(ctx context.Context, sel ast.Selectio
 	}
 }
 
+func (ec *executionContext) _AddVisualizationsToAlbumResult(ctx context.Context, sel ast.SelectionSet, obj AddVisualizationsToAlbumResult) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case VisualizationsAddedToAlbum:
+		return ec._VisualizationsAddedToAlbum(ctx, sel, &obj)
+	case *VisualizationsAddedToAlbum:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._VisualizationsAddedToAlbum(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
+func (ec *executionContext) _AlbumPage(ctx context.Context, sel ast.SelectionSet, obj AlbumPage) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case AlbumPageCover:
+		return ec._AlbumPageCover(ctx, sel, &obj)
+	case *AlbumPageCover:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._AlbumPageCover(ctx, sel, obj)
+	case AlbumPageVisualization:
+		return ec._AlbumPageVisualization(ctx, sel, &obj)
+	case *AlbumPageVisualization:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._AlbumPageVisualization(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
+func (ec *executionContext) _AlbumPageVisualizationResult(ctx context.Context, sel ast.SelectionSet, obj AlbumPageVisualizationResult) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case Visualization:
+		return ec._Visualization(ctx, sel, &obj)
+	case *Visualization:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Visualization(ctx, sel, obj)
+	case NotFound:
+		return ec._NotFound(ctx, sel, &obj)
+	case *NotFound:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._NotFound(ctx, sel, obj)
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
+func (ec *executionContext) _AlbumPagesResult(ctx context.Context, sel ast.SelectionSet, obj AlbumPagesResult) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case AlbumPages:
+		return ec._AlbumPages(ctx, sel, &obj)
+	case *AlbumPages:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._AlbumPages(ctx, sel, obj)
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
+func (ec *executionContext) _AlbumProjectResult(ctx context.Context, sel ast.SelectionSet, obj AlbumProjectResult) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case Project:
+		return ec._Project(ctx, sel, &obj)
+	case *Project:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Project(ctx, sel, obj)
+	case NotFound:
+		return ec._NotFound(ctx, sel, &obj)
+	case *NotFound:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._NotFound(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
+func (ec *executionContext) _AlbumResult(ctx context.Context, sel ast.SelectionSet, obj AlbumResult) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case Album:
+		return ec._Album(ctx, sel, &obj)
+	case *Album:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Album(ctx, sel, obj)
+	case NotFound:
+		return ec._NotFound(ctx, sel, &obj)
+	case *NotFound:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._NotFound(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
 func (ec *executionContext) _ChangeProjectDatesResult(ctx context.Context, sel ast.SelectionSet, obj ChangeProjectDatesResult) graphql.Marshaler {
 	switch obj := (obj).(type) {
 	case nil:
@@ -12658,6 +14305,36 @@ func (ec *executionContext) _ConfirmLoginPinResult(ctx context.Context, sel ast.
 	}
 }
 
+func (ec *executionContext) _CreateAlbumResult(ctx context.Context, sel ast.SelectionSet, obj CreateAlbumResult) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case AlbumCreated:
+		return ec._AlbumCreated(ctx, sel, &obj)
+	case *AlbumCreated:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._AlbumCreated(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
 func (ec *executionContext) _CreateProjectResult(ctx context.Context, sel ast.SelectionSet, obj CreateProjectResult) graphql.Marshaler {
 	switch obj := (obj).(type) {
 	case nil:
@@ -12676,6 +14353,43 @@ func (ec *executionContext) _CreateProjectResult(ctx context.Context, sel ast.Se
 			return graphql.Null
 		}
 		return ec._Forbidden(ctx, sel, obj)
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
+func (ec *executionContext) _DeleteAlbumResult(ctx context.Context, sel ast.SelectionSet, obj DeleteAlbumResult) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case AlbumDeleted:
+		return ec._AlbumDeleted(ctx, sel, &obj)
+	case *AlbumDeleted:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._AlbumDeleted(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
+	case NotFound:
+		return ec._NotFound(ctx, sel, &obj)
+	case *NotFound:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._NotFound(ctx, sel, obj)
 	case ServerError:
 		return ec._ServerError(ctx, sel, &obj)
 	case *ServerError:
@@ -12919,6 +14633,66 @@ func (ec *executionContext) _LoginByEmailResult(ctx context.Context, sel ast.Sel
 			return graphql.Null
 		}
 		return ec._InvalidEmail(ctx, sel, obj)
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
+func (ec *executionContext) _ProjectAlbumsListResult(ctx context.Context, sel ast.SelectionSet, obj ProjectAlbumsListResult) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case ProjectAlbumsList:
+		return ec._ProjectAlbumsList(ctx, sel, &obj)
+	case *ProjectAlbumsList:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ProjectAlbumsList(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
+func (ec *executionContext) _ProjectAlbumsTotalResult(ctx context.Context, sel ast.SelectionSet, obj ProjectAlbumsTotalResult) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case ProjectAlbumsTotal:
+		return ec._ProjectAlbumsTotal(ctx, sel, &obj)
+	case *ProjectAlbumsTotal:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ProjectAlbumsTotal(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
 	case ServerError:
 		return ec._ServerError(ctx, sel, &obj)
 	case *ServerError:
@@ -13607,6 +15381,283 @@ func (ec *executionContext) _WorkspaceUsersTotalResult(ctx context.Context, sel 
 
 // region    **************************** object.gotpl ****************************
 
+var albumImplementors = []string{"Album", "AlbumResult"}
+
+func (ec *executionContext) _Album(ctx context.Context, sel ast.SelectionSet, obj *Album) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, albumImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Album")
+		case "id":
+
+			out.Values[i] = ec._Album_id(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "name":
+
+			out.Values[i] = ec._Album_name(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "project":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Album_project(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		case "settings":
+
+			out.Values[i] = ec._Album_settings(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "pages":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Album_pages(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var albumCreatedImplementors = []string{"AlbumCreated", "CreateAlbumResult"}
+
+func (ec *executionContext) _AlbumCreated(ctx context.Context, sel ast.SelectionSet, obj *AlbumCreated) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, albumCreatedImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AlbumCreated")
+		case "album":
+
+			out.Values[i] = ec._AlbumCreated_album(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var albumDeletedImplementors = []string{"AlbumDeleted", "DeleteAlbumResult"}
+
+func (ec *executionContext) _AlbumDeleted(ctx context.Context, sel ast.SelectionSet, obj *AlbumDeleted) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, albumDeletedImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AlbumDeleted")
+		case "album":
+
+			out.Values[i] = ec._AlbumDeleted_album(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var albumPageCoverImplementors = []string{"AlbumPageCover", "AlbumPage"}
+
+func (ec *executionContext) _AlbumPageCover(ctx context.Context, sel ast.SelectionSet, obj *AlbumPageCover) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, albumPageCoverImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AlbumPageCover")
+		case "position":
+
+			out.Values[i] = ec._AlbumPageCover_position(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var albumPageVisualizationImplementors = []string{"AlbumPageVisualization", "AlbumPage"}
+
+func (ec *executionContext) _AlbumPageVisualization(ctx context.Context, sel ast.SelectionSet, obj *AlbumPageVisualization) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, albumPageVisualizationImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AlbumPageVisualization")
+		case "position":
+
+			out.Values[i] = ec._AlbumPageVisualization_position(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "visualization":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._AlbumPageVisualization_visualization(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var albumPagesImplementors = []string{"AlbumPages", "AlbumPagesResult"}
+
+func (ec *executionContext) _AlbumPages(ctx context.Context, sel ast.SelectionSet, obj *AlbumPages) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, albumPagesImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AlbumPages")
+		case "items":
+
+			out.Values[i] = ec._AlbumPages_items(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var albumSettingsImplementors = []string{"AlbumSettings"}
+
+func (ec *executionContext) _AlbumSettings(ctx context.Context, sel ast.SelectionSet, obj *AlbumSettings) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, albumSettingsImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AlbumSettings")
+		case "pageSize":
+
+			out.Values[i] = ec._AlbumSettings_pageSize(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "orientation":
+
+			out.Values[i] = ec._AlbumSettings_orientation(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var alreadyExistsImplementors = []string{"AlreadyExists", "UploadProjectFileResult", "Error"}
 
 func (ec *executionContext) _AlreadyExists(ctx context.Context, sel ast.SelectionSet, obj *AlreadyExists) graphql.Marshaler {
@@ -13873,7 +15924,7 @@ func (ec *executionContext) _ExpiredToken(ctx context.Context, sel ast.Selection
 	return out
 }
 
-var forbiddenImplementors = []string{"Forbidden", "AddContactResult", "AddHouseResult", "AddRoomResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "CreateProjectResult", "DeleteContactResult", "DeleteRoomResult", "DeleteVisualizationsResult", "UpdateContactResult", "UpdateHouseResult", "UpdateRoomResult", "UploadProjectFileResult", "UploadVisualizationResult", "UploadVisualizationsResult", "UserProfileResult", "ProjectResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "ProjectVisualizationsListResult", "ProjectVisualizationsTotalResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "WorkspaceResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "WorkspaceUsersListResult", "WorkspaceUsersTotalResult", "Error"}
+var forbiddenImplementors = []string{"Forbidden", "AddContactResult", "AddHouseResult", "AddRoomResult", "AddVisualizationsToAlbumResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "CreateAlbumResult", "CreateProjectResult", "DeleteAlbumResult", "DeleteContactResult", "DeleteRoomResult", "DeleteVisualizationsResult", "UpdateContactResult", "UpdateHouseResult", "UpdateRoomResult", "UploadProjectFileResult", "UploadVisualizationResult", "UploadVisualizationsResult", "AlbumResult", "AlbumProjectResult", "UserProfileResult", "ProjectResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "ProjectVisualizationsListResult", "ProjectVisualizationsTotalResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectAlbumsListResult", "ProjectAlbumsTotalResult", "WorkspaceResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "WorkspaceUsersListResult", "WorkspaceUsersTotalResult", "Error"}
 
 func (ec *executionContext) _Forbidden(ctx context.Context, sel ast.SelectionSet, obj *Forbidden) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, forbiddenImplementors)
@@ -14314,7 +16365,6 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 	})
 
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
 	for i, field := range fields {
 		innerCtx := graphql.WithRootFieldContext(ctx, &graphql.RootFieldContext{
 			Object: field.Name,
@@ -14330,183 +16380,141 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 				return ec._Mutation_ping(ctx, field)
 			})
 
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "addContact":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_addContact(ctx, field)
 			})
 
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "addHouse":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_addHouse(ctx, field)
 			})
 
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "addRoom":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_addRoom(ctx, field)
 			})
 
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
+		case "addVisualizationsToAlbum":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_addVisualizationsToAlbum(ctx, field)
+			})
+
 		case "changeProjectDates":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_changeProjectDates(ctx, field)
 			})
 
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "changeProjectStatus":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_changeProjectStatus(ctx, field)
 			})
 
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "confirmLoginLink":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_confirmLoginLink(ctx, field)
 			})
 
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "confirmLoginPin":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_confirmLoginPin(ctx, field)
 			})
 
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
+		case "createAlbum":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createAlbum(ctx, field)
+			})
+
 		case "createProject":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createProject(ctx, field)
 			})
 
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
+		case "deleteAlbum":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteAlbum(ctx, field)
+			})
+
 		case "deleteContact":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteContact(ctx, field)
 			})
 
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "deleteRoom":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteRoom(ctx, field)
 			})
 
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "deleteVisualizations":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteVisualizations(ctx, field)
 			})
 
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "loginByEmail":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_loginByEmail(ctx, field)
 			})
 
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "updateContact":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_updateContact(ctx, field)
 			})
 
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "updateHouse":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_updateHouse(ctx, field)
 			})
 
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "updateRoom":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_updateRoom(ctx, field)
 			})
 
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "uploadProjectFile":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_uploadProjectFile(ctx, field)
 			})
 
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "uploadVisualization":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_uploadVisualization(ctx, field)
 			})
 
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "uploadVisualizations":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_uploadVisualizations(ctx, field)
 			})
 
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
 	}
 	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
 	return out
 }
 
-var notFoundImplementors = []string{"NotFound", "AddHouseResult", "AddRoomResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "DeleteContactResult", "DeleteRoomResult", "DeleteVisualizationsResult", "UpdateContactResult", "UpdateHouseResult", "UpdateRoomResult", "ProjectResult", "WorkspaceResult", "Error"}
+var notFoundImplementors = []string{"NotFound", "AddHouseResult", "AddRoomResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "DeleteAlbumResult", "DeleteContactResult", "DeleteRoomResult", "DeleteVisualizationsResult", "UpdateContactResult", "UpdateHouseResult", "UpdateRoomResult", "AlbumResult", "AlbumProjectResult", "AlbumPageVisualizationResult", "ProjectResult", "WorkspaceResult", "Error"}
 
 func (ec *executionContext) _NotFound(ctx context.Context, sel ast.SelectionSet, obj *NotFound) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, notFoundImplementors)
@@ -14569,7 +16577,7 @@ func (ec *executionContext) _PinSentByEmail(ctx context.Context, sel ast.Selecti
 	return out
 }
 
-var projectImplementors = []string{"Project", "ProjectResult"}
+var projectImplementors = []string{"Project", "AlbumProjectResult", "ProjectResult"}
 
 func (ec *executionContext) _Project(ctx context.Context, sel ast.SelectionSet, obj *Project) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, projectImplementors)
@@ -14705,6 +16713,143 @@ func (ec *executionContext) _Project(ctx context.Context, sel ast.SelectionSet, 
 				return innerFunc(ctx)
 
 			})
+		case "albums":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Project_albums(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var projectAlbumsImplementors = []string{"ProjectAlbums"}
+
+func (ec *executionContext) _ProjectAlbums(ctx context.Context, sel ast.SelectionSet, obj *ProjectAlbums) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, projectAlbumsImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ProjectAlbums")
+		case "list":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._ProjectAlbums_list(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		case "total":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._ProjectAlbums_total(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var projectAlbumsListImplementors = []string{"ProjectAlbumsList", "ProjectAlbumsListResult"}
+
+func (ec *executionContext) _ProjectAlbumsList(ctx context.Context, sel ast.SelectionSet, obj *ProjectAlbumsList) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, projectAlbumsListImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ProjectAlbumsList")
+		case "items":
+
+			out.Values[i] = ec._ProjectAlbumsList_items(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var projectAlbumsTotalImplementors = []string{"ProjectAlbumsTotal", "ProjectAlbumsTotalResult"}
+
+func (ec *executionContext) _ProjectAlbumsTotal(ctx context.Context, sel ast.SelectionSet, obj *ProjectAlbumsTotal) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, projectAlbumsTotalImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ProjectAlbumsTotal")
+		case "total":
+
+			out.Values[i] = ec._ProjectAlbumsTotal_total(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -15452,7 +17597,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 	})
 
 	out := graphql.NewFieldSet(fields)
-	var invalids uint32
 	for i, field := range fields {
 		innerCtx := graphql.WithRootFieldContext(ctx, &graphql.RootFieldContext{
 			Object: field.Name,
@@ -15472,9 +17616,26 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_version(ctx, field)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
+		case "album":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_album(ctx, field)
 				return res
 			}
 
@@ -15515,9 +17676,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_profile(ctx, field)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
 				return res
 			}
 
@@ -15538,9 +17696,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_project(ctx, field)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
 				return res
 			}
 
@@ -15561,9 +17716,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_workspace(ctx, field)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
 				return res
 			}
 
@@ -15591,9 +17743,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		}
 	}
 	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
 	return out
 }
 
@@ -15738,7 +17887,7 @@ func (ec *executionContext) _RoomUpdated(ctx context.Context, sel ast.SelectionS
 	return out
 }
 
-var serverErrorImplementors = []string{"ServerError", "AddContactResult", "AddHouseResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "ConfirmLoginLinkResult", "ConfirmLoginPinResult", "CreateProjectResult", "DeleteContactResult", "DeleteVisualizationsResult", "LoginByEmailResult", "UpdateContactResult", "UpdateHouseResult", "UploadProjectFileResult", "UploadVisualizationResult", "UploadVisualizationsResult", "UserProfileResult", "ProjectResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "ProjectVisualizationsListResult", "ProjectVisualizationsTotalResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "WorkspaceResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "WorkspaceUsersListResult", "WorkspaceUsersTotalResult", "Error"}
+var serverErrorImplementors = []string{"ServerError", "AddContactResult", "AddHouseResult", "AddVisualizationsToAlbumResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "ConfirmLoginLinkResult", "ConfirmLoginPinResult", "CreateAlbumResult", "CreateProjectResult", "DeleteAlbumResult", "DeleteContactResult", "DeleteVisualizationsResult", "LoginByEmailResult", "UpdateContactResult", "UpdateHouseResult", "UploadProjectFileResult", "UploadVisualizationResult", "UploadVisualizationsResult", "AlbumResult", "AlbumProjectResult", "AlbumPagesResult", "AlbumPageVisualizationResult", "UserProfileResult", "ProjectResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "ProjectVisualizationsListResult", "ProjectVisualizationsTotalResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectAlbumsListResult", "ProjectAlbumsTotalResult", "WorkspaceResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "WorkspaceUsersListResult", "WorkspaceUsersTotalResult", "Error"}
 
 func (ec *executionContext) _ServerError(ctx context.Context, sel ast.SelectionSet, obj *ServerError) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, serverErrorImplementors)
@@ -15895,7 +18044,7 @@ func (ec *executionContext) _UserProfile(ctx context.Context, sel ast.SelectionS
 	return out
 }
 
-var visualizationImplementors = []string{"Visualization"}
+var visualizationImplementors = []string{"Visualization", "AlbumPageVisualizationResult"}
 
 func (ec *executionContext) _Visualization(ctx context.Context, sel ast.SelectionSet, obj *Visualization) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, visualizationImplementors)
@@ -16015,6 +18164,34 @@ func (ec *executionContext) _VisualizationUploaded(ctx context.Context, sel ast.
 		case "visualization":
 
 			out.Values[i] = ec._VisualizationUploaded_visualization(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var visualizationsAddedToAlbumImplementors = []string{"VisualizationsAddedToAlbum", "AddVisualizationsToAlbumResult"}
+
+func (ec *executionContext) _VisualizationsAddedToAlbum(ctx context.Context, sel ast.SelectionSet, obj *VisualizationsAddedToAlbum) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, visualizationsAddedToAlbumImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("VisualizationsAddedToAlbum")
+		case "pages":
+
+			out.Values[i] = ec._VisualizationsAddedToAlbum_pages(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
@@ -16820,6 +18997,228 @@ func (ec *executionContext) marshalNAddRoomResult2githubᚗcomᚋapartomatᚋapa
 	return ec._AddRoomResult(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNAddVisualizationsToAlbumResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAddVisualizationsToAlbumResult(ctx context.Context, sel ast.SelectionSet, v AddVisualizationsToAlbumResult) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._AddVisualizationsToAlbumResult(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNAlbum2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumᚄ(ctx context.Context, sel ast.SelectionSet, v []*Album) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNAlbum2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbum(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNAlbum2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbum(ctx context.Context, sel ast.SelectionSet, v *Album) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Album(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNAlbumPage2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumPage(ctx context.Context, sel ast.SelectionSet, v AlbumPage) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._AlbumPage(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNAlbumPage2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumPageᚄ(ctx context.Context, sel ast.SelectionSet, v []AlbumPage) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNAlbumPage2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumPage(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNAlbumPageVisualization2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumPageVisualizationᚄ(ctx context.Context, sel ast.SelectionSet, v []*AlbumPageVisualization) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNAlbumPageVisualization2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumPageVisualization(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNAlbumPageVisualization2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumPageVisualization(ctx context.Context, sel ast.SelectionSet, v *AlbumPageVisualization) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._AlbumPageVisualization(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNAlbumPageVisualizationResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumPageVisualizationResult(ctx context.Context, sel ast.SelectionSet, v AlbumPageVisualizationResult) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._AlbumPageVisualizationResult(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNAlbumPagesResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumPagesResult(ctx context.Context, sel ast.SelectionSet, v AlbumPagesResult) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._AlbumPagesResult(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNAlbumProjectResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumProjectResult(ctx context.Context, sel ast.SelectionSet, v AlbumProjectResult) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._AlbumProjectResult(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNAlbumResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumResult(ctx context.Context, sel ast.SelectionSet, v AlbumResult) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._AlbumResult(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNAlbumSettings2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumSettings(ctx context.Context, sel ast.SelectionSet, v *AlbumSettings) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._AlbumSettings(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
 	res, err := graphql.UnmarshalBoolean(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -17020,6 +19419,16 @@ func (ec *executionContext) marshalNContactType2githubᚗcomᚋapartomatᚋapart
 	return v
 }
 
+func (ec *executionContext) marshalNCreateAlbumResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐCreateAlbumResult(ctx context.Context, sel ast.SelectionSet, v CreateAlbumResult) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._CreateAlbumResult(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNCreateProjectInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐCreateProjectInput(ctx context.Context, v interface{}) (CreateProjectInput, error) {
 	res, err := ec.unmarshalInputCreateProjectInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -17033,6 +19442,16 @@ func (ec *executionContext) marshalNCreateProjectResult2githubᚗcomᚋapartomat
 		return graphql.Null
 	}
 	return ec._CreateProjectResult(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNDeleteAlbumResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐDeleteAlbumResult(ctx context.Context, sel ast.SelectionSet, v DeleteAlbumResult) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._DeleteAlbumResult(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNDeleteContactResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐDeleteContactResult(ctx context.Context, sel ast.SelectionSet, v DeleteContactResult) graphql.Marshaler {
@@ -17178,6 +19597,26 @@ func (ec *executionContext) marshalNLoginByEmailResult2githubᚗcomᚋapartomat�
 	return ec._LoginByEmailResult(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNOrientation2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐOrientation(ctx context.Context, v interface{}) (Orientation, error) {
+	var res Orientation
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNOrientation2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐOrientation(ctx context.Context, sel ast.SelectionSet, v Orientation) graphql.Marshaler {
+	return v
+}
+
+func (ec *executionContext) unmarshalNPageSize2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐPageSize(ctx context.Context, v interface{}) (PageSize, error) {
+	var res PageSize
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNPageSize2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐPageSize(ctx context.Context, sel ast.SelectionSet, v PageSize) graphql.Marshaler {
+	return v
+}
+
 func (ec *executionContext) marshalNProject2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectᚄ(ctx context.Context, sel ast.SelectionSet, v []*Project) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
@@ -17230,6 +19669,40 @@ func (ec *executionContext) marshalNProject2ᚖgithubᚗcomᚋapartomatᚋaparto
 		return graphql.Null
 	}
 	return ec._Project(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNProjectAlbums2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectAlbums(ctx context.Context, sel ast.SelectionSet, v ProjectAlbums) graphql.Marshaler {
+	return ec._ProjectAlbums(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNProjectAlbums2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectAlbums(ctx context.Context, sel ast.SelectionSet, v *ProjectAlbums) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._ProjectAlbums(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNProjectAlbumsListResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectAlbumsListResult(ctx context.Context, sel ast.SelectionSet, v ProjectAlbumsListResult) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._ProjectAlbumsListResult(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNProjectAlbumsTotalResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectAlbumsTotalResult(ctx context.Context, sel ast.SelectionSet, v ProjectAlbumsTotalResult) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._ProjectAlbumsTotalResult(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNProjectContacts2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectContacts(ctx context.Context, sel ast.SelectionSet, v ProjectContacts) graphql.Marshaler {

@@ -2,52 +2,31 @@ package postgres
 
 import (
 	"errors"
-
-	. "github.com/apartomat/apartomat/internal/store/users"
+	. "github.com/apartomat/apartomat/internal/store/albums"
 	"github.com/doug-martin/goqu/v9"
 )
 
-type query interface {
+type specQuery interface {
 	Expression() (goqu.Expression, error)
 }
 
-func toQuery(spec Spec) (query, error) {
-	if spec == nil {
-		return nil, nil
-	}
-
-	if s, ok := spec.(query); ok {
+func toQuery(spec Spec) (specQuery, error) {
+	if s, ok := spec.(specQuery); ok {
 		return s, nil
 	}
 
 	switch s := spec.(type) {
 	case IDInSpec:
 		return idInSpecQuery{s}, nil
-	case EmailInSpec:
-		return emailInSpecQuery{s}, nil
+	case ProjectIDInSpec:
+		return projectIDInSpecQuery{s}, nil
 	case AndSpec:
 		return andSpecQuery{spec: s}, nil
 	case OrSpec:
 		return orSpecQuery{spec: s}, nil
 	}
 
-	return nil, errors.New("unknown user spec")
-}
-
-type idInSpecQuery struct {
-	spec IDInSpec
-}
-
-func (s idInSpecQuery) Expression() (goqu.Expression, error) {
-	return goqu.Ex{"id": s.spec.ID}, nil
-}
-
-type emailInSpecQuery struct {
-	spec EmailInSpec
-}
-
-func (s emailInSpecQuery) Expression() (goqu.Expression, error) {
-	return goqu.Ex{"email": s.spec.Email}, nil
+	return nil, errors.New("unknown albums spec")
 }
 
 type andSpecQuery struct {
@@ -60,7 +39,7 @@ func (s andSpecQuery) Expression() (goqu.Expression, error) {
 	for _, spec := range s.spec.Specs {
 		if ps, err := toQuery(spec); err != nil {
 			return nil, err
-		} else if ps != nil {
+		} else {
 			expr, err := ps.Expression()
 			if err != nil {
 				return nil, err
@@ -83,7 +62,7 @@ func (s orSpecQuery) Expression() (goqu.Expression, error) {
 	for _, spec := range s.spec.Specs {
 		if ps, err := toQuery(spec); err != nil {
 			return nil, err
-		} else if ps != nil {
+		} else {
 			expr, err := ps.Expression()
 			if err != nil {
 				return nil, err
@@ -94,4 +73,20 @@ func (s orSpecQuery) Expression() (goqu.Expression, error) {
 	}
 
 	return goqu.Or(exs...), nil
+}
+
+type idInSpecQuery struct {
+	spec IDInSpec
+}
+
+func (s idInSpecQuery) Expression() (goqu.Expression, error) {
+	return goqu.Ex{"id": s.spec.ID}, nil
+}
+
+type projectIDInSpecQuery struct {
+	spec ProjectIDInSpec
+}
+
+func (s projectIDInSpecQuery) Expression() (goqu.Expression, error) {
+	return goqu.Ex{"project_id": s.spec.ProjectID}, nil
 }

@@ -41,7 +41,6 @@ func (s idInSpecQuery) Expression() (goqu.Expression, error) {
 	return goqu.Ex{"id": s.spec.ID}, nil
 }
 
-//
 type userIDInSpecQuery struct {
 	spec UserIDInSpec
 }
@@ -50,7 +49,6 @@ func (s userIDInSpecQuery) Expression() (goqu.Expression, error) {
 	return goqu.Ex{"user_id": s.spec.UserID}, nil
 }
 
-//
 type andSpecQuery struct {
 	spec AndSpec
 }
@@ -74,7 +72,6 @@ func (s andSpecQuery) Expression() (goqu.Expression, error) {
 	return goqu.And(exs...), nil
 }
 
-//
 type orSpecQuery struct {
 	spec OrSpec
 }

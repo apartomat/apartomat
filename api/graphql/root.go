@@ -2,14 +2,16 @@ package graphql
 
 import (
 	apartomat "github.com/apartomat/apartomat/internal"
+	"go.uber.org/zap"
 )
 
 type rootResolver struct {
 	useCases *apartomat.Apartomat
+	logger   *zap.Logger
 }
 
-func NewRootResolver(useCases *apartomat.Apartomat) ResolverRoot {
-	return &rootResolver{useCases: useCases}
+func NewRootResolver(useCases *apartomat.Apartomat, logger *zap.Logger) ResolverRoot {
+	return &rootResolver{useCases: useCases, logger: logger}
 }
 
 func notFound() (NotFound, error) {

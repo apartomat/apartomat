@@ -105,7 +105,6 @@ func toRoomSpecQuery(spec Spec) (roomSpecQuery, error) {
 	return nil, errors.New("unknown spec")
 }
 
-//
 type roomIDInSpecQuery struct {
 	spec IDInSpec
 }
@@ -114,7 +113,6 @@ func (s roomIDInSpecQuery) Expression() (goqu.Expression, error) {
 	return goqu.Ex{"id": s.spec.IDs}, nil
 }
 
-//
 type roomHouseIDInSpecQuery struct {
 	spec HouseIDInSpec
 }
@@ -127,8 +125,8 @@ type roomsRecord struct {
 	tableName  struct{}  `pg:"apartomat.rooms,alias:rooms"`
 	ID         string    `pg:"id,pk"`
 	Name       string    `pg:"name"`
-	Square     *float64  `pg:"square,omit_empty"`
-	Level      *int      `pg:"level,omit_empty"`
+	Square     *float64  `pg:"square"`
+	Level      *int      `pg:"level"`
 	CreatedAt  time.Time `pg:"created_at"`
 	ModifiedAt time.Time `pg:"modified_at"`
 	HouseID    string    `pg:"house_id"`

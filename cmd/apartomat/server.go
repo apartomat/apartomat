@@ -9,6 +9,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"go.uber.org/zap"
 	"log"
 	"net"
 	"net/http"
@@ -44,12 +45,14 @@ func (opt addrOpt) Apply(s *http.Server) {
 type server struct {
 	useCases *apartomat.Apartomat
 	loaders  *dataloader.DataLoaders
+	logger   *zap.Logger
 }
 
-func NewServer(useCases *apartomat.Apartomat, loaders *dataloader.DataLoaders) *server {
+func NewServer(useCases *apartomat.Apartomat, loaders *dataloader.DataLoaders, logger *zap.Logger) *server {
 	return &server{
 		useCases: useCases,
 		loaders:  loaders,
+		logger:   logger,
 	}
 }
 
@@ -64,7 +67,7 @@ func (server *server) Run(opts ...Option) {
 	mux.Handle("/graphql", graphql.Handler(
 		server.useCases.CheckAuthToken,
 		server.loaders,
-		graphql.NewRootResolver(server.useCases),
+		graphql.NewRootResolver(server.useCases, server.logger),
 		10000,
 	))
 

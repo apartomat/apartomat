@@ -1,0 +1,9 @@
+extend type Mutation {
+    addVisualizationsToAlbum(albumId: String! visualizations: [String!]!): AddVisualizationsToAlbumResult!
+}
+
+union AddVisualizationsToAlbumResult = VisualizationsAddedToAlbum | Forbidden | ServerError
+
+type VisualizationsAddedToAlbum {
+    pages: [AlbumPageVisualization!]!
+}

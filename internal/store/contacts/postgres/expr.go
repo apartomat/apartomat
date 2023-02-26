@@ -29,7 +29,6 @@ func toSpecQuery(spec contacts.Spec) (specQuery, error) {
 	return nil, errors.New("unknown contacts spec")
 }
 
-//
 type andSpecQuery struct {
 	spec contacts.AndSpec
 }
@@ -53,7 +52,6 @@ func (s andSpecQuery) Expression() (goqu.Expression, error) {
 	return goqu.And(exs...), nil
 }
 
-//
 type orSpecQuery struct {
 	spec contacts.OrSpec
 }
@@ -77,7 +75,6 @@ func (s orSpecQuery) Expression() (goqu.Expression, error) {
 	return goqu.Or(exs...), nil
 }
 
-//
 type contactIDInSpecQuery struct {
 	spec contacts.IDInSpec
 }
@@ -86,7 +83,6 @@ func (s contactIDInSpecQuery) Expression() (goqu.Expression, error) {
 	return goqu.Ex{"id": s.spec.IDs}, nil
 }
 
-//
 type contactProjectIDInSpecQuery struct {
 	spec contacts.ProjectIDInSpec
 }

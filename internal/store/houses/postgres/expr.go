@@ -33,7 +33,6 @@ func (s houseIDInSpecQuery) Expression() (goqu.Expression, error) {
 	return goqu.Ex{"id": s.spec.IDs}, nil
 }
 
-//
 type houseProjectIDInSpecQuery struct {
 	spec ProjectIDInSpec
 }

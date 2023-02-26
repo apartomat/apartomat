@@ -16,6 +16,7 @@ import (
 	"github.com/apartomat/apartomat/internal/mail"
 	"github.com/apartomat/apartomat/internal/mail/smtp"
 	"github.com/apartomat/apartomat/internal/postgres/store"
+	albums "github.com/apartomat/apartomat/internal/store/albums/postgres"
 	contacts "github.com/apartomat/apartomat/internal/store/contacts/postgres"
 	files "github.com/apartomat/apartomat/internal/store/files/postgres"
 	houses "github.com/apartomat/apartomat/internal/store/houses/postgres"
@@ -81,6 +82,7 @@ func main() {
 		workspaceUsersStore := workspace_users.NewStore(pgdb)
 		projectsStore := projects.NewStore(pgdb)
 		filesStore := files.NewStore(pgdb)
+		albumsStore := albums.NewStore(pgdb)
 		contactsStore := contacts.NewStore(pgdb)
 		housesStore := houses.NewHousesStore(pgdb)
 		roomsStore := store.NewRoomsStore(pgdb)
@@ -111,6 +113,7 @@ func main() {
 			Mailer:                       mailer,
 			MailFactory:                  mail.NewFactory("https://crm.apartomat.ru", "apartomat@yandex.ru"),
 			Uploader:                     uploader,
+			Albums:                       albumsStore,
 			Contacts:                     contactsStore,
 			Houses:                       housesStore,
 			Projects:                     projectsStore,
@@ -131,6 +134,7 @@ func main() {
 			&dataloader.DataLoaders{
 				Users: usersLoader,
 			},
+			logger,
 		).Run(serverOpts...)
 
 	default:

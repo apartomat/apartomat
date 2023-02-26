@@ -1,0 +1,9 @@
+extend type Mutation {
+    createAlbum(projectId: String! name: String!): CreateAlbumResult!
+}
+
+union CreateAlbumResult = AlbumCreated | Forbidden | ServerError
+
+type AlbumCreated {
+    album: Album!
+}

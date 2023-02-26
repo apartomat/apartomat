@@ -15,6 +15,7 @@ type Project {
     houses: ProjectHouses!
     visualizations: ProjectVisualizations!
     files: ProjectFiles!
+    albums: ProjectAlbums! @goField(forceResolver: true)
 }
 
 enum ProjectStatus {
@@ -198,4 +199,21 @@ type ProjectFile {
     url: Url!
     type: ProjectFileType!
     mimeType: String!
+}
+
+type ProjectAlbums {
+    list(limit: Int! = 10 offset: Int! = 0): ProjectAlbumsListResult! @goField(forceResolver: true)
+    total: ProjectAlbumsTotalResult! @goField(forceResolver: true)
+}
+
+union ProjectAlbumsListResult = ProjectAlbumsList | Forbidden | ServerError
+
+type ProjectAlbumsList {
+    items: [Album!]!
+}
+
+union ProjectAlbumsTotalResult = ProjectAlbumsTotal | Forbidden | ServerError
+
+type ProjectAlbumsTotal {
+    total: Int!
 }

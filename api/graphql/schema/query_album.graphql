@@ -1,0 +1,49 @@
+extend type Query {
+    album(id: String!): AlbumResult!
+}
+
+union AlbumResult = Album | NotFound | Forbidden | ServerError
+
+type Album {
+    id: String!
+    name: String!
+    project: AlbumProjectResult! @goField(forceResolver: true)
+    settings: AlbumSettings!
+    pages: AlbumPagesResult! @goField(forceResolver: true)
+}
+
+union AlbumProjectResult = Project | NotFound | Forbidden | ServerError
+
+type AlbumSettings {
+    pageSize: PageSize!
+    orientation: Orientation!
+}
+
+enum PageSize {
+    A4
+    A3
+}
+
+enum Orientation {
+    PORTRAIT
+    LANDSCAPE
+}
+
+union AlbumPagesResult = AlbumPages | ServerError
+
+type AlbumPages {
+    items: [AlbumPage!]!
+}
+
+union AlbumPage = AlbumPageCover | AlbumPageVisualization
+
+type AlbumPageCover {
+    position: Int!
+}
+
+type AlbumPageVisualization {
+    position: Int!
+    visualization: AlbumPageVisualizationResult! @goField(forceResolver: true)
+}
+
+union AlbumPageVisualizationResult = Visualization | NotFound | ServerError

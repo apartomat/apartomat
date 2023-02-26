@@ -4,7 +4,6 @@ type Spec interface {
 	Is(*File) bool
 }
 
-//
 type IDInSpec struct {
 	ID []string
 }
@@ -23,7 +22,6 @@ func IDIn(vals ...string) Spec {
 	return IDInSpec{ID: vals}
 }
 
-//
 type ProjectIDInSpec struct {
 	ProjectID []string
 }
@@ -42,7 +40,6 @@ func ProjectIDIn(vals ...string) Spec {
 	return ProjectIDInSpec{ProjectID: vals}
 }
 
-//
 type FileTypeInSpec struct {
 	Type []FileType
 }
@@ -61,7 +58,6 @@ func FileTypeIn(vals ...FileType) Spec {
 	return FileTypeInSpec{Type: vals}
 }
 
-//
 type AndSpec struct {
 	Specs []Spec
 }
@@ -80,7 +76,6 @@ func And(specs ...Spec) Spec {
 	return AndSpec{Specs: specs}
 }
 
-//
 type OrSpec struct {
 	Specs []Spec
 }

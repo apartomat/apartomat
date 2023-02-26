@@ -1,14 +1,14 @@
-package workspaces
+package albums
 
 type Spec interface {
-	Is(*Workspace) bool
+	Is(*Album) bool
 }
 
 type IDInSpec struct {
 	ID []string
 }
 
-func (s IDInSpec) Is(c *Workspace) bool {
+func (s IDInSpec) Is(c *Album) bool {
 	for _, val := range s.ID {
 		if c.ID == val {
 			return true
@@ -22,13 +22,13 @@ func IDIn(vals ...string) Spec {
 	return IDInSpec{ID: vals}
 }
 
-type UserIDInSpec struct {
-	UserID []string
+type ProjectIDInSpec struct {
+	ProjectID []string
 }
 
-func (s UserIDInSpec) Is(c *Workspace) bool {
-	for _, val := range s.UserID {
-		if c.UserID == val {
+func (s ProjectIDInSpec) Is(c *Album) bool {
+	for _, val := range s.ProjectID {
+		if c.ProjectID == val {
 			return true
 		}
 	}
@@ -36,15 +36,15 @@ func (s UserIDInSpec) Is(c *Workspace) bool {
 	return false
 }
 
-func UserIDIn(vals ...string) Spec {
-	return UserIDInSpec{UserID: vals}
+func ProjectIDIn(vals ...string) Spec {
+	return ProjectIDInSpec{ProjectID: vals}
 }
 
 type AndSpec struct {
 	Specs []Spec
 }
 
-func (s AndSpec) Is(c *Workspace) bool {
+func (s AndSpec) Is(c *Album) bool {
 	for _, spec := range s.Specs {
 		if !spec.Is(c) {
 			return false
@@ -62,7 +62,7 @@ type OrSpec struct {
 	Specs []Spec
 }
 
-func (s OrSpec) Is(c *Workspace) bool {
+func (s OrSpec) Is(c *Album) bool {
 	for _, spec := range s.Specs {
 		if spec.Is(c) {
 			return true

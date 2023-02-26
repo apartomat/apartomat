@@ -43,7 +43,6 @@ func (s idInSpecQuery) Expression() (goqu.Expression, error) {
 	return goqu.Ex{"id": s.spec.ID}, nil
 }
 
-//
 type projectIDInSpecQuery struct {
 	spec ProjectIDInSpec
 }
@@ -52,7 +51,6 @@ func (s projectIDInSpecQuery) Expression() (goqu.Expression, error) {
 	return goqu.Ex{"project_id": s.spec.ProjectID}, nil
 }
 
-//
 type fileTypeInSpecQuery struct {
 	spec FileTypeInSpec
 }
@@ -61,7 +59,6 @@ func (s fileTypeInSpecQuery) Expression() (goqu.Expression, error) {
 	return goqu.Ex{"type": s.spec.Type}, nil
 }
 
-//
 type andSpecQuery struct {
 	spec AndSpec
 }
@@ -85,7 +82,6 @@ func (s andSpecQuery) Expression() (goqu.Expression, error) {
 	return goqu.And(exs...), nil
 }
 
-//
 type orSpecQuery struct {
 	spec OrSpec
 }

@@ -1,0 +1,9 @@
+extend type Mutation {
+    deleteAlbum(id: String!): DeleteAlbumResult!
+}
+
+union DeleteAlbumResult = AlbumDeleted | Forbidden | NotFound | ServerError
+
+type AlbumDeleted {
+    album: Album!
+}

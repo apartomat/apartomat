@@ -33,6 +33,10 @@ func (r *projectResolver) Visualizations(ctx context.Context, obj *Project) (*Pr
 	return &ProjectVisualizations{}, nil
 }
 
+func (r *projectResolver) Albums(ctx context.Context, obj *Project) (*ProjectAlbums, error) {
+	return &ProjectAlbums{}, nil
+}
+
 func projectToGraphQL(p *projects.Project) *Project {
 	if p == nil {
 		return nil

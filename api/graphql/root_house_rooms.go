@@ -3,7 +3,6 @@ package graphql
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/99designs/gqlgen/graphql"
 	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/store/rooms"
@@ -19,11 +18,6 @@ type houseRoomsResolver struct {
 }
 
 func (r *houseRoomsResolver) List(ctx context.Context, obj *HouseRooms, limit int, offset int) (HouseRoomsListResult, error) {
-
-	gtx := graphql.GetFieldContext(ctx)
-
-	fmt.Printf("context: %#v\n", gtx.Parent.Parent)
-
 	if phouse, ok := graphql.GetFieldContext(ctx).Parent.Parent.Result.(**House); !ok {
 		log.Printf("can't resolve house rooms: %s", errors.New("unknown house"))
 

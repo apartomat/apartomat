@@ -45,7 +45,6 @@ func (s visualizationIDInSpecQuery) Expression() (goqu.Expression, error) {
 	return goqu.Ex{"id": s.spec.ID}, nil
 }
 
-//
 type visualizationProjectIDInSpecQuery struct {
 	spec ProjectIDInSpec
 }
@@ -54,7 +53,6 @@ func (s visualizationProjectIDInSpecQuery) Expression() (goqu.Expression, error)
 	return goqu.Ex{"project_id": s.spec.ProjectID}, nil
 }
 
-//
 type visualizationRoomIDInSpecQuery struct {
 	spec RoomIDInSpec
 }
@@ -63,7 +61,6 @@ func (s visualizationRoomIDInSpecQuery) Expression() (goqu.Expression, error) {
 	return goqu.Ex{"room_id": s.spec.RoomID}, nil
 }
 
-//
 type visualizationStatusInSpecQuery struct {
 	spec StatusInSpec
 }
@@ -72,7 +69,6 @@ func (s visualizationStatusInSpecQuery) Expression() (goqu.Expression, error) {
 	return goqu.Ex{"status": s.spec.Status}, nil
 }
 
-//
 type andSpecQuery struct {
 	spec AndSpec
 }
@@ -96,7 +92,6 @@ func (s andSpecQuery) Expression() (goqu.Expression, error) {
 	return goqu.And(exs...), nil
 }
 
-//
 type orSpecQuery struct {
 	spec OrSpec
 }

@@ -4,7 +4,6 @@ type Spec interface {
 	Is(*WorkspaceUser) bool
 }
 
-//
 type IDInSpec struct {
 	ID []string
 }
@@ -23,7 +22,6 @@ func IDIn(vals ...string) Spec {
 	return IDInSpec{ID: vals}
 }
 
-//
 type WorkspaceIDInSpec struct {
 	WorkspaceID []string
 }
@@ -42,7 +40,6 @@ func WorkspaceIDIn(vals ...string) Spec {
 	return WorkspaceIDInSpec{WorkspaceID: vals}
 }
 
-//
 type UserIDInSpec struct {
 	UserID []string
 }
@@ -61,7 +58,6 @@ func UserIDIn(vals ...string) Spec {
 	return UserIDInSpec{UserID: vals}
 }
 
-//
 type AndSpec struct {
 	Specs []Spec
 }
@@ -80,7 +76,6 @@ func And(specs ...Spec) Spec {
 	return AndSpec{Specs: specs}
 }
 
-//
 type OrSpec struct {
 	Specs []Spec
 }

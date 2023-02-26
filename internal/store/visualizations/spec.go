@@ -58,7 +58,6 @@ func RoomIDIn(vals ...string) Spec {
 	return RoomIDInSpec{RoomID: vals}
 }
 
-//
 type StatusInSpec struct {
 	Status []VisualizationStatus
 }
@@ -77,7 +76,6 @@ func StatusIn(vals ...VisualizationStatus) Spec {
 	return StatusInSpec{Status: vals}
 }
 
-//
 type AndSpec struct {
 	Specs []Spec
 }

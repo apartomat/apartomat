@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/apartomat/apartomat/internal/image"
 	"github.com/apartomat/apartomat/internal/mail"
+	"github.com/apartomat/apartomat/internal/store/albums"
 	"github.com/apartomat/apartomat/internal/store/contacts"
 	"github.com/apartomat/apartomat/internal/store/files"
 	"github.com/apartomat/apartomat/internal/store/houses"
@@ -31,6 +32,7 @@ type Apartomat struct {
 
 	Uploader image.Uploader
 
+	Albums         albums.Store
 	Contacts       contacts.Store
 	Houses         houses.Store
 	Projects       projects.Store

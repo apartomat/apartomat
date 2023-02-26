@@ -23,6 +23,30 @@ type AddRoomResult interface {
 	IsAddRoomResult()
 }
 
+type AddVisualizationsToAlbumResult interface {
+	IsAddVisualizationsToAlbumResult()
+}
+
+type AlbumPage interface {
+	IsAlbumPage()
+}
+
+type AlbumPageVisualizationResult interface {
+	IsAlbumPageVisualizationResult()
+}
+
+type AlbumPagesResult interface {
+	IsAlbumPagesResult()
+}
+
+type AlbumProjectResult interface {
+	IsAlbumProjectResult()
+}
+
+type AlbumResult interface {
+	IsAlbumResult()
+}
+
 type ChangeProjectDatesResult interface {
 	IsChangeProjectDatesResult()
 }
@@ -39,8 +63,16 @@ type ConfirmLoginPinResult interface {
 	IsConfirmLoginPinResult()
 }
 
+type CreateAlbumResult interface {
+	IsCreateAlbumResult()
+}
+
 type CreateProjectResult interface {
 	IsCreateProjectResult()
+}
+
+type DeleteAlbumResult interface {
+	IsDeleteAlbumResult()
 }
 
 type DeleteContactResult interface {
@@ -66,6 +98,14 @@ type HouseRoomsListResult interface {
 
 type LoginByEmailResult interface {
 	IsLoginByEmailResult()
+}
+
+type ProjectAlbumsListResult interface {
+	IsProjectAlbumsListResult()
+}
+
+type ProjectAlbumsTotalResult interface {
+	IsProjectAlbumsTotalResult()
 }
 
 type ProjectContactsListResult interface {
@@ -169,6 +209,52 @@ type AddRoomInput struct {
 	Level  *int     `json:"level"`
 }
 
+type Album struct {
+	ID       string             `json:"id"`
+	Name     string             `json:"name"`
+	Project  AlbumProjectResult `json:"project"`
+	Settings *AlbumSettings     `json:"settings"`
+	Pages    AlbumPagesResult   `json:"pages"`
+}
+
+func (Album) IsAlbumResult() {}
+
+type AlbumCreated struct {
+	Album *Album `json:"album"`
+}
+
+func (AlbumCreated) IsCreateAlbumResult() {}
+
+type AlbumDeleted struct {
+	Album *Album `json:"album"`
+}
+
+func (AlbumDeleted) IsDeleteAlbumResult() {}
+
+type AlbumPageCover struct {
+	Position int `json:"position"`
+}
+
+func (AlbumPageCover) IsAlbumPage() {}
+
+type AlbumPageVisualization struct {
+	Position      int                          `json:"position"`
+	Visualization AlbumPageVisualizationResult `json:"visualization"`
+}
+
+func (AlbumPageVisualization) IsAlbumPage() {}
+
+type AlbumPages struct {
+	Items []AlbumPage `json:"items"`
+}
+
+func (AlbumPages) IsAlbumPagesResult() {}
+
+type AlbumSettings struct {
+	PageSize    PageSize    `json:"pageSize"`
+	Orientation Orientation `json:"orientation"`
+}
+
 type AlreadyExists struct {
 	Message string `json:"message"`
 }
@@ -252,11 +338,17 @@ func (Forbidden) IsAddHouseResult() {}
 
 func (Forbidden) IsAddRoomResult() {}
 
+func (Forbidden) IsAddVisualizationsToAlbumResult() {}
+
 func (Forbidden) IsChangeProjectDatesResult() {}
 
 func (Forbidden) IsChangeProjectStatusResult() {}
 
+func (Forbidden) IsCreateAlbumResult() {}
+
 func (Forbidden) IsCreateProjectResult() {}
+
+func (Forbidden) IsDeleteAlbumResult() {}
 
 func (Forbidden) IsDeleteContactResult() {}
 
@@ -275,6 +367,10 @@ func (Forbidden) IsUploadProjectFileResult() {}
 func (Forbidden) IsUploadVisualizationResult() {}
 
 func (Forbidden) IsUploadVisualizationsResult() {}
+
+func (Forbidden) IsAlbumResult() {}
+
+func (Forbidden) IsAlbumProjectResult() {}
 
 func (Forbidden) IsUserProfileResult() {}
 
@@ -297,6 +393,10 @@ func (Forbidden) IsProjectVisualizationsTotalResult() {}
 func (Forbidden) IsProjectFilesListResult() {}
 
 func (Forbidden) IsProjectFilesTotalResult() {}
+
+func (Forbidden) IsProjectAlbumsListResult() {}
+
+func (Forbidden) IsProjectAlbumsTotalResult() {}
 
 func (Forbidden) IsWorkspaceResult() {}
 
@@ -406,6 +506,8 @@ func (NotFound) IsChangeProjectDatesResult() {}
 
 func (NotFound) IsChangeProjectStatusResult() {}
 
+func (NotFound) IsDeleteAlbumResult() {}
+
 func (NotFound) IsDeleteContactResult() {}
 
 func (NotFound) IsDeleteRoomResult() {}
@@ -417,6 +519,12 @@ func (NotFound) IsUpdateContactResult() {}
 func (NotFound) IsUpdateHouseResult() {}
 
 func (NotFound) IsUpdateRoomResult() {}
+
+func (NotFound) IsAlbumResult() {}
+
+func (NotFound) IsAlbumProjectResult() {}
+
+func (NotFound) IsAlbumPageVisualizationResult() {}
 
 func (NotFound) IsProjectResult() {}
 
@@ -443,9 +551,29 @@ type Project struct {
 	Houses         *ProjectHouses         `json:"houses"`
 	Visualizations *ProjectVisualizations `json:"visualizations"`
 	Files          *ProjectFiles          `json:"files"`
+	Albums         *ProjectAlbums         `json:"albums"`
 }
 
+func (Project) IsAlbumProjectResult() {}
+
 func (Project) IsProjectResult() {}
+
+type ProjectAlbums struct {
+	List  ProjectAlbumsListResult  `json:"list"`
+	Total ProjectAlbumsTotalResult `json:"total"`
+}
+
+type ProjectAlbumsList struct {
+	Items []*Album `json:"items"`
+}
+
+func (ProjectAlbumsList) IsProjectAlbumsListResult() {}
+
+type ProjectAlbumsTotal struct {
+	Total int `json:"total"`
+}
+
+func (ProjectAlbumsTotal) IsProjectAlbumsTotalResult() {}
 
 type ProjectContacts struct {
 	List  ProjectContactsListResult  `json:"list"`
@@ -620,6 +748,8 @@ func (ServerError) IsAddContactResult() {}
 
 func (ServerError) IsAddHouseResult() {}
 
+func (ServerError) IsAddVisualizationsToAlbumResult() {}
+
 func (ServerError) IsChangeProjectDatesResult() {}
 
 func (ServerError) IsChangeProjectStatusResult() {}
@@ -628,7 +758,11 @@ func (ServerError) IsConfirmLoginLinkResult() {}
 
 func (ServerError) IsConfirmLoginPinResult() {}
 
+func (ServerError) IsCreateAlbumResult() {}
+
 func (ServerError) IsCreateProjectResult() {}
+
+func (ServerError) IsDeleteAlbumResult() {}
 
 func (ServerError) IsDeleteContactResult() {}
 
@@ -645,6 +779,14 @@ func (ServerError) IsUploadProjectFileResult() {}
 func (ServerError) IsUploadVisualizationResult() {}
 
 func (ServerError) IsUploadVisualizationsResult() {}
+
+func (ServerError) IsAlbumResult() {}
+
+func (ServerError) IsAlbumProjectResult() {}
+
+func (ServerError) IsAlbumPagesResult() {}
+
+func (ServerError) IsAlbumPageVisualizationResult() {}
 
 func (ServerError) IsUserProfileResult() {}
 
@@ -667,6 +809,10 @@ func (ServerError) IsProjectVisualizationsTotalResult() {}
 func (ServerError) IsProjectFilesListResult() {}
 
 func (ServerError) IsProjectFilesTotalResult() {}
+
+func (ServerError) IsProjectAlbumsListResult() {}
+
+func (ServerError) IsProjectAlbumsTotalResult() {}
 
 func (ServerError) IsWorkspaceResult() {}
 
@@ -739,11 +885,19 @@ type Visualization struct {
 	Room        *Room               `json:"room"`
 }
 
+func (Visualization) IsAlbumPageVisualizationResult() {}
+
 type VisualizationUploaded struct {
 	Visualization *Visualization `json:"visualization"`
 }
 
 func (VisualizationUploaded) IsUploadVisualizationResult() {}
+
+type VisualizationsAddedToAlbum struct {
+	Pages []*AlbumPageVisualization `json:"pages"`
+}
+
+func (VisualizationsAddedToAlbum) IsAddVisualizationsToAlbumResult() {}
 
 type VisualizationsDeleted struct {
 	Visualizations []*Visualization `json:"visualizations"`
@@ -861,6 +1015,88 @@ func (e *ContactType) UnmarshalGQL(v interface{}) error {
 }
 
 func (e ContactType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type Orientation string
+
+const (
+	OrientationPortrait  Orientation = "PORTRAIT"
+	OrientationLandscape Orientation = "LANDSCAPE"
+)
+
+var AllOrientation = []Orientation{
+	OrientationPortrait,
+	OrientationLandscape,
+}
+
+func (e Orientation) IsValid() bool {
+	switch e {
+	case OrientationPortrait, OrientationLandscape:
+		return true
+	}
+	return false
+}
+
+func (e Orientation) String() string {
+	return string(e)
+}
+
+func (e *Orientation) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = Orientation(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid Orientation", str)
+	}
+	return nil
+}
+
+func (e Orientation) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type PageSize string
+
+const (
+	PageSizeA4 PageSize = "A4"
+	PageSizeA3 PageSize = "A3"
+)
+
+var AllPageSize = []PageSize{
+	PageSizeA4,
+	PageSizeA3,
+}
+
+func (e PageSize) IsValid() bool {
+	switch e {
+	case PageSizeA4, PageSizeA3:
+		return true
+	}
+	return false
+}
+
+func (e PageSize) String() string {
+	return string(e)
+}
+
+func (e *PageSize) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = PageSize(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid PageSize", str)
+	}
+	return nil
+}
+
+func (e PageSize) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 

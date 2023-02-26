@@ -4,7 +4,6 @@ type Spec interface {
 	Is(*User) bool
 }
 
-//
 type IDInSpec struct {
 	ID []string
 }
@@ -23,7 +22,6 @@ func IDIn(vals ...string) Spec {
 	return IDInSpec{ID: vals}
 }
 
-//
 type EmailInSpec struct {
 	Email []string
 }
@@ -42,7 +40,6 @@ func EmailIn(vals ...string) Spec {
 	return EmailInSpec{Email: vals}
 }
 
-//
 type AndSpec struct {
 	Specs []Spec
 }
@@ -61,7 +58,6 @@ func And(specs ...Spec) Spec {
 	return AndSpec{Specs: specs}
 }
 
-//
 type OrSpec struct {
 	Specs []Spec
 }
