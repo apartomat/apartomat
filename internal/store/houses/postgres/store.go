@@ -17,7 +17,7 @@ type housesStore struct {
 	db *pg.DB
 }
 
-func NewHousesStore(db *pg.DB) *housesStore {
+func NewStore(db *pg.DB) *housesStore {
 	return &housesStore{db}
 }
 

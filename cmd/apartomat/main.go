@@ -15,12 +15,12 @@ import (
 	"github.com/apartomat/apartomat/internal/image/minio"
 	"github.com/apartomat/apartomat/internal/mail"
 	"github.com/apartomat/apartomat/internal/mail/smtp"
-	"github.com/apartomat/apartomat/internal/postgres/store"
 	albums "github.com/apartomat/apartomat/internal/store/albums/postgres"
 	contacts "github.com/apartomat/apartomat/internal/store/contacts/postgres"
 	files "github.com/apartomat/apartomat/internal/store/files/postgres"
 	houses "github.com/apartomat/apartomat/internal/store/houses/postgres"
 	projects "github.com/apartomat/apartomat/internal/store/projects/postgres"
+	rooms "github.com/apartomat/apartomat/internal/store/rooms/postgres"
 	users "github.com/apartomat/apartomat/internal/store/users/postgres"
 	visualizations "github.com/apartomat/apartomat/internal/store/visualizations/postgres"
 	workspace_users "github.com/apartomat/apartomat/internal/store/workspace_users/postgres"
@@ -84,8 +84,8 @@ func main() {
 		filesStore := files.NewStore(pgdb)
 		albumsStore := albums.NewStore(pgdb)
 		contactsStore := contacts.NewStore(pgdb)
-		housesStore := houses.NewHousesStore(pgdb)
-		roomsStore := store.NewRoomsStore(pgdb)
+		housesStore := houses.NewStore(pgdb)
+		roomsStore := rooms.NewStore(pgdb)
 		visualizationsStore := visualizations.NewStore(pgdb)
 
 		usersLoader := dataloader.NewUserLoader(dataloader.NewUserLoaderConfig(ctx, usersStore))

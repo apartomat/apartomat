@@ -102,15 +102,15 @@ func (u *Apartomat) AddRoom(
 		return nil, err
 	}
 
-	room := &Room{
-		ID:      id,
-		Name:    name,
-		Square:  square,
-		Level:   level,
-		HouseID: houseID,
+	var (
+		room = New(id, name, square, level, houseID)
+	)
+
+	if err := u.Rooms.Save(ctx, room); err != nil {
+		return nil, err
 	}
 
-	return u.Rooms.Save(ctx, room)
+	return room, nil
 }
 
 func (u *Apartomat) CanAddRoom(ctx context.Context, subj *UserCtx, obj *houses.House) (bool, error) {
@@ -144,15 +144,15 @@ func (u *Apartomat) UpdateRoom(
 		return nil, fmt.Errorf("can't update room (id=%s): %w", room.ID, ErrForbidden)
 	}
 
-	room = &Room{
-		ID:      room.ID,
-		Name:    name,
-		Square:  square,
-		Level:   level,
-		HouseID: room.HouseID,
+	room.Name = name
+	room.Square = square
+	room.Level = level
+
+	if err := u.Rooms.Save(ctx, room); err != nil {
+		return nil, err
 	}
 
-	return u.Rooms.Save(ctx, room)
+	return room, nil
 }
 
 func (u *Apartomat) CanUpdateRoom(ctx context.Context, subj *UserCtx, obj *Room) (bool, error) {
