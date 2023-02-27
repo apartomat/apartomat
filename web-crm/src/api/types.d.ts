@@ -40,6 +40,59 @@ export type AddRoomInput = {
 
 export type AddRoomResult = Forbidden | NotFound | RoomAdded;
 
+export type AddVisualizationsToAlbumResult = Forbidden | ServerError | VisualizationsAddedToAlbum;
+
+export type Album = {
+  __typename?: 'Album';
+  id: Scalars['String'];
+  name: Scalars['String'];
+  pages: AlbumPagesResult;
+  project: AlbumProjectResult;
+  settings: AlbumSettings;
+};
+
+export type AlbumCreated = {
+  __typename?: 'AlbumCreated';
+  album: Album;
+};
+
+export type AlbumDeleted = {
+  __typename?: 'AlbumDeleted';
+  album: Album;
+};
+
+export type AlbumPage = AlbumPageCover | AlbumPageVisualization;
+
+export type AlbumPageCover = {
+  __typename?: 'AlbumPageCover';
+  position: Scalars['Int'];
+};
+
+export type AlbumPageVisualization = {
+  __typename?: 'AlbumPageVisualization';
+  position: Scalars['Int'];
+  visualization: AlbumPageVisualizationResult;
+};
+
+export type AlbumPageVisualizationResult = NotFound | ServerError | Visualization;
+
+export type AlbumPages = {
+  __typename?: 'AlbumPages';
+  items: Array<AlbumPage>;
+};
+
+export type AlbumPagesResult = AlbumPages | ServerError;
+
+export type AlbumProjectResult = Forbidden | NotFound | Project | ServerError;
+
+export type AlbumResult = Album | Forbidden | NotFound | ServerError;
+
+export type AlbumSettings = {
+  __typename?: 'AlbumSettings';
+  orientation: Orientation;
+  pageSize: PageSize;
+};
+
 export type AlreadyExists = Error & {
   __typename?: 'AlreadyExists';
   message: Scalars['String'];
@@ -103,6 +156,8 @@ export type ContactUpdated = {
   contact: Contact;
 };
 
+export type CreateAlbumResult = AlbumCreated | Forbidden | ServerError;
+
 export type CreateProjectInput = {
   endAt?: Maybe<Scalars['Time']>;
   name: Scalars['String'];
@@ -111,6 +166,8 @@ export type CreateProjectInput = {
 };
 
 export type CreateProjectResult = Forbidden | ProjectCreated | ServerError;
+
+export type DeleteAlbumResult = AlbumDeleted | Forbidden | NotFound | ServerError;
 
 export type DeleteContactResult = ContactDeleted | Forbidden | NotFound | ServerError;
 
@@ -218,11 +275,14 @@ export type Mutation = {
   addContact: AddContactResult;
   addHouse: AddHouseResult;
   addRoom: AddRoomResult;
+  addVisualizationsToAlbum: AddVisualizationsToAlbumResult;
   changeProjectDates: ChangeProjectDatesResult;
   changeProjectStatus: ChangeProjectStatusResult;
   confirmLoginLink: ConfirmLoginLinkResult;
   confirmLoginPin: ConfirmLoginPinResult;
+  createAlbum: CreateAlbumResult;
   createProject: CreateProjectResult;
+  deleteAlbum: DeleteAlbumResult;
   deleteContact: DeleteContactResult;
   deleteRoom: DeleteRoomResult;
   deleteVisualizations: DeleteVisualizationsResult;
@@ -255,6 +315,12 @@ export type MutationAddRoomArgs = {
 };
 
 
+export type MutationAddVisualizationsToAlbumArgs = {
+  albumId: Scalars['String'];
+  visualizations: Array<Scalars['String']>;
+};
+
+
 export type MutationChangeProjectDatesArgs = {
   dates: ChangeProjectDatesInput;
   projectId: Scalars['String'];
@@ -278,8 +344,19 @@ export type MutationConfirmLoginPinArgs = {
 };
 
 
+export type MutationCreateAlbumArgs = {
+  name: Scalars['String'];
+  projectId: Scalars['String'];
+};
+
+
 export type MutationCreateProjectArgs = {
   input: CreateProjectInput;
+};
+
+
+export type MutationDeleteAlbumArgs = {
+  id: Scalars['String'];
 };
 
 
@@ -345,6 +422,16 @@ export type NotFound = Error & {
   message: Scalars['String'];
 };
 
+export enum Orientation {
+  Landscape = 'LANDSCAPE',
+  Portrait = 'PORTRAIT'
+}
+
+export enum PageSize {
+  A3 = 'A3',
+  A4 = 'A4'
+}
+
 export type PinSentByEmail = {
   __typename?: 'PinSentByEmail';
   email: Scalars['String'];
@@ -353,6 +440,7 @@ export type PinSentByEmail = {
 
 export type Project = {
   __typename?: 'Project';
+  albums: ProjectAlbums;
   contacts: ProjectContacts;
   endAt?: Maybe<Scalars['Time']>;
   files: ProjectFiles;
@@ -369,6 +457,32 @@ export type Project = {
 export type ProjectPeriodArgs = {
   timezone?: Maybe<Scalars['String']>;
 };
+
+export type ProjectAlbums = {
+  __typename?: 'ProjectAlbums';
+  list: ProjectAlbumsListResult;
+  total: ProjectAlbumsTotalResult;
+};
+
+
+export type ProjectAlbumsListArgs = {
+  limit?: Scalars['Int'];
+  offset?: Scalars['Int'];
+};
+
+export type ProjectAlbumsList = {
+  __typename?: 'ProjectAlbumsList';
+  items: Array<Album>;
+};
+
+export type ProjectAlbumsListResult = Forbidden | ProjectAlbumsList | ServerError;
+
+export type ProjectAlbumsTotal = {
+  __typename?: 'ProjectAlbumsTotal';
+  total: Scalars['Int'];
+};
+
+export type ProjectAlbumsTotalResult = Forbidden | ProjectAlbumsTotal | ServerError;
 
 export type ProjectContacts = {
   __typename?: 'ProjectContacts';
@@ -584,11 +698,17 @@ export type ProjectVisualizationsTotalResult = Forbidden | ProjectVisualizations
 
 export type Query = {
   __typename?: 'Query';
+  album: AlbumResult;
   enums?: Maybe<Enums>;
   profile: UserProfileResult;
   project: ProjectResult;
   version: Scalars['String'];
   workspace: WorkspaceResult;
+};
+
+
+export type QueryAlbumArgs = {
+  id: Scalars['String'];
 };
 
 
@@ -710,6 +830,11 @@ export enum VisualizationStatus {
 export type VisualizationUploaded = {
   __typename?: 'VisualizationUploaded';
   visualization: Visualization;
+};
+
+export type VisualizationsAddedToAlbum = {
+  __typename?: 'VisualizationsAddedToAlbum';
+  pages: Array<AlbumPageVisualization>;
 };
 
 export type VisualizationsDeleted = {
@@ -908,6 +1033,53 @@ export type UpdateHouseMutationVariables = Exact<{
 
 export type UpdateHouseMutation = { __typename?: 'Mutation', updateHouse: { __typename: 'Forbidden', message: string } | { __typename: 'HouseUpdated', house: { __typename?: 'House', id: string, city: string, address: string, housingComplex: string, createdAt: any, modifiedAt: any } } | { __typename: 'NotFound', message: string } | { __typename: 'ServerError', message: string } };
 
+export type AddVisualizationsToAlbumMutationVariables = Exact<{
+  albumId: Scalars['String'];
+  visualizations: Array<Scalars['String']> | Scalars['String'];
+}>;
+
+
+export type AddVisualizationsToAlbumMutation = { __typename?: 'Mutation', addVisualizationsToAlbum: { __typename: 'Forbidden', message: string } | { __typename: 'ServerError', message: string } | { __typename: 'VisualizationsAddedToAlbum', pages: Array<{ __typename?: 'AlbumPageVisualization', position: number, visualization: { __typename?: 'NotFound' } | { __typename?: 'ServerError' } | { __typename?: 'Visualization', id: string, file: { __typename?: 'ProjectFile', url: any } } }> } };
+
+export type AlbumScreenQueryVariables = Exact<{
+  id: Scalars['String'];
+  filter: ProjectVisualizationsListFilter;
+}>;
+
+
+export type AlbumScreenQuery = { __typename?: 'Query', album: { __typename: 'Album', id: string, name: string, project: { __typename?: 'Forbidden', message: string } | { __typename?: 'NotFound', message: string } | { __typename?: 'Project', id: string, name: string, visualizations: { __typename?: 'ProjectVisualizations', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'ProjectVisualizationsList', items: Array<{ __typename?: 'Visualization', id: string, name: string, description: string, version: number, file: { __typename?: 'ProjectFile', id: string, name: string, url: any, type: ProjectFileType, mimeType: string }, room?: { __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined } | null | undefined }> } | { __typename?: 'ServerError', message: string } }, houses: { __typename?: 'ProjectHouses', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectHousesList', items: Array<{ __typename?: 'House', rooms: { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined }> } | { __typename?: 'ServerError', message: string } } }> } | { __typename: 'ServerError', message: string } } } | { __typename?: 'ServerError', message: string }, pages: { __typename?: 'AlbumPages', items: Array<{ __typename?: 'AlbumPageCover', position: number } | { __typename?: 'AlbumPageVisualization', position: number, visualization: { __typename?: 'NotFound', message: string } | { __typename?: 'ServerError', message: string } | { __typename?: 'Visualization', id: string, file: { __typename?: 'ProjectFile', url: any } } }> } | { __typename?: 'ServerError', message: string } } | { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'ServerError', message: string } };
+
+export type AlbumScreenAlbumFragment = { __typename?: 'Album', id: string, name: string, project: { __typename?: 'Forbidden', message: string } | { __typename?: 'NotFound', message: string } | { __typename?: 'Project', id: string, name: string, visualizations: { __typename?: 'ProjectVisualizations', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'ProjectVisualizationsList', items: Array<{ __typename?: 'Visualization', id: string, name: string, description: string, version: number, file: { __typename?: 'ProjectFile', id: string, name: string, url: any, type: ProjectFileType, mimeType: string }, room?: { __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined } | null | undefined }> } | { __typename?: 'ServerError', message: string } }, houses: { __typename?: 'ProjectHouses', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectHousesList', items: Array<{ __typename?: 'House', rooms: { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined }> } | { __typename?: 'ServerError', message: string } } }> } | { __typename: 'ServerError', message: string } } } | { __typename?: 'ServerError', message: string }, pages: { __typename?: 'AlbumPages', items: Array<{ __typename?: 'AlbumPageCover', position: number } | { __typename?: 'AlbumPageVisualization', position: number, visualization: { __typename?: 'NotFound', message: string } | { __typename?: 'ServerError', message: string } | { __typename?: 'Visualization', id: string, file: { __typename?: 'ProjectFile', url: any } } }> } | { __typename?: 'ServerError', message: string } };
+
+export type AlbumScreenProjectFragment = { __typename?: 'Project', id: string, name: string, visualizations: { __typename?: 'ProjectVisualizations', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'ProjectVisualizationsList', items: Array<{ __typename?: 'Visualization', id: string, name: string, description: string, version: number, file: { __typename?: 'ProjectFile', id: string, name: string, url: any, type: ProjectFileType, mimeType: string }, room?: { __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined } | null | undefined }> } | { __typename?: 'ServerError', message: string } }, houses: { __typename?: 'ProjectHouses', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectHousesList', items: Array<{ __typename?: 'House', rooms: { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined }> } | { __typename?: 'ServerError', message: string } } }> } | { __typename: 'ServerError', message: string } } };
+
+export type AlbumScreenVisualizationFragment = { __typename?: 'Visualization', id: string, name: string, description: string, version: number, file: { __typename?: 'ProjectFile', id: string, name: string, url: any, type: ProjectFileType, mimeType: string }, room?: { __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined } | null | undefined };
+
+export type AlbumScreenHouseRoomFragment = { __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined };
+
+export type AlbumScreenHousesFragment = { __typename?: 'ProjectHouses', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectHousesList', items: Array<{ __typename?: 'House', rooms: { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined }> } | { __typename?: 'ServerError', message: string } } }> } | { __typename: 'ServerError', message: string } };
+
+export type AlbumScreenHouseRoomsFragment = { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined }> } | { __typename?: 'ServerError', message: string } };
+
+export type AlbumScreenAlbumPageCoverFragment = { __typename?: 'AlbumPageCover', position: number };
+
+export type AlbumScreenAlbumPageVisualizationFragment = { __typename?: 'AlbumPageVisualization', position: number, visualization: { __typename?: 'NotFound', message: string } | { __typename?: 'ServerError', message: string } | { __typename?: 'Visualization', id: string, file: { __typename?: 'ProjectFile', url: any } } };
+
+export type DeleteAlbumMutationVariables = Exact<{
+  id: Scalars['String'];
+}>;
+
+
+export type DeleteAlbumMutation = { __typename?: 'Mutation', deleteAlbum: { __typename: 'AlbumDeleted', album: { __typename?: 'Album', id: string } } | { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'ServerError', message: string } };
+
+export type CreateAlbumMutationVariables = Exact<{
+  projectId: Scalars['String'];
+  name: Scalars['String'];
+}>;
+
+
+export type CreateAlbumMutation = { __typename?: 'Mutation', createAlbum: { __typename: 'AlbumCreated', album: { __typename?: 'Album', id: string, name: string } } | { __typename: 'Forbidden', message: string } | { __typename: 'ServerError', message: string } };
+
 export type AddRoomMutationVariables = Exact<{
   houseId: Scalars['String'];
   room: AddRoomInput;
@@ -945,9 +1117,9 @@ export type ProjectScreenQueryVariables = Exact<{
 }>;
 
 
-export type ProjectScreenQuery = { __typename?: 'Query', project: { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'Project', id: string, name: string, startAt?: any | null | undefined, endAt?: any | null | undefined, status: ProjectStatus, contacts: { __typename?: 'ProjectContacts', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectContactsList', items: Array<{ __typename?: 'Contact', id: string, fullName: string, photo: string, details: Array<{ __typename?: 'ContactDetails', type: ContactType, value: string }> }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectContactsTotal', total: number } | { __typename: 'ServerError' } }, houses: { __typename?: 'ProjectHouses', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectHousesList', items: Array<{ __typename?: 'House', id: string, city: string, address: string, housingComplex: string, createdAt: any, modifiedAt: any, rooms: { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined }> } | { __typename?: 'ServerError', message: string } } }> } | { __typename: 'ServerError', message: string } }, visualizations: { __typename?: 'ProjectVisualizations', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectVisualizationsList', items: Array<{ __typename?: 'Visualization', id: string, name: string, description: string, version: number, file: { __typename?: 'ProjectFile', id: string, name: string, url: any, type: ProjectFileType, mimeType: string }, room?: { __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined } | null | undefined }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectVisualizationsTotal', total: number } | { __typename: 'ServerError' } } } | { __typename: 'ServerError', message: string }, enums?: { __typename?: 'Enums', project: { __typename?: 'ProjectEnums', status: { __typename?: 'ProjectStatusEnum', items: Array<{ __typename?: 'ProjectStatusEnumItem', key: ProjectStatus, value: string }> } } } | null | undefined };
+export type ProjectScreenQuery = { __typename?: 'Query', project: { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'Project', id: string, name: string, startAt?: any | null | undefined, endAt?: any | null | undefined, status: ProjectStatus, contacts: { __typename?: 'ProjectContacts', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectContactsList', items: Array<{ __typename?: 'Contact', id: string, fullName: string, photo: string, details: Array<{ __typename?: 'ContactDetails', type: ContactType, value: string }> }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectContactsTotal', total: number } | { __typename: 'ServerError' } }, houses: { __typename?: 'ProjectHouses', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectHousesList', items: Array<{ __typename?: 'House', id: string, city: string, address: string, housingComplex: string, createdAt: any, modifiedAt: any, rooms: { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined }> } | { __typename?: 'ServerError', message: string } } }> } | { __typename: 'ServerError', message: string } }, visualizations: { __typename?: 'ProjectVisualizations', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectVisualizationsList', items: Array<{ __typename?: 'Visualization', id: string, name: string, description: string, version: number, file: { __typename?: 'ProjectFile', id: string, name: string, url: any, type: ProjectFileType, mimeType: string }, room?: { __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined } | null | undefined }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectVisualizationsTotal', total: number } | { __typename: 'ServerError' } }, albums: { __typename?: 'ProjectAlbums', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectAlbumsList', items: Array<{ __typename: 'Album', id: string, name: string }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectAlbumsTotal', total: number } | { __typename: 'ServerError' } } } | { __typename: 'ServerError', message: string }, enums?: { __typename?: 'Enums', project: { __typename?: 'ProjectEnums', status: { __typename?: 'ProjectStatusEnum', items: Array<{ __typename?: 'ProjectStatusEnumItem', key: ProjectStatus, value: string }> } } } | null | undefined };
 
-export type ProjectScreenProjectFragment = { __typename?: 'Project', id: string, name: string, startAt?: any | null | undefined, endAt?: any | null | undefined, status: ProjectStatus, contacts: { __typename?: 'ProjectContacts', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectContactsList', items: Array<{ __typename?: 'Contact', id: string, fullName: string, photo: string, details: Array<{ __typename?: 'ContactDetails', type: ContactType, value: string }> }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectContactsTotal', total: number } | { __typename: 'ServerError' } }, houses: { __typename?: 'ProjectHouses', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectHousesList', items: Array<{ __typename?: 'House', id: string, city: string, address: string, housingComplex: string, createdAt: any, modifiedAt: any, rooms: { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined }> } | { __typename?: 'ServerError', message: string } } }> } | { __typename: 'ServerError', message: string } }, visualizations: { __typename?: 'ProjectVisualizations', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectVisualizationsList', items: Array<{ __typename?: 'Visualization', id: string, name: string, description: string, version: number, file: { __typename?: 'ProjectFile', id: string, name: string, url: any, type: ProjectFileType, mimeType: string }, room?: { __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined } | null | undefined }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectVisualizationsTotal', total: number } | { __typename: 'ServerError' } } };
+export type ProjectScreenProjectFragment = { __typename?: 'Project', id: string, name: string, startAt?: any | null | undefined, endAt?: any | null | undefined, status: ProjectStatus, contacts: { __typename?: 'ProjectContacts', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectContactsList', items: Array<{ __typename?: 'Contact', id: string, fullName: string, photo: string, details: Array<{ __typename?: 'ContactDetails', type: ContactType, value: string }> }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectContactsTotal', total: number } | { __typename: 'ServerError' } }, houses: { __typename?: 'ProjectHouses', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectHousesList', items: Array<{ __typename?: 'House', id: string, city: string, address: string, housingComplex: string, createdAt: any, modifiedAt: any, rooms: { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined }> } | { __typename?: 'ServerError', message: string } } }> } | { __typename: 'ServerError', message: string } }, visualizations: { __typename?: 'ProjectVisualizations', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectVisualizationsList', items: Array<{ __typename?: 'Visualization', id: string, name: string, description: string, version: number, file: { __typename?: 'ProjectFile', id: string, name: string, url: any, type: ProjectFileType, mimeType: string }, room?: { __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined } | null | undefined }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectVisualizationsTotal', total: number } | { __typename: 'ServerError' } }, albums: { __typename?: 'ProjectAlbums', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectAlbumsList', items: Array<{ __typename: 'Album', id: string, name: string }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectAlbumsTotal', total: number } | { __typename: 'ServerError' } } };
 
 export type ProjectScreenVisualizationsFragment = { __typename?: 'ProjectVisualizations', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectVisualizationsList', items: Array<{ __typename?: 'Visualization', id: string, name: string, description: string, version: number, file: { __typename?: 'ProjectFile', id: string, name: string, url: any, type: ProjectFileType, mimeType: string }, room?: { __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined } | null | undefined }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectVisualizationsTotal', total: number } | { __typename: 'ServerError' } };
 
@@ -960,6 +1132,10 @@ export type ProjectScreenHouseFragment = { __typename?: 'House', id: string, cit
 export type ProjectScreenHouseRoomsFragment = { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined }> } | { __typename?: 'ServerError', message: string } };
 
 export type ProjectScreenHouseRoomFragment = { __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined };
+
+export type ProjectScreenAlbumsFragment = { __typename?: 'ProjectAlbums', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectAlbumsList', items: Array<{ __typename: 'Album', id: string, name: string }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectAlbumsTotal', total: number } | { __typename: 'ServerError' } };
+
+export type ProjectScreenAlbumFragment = { __typename?: 'Album', id: string, name: string };
 
 export type DeleteVisualizationsMutationVariables = Exact<{
   id: Array<Scalars['String']> | Scalars['String'];
@@ -1024,6 +1200,137 @@ export const UpdateHouseFragmentDoc = gql`
   modifiedAt
 }
     `;
+export const AlbumScreenHouseRoomFragmentDoc = gql`
+    fragment AlbumScreenHouseRoom on Room {
+  id
+  name
+  square
+  level
+}
+    `;
+export const AlbumScreenVisualizationFragmentDoc = gql`
+    fragment AlbumScreenVisualization on Visualization {
+  id
+  name
+  description
+  version
+  file {
+    id
+    name
+    url
+    type
+    mimeType
+  }
+  room {
+    ...AlbumScreenHouseRoom
+  }
+}
+    ${AlbumScreenHouseRoomFragmentDoc}`;
+export const AlbumScreenHouseRoomsFragmentDoc = gql`
+    fragment AlbumScreenHouseRooms on HouseRooms {
+  list {
+    ... on HouseRoomsList {
+      items {
+        ...AlbumScreenHouseRoom
+      }
+    }
+    ... on Error {
+      message
+    }
+  }
+}
+    ${AlbumScreenHouseRoomFragmentDoc}`;
+export const AlbumScreenHousesFragmentDoc = gql`
+    fragment AlbumScreenHouses on ProjectHouses {
+  list(filter: {}, limit: 1, offset: 0) {
+    __typename
+    ... on ProjectHousesList {
+      items {
+        rooms {
+          ...AlbumScreenHouseRooms
+        }
+      }
+    }
+    ... on Error {
+      message
+    }
+  }
+}
+    ${AlbumScreenHouseRoomsFragmentDoc}`;
+export const AlbumScreenProjectFragmentDoc = gql`
+    fragment AlbumScreenProject on Project {
+  id
+  name
+  visualizations {
+    list(filter: $filter, limit: 100, offset: 0) {
+      ... on ProjectVisualizationsList {
+        items {
+          ...AlbumScreenVisualization
+        }
+      }
+      ... on Error {
+        message
+      }
+    }
+  }
+  houses {
+    ...AlbumScreenHouses
+  }
+}
+    ${AlbumScreenVisualizationFragmentDoc}
+${AlbumScreenHousesFragmentDoc}`;
+export const AlbumScreenAlbumPageCoverFragmentDoc = gql`
+    fragment AlbumScreenAlbumPageCover on AlbumPageCover {
+  position
+}
+    `;
+export const AlbumScreenAlbumPageVisualizationFragmentDoc = gql`
+    fragment AlbumScreenAlbumPageVisualization on AlbumPageVisualization {
+  position
+  visualization {
+    ... on Visualization {
+      id
+      file {
+        url
+      }
+    }
+    ... on Error {
+      message
+    }
+  }
+}
+    `;
+export const AlbumScreenAlbumFragmentDoc = gql`
+    fragment AlbumScreenAlbum on Album {
+  id
+  name
+  project {
+    ... on Project {
+      ...AlbumScreenProject
+    }
+    ... on Error {
+      message
+    }
+  }
+  pages {
+    ... on AlbumPages {
+      items {
+        ... on AlbumPageCover {
+          ...AlbumScreenAlbumPageCover
+        }
+        ... on AlbumPageVisualization {
+          ...AlbumScreenAlbumPageVisualization
+        }
+      }
+    }
+    ... on Error {
+      message
+    }
+  }
+}
+    ${AlbumScreenProjectFragmentDoc}
+${AlbumScreenAlbumPageCoverFragmentDoc}
+${AlbumScreenAlbumPageVisualizationFragmentDoc}`;
 export const ProjectScreenHouseFragmentDoc = gql`
     fragment ProjectScreenHouse on House {
   id
@@ -1114,6 +1421,36 @@ export const ProjectScreenVisualizationsFragmentDoc = gql`
   }
 }
     ${ProjectScreenVisualizationFragmentDoc}`;
+export const ProjectScreenAlbumFragmentDoc = gql`
+    fragment ProjectScreenAlbum on Album {
+  id
+  name
+}
+    `;
+export const ProjectScreenAlbumsFragmentDoc = gql`
+    fragment ProjectScreenAlbums on ProjectAlbums {
+  list(limit: 20, offset: 0) {
+    __typename
+    ... on ProjectAlbumsList {
+      items {
+        __typename
+        ... on Album {
+          ...ProjectScreenAlbum
+        }
+      }
+    }
+    ... on Error {
+      message
+    }
+  }
+  total {
+    __typename
+    ... on ProjectAlbumsTotal {
+      total
+    }
+  }
+}
+    ${ProjectScreenAlbumFragmentDoc}`;
 export const ProjectScreenProjectFragmentDoc = gql`
     fragment ProjectScreenProject on Project {
   id
@@ -1152,9 +1489,13 @@ export const ProjectScreenProjectFragmentDoc = gql`
   visualizations {
     ...ProjectScreenVisualizations
   }
+  albums {
+    ...ProjectScreenAlbums
+  }
 }
     ${ProjectScreenHousesFragmentDoc}
-${ProjectScreenVisualizationsFragmentDoc}`;
+${ProjectScreenVisualizationsFragmentDoc}
+${ProjectScreenAlbumsFragmentDoc}`;
 export const VisualizationsScreenHouseRoomFragmentDoc = gql`
     fragment VisualizationsScreenHouseRoom on Room {
   id
@@ -1871,6 +2212,186 @@ export function useUpdateHouseMutation(baseOptions?: Apollo.MutationHookOptions<
 export type UpdateHouseMutationHookResult = ReturnType<typeof useUpdateHouseMutation>;
 export type UpdateHouseMutationResult = Apollo.MutationResult<UpdateHouseMutation>;
 export type UpdateHouseMutationOptions = Apollo.BaseMutationOptions<UpdateHouseMutation, UpdateHouseMutationVariables>;
+export const AddVisualizationsToAlbumDocument = gql`
+    mutation addVisualizationsToAlbum($albumId: String!, $visualizations: [String!]!) {
+  addVisualizationsToAlbum(albumId: $albumId, visualizations: $visualizations) {
+    __typename
+    ... on VisualizationsAddedToAlbum {
+      pages {
+        position
+        visualization {
+          ... on Visualization {
+            id
+            file {
+              url
+            }
+          }
+        }
+      }
+    }
+    ... on Forbidden {
+      message
+    }
+    ... on ServerError {
+      message
+    }
+  }
+}
+    `;
+export type AddVisualizationsToAlbumMutationFn = Apollo.MutationFunction<AddVisualizationsToAlbumMutation, AddVisualizationsToAlbumMutationVariables>;
+
+/**
+ * __useAddVisualizationsToAlbumMutation__
+ *
+ * To run a mutation, you first call `useAddVisualizationsToAlbumMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddVisualizationsToAlbumMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addVisualizationsToAlbumMutation, { data, loading, error }] = useAddVisualizationsToAlbumMutation({
+ *   variables: {
+ *      albumId: // value for 'albumId'
+ *      visualizations: // value for 'visualizations'
+ *   },
+ * });
+ */
+export function useAddVisualizationsToAlbumMutation(baseOptions?: Apollo.MutationHookOptions<AddVisualizationsToAlbumMutation, AddVisualizationsToAlbumMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AddVisualizationsToAlbumMutation, AddVisualizationsToAlbumMutationVariables>(AddVisualizationsToAlbumDocument, options);
+      }
+export type AddVisualizationsToAlbumMutationHookResult = ReturnType<typeof useAddVisualizationsToAlbumMutation>;
+export type AddVisualizationsToAlbumMutationResult = Apollo.MutationResult<AddVisualizationsToAlbumMutation>;
+export type AddVisualizationsToAlbumMutationOptions = Apollo.BaseMutationOptions<AddVisualizationsToAlbumMutation, AddVisualizationsToAlbumMutationVariables>;
+export const AlbumScreenDocument = gql`
+    query albumScreen($id: String!, $filter: ProjectVisualizationsListFilter!) {
+  album: album(id: $id) {
+    __typename
+    ... on Album {
+      ...AlbumScreenAlbum
+    }
+    ... on Error {
+      message
+    }
+  }
+}
+    ${AlbumScreenAlbumFragmentDoc}`;
+
+/**
+ * __useAlbumScreenQuery__
+ *
+ * To run a query within a React component, call `useAlbumScreenQuery` and pass it any options that fit your needs.
+ * When your component renders, `useAlbumScreenQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useAlbumScreenQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *      filter: // value for 'filter'
+ *   },
+ * });
+ */
+export function useAlbumScreenQuery(baseOptions: Apollo.QueryHookOptions<AlbumScreenQuery, AlbumScreenQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<AlbumScreenQuery, AlbumScreenQueryVariables>(AlbumScreenDocument, options);
+      }
+export function useAlbumScreenLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<AlbumScreenQuery, AlbumScreenQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<AlbumScreenQuery, AlbumScreenQueryVariables>(AlbumScreenDocument, options);
+        }
+export type AlbumScreenQueryHookResult = ReturnType<typeof useAlbumScreenQuery>;
+export type AlbumScreenLazyQueryHookResult = ReturnType<typeof useAlbumScreenLazyQuery>;
+export type AlbumScreenQueryResult = Apollo.QueryResult<AlbumScreenQuery, AlbumScreenQueryVariables>;
+export const DeleteAlbumDocument = gql`
+    mutation deleteAlbum($id: String!) {
+  deleteAlbum(id: $id) {
+    __typename
+    ... on AlbumDeleted {
+      album {
+        id
+      }
+    }
+    ... on Error {
+      __typename
+      message
+    }
+  }
+}
+    `;
+export type DeleteAlbumMutationFn = Apollo.MutationFunction<DeleteAlbumMutation, DeleteAlbumMutationVariables>;
+
+/**
+ * __useDeleteAlbumMutation__
+ *
+ * To run a mutation, you first call `useDeleteAlbumMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteAlbumMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteAlbumMutation, { data, loading, error }] = useDeleteAlbumMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useDeleteAlbumMutation(baseOptions?: Apollo.MutationHookOptions<DeleteAlbumMutation, DeleteAlbumMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteAlbumMutation, DeleteAlbumMutationVariables>(DeleteAlbumDocument, options);
+      }
+export type DeleteAlbumMutationHookResult = ReturnType<typeof useDeleteAlbumMutation>;
+export type DeleteAlbumMutationResult = Apollo.MutationResult<DeleteAlbumMutation>;
+export type DeleteAlbumMutationOptions = Apollo.BaseMutationOptions<DeleteAlbumMutation, DeleteAlbumMutationVariables>;
+export const CreateAlbumDocument = gql`
+    mutation createAlbum($projectId: String!, $name: String!) {
+  createAlbum(projectId: $projectId, name: $name) {
+    __typename
+    ... on AlbumCreated {
+      album {
+        ...ProjectScreenAlbum
+      }
+    }
+    ... on Error {
+      __typename
+      message
+    }
+  }
+}
+    ${ProjectScreenAlbumFragmentDoc}`;
+export type CreateAlbumMutationFn = Apollo.MutationFunction<CreateAlbumMutation, CreateAlbumMutationVariables>;
+
+/**
+ * __useCreateAlbumMutation__
+ *
+ * To run a mutation, you first call `useCreateAlbumMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateAlbumMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createAlbumMutation, { data, loading, error }] = useCreateAlbumMutation({
+ *   variables: {
+ *      projectId: // value for 'projectId'
+ *      name: // value for 'name'
+ *   },
+ * });
+ */
+export function useCreateAlbumMutation(baseOptions?: Apollo.MutationHookOptions<CreateAlbumMutation, CreateAlbumMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateAlbumMutation, CreateAlbumMutationVariables>(CreateAlbumDocument, options);
+      }
+export type CreateAlbumMutationHookResult = ReturnType<typeof useCreateAlbumMutation>;
+export type CreateAlbumMutationResult = Apollo.MutationResult<CreateAlbumMutation>;
+export type CreateAlbumMutationOptions = Apollo.BaseMutationOptions<CreateAlbumMutation, CreateAlbumMutationVariables>;
 export const AddRoomDocument = gql`
     mutation addRoom($houseId: String!, $room: AddRoomInput!) {
   addRoom(houseId: $houseId, room: $room) {

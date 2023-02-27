@@ -1,0 +1,134 @@
+query albumScreen($id: String! $filter: ProjectVisualizationsListFilter!) {
+    album: album(id: $id) {
+        __typename
+        ...on Album {
+            ...AlbumScreenAlbum
+        }
+        ...on Error {
+            message
+        }
+    }
+}
+
+fragment AlbumScreenAlbum on Album {
+    id
+    name
+    project {
+        ... on Project {
+            ...AlbumScreenProject
+        }
+        ... on Error {
+            message
+        }
+    }
+    pages {
+        ... on AlbumPages {
+            items {
+                ... on AlbumPageCover {
+                    ...AlbumScreenAlbumPageCover
+                }
+                ... on AlbumPageVisualization {
+                    ...AlbumScreenAlbumPageVisualization
+                }
+            }
+        }
+        ... on Error {
+            message
+        }
+    }
+}
+
+fragment AlbumScreenProject on Project {
+    id
+    name
+    visualizations {
+        list(filter: $filter limit: 100 offset: 0) {
+            ... on ProjectVisualizationsList {
+                items {
+                    ...AlbumScreenVisualization
+                }
+            }
+            ... on Error {
+                message
+            }
+        }
+
+    }
+    houses {
+        ...AlbumScreenHouses
+    }
+}
+
+fragment AlbumScreenVisualization on Visualization {
+    id
+    name
+    description
+    version
+    file {
+        id
+        name
+        url
+        type
+        mimeType
+    }
+    room {
+        ...AlbumScreenHouseRoom
+    }
+}
+
+
+fragment AlbumScreenHouseRoom on Room {
+    id
+    name
+    square
+    level
+}
+
+
+fragment AlbumScreenHouses on ProjectHouses {
+    list(filter: {} limit: 1 offset: 0) {
+        __typename
+        ...on ProjectHousesList {
+            items {
+                rooms {
+                    ...AlbumScreenHouseRooms
+                }
+            }
+        }
+        ...on Error {
+            message
+        }
+    }
+}
+
+fragment AlbumScreenHouseRooms on HouseRooms {
+    list {
+        ...on HouseRoomsList {
+            items {
+                ...AlbumScreenHouseRoom
+            }
+        }
+        ...on Error {
+            message
+        }
+    }
+}
+
+fragment AlbumScreenAlbumPageCover on AlbumPageCover {
+    position
+}
+
+fragment AlbumScreenAlbumPageVisualization on AlbumPageVisualization {
+    position
+    visualization {
+        ... on Visualization {
+            id
+            file {
+                url
+            }
+        }
+        ... on Error {
+            message
+        }
+    }
+}

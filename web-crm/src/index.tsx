@@ -12,11 +12,13 @@ import Logout from "screen/Logout/Logout"
 import Confirm from "screen/Confirm/Confirm"
 import Workspace from "screen/Workspace/Workspace"
 import Project from "screen/Project/Project"
+import Visualizations from "screen/Visualizations/Visualizations"
+import Album from "screen/Album/Album"
 
 import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client"
 import { setContext } from "@apollo/client/link/context"
 import { createUploadLink } from "apollo-upload-client"
-import Visualizations from "screen/Visualizations/Visualizations"
+
 
 const authLink = setContext((_, { headers }) => {
   const token = JSON.parse(localStorage.getItem("token") || `""`);
@@ -69,8 +71,14 @@ ReactDOM.render(
                             <PrivateRoute exact path="/p/:id">
                                 <Project/>
                             </PrivateRoute>
-                            <PrivateRoute exact path="/p/:id/vis">
+                            <PrivateRoute exact path="/vis/:id">
                                 <Visualizations/>
+                            </PrivateRoute>
+                            <PrivateRoute exact path="/album/:id">
+                                <Album/>
+                            </PrivateRoute>
+                            <PrivateRoute exact path="/p/:id/album">
+                                <Album/>
                             </PrivateRoute>
                         </Switch>
                     </Router>

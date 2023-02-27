@@ -55,7 +55,6 @@ export default function Visualizations({
                             style={{gridAutoFlow: "column", overflowX: "scroll"}}
                             gap="xsmall"
                             ref={gridRef}
-                            height="large"
                         >
                             {visualizations.list.items.map((item) => (
                                 <Box

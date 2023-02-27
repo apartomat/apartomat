@@ -57,6 +57,9 @@ fragment ProjectScreenProject on Project {
     visualizations {
         ...ProjectScreenVisualizations
     }
+    albums {
+        ...ProjectScreenAlbums
+    }
 }
 
 fragment ProjectScreenVisualizations on ProjectVisualizations {
@@ -142,3 +145,30 @@ fragment ProjectScreenHouseRoom on Room {
     level
 }
 
+fragment ProjectScreenAlbums on ProjectAlbums {
+    list(limit: 20 offset: 0) {
+        __typename
+        ...on ProjectAlbumsList {
+            items {
+                __typename
+                ...on Album {
+                    ...ProjectScreenAlbum
+                }
+            }
+        }
+        ...on Error {
+            message
+        }
+    }
+    total {
+        __typename
+        ...on ProjectAlbumsTotal {
+            total
+        }
+    }
+}
+
+fragment ProjectScreenAlbum on Album {
+    id
+    name
+}

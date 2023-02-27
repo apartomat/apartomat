@@ -87,7 +87,7 @@ export default function Workspace () {
                 <Box><UserAvatar user={user}/></Box>
             </Header>
 
-            <Box margin={{horizontal: "large"}}>
+            <Box margin={{ horizontal: "large" }}>
                 <Box margin={{bottom: "medium"}}>
                     <Box direction="row" margin={{vertical: "medium"}} justify="between">
                         <Heading level={2} margin="none">{screen.name}</Heading>

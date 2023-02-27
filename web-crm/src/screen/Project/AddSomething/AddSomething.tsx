@@ -35,18 +35,18 @@ export default function AddSomething ({
                         setShow(false)
                         onClickAddVisualizations()
                     }}/>
-                    <Button plain>
+                    {/* <Button plain>
                         <Box pad="small"><Text>План</Text></Box>
                     </Button>
                     <Button plain>
                         <Box pad="small"><Text>Исходники</Text></Box>
-                    </Button>
+                    </Button> */}
                     <Button plain>
                         <Box pad="small"><Text>Альбом</Text></Box>
                     </Button>
-                    <Button plain>
+                    {/* <Button plain>
                         <Box pad="small"><Text>Спецификация</Text></Box>
-                    </Button>
+                    </Button> */}
                 </Drop>
             )}
         </Box>

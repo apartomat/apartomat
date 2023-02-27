@@ -1,0 +1,24 @@
+mutation addVisualizationsToAlbum($albumId: String! $visualizations: [String!]!) {
+    addVisualizationsToAlbum(albumId: $albumId visualizations: $visualizations) {
+        __typename
+        ...on VisualizationsAddedToAlbum {
+            pages {
+                position
+                visualization {
+                    ... on Visualization {
+                        id
+                        file {
+                            url
+                        }
+                    }
+                }
+            }
+        }
+        ...on Forbidden {
+            message
+        }
+        ...on ServerError {
+            message
+        }
+    }
+}

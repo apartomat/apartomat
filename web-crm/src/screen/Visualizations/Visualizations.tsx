@@ -215,7 +215,7 @@ export default function Visualizations() {
             </Header>
 
             <Box direction="row" justify="between" margin={{ vertical: "medium" }}>
-                <Heading level={2} margin="none"><AnchorLink to={`/p/${project?.id}/`} color="black">{project?.name}</AnchorLink></Heading>
+                <Heading level={2} margin="none"><AnchorLink to={`/p/${project?.id}`} color="black">{project?.name}</AnchorLink></Heading>
                 <Box direction="row" gap="small" justify="center" align="center">
                     <Button
                         disabled={selected.length === 0}

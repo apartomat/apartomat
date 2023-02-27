@@ -1,0 +1,14 @@
+mutation createAlbum($projectId: String! $name: String!) {
+    createAlbum(projectId: $projectId name: $name) {
+        __typename
+        ...on AlbumCreated {
+            album {
+                ...ProjectScreenAlbum
+            }
+        }
+        ...on Error {
+            __typename
+            message
+        }
+    }
+}
