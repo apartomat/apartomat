@@ -68,33 +68,33 @@ func (s *store) Delete(ctx context.Context, visualization *Visualization) error 
 }
 
 type visualizationsRecord struct {
-	tableName     struct{}   `pg:"apartomat.visualizations,alias:visualizations"`
-	ID            string     `pg:"id,pk"`
-	Name          string     `pg:"name,use_zero"`
-	Description   string     `pg:"description,use_zero"`
-	Version       int        `pg:"version,use_zero"`
-	Status        string     `pg:"status"`
-	CreatedAt     time.Time  `pg:"created_at"`
-	ModifiedAt    time.Time  `pg:"modified_at"`
-	DeletedAt     *time.Time `pg:"deleted_at"`
-	ProjectID     string     `pg:"project_id"`
-	ProjectFileID string     `pg:"project_file_id"`
-	RoomID        *string    `pg:"room_id"`
+	tableName   struct{}   `pg:"apartomat.visualizations"`
+	ID          string     `pg:"id,pk"`
+	Name        string     `pg:"name,use_zero"`
+	Description string     `pg:"description,use_zero"`
+	Version     int        `pg:"version,use_zero"`
+	Status      string     `pg:"status"`
+	CreatedAt   time.Time  `pg:"created_at"`
+	ModifiedAt  time.Time  `pg:"modified_at"`
+	DeletedAt   *time.Time `pg:"deleted_at"`
+	ProjectID   string     `pg:"project_id"`
+	FileID      string     `pg:"file_id"`
+	RoomID      *string    `pg:"room_id"`
 }
 
 func toVisualizationsRecord(visualization *Visualization) *visualizationsRecord {
 	return &visualizationsRecord{
-		ID:            visualization.ID,
-		Name:          visualization.Name,
-		Description:   visualization.Description,
-		Version:       visualization.Version,
-		Status:        string(visualization.Status),
-		CreatedAt:     visualization.CreatedAt,
-		ModifiedAt:    visualization.ModifiedAt,
-		DeletedAt:     visualization.DeletedAt,
-		ProjectID:     visualization.ProjectID,
-		ProjectFileID: visualization.ProjectFileID,
-		RoomID:        visualization.RoomID,
+		ID:          visualization.ID,
+		Name:        visualization.Name,
+		Description: visualization.Description,
+		Version:     visualization.Version,
+		Status:      string(visualization.Status),
+		CreatedAt:   visualization.CreatedAt,
+		ModifiedAt:  visualization.ModifiedAt,
+		DeletedAt:   visualization.DeletedAt,
+		ProjectID:   visualization.ProjectID,
+		FileID:      visualization.FileID,
+		RoomID:      visualization.RoomID,
 	}
 }
 
@@ -115,17 +115,17 @@ func fromVisualizationsRecords(records []*visualizationsRecord) []*Visualization
 
 	for i, r := range records {
 		visualizations[i] = &Visualization{
-			ID:            r.ID,
-			Name:          r.Name,
-			Description:   r.Description,
-			Version:       r.Version,
-			Status:        VisualizationStatus(r.Status),
-			CreatedAt:     r.CreatedAt,
-			ModifiedAt:    r.ModifiedAt,
-			DeletedAt:     r.DeletedAt,
-			ProjectID:     r.ProjectID,
-			ProjectFileID: r.ProjectFileID,
-			RoomID:        r.RoomID,
+			ID:          r.ID,
+			Name:        r.Name,
+			Description: r.Description,
+			Version:     r.Version,
+			Status:      VisualizationStatus(r.Status),
+			CreatedAt:   r.CreatedAt,
+			ModifiedAt:  r.ModifiedAt,
+			DeletedAt:   r.DeletedAt,
+			ProjectID:   r.ProjectID,
+			FileID:      r.FileID,
+			RoomID:      r.RoomID,
 		}
 	}
 

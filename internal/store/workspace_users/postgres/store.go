@@ -64,7 +64,7 @@ func (s *store) List(
 }
 
 type record struct {
-	tableName   struct{}  `pg:"apartomat.workspace_users,alias:wu"`
+	tableName   struct{}  `pg:"apartomat.workspace_users"`
 	ID          string    `pg:"id,pk"`
 	WorkspaceID string    `pg:"workspace_id"`
 	UserID      string    `pg:"user_id"`

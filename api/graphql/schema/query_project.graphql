@@ -157,7 +157,7 @@ type Visualization {
     status: VisualizationStatus!
     createdAt:  Time!
     modifiedAt: Time!
-    file: ProjectFile!
+    file: File!
     room: Room
 }
 
@@ -173,10 +173,10 @@ type ProjectFiles {
 }
 
 input ProjectFilesListFilter {
-    type: [ProjectFileType!]
+    type: [FileType!]
 }
 
-enum ProjectFileType {
+enum FileType {
     NONE
     VISUALIZATION
 }
@@ -184,7 +184,7 @@ enum ProjectFileType {
 union ProjectFilesListResult = ProjectFilesList | Forbidden | ServerError
 
 type ProjectFilesList {
-    items: [ProjectFile!]!
+    items: [File!]!
 }
 
 union ProjectFilesTotalResult = ProjectFilesTotal | Forbidden | ServerError
@@ -193,11 +193,11 @@ type ProjectFilesTotal {
     total: Int!
 }
 
-type ProjectFile {
+type File {
     id: String!
     name: String!
     url: Url!
-    type: ProjectFileType!
+    type: FileType!
     mimeType: String!
 }
 

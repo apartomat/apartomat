@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	filesTableName = `apartomat.project_files`
+	filesTableName = `apartomat.files`
 )
 
 type store struct {
@@ -84,7 +84,7 @@ func (s *store) Count(ctx context.Context, spec Spec) (int, error) {
 }
 
 type record struct {
-	tableName  struct{}  `pg:"apartomat.project_files,alias:pf"`
+	tableName  struct{}  `pg:"apartomat.files"`
 	ID         string    `pg:"id,pk"`
 	Name       string    `pg:"name"`
 	URL        string    `pg:"url"`

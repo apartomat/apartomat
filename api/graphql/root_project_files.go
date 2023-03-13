@@ -29,7 +29,7 @@ func (r *projectFilesResolver) List(
 
 		return serverError()
 	} else {
-		files, err := r.useCases.GetProjectFiles(
+		files, err := r.useCases.GetFiles(
 			ctx,
 			project.ID,
 			toProjectFileTypes(filter.Type),
@@ -50,18 +50,18 @@ func (r *projectFilesResolver) List(
 	}
 }
 
-func projectFilesToGraphQL(projects []*files.File) []*ProjectFile {
-	result := make([]*ProjectFile, 0, len(projects))
+func projectFilesToGraphQL(projects []*files.File) []*File {
+	result := make([]*File, 0, len(projects))
 
 	for _, u := range projects {
-		result = append(result, projectFileToGraphQL(u))
+		result = append(result, fileToGraphQL(u))
 	}
 
 	return result
 }
 
-func projectFileToGraphQL(file *files.File) *ProjectFile {
-	return &ProjectFile{
+func fileToGraphQL(file *files.File) *File {
+	return &File{
 		ID:       file.ID,
 		Name:     file.Name,
 		URL:      file.URL,
@@ -80,7 +80,7 @@ func (r *projectFilesResolver) Total(
 
 		return nil, errors.New("server error: can't resolver project files")
 	} else {
-		tot, err := r.useCases.CountProjectFiles(
+		tot, err := r.useCases.CountFiles(
 			ctx,
 			project.ID,
 			toProjectFileTypes(filter.Type),
@@ -99,29 +99,29 @@ func (r *projectFilesResolver) Total(
 	}
 }
 
-func projectFileTypeToGraphQL(t files.FileType) ProjectFileType {
+func projectFileTypeToGraphQL(t files.FileType) FileType {
 	switch t {
 	case files.FileTypeVisualization:
-		return ProjectFileTypeVisualization
+		return FileTypeVisualization
 	case files.FileTypeNone:
-		return ProjectFileTypeNone
+		return FileTypeNone
 	default:
-		return ProjectFileTypeNone
+		return FileTypeNone
 	}
 }
 
-func toProjectFileType(t ProjectFileType) files.FileType {
+func toProjectFileType(t FileType) files.FileType {
 	switch t {
-	case ProjectFileTypeVisualization:
+	case FileTypeVisualization:
 		return files.FileTypeVisualization
-	case ProjectFileTypeNone:
+	case FileTypeNone:
 		return files.FileTypeNone
 	default:
 		return files.FileTypeNone
 	}
 }
 
-func toProjectFileTypes(l []ProjectFileType) []files.FileType {
+func toProjectFileTypes(l []FileType) []files.FileType {
 	res := make([]files.FileType, len(l))
 
 	for i, t := range l {

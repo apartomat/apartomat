@@ -17,7 +17,7 @@ type Upload struct {
 	Size     int64
 }
 
-func (u *Apartomat) GetProjectFiles(
+func (u *Apartomat) GetFiles(
 	ctx context.Context,
 	projectID string,
 	fileType []FileType,
@@ -36,7 +36,7 @@ func (u *Apartomat) GetProjectFiles(
 		project = prjs[0]
 	)
 
-	if ok, err := u.CanGetProjectFiles(ctx, UserFromCtx(ctx), project); err != nil {
+	if ok, err := u.CanGetFiles(ctx, UserFromCtx(ctx), project); err != nil {
 		return nil, err
 	} else if !ok {
 		return nil, fmt.Errorf("can't get project (id=%s) files: %w", project.ID, ErrForbidden)
@@ -55,11 +55,11 @@ func (u *Apartomat) GetProjectFiles(
 	return p, nil
 }
 
-func (u *Apartomat) CanGetProjectFiles(ctx context.Context, subj *UserCtx, obj *projects.Project) (bool, error) {
+func (u *Apartomat) CanGetFiles(ctx context.Context, subj *UserCtx, obj *projects.Project) (bool, error) {
 	return u.isProjectUser(ctx, subj, obj)
 }
 
-func (u *Apartomat) CountProjectFiles(
+func (u *Apartomat) CountFiles(
 	ctx context.Context,
 	projectID string,
 	fileType []FileType,
@@ -77,7 +77,7 @@ func (u *Apartomat) CountProjectFiles(
 		project = prjs[0]
 	)
 
-	if ok, err := u.CanCountProjectFiles(ctx, UserFromCtx(ctx), project); err != nil {
+	if ok, err := u.CanCountFiles(ctx, UserFromCtx(ctx), project); err != nil {
 		return 0, err
 	} else if !ok {
 		return 0, fmt.Errorf("can't get project (id=%s) files: %w", project.ID, ErrForbidden)
@@ -89,7 +89,7 @@ func (u *Apartomat) CountProjectFiles(
 	)
 }
 
-func (u *Apartomat) CanCountProjectFiles(ctx context.Context, subj *UserCtx, obj *projects.Project) (bool, error) {
+func (u *Apartomat) CanCountFiles(ctx context.Context, subj *UserCtx, obj *projects.Project) (bool, error) {
 	return u.isProjectUser(ctx, subj, obj)
 }
 
@@ -112,7 +112,7 @@ func (u *Apartomat) UploadFile(
 		project = prjs[0]
 	)
 
-	if ok, err := u.CanUploadProjectFile(ctx, UserFromCtx(ctx), project); err != nil {
+	if ok, err := u.CanUploadFile(ctx, UserFromCtx(ctx), project); err != nil {
 		return nil, err
 	} else if !ok {
 		return nil, fmt.Errorf("can't get project (id=%s) files: %w", project.ID, ErrForbidden)
@@ -139,6 +139,6 @@ func (u *Apartomat) UploadFile(
 	return f, nil
 }
 
-func (u *Apartomat) CanUploadProjectFile(ctx context.Context, subj *UserCtx, obj *projects.Project) (bool, error) {
+func (u *Apartomat) CanUploadFile(ctx context.Context, subj *UserCtx, obj *projects.Project) (bool, error) {
 	return u.isProjectUser(ctx, subj, obj)
 }

@@ -53,13 +53,13 @@ func visualizationToGraphQL(vis *visualizations.Visualization, file *files.File)
 		Status:      visualizationStatusToGraphQL(vis.Status),
 		CreatedAt:   vis.CreatedAt,
 		ModifiedAt:  vis.ModifiedAt,
-		File: &ProjectFile{
-			ID: vis.ProjectFileID,
+		File: &File{
+			ID: vis.FileID,
 		},
 	}
 
 	if file != nil {
-		res.File = projectFileToGraphQL(file)
+		res.File = fileToGraphQL(file)
 	}
 
 	if vis.RoomID != nil {

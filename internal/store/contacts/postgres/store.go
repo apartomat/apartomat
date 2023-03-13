@@ -80,7 +80,7 @@ func (s *store) List(ctx context.Context, spec Spec, limit, offset int) ([]*Cont
 }
 
 type record struct {
-	tableName  struct{}       `pg:"apartomat.contacts,alias:contacts"`
+	tableName  struct{}       `pg:"apartomat.contacts"`
 	ID         string         `pg:"id,pk"`
 	FullName   string         `pg:"full_name"`
 	Photo      string         `pg:"photo"`

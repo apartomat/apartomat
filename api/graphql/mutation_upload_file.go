@@ -7,18 +7,18 @@ import (
 	"log"
 )
 
-func (r *mutationResolver) UploadProjectFile(
+func (r *mutationResolver) UploadFile(
 	ctx context.Context,
-	input UploadProjectFileInput,
-) (UploadProjectFileResult, error) {
+	input UploadFileInput,
+) (UploadFileResult, error) {
 	pf, err := r.useCases.UploadFile(
 		ctx,
 		input.ProjectID,
 		apartomat.Upload{
-			Name:     input.File.Filename,
-			MimeType: input.File.ContentType,
-			Data:     input.File.File,
-			Size:     input.File.Size,
+			Name:     input.Data.Filename,
+			MimeType: input.Data.ContentType,
+			Data:     input.Data.File,
+			Size:     input.Data.Size,
 		},
 		toProjectFileType(input.Type),
 	)
@@ -32,5 +32,5 @@ func (r *mutationResolver) UploadProjectFile(
 		return serverError()
 	}
 
-	return ProjectFileUploaded{File: projectFileToGraphQL(pf)}, nil
+	return FileUploaded{File: fileToGraphQL(pf)}, nil
 }

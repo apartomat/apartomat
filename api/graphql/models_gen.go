@@ -156,8 +156,8 @@ type UpdateRoomResult interface {
 	IsUpdateRoomResult()
 }
 
-type UploadProjectFileResult interface {
-	IsUploadProjectFileResult()
+type UploadFileResult interface {
+	IsUploadFileResult()
 }
 
 type UploadVisualizationResult interface {
@@ -259,7 +259,7 @@ type AlreadyExists struct {
 	Message string `json:"message"`
 }
 
-func (AlreadyExists) IsUploadProjectFileResult() {}
+func (AlreadyExists) IsUploadFileResult() {}
 
 func (AlreadyExists) IsError()                {}
 func (this AlreadyExists) GetMessage() string { return this.Message }
@@ -328,6 +328,20 @@ func (this ExpiredToken) GetMessage() string { return this.Message }
 
 func (ExpiredToken) IsConfirmLoginPinResult() {}
 
+type File struct {
+	ID       string   `json:"id"`
+	Name     string   `json:"name"`
+	URL      string   `json:"url"`
+	Type     FileType `json:"type"`
+	MimeType string   `json:"mimeType"`
+}
+
+type FileUploaded struct {
+	File *File `json:"file"`
+}
+
+func (FileUploaded) IsUploadFileResult() {}
+
 type Forbidden struct {
 	Message string `json:"message"`
 }
@@ -362,7 +376,7 @@ func (Forbidden) IsUpdateHouseResult() {}
 
 func (Forbidden) IsUpdateRoomResult() {}
 
-func (Forbidden) IsUploadProjectFileResult() {}
+func (Forbidden) IsUploadFileResult() {}
 
 func (Forbidden) IsUploadVisualizationResult() {}
 
@@ -612,33 +626,19 @@ type ProjectEnums struct {
 	Status *ProjectStatusEnum `json:"status"`
 }
 
-type ProjectFile struct {
-	ID       string          `json:"id"`
-	Name     string          `json:"name"`
-	URL      string          `json:"url"`
-	Type     ProjectFileType `json:"type"`
-	MimeType string          `json:"mimeType"`
-}
-
-type ProjectFileUploaded struct {
-	File *ProjectFile `json:"file"`
-}
-
-func (ProjectFileUploaded) IsUploadProjectFileResult() {}
-
 type ProjectFiles struct {
 	List  ProjectFilesListResult  `json:"list"`
 	Total ProjectFilesTotalResult `json:"total"`
 }
 
 type ProjectFilesList struct {
-	Items []*ProjectFile `json:"items"`
+	Items []*File `json:"items"`
 }
 
 func (ProjectFilesList) IsProjectFilesListResult() {}
 
 type ProjectFilesListFilter struct {
-	Type []ProjectFileType `json:"type"`
+	Type []FileType `json:"type"`
 }
 
 type ProjectFilesTotal struct {
@@ -774,7 +774,7 @@ func (ServerError) IsUpdateContactResult() {}
 
 func (ServerError) IsUpdateHouseResult() {}
 
-func (ServerError) IsUploadProjectFileResult() {}
+func (ServerError) IsUploadFileResult() {}
 
 func (ServerError) IsUploadVisualizationResult() {}
 
@@ -856,10 +856,10 @@ type UpdateRoomInput struct {
 	Level  *int     `json:"level"`
 }
 
-type UploadProjectFileInput struct {
-	ProjectID string          `json:"projectId"`
-	Type      ProjectFileType `json:"type"`
-	File      graphql.Upload  `json:"file"`
+type UploadFileInput struct {
+	ProjectID string         `json:"projectId"`
+	Type      FileType       `json:"type"`
+	Data      graphql.Upload `json:"data"`
 }
 
 type UserProfile struct {
@@ -881,7 +881,7 @@ type Visualization struct {
 	Status      VisualizationStatus `json:"status"`
 	CreatedAt   time.Time           `json:"createdAt"`
 	ModifiedAt  time.Time           `json:"modifiedAt"`
-	File        *ProjectFile        `json:"file"`
+	File        *File               `json:"file"`
 	Room        *Room               `json:"room"`
 }
 
@@ -1018,6 +1018,47 @@ func (e ContactType) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
+type FileType string
+
+const (
+	FileTypeNone          FileType = "NONE"
+	FileTypeVisualization FileType = "VISUALIZATION"
+)
+
+var AllFileType = []FileType{
+	FileTypeNone,
+	FileTypeVisualization,
+}
+
+func (e FileType) IsValid() bool {
+	switch e {
+	case FileTypeNone, FileTypeVisualization:
+		return true
+	}
+	return false
+}
+
+func (e FileType) String() string {
+	return string(e)
+}
+
+func (e *FileType) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = FileType(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid FileType", str)
+	}
+	return nil
+}
+
+func (e FileType) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
 type Orientation string
 
 const (
@@ -1097,47 +1138,6 @@ func (e *PageSize) UnmarshalGQL(v interface{}) error {
 }
 
 func (e PageSize) MarshalGQL(w io.Writer) {
-	fmt.Fprint(w, strconv.Quote(e.String()))
-}
-
-type ProjectFileType string
-
-const (
-	ProjectFileTypeNone          ProjectFileType = "NONE"
-	ProjectFileTypeVisualization ProjectFileType = "VISUALIZATION"
-)
-
-var AllProjectFileType = []ProjectFileType{
-	ProjectFileTypeNone,
-	ProjectFileTypeVisualization,
-}
-
-func (e ProjectFileType) IsValid() bool {
-	switch e {
-	case ProjectFileTypeNone, ProjectFileTypeVisualization:
-		return true
-	}
-	return false
-}
-
-func (e ProjectFileType) String() string {
-	return string(e)
-}
-
-func (e *ProjectFileType) UnmarshalGQL(v interface{}) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("enums must be strings")
-	}
-
-	*e = ProjectFileType(str)
-	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid ProjectFileType", str)
-	}
-	return nil
-}
-
-func (e ProjectFileType) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 

@@ -59,7 +59,7 @@ func (s *store) Save(ctx context.Context, workspaces ...*Workspace) error {
 }
 
 type record struct {
-	tableName  struct{}  `pg:"apartomat.workspaces,alias:w"`
+	tableName  struct{}  `pg:"apartomat.workspaces"`
 	ID         string    `pg:"id,pk"`
 	Name       string    `pg:"name"`
 	IsActive   bool      `pg:"is_active"`

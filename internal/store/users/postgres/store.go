@@ -59,7 +59,7 @@ func (s *store) Save(ctx context.Context, users ...*User) error {
 }
 
 type record struct {
-	tableName     struct{}  `pg:"apartomat.users,alias:u"`
+	tableName     struct{}  `pg:"apartomat.users"`
 	ID            string    `pg:"id,pk"`
 	Email         string    `pg:"email"`
 	FullName      string    `pg:"full_name"`

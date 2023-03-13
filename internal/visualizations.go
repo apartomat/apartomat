@@ -62,7 +62,7 @@ func (u *Apartomat) UploadVisualizations(
 		project = prjs[0]
 	)
 
-	if ok, err := u.CanUploadProjectFile(ctx, UserFromCtx(ctx), project); err != nil {
+	if ok, err := u.CanUploadFile(ctx, UserFromCtx(ctx), project); err != nil {
 		return nil, err
 	} else if !ok {
 		return nil, fmt.Errorf("can't get project (id=%s) files: %w", project.ID, ErrForbidden)
