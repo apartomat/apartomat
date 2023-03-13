@@ -11,7 +11,7 @@ type Workspace struct {
 	UserID     string
 }
 
-func New(id, name string, isActive bool, userID string) *Workspace {
+func NewWorkspace(id, name string, isActive bool, userID string) *Workspace {
 	now := time.Now()
 
 	return &Workspace{

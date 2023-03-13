@@ -32,7 +32,7 @@ func (album *Album) AddPageWithVisualization(vis *visualizations.Visualization) 
 		album.Pages,
 		AlbumPageVisualization{
 			VisualizationID: vis.ID,
-			FileID:          vis.ProjectFileID,
+			FileID:          vis.FileID,
 		},
 	)
 

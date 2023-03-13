@@ -103,7 +103,7 @@ func (u *Apartomat) AddRoom(
 	}
 
 	var (
-		room = New(id, name, square, level, houseID)
+		room = NewRoom(id, name, square, level, houseID)
 	)
 
 	if err := u.Rooms.Save(ctx, room); err != nil {

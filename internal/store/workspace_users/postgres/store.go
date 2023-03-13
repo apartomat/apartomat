@@ -24,14 +24,6 @@ var (
 	_ Store = (*store)(nil)
 )
 
-func (s *store) Save(ctx context.Context, users ...*WorkspaceUser) error {
-	recs := toRecords(users)
-
-	_, err := s.db.ModelContext(ctx, &recs).Returning("NULL").OnConflict("(id) DO UPDATE").Insert()
-
-	return err
-}
-
 func (s *store) List(
 	ctx context.Context,
 	spec Spec,
@@ -61,6 +53,14 @@ func (s *store) List(
 	}
 
 	return fromRecords(rows), nil
+}
+
+func (s *store) Save(ctx context.Context, users ...*WorkspaceUser) error {
+	recs := toRecords(users)
+
+	_, err := s.db.ModelContext(ctx, &recs).Returning("NULL").OnConflict("(id) DO UPDATE").Insert()
+
+	return err
 }
 
 type record struct {
@@ -102,11 +102,11 @@ func fromRecords(records []*record) []*WorkspaceUser {
 	for i, r := range records {
 		users[i] = &WorkspaceUser{
 			ID:          r.ID,
-			WorkspaceID: r.WorkspaceID,
-			UserID:      r.UserID,
 			Role:        WorkspaceUserRole(r.Role),
 			CreatedAt:   r.CreatedAt,
 			ModifiedAt:  r.ModifiedAt,
+			WorkspaceID: r.WorkspaceID,
+			UserID:      r.UserID,
 		}
 	}
 

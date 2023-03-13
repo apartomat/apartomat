@@ -39,7 +39,7 @@ func (u *Apartomat) CreateProject(
 		return nil, err
 	}
 
-	project := New(id, name, startAt, endAt, workspaceID)
+	project := NewProject(id, name, startAt, endAt, workspaceID)
 
 	if err := u.Projects.Save(ctx, project); err != nil {
 		return nil, err

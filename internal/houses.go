@@ -85,7 +85,7 @@ func (u *Apartomat) AddHouse(
 		return nil, err
 	}
 
-	house := New(id, city, address, housingComplex, project.ID)
+	house := NewHouse(id, city, address, housingComplex, project.ID)
 
 	if err := u.Houses.Save(ctx, house); err != nil {
 		return nil, err

@@ -39,7 +39,7 @@ func (u *Apartomat) AddContact(ctx context.Context, projectID string, params Add
 		return nil, err
 	}
 
-	contact := New(id, params.FullName, params.Photo, params.Details, projectID)
+	contact := NewContact(id, params.FullName, params.Photo, params.Details, projectID)
 
 	if err := u.Contacts.Save(ctx, contact); err != nil {
 		return nil, err

@@ -81,7 +81,7 @@ func (u *Apartomat) UploadVisualizations(
 			return nil, err
 		}
 
-		f := files.New(fileID, file.Name, url, files.FileTypeVisualization, file.MimeType, projectID)
+		f := files.NewFile(fileID, file.Name, url, files.FileTypeVisualization, file.MimeType, projectID)
 
 		if err := u.Files.Save(ctx, f); err != nil {
 			return nil, err

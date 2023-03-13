@@ -24,56 +24,6 @@ var (
 	_ Store = (*store)(nil)
 )
 
-func (s *store) Save(ctx context.Context, albums ...*Album) error {
-	recs := toRecords(albums)
-
-	_, err := s.db.ModelContext(ctx, &recs).Returning("NULL").OnConflict("(id) DO UPDATE").Insert()
-
-	return err
-}
-
-func (s *store) Delete(ctx context.Context, albums ...*Album) error {
-	var (
-		ids = make([]string, len(albums))
-	)
-
-	for i, c := range albums {
-		ids[i] = c.ID
-	}
-
-	_, err := s.db.ModelContext(ctx, (*record)(nil)).Where(`id IN (?)`, pg.In(ids)).Delete()
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (s *store) Count(ctx context.Context, spec Spec) (int, error) {
-	qs, err := toQuery(spec)
-	if err != nil {
-		return 0, err
-	}
-
-	expr, err := qs.Expression()
-	if err != nil {
-		return 0, err
-	}
-
-	sql, args, err := goqu.Select(goqu.COUNT(goqu.Star())).From(albumsTableName).Where(expr).ToSQL()
-	if err != nil {
-		return 0, err
-	}
-
-	var (
-		c int
-	)
-
-	_, err = s.db.QueryOneContext(ctx, pg.Scan(&c), sql, args...)
-
-	return c, err
-}
-
 func (s *store) List(ctx context.Context, spec Spec, limit, offset int) ([]*Album, error) {
 	qs, err := toQuery(spec)
 	if err != nil {
@@ -104,15 +54,68 @@ func (s *store) List(ctx context.Context, spec Spec, limit, offset int) ([]*Albu
 	return fromRecords(records), nil
 }
 
+func (s *store) Save(ctx context.Context, albums ...*Album) error {
+	recs := toRecords(albums)
+
+	_, err := s.db.ModelContext(ctx, &recs).Returning("NULL").OnConflict("(id) DO UPDATE").Insert()
+
+	return err
+}
+
+func (s *store) Delete(ctx context.Context, albums ...*Album) error {
+	var (
+		ids = make([]string, len(albums))
+	)
+
+	for i, c := range albums {
+		ids[i] = c.ID
+	}
+
+	_, err := s.db.ModelContext(ctx, (*record)(nil)).Where(`id IN (?)`, pg.In(ids)).Delete()
+
+	return err
+}
+
+func (s *store) Count(ctx context.Context, spec Spec) (int, error) {
+	qs, err := toQuery(spec)
+	if err != nil {
+		return 0, err
+	}
+
+	expr, err := qs.Expression()
+	if err != nil {
+		return 0, err
+	}
+
+	sql, args, err := goqu.Select(goqu.COUNT(goqu.Star())).From(albumsTableName).Where(expr).ToSQL()
+	if err != nil {
+		return 0, err
+	}
+
+	var (
+		c int
+	)
+
+	_, err = s.db.QueryOneContext(ctx, pg.Scan(&c), sql, args...)
+
+	return c, err
+}
+
 type record struct {
-	tableName  struct{}     `pg:"apartomat.albums,alias:albums"`
-	ID         string       `pg:"id,pk"`
-	Name       string       `pg:"name"`
-	Version    int          `pg:"version"`
-	Pages      []pageRecord `pg:"pages"`
-	CreatedAt  time.Time    `pg:"created_at"`
-	ModifiedAt time.Time    `pg:"modified_at"`
-	ProjectID  string       `pg:"project_id"`
+	tableName  struct{}       `pg:"apartomat.albums"`
+	ID         string         `pg:"id,pk"`
+	Name       string         `pg:"name"`
+	Version    int            `pg:"version"`
+	Settings   settingsRecord `pg:"settings"`
+	Pages      []pageRecord   `pg:"pages"`
+	CreatedAt  time.Time      `pg:"created_at"`
+	ModifiedAt time.Time      `pg:"modified_at"`
+	ProjectID  string         `pg:"project_id"`
+}
+
+type settingsRecord struct {
+	Orientation string `pg:"orientation"`
+	Format      string `pg:"format"`
 }
 
 type pageRecord struct {

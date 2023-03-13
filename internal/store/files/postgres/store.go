@@ -24,14 +24,6 @@ var (
 	_ Store = (*store)(nil)
 )
 
-func (s *store) Save(ctx context.Context, files ...*File) error {
-	recs := toRecords(files)
-
-	_, err := s.db.ModelContext(ctx, &recs).Returning("NULL").OnConflict("(id) DO UPDATE").Insert()
-
-	return err
-}
-
 func (s *store) List(ctx context.Context, spec Spec, limit, offset int) ([]*File, error) {
 	qs, err := toQuery(spec)
 	if err != nil {
@@ -56,6 +48,14 @@ func (s *store) List(ctx context.Context, spec Spec, limit, offset int) ([]*File
 	}
 
 	return fromRecords(rows), nil
+}
+
+func (s *store) Save(ctx context.Context, files ...*File) error {
+	recs := toRecords(files)
+
+	_, err := s.db.ModelContext(ctx, &recs).Returning("NULL").OnConflict("(id) DO UPDATE").Insert()
+
+	return err
 }
 
 func (s *store) Count(ctx context.Context, spec Spec) (int, error) {

@@ -12,7 +12,7 @@ type User struct {
 	ModifiedAt  time.Time
 }
 
-func New(id, email, fullName string, isActive, useGravatar bool) *User {
+func NewUser(id, email, fullName string, isActive, useGravatar bool) *User {
 	var (
 		now = time.Now()
 	)

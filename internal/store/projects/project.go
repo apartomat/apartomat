@@ -22,7 +22,7 @@ const (
 	StatusCanceled   Status = "CANCELED"
 )
 
-func New(id, name string, startAt, endAt *time.Time, workspaceID string) *Project {
+func NewProject(id, name string, startAt, endAt *time.Time, workspaceID string) *Project {
 	now := time.Now()
 
 	return &Project{

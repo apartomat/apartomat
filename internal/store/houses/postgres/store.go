@@ -13,27 +13,19 @@ const (
 	housesTableName = `apartomat.houses`
 )
 
-type housesStore struct {
+type store struct {
 	db *pg.DB
 }
 
-func NewStore(db *pg.DB) *housesStore {
-	return &housesStore{db}
+func NewStore(db *pg.DB) *store {
+	return &store{db}
 }
 
 var (
-	_ Store = (*housesStore)(nil)
+	_ Store = (*store)(nil)
 )
 
-func (s *housesStore) Save(ctx context.Context, houses ...*House) error {
-	recs := toRecords(houses)
-
-	_, err := s.db.ModelContext(ctx, &recs).Returning("NULL").OnConflict("(id) DO UPDATE").Insert()
-
-	return err
-}
-
-func (s *housesStore) List(ctx context.Context, spec Spec, limit, offset int) ([]*House, error) {
+func (s *store) List(ctx context.Context, spec Spec, limit, offset int) ([]*House, error) {
 	qs, err := toSpecQuery(spec)
 	if err != nil {
 		return nil, err
@@ -64,6 +56,14 @@ func (s *housesStore) List(ctx context.Context, spec Spec, limit, offset int) ([
 	}
 
 	return fromRecords(houses), nil
+}
+
+func (s *store) Save(ctx context.Context, houses ...*House) error {
+	recs := toRecords(houses)
+
+	_, err := s.db.ModelContext(ctx, &recs).Returning("NULL").OnConflict("(id) DO UPDATE").Insert()
+
+	return err
 }
 
 type record struct {

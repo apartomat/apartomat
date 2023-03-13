@@ -14,7 +14,7 @@ type House struct {
 	ProjectID      string
 }
 
-func New(id, city, address, housingComplex, projectID string) *House {
+func NewHouse(id, city, address, housingComplex, projectID string) *House {
 	now := time.Now()
 
 	return &House{

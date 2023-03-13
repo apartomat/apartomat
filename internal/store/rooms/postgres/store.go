@@ -24,28 +24,6 @@ var (
 	_ Store = (*store)(nil)
 )
 
-func (s *store) Save(ctx context.Context, rooms ...*Room) error {
-	recs := toRecords(rooms)
-
-	_, err := s.db.ModelContext(ctx, &recs).Returning("NULL").OnConflict("(id) DO UPDATE").Insert()
-
-	return err
-}
-
-func (s *store) Delete(ctx context.Context, rooms ...*Room) error {
-	var (
-		ids = make([]string, len(rooms))
-	)
-
-	for i, r := range rooms {
-		ids[i] = r.ID
-	}
-
-	_, err := s.db.ModelContext(ctx, (*record)(nil)).Where(`id IN (?)`, pg.In(ids)).Delete()
-
-	return err
-}
-
 func (s *store) List(ctx context.Context, spec Spec, limit, offset int) ([]*Room, error) {
 	qs, err := toRoomSpecQuery(spec)
 	if err != nil {
@@ -77,6 +55,28 @@ func (s *store) List(ctx context.Context, spec Spec, limit, offset int) ([]*Room
 	}
 
 	return fromRecord(recs), nil
+}
+
+func (s *store) Save(ctx context.Context, rooms ...*Room) error {
+	recs := toRecords(rooms)
+
+	_, err := s.db.ModelContext(ctx, &recs).Returning("NULL").OnConflict("(id) DO UPDATE").Insert()
+
+	return err
+}
+
+func (s *store) Delete(ctx context.Context, rooms ...*Room) error {
+	var (
+		ids = make([]string, len(rooms))
+	)
+
+	for i, r := range rooms {
+		ids[i] = r.ID
+	}
+
+	_, err := s.db.ModelContext(ctx, (*record)(nil)).Where(`id IN (?)`, pg.In(ids)).Delete()
+
+	return err
 }
 
 type record struct {

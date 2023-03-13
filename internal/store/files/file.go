@@ -20,7 +20,7 @@ const (
 	FileTypeVisualization FileType = "VISUALIZATION"
 )
 
-func New(id, name, url string, fileType FileType, mimeType, projectID string) *File {
+func NewFile(id, name, url string, fileType FileType, mimeType, projectID string) *File {
 	now := time.Now()
 
 	return &File{

@@ -113,7 +113,7 @@ func (u *Apartomat) LoginByEmail(ctx context.Context, email string, workspaceNam
 			return "", err
 		}
 
-		user = New(id, email, "", true, false)
+		user = NewUser(id, email, "", true, false)
 
 		if err := u.Users.Save(ctx, user); err != nil {
 			return "", err
@@ -133,7 +133,7 @@ func (u *Apartomat) LoginByEmail(ctx context.Context, email string, workspaceNam
 			return "", err
 		}
 
-		workspace = workspaces.New(id, workspaceName, true, user.ID)
+		workspace = workspaces.NewWorkspace(id, workspaceName, true, user.ID)
 
 		if err := u.Workspaces.Save(ctx, workspace); err != nil {
 			return "", err
@@ -144,12 +144,7 @@ func (u *Apartomat) LoginByEmail(ctx context.Context, email string, workspaceNam
 			return "", err
 		}
 
-		wu := &workspace_users.WorkspaceUser{
-			ID:          wid,
-			WorkspaceID: workspace.ID,
-			UserID:      user.ID,
-			Role:        workspace_users.WorkspaceUserRoleAdmin,
-		}
+		wu := workspace_users.NewWorkspaceUser(wid, workspace_users.WorkspaceUserRoleAdmin, workspace.ID, user.ID)
 
 		if err := u.WorkspaceUsers.Save(ctx, wu); err != nil {
 			return "", err
@@ -242,7 +237,7 @@ func (u *Apartomat) LoginEmailPIN(ctx context.Context, email string, workspaceNa
 			return "", "", err
 		}
 
-		user = New(id, email, "", true, false)
+		user = NewUser(id, email, "", true, false)
 
 		if err := u.Users.Save(ctx, user); err != nil {
 			return "", "", err
@@ -262,7 +257,7 @@ func (u *Apartomat) LoginEmailPIN(ctx context.Context, email string, workspaceNa
 			return "", "", err
 		}
 
-		workspace = workspaces.New(id, workspaceName, true, user.ID)
+		workspace = workspaces.NewWorkspace(id, workspaceName, true, user.ID)
 
 		if err := u.Workspaces.Save(ctx, workspace); err != nil {
 			return "", "", err
@@ -273,12 +268,7 @@ func (u *Apartomat) LoginEmailPIN(ctx context.Context, email string, workspaceNa
 			return "", "", err
 		}
 
-		wu := &workspace_users.WorkspaceUser{
-			ID:          wid,
-			WorkspaceID: workspace.ID,
-			UserID:      user.ID,
-			Role:        workspace_users.WorkspaceUserRoleAdmin,
-		}
+		wu := workspace_users.NewWorkspaceUser(wid, workspace_users.WorkspaceUserRoleAdmin, workspace.ID, user.ID)
 
 		if err := u.WorkspaceUsers.Save(ctx, wu); err != nil {
 			return "", "", err

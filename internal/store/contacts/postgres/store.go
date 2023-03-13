@@ -24,31 +24,6 @@ var (
 	_ Store = (*store)(nil)
 )
 
-func (s *store) Save(ctx context.Context, contacts ...*Contact) error {
-	recs := toRecords(contacts)
-
-	_, err := s.db.ModelContext(ctx, &recs).Returning("NULL").OnConflict("(id) DO UPDATE").Insert()
-
-	return err
-}
-
-func (s *store) Delete(ctx context.Context, contacts ...*Contact) error {
-	var (
-		ids = make([]string, len(contacts))
-	)
-
-	for i, c := range contacts {
-		ids[i] = c.ID
-	}
-
-	_, err := s.db.ModelContext(ctx, (*record)(nil)).Where(`id IN (?)`, pg.In(ids)).Delete()
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func (s *store) List(ctx context.Context, spec Spec, limit, offset int) ([]*Contact, error) {
 	qs, err := toSpecQuery(spec)
 	if err != nil {
@@ -77,6 +52,28 @@ func (s *store) List(ctx context.Context, spec Spec, limit, offset int) ([]*Cont
 	}
 
 	return fromRecords(contacts), nil
+}
+
+func (s *store) Save(ctx context.Context, contacts ...*Contact) error {
+	recs := toRecords(contacts)
+
+	_, err := s.db.ModelContext(ctx, &recs).Returning("NULL").OnConflict("(id) DO UPDATE").Insert()
+
+	return err
+}
+
+func (s *store) Delete(ctx context.Context, contacts ...*Contact) error {
+	var (
+		ids = make([]string, len(contacts))
+	)
+
+	for i, c := range contacts {
+		ids[i] = c.ID
+	}
+
+	_, err := s.db.ModelContext(ctx, (*record)(nil)).Where(`id IN (?)`, pg.In(ids)).Delete()
+
+	return err
 }
 
 type record struct {

@@ -14,7 +14,7 @@ type Contact struct {
 	ProjectID  string
 }
 
-func New(id, fullName, photo string, details []Details, projectID string) *Contact {
+func NewContact(id, fullName, photo string, details []Details, projectID string) *Contact {
 	now := time.Now()
 
 	return &Contact{

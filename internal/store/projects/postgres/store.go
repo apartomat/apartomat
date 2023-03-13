@@ -24,14 +24,6 @@ var (
 	_ Store = (*store)(nil)
 )
 
-func (s *store) Save(ctx context.Context, projects ...*Project) error {
-	recs := toRecords(projects)
-
-	_, err := s.db.ModelContext(ctx, &recs).Returning("NULL").OnConflict("(id) DO UPDATE").Insert()
-
-	return err
-}
-
 func (s *store) List(ctx context.Context, spec Spec, limit, offset int) ([]*Project, error) {
 	qs, err := toSpecQuery(spec)
 	if err != nil {
@@ -56,6 +48,14 @@ func (s *store) List(ctx context.Context, spec Spec, limit, offset int) ([]*Proj
 	}
 
 	return fromRecords(rows), nil
+}
+
+func (s *store) Save(ctx context.Context, projects ...*Project) error {
+	recs := toRecords(projects)
+
+	_, err := s.db.ModelContext(ctx, &recs).Returning("NULL").OnConflict("(id) DO UPDATE").Insert()
+
+	return err
 }
 
 type record struct {

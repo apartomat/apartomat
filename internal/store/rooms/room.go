@@ -14,7 +14,7 @@ type Room struct {
 	HouseID    string
 }
 
-func New(id, name string, square *float64, level *int, houseID string) *Room {
+func NewRoom(id, name string, square *float64, level *int, houseID string) *Room {
 	now := time.Now()
 
 	return &Room{

@@ -24,14 +24,6 @@ var (
 	_ Store = (*store)(nil)
 )
 
-func (s *store) Save(ctx context.Context, visualizations ...*Visualization) error {
-	recs := toVisualizationsRecords(visualizations)
-
-	_, err := s.db.ModelContext(ctx, &recs).Returning("NULL").OnConflict("(id) DO UPDATE").Insert()
-
-	return err
-}
-
 func (s *store) List(ctx context.Context, spec Spec, limit, offset int) ([]*Visualization, error) {
 	qs, err := toVisualizationSpecQuery(spec)
 	if err != nil {
@@ -48,26 +40,39 @@ func (s *store) List(ctx context.Context, spec Spec, limit, offset int) ([]*Visu
 		return nil, err
 	}
 
-	rows := make([]*visualizationsRecord, 0)
+	rows := make([]*record, 0)
 
 	_, err = s.db.QueryContext(ctx, &rows, sql, args...)
 	if err != nil {
 		return nil, err
 	}
 
-	return fromVisualizationsRecords(rows), nil
+	return fromRecords(rows), nil
 }
 
-func (s *store) Delete(ctx context.Context, visualization *Visualization) error {
-	_, err := s.db.ModelContext(ctx, (*visualizationsRecord)(nil)).Where(`id = ?`, visualization.ID).Delete()
-	if err != nil {
-		return err
+func (s *store) Save(ctx context.Context, visualizations ...*Visualization) error {
+	recs := toRecords(visualizations)
+
+	_, err := s.db.ModelContext(ctx, &recs).Returning("NULL").OnConflict("(id) DO UPDATE").Insert()
+
+	return err
+}
+
+func (s *store) Delete(ctx context.Context, visualizations ...*Visualization) error {
+	var (
+		ids = make([]string, len(visualizations))
+	)
+
+	for i, v := range visualizations {
+		ids[i] = v.ID
 	}
 
-	return nil
+	_, err := s.db.ModelContext(ctx, (*record)(nil)).Where(`id IN (?)`, pg.In(ids)).Delete()
+
+	return err
 }
 
-type visualizationsRecord struct {
+type record struct {
 	tableName   struct{}   `pg:"apartomat.visualizations"`
 	ID          string     `pg:"id,pk"`
 	Name        string     `pg:"name,use_zero"`
@@ -82,8 +87,8 @@ type visualizationsRecord struct {
 	RoomID      *string    `pg:"room_id"`
 }
 
-func toVisualizationsRecord(visualization *Visualization) *visualizationsRecord {
-	return &visualizationsRecord{
+func toRecord(visualization *Visualization) *record {
+	return &record{
 		ID:          visualization.ID,
 		Name:        visualization.Name,
 		Description: visualization.Description,
@@ -98,19 +103,19 @@ func toVisualizationsRecord(visualization *Visualization) *visualizationsRecord 
 	}
 }
 
-func toVisualizationsRecords(visualizations []*Visualization) []*visualizationsRecord {
+func toRecords(visualizations []*Visualization) []*record {
 	var (
-		res = make([]*visualizationsRecord, len(visualizations))
+		res = make([]*record, len(visualizations))
 	)
 
 	for i, v := range visualizations {
-		res[i] = toVisualizationsRecord(v)
+		res[i] = toRecord(v)
 	}
 
 	return res
 }
 
-func fromVisualizationsRecords(records []*visualizationsRecord) []*Visualization {
+func fromRecords(records []*record) []*Visualization {
 	visualizations := make([]*Visualization, len(records))
 
 	for i, r := range records {

@@ -5,6 +5,6 @@ import (
 )
 
 type Store interface {
-	Save(context.Context, ...*WorkspaceUser) error
 	List(ctx context.Context, spec Spec, limit, offset int) ([]*WorkspaceUser, error)
+	Save(context.Context, ...*WorkspaceUser) error
 }

@@ -130,7 +130,7 @@ func (u *Apartomat) UploadFile(
 		return nil, err
 	}
 
-	f := New(id, upload.Name, url, fileType, upload.MimeType, projectID)
+	f := NewFile(id, upload.Name, url, fileType, upload.MimeType, projectID)
 
 	if err := u.Files.Save(ctx, f); err != nil {
 		return nil, err
