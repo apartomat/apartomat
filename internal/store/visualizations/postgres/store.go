@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"github.com/apartomat/apartomat/internal/postgres"
 	. "github.com/apartomat/apartomat/internal/store/visualizations"
 	"github.com/doug-martin/goqu/v9"
 	"github.com/go-pg/pg/v10"
@@ -42,7 +43,7 @@ func (s *store) List(ctx context.Context, spec Spec, limit, offset int) ([]*Visu
 
 	rows := make([]*record, 0)
 
-	_, err = s.db.QueryContext(ctx, &rows, sql, args...)
+	_, err = s.db.QueryContext(postgres.WithQueryContext(ctx, "visualizations.List"), &rows, sql, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +54,10 @@ func (s *store) List(ctx context.Context, spec Spec, limit, offset int) ([]*Visu
 func (s *store) Save(ctx context.Context, visualizations ...*Visualization) error {
 	recs := toRecords(visualizations)
 
-	_, err := s.db.ModelContext(ctx, &recs).Returning("NULL").OnConflict("(id) DO UPDATE").Insert()
+	_, err := s.db.ModelContext(postgres.WithQueryContext(ctx, "visualizations.Save"), &recs).
+		Returning("NULL").
+		OnConflict("(id) DO UPDATE").
+		Insert()
 
 	return err
 }
@@ -67,7 +71,9 @@ func (s *store) Delete(ctx context.Context, visualizations ...*Visualization) er
 		ids[i] = v.ID
 	}
 
-	_, err := s.db.ModelContext(ctx, (*record)(nil)).Where(`id IN (?)`, pg.In(ids)).Delete()
+	_, err := s.db.ModelContext(postgres.WithQueryContext(ctx, "visualizations.Delete"), (*record)(nil)).
+		Where(`id IN (?)`, pg.In(ids)).
+		Delete()
 
 	return err
 }

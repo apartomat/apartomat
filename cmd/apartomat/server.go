@@ -43,26 +43,32 @@ func (opt addrOpt) Apply(s *http.Server) {
 }
 
 type server struct {
-	useCases *apartomat.Apartomat
-	loaders  *dataloader.DataLoaders
-	logger   *zap.Logger
+	useCases   *apartomat.Apartomat
+	loaders    *dataloader.DataLoaders
+	prometheus *prometheus.Registry
+	logger     *zap.Logger
 }
 
-func NewServer(useCases *apartomat.Apartomat, loaders *dataloader.DataLoaders, logger *zap.Logger) *server {
+func NewServer(
+	useCases *apartomat.Apartomat,
+	loaders *dataloader.DataLoaders,
+	reg *prometheus.Registry,
+	logger *zap.Logger,
+) *server {
 	return &server{
-		useCases: useCases,
-		loaders:  loaders,
-		logger:   logger,
+		useCases:   useCases,
+		loaders:    loaders,
+		prometheus: reg,
+		logger:     logger,
 	}
 }
 
 func (server *server) Run(opts ...Option) {
 	bgCtx := context.Background()
-	reg := prometheus.NewRegistry()
 
 	mux := chi.NewRouter()
 
-	mux.Use(PrometheusMiddleware(reg))
+	mux.Use(PrometheusLatencyMiddleware(server.prometheus))
 
 	mux.Handle("/graphql", graphql.Handler(
 		server.useCases.CheckAuthToken,
@@ -73,7 +79,7 @@ func (server *server) Run(opts ...Option) {
 
 	mux.Handle("/pg", playground.Handler("GraphQL playground", "/graphql"))
 
-	mux.Handle("/metrics", promhttp.HandlerFor(reg, promhttp.HandlerOpts{}))
+	mux.Handle("/metrics", promhttp.HandlerFor(server.prometheus, promhttp.HandlerOpts{}))
 
 	s := http.Server{
 		Addr:         defaultAddr,

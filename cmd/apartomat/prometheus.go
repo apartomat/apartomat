@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-func PrometheusMiddleware(reg *prometheus.Registry) func(next http.Handler) http.Handler {
+func PrometheusLatencyMiddleware(reg *prometheus.Registry) func(next http.Handler) http.Handler {
 	var (
 		_requestTimer = prometheus.NewHistogramVec(
 			prometheus.HistogramOpts{

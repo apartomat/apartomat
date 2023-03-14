@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"github.com/apartomat/apartomat/internal/postgres"
 	. "github.com/apartomat/apartomat/internal/store/projects"
 	"github.com/doug-martin/goqu/v9"
 	"github.com/go-pg/pg/v10"
@@ -42,7 +43,7 @@ func (s *store) List(ctx context.Context, spec Spec, limit, offset int) ([]*Proj
 
 	rows := make([]*record, 0)
 
-	_, err = s.db.QueryContext(ctx, &rows, sql, args...)
+	_, err = s.db.QueryContext(postgres.WithQueryContext(ctx, "projects.List"), &rows, sql, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +54,10 @@ func (s *store) List(ctx context.Context, spec Spec, limit, offset int) ([]*Proj
 func (s *store) Save(ctx context.Context, projects ...*Project) error {
 	recs := toRecords(projects)
 
-	_, err := s.db.ModelContext(ctx, &recs).Returning("NULL").OnConflict("(id) DO UPDATE").Insert()
+	_, err := s.db.ModelContext(postgres.WithQueryContext(ctx, "projects.Save"), &recs).
+		Returning("NULL").
+		OnConflict("(id) DO UPDATE").
+		Insert()
 
 	return err
 }

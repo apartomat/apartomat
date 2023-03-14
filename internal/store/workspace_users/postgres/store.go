@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"github.com/apartomat/apartomat/internal/postgres"
 	. "github.com/apartomat/apartomat/internal/store/workspace_users"
 	"github.com/doug-martin/goqu/v9"
 	"github.com/go-pg/pg/v10"
@@ -47,7 +48,7 @@ func (s *store) List(
 
 	rows := make([]*record, 0)
 
-	_, err = s.db.QueryContext(ctx, &rows, sql, args...)
+	_, err = s.db.QueryContext(postgres.WithQueryContext(ctx, "workspaceUsers.List"), &rows, sql, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +59,10 @@ func (s *store) List(
 func (s *store) Save(ctx context.Context, users ...*WorkspaceUser) error {
 	recs := toRecords(users)
 
-	_, err := s.db.ModelContext(ctx, &recs).Returning("NULL").OnConflict("(id) DO UPDATE").Insert()
+	_, err := s.db.ModelContext(postgres.WithQueryContext(ctx, "workspaceUsers.Save"), &recs).
+		Returning("NULL").
+		OnConflict("(id) DO UPDATE").
+		Insert()
 
 	return err
 }

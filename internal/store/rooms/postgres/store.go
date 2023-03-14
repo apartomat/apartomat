@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"github.com/apartomat/apartomat/internal/postgres"
 	. "github.com/apartomat/apartomat/internal/store/rooms"
 	"github.com/doug-martin/goqu/v9"
 	"github.com/go-pg/pg/v10"
@@ -49,7 +50,7 @@ func (s *store) List(ctx context.Context, spec Spec, limit, offset int) ([]*Room
 
 	recs := make([]*record, 0)
 
-	_, err = s.db.QueryContext(ctx, &recs, sql, args...)
+	_, err = s.db.QueryContext(postgres.WithQueryContext(ctx, "rooms.List"), &recs, sql, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +61,10 @@ func (s *store) List(ctx context.Context, spec Spec, limit, offset int) ([]*Room
 func (s *store) Save(ctx context.Context, rooms ...*Room) error {
 	recs := toRecords(rooms)
 
-	_, err := s.db.ModelContext(ctx, &recs).Returning("NULL").OnConflict("(id) DO UPDATE").Insert()
+	_, err := s.db.ModelContext(postgres.WithQueryContext(ctx, "rooms.Save"), &recs).
+		Returning("NULL").
+		OnConflict("(id) DO UPDATE").
+		Insert()
 
 	return err
 }
@@ -74,7 +78,9 @@ func (s *store) Delete(ctx context.Context, rooms ...*Room) error {
 		ids[i] = r.ID
 	}
 
-	_, err := s.db.ModelContext(ctx, (*record)(nil)).Where(`id IN (?)`, pg.In(ids)).Delete()
+	_, err := s.db.ModelContext(postgres.WithQueryContext(ctx, "rooms.Delete"), (*record)(nil)).
+		Where(`id IN (?)`, pg.In(ids)).
+		Delete()
 
 	return err
 }

@@ -6,6 +6,8 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
+	"github.com/apartomat/apartomat/internal/postgres"
+	"github.com/prometheus/client_golang/prometheus"
 	"io/ioutil"
 	"log"
 	"os"
@@ -75,7 +77,11 @@ func main() {
 			log.Fatalf("can't init zap: %s", err)
 		}
 
-		pgdb.AddQueryHook(loggerHook{"postgres", logger})
+		pgdb.AddQueryHook(postgres.NewLoggerHook(logger))
+
+		reg := prometheus.NewRegistry()
+
+		pgdb.AddQueryHook(postgres.NewQueryLatencyHook(reg))
 
 		usersStore := users.NewStore(pgdb)
 		workspacesStore := workspaces.NewStore(pgdb)
@@ -134,6 +140,7 @@ func main() {
 			&dataloader.DataLoaders{
 				Users: usersLoader,
 			},
+			reg,
 			logger,
 		).Run(serverOpts...)
 

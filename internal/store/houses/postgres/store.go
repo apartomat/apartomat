@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"github.com/apartomat/apartomat/internal/postgres"
 	"time"
 
 	. "github.com/apartomat/apartomat/internal/store/houses"
@@ -50,7 +51,7 @@ func (s *store) List(ctx context.Context, spec Spec, limit, offset int) ([]*Hous
 
 	houses := make([]*record, 0)
 
-	_, err = s.db.QueryContext(ctx, &houses, sql, args...)
+	_, err = s.db.QueryContext(postgres.WithQueryContext(ctx, "houses.List"), &houses, sql, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -61,7 +62,10 @@ func (s *store) List(ctx context.Context, spec Spec, limit, offset int) ([]*Hous
 func (s *store) Save(ctx context.Context, houses ...*House) error {
 	recs := toRecords(houses)
 
-	_, err := s.db.ModelContext(ctx, &recs).Returning("NULL").OnConflict("(id) DO UPDATE").Insert()
+	_, err := s.db.ModelContext(postgres.WithQueryContext(ctx, "houses.Save"), &recs).
+		Returning("NULL").
+		OnConflict("(id) DO UPDATE").
+		Insert()
 
 	return err
 }

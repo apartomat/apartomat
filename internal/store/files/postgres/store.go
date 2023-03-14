@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"github.com/apartomat/apartomat/internal/postgres"
 	. "github.com/apartomat/apartomat/internal/store/files"
 	"github.com/doug-martin/goqu/v9"
 	"github.com/go-pg/pg/v10"
@@ -42,7 +43,7 @@ func (s *store) List(ctx context.Context, spec Spec, limit, offset int) ([]*File
 
 	rows := make([]*record, 0)
 
-	_, err = s.db.QueryContext(ctx, &rows, sql, args...)
+	_, err = s.db.QueryContext(postgres.WithQueryContext(ctx, "files.List"), &rows, sql, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +54,9 @@ func (s *store) List(ctx context.Context, spec Spec, limit, offset int) ([]*File
 func (s *store) Save(ctx context.Context, files ...*File) error {
 	recs := toRecords(files)
 
-	_, err := s.db.ModelContext(ctx, &recs).Returning("NULL").OnConflict("(id) DO UPDATE").Insert()
+	_, err := s.db.ModelContext(postgres.WithQueryContext(ctx, "files.Save"), &recs).Returning("NULL").
+		OnConflict("(id) DO UPDATE").
+		Insert()
 
 	return err
 }
@@ -78,7 +81,7 @@ func (s *store) Count(ctx context.Context, spec Spec) (int, error) {
 		c int
 	)
 
-	_, err = s.db.QueryOneContext(ctx, pg.Scan(&c), sql, args...)
+	_, err = s.db.QueryOneContext(postgres.WithQueryContext(ctx, "files.Count"), pg.Scan(&c), sql, args...)
 
 	return c, err
 }
