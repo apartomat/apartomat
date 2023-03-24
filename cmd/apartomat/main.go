@@ -131,10 +131,6 @@ func main() {
 			WorkspaceUsers:               workspaceUsersStore,
 		}
 
-		serverOpts := []Option{
-			Addr(os.Getenv("SERVER_ADDR")),
-		}
-
 		NewServer(
 			usecases,
 			&dataloader.DataLoaders{
@@ -142,7 +138,7 @@ func main() {
 			},
 			reg,
 			logger,
-		).Run(serverOpts...)
+		).Run(WithAddr(os.Getenv("SERVER_ADDR")))
 
 	default:
 		log.Print("expect command (run or gen-key-pair)")

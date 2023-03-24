@@ -22,20 +22,16 @@ import (
 
 const defaultAddr = ":80"
 
-type Option interface {
-	Apply(server *http.Server)
-}
+type ServerOption func(server *http.Server)
 
 type addrOpt struct {
 	addr string
 }
 
-func Addr(addr string) addrOpt {
-	if addr == "" {
-		return addrOpt{addr: defaultAddr}
+func WithAddr(addr string) ServerOption {
+	return func(s *http.Server) {
+		s.Addr = addr
 	}
-
-	return addrOpt{addr: addr}
 }
 
 func (opt addrOpt) Apply(s *http.Server) {
@@ -63,7 +59,7 @@ func NewServer(
 	}
 }
 
-func (server *server) Run(opts ...Option) {
+func (server *server) Run(opts ...ServerOption) {
 	bgCtx := context.Background()
 
 	mux := chi.NewRouter()
@@ -89,7 +85,7 @@ func (server *server) Run(opts ...Option) {
 	}
 
 	for _, opt := range opts {
-		opt.Apply(&s)
+		opt(&s)
 	}
 
 	done := make(chan bool)
