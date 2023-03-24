@@ -1,0 +1,9 @@
+extend type Mutation {
+    changeAlbumPageOrientation(albumId: String! orientation: PageOrientation!): ChangeAlbumPageOrientationResult!
+}
+
+union ChangeAlbumPageOrientationResult = AlbumPageOrientationChanged | NotFound | Forbidden | ServerError
+
+type AlbumPageOrientationChanged {
+    album: Album!
+}

@@ -1,0 +1,9 @@
+extend type Mutation {
+    changeAlbumPageSize(albumId: String! size: PageSize!): ChangeAlbumPageSizeResult!
+}
+
+union ChangeAlbumPageSizeResult = AlbumPageSizeChanged | NotFound | Forbidden | ServerError
+
+type AlbumPageSizeChanged {
+    album: Album!
+}

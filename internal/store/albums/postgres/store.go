@@ -45,14 +45,14 @@ func (s *store) List(ctx context.Context, spec Spec, limit, offset int) ([]*Albu
 		return nil, err
 	}
 
-	records := make([]*record, 0)
+	recs := make([]*record, 0)
 
-	_, err = s.db.QueryContext(postgres.WithQueryContext(ctx, "albums.List"), &records, sql, args...)
+	_, err = s.db.QueryContext(postgres.WithQueryContext(ctx, "albums.List"), &recs, sql, args...)
 	if err != nil {
 		return nil, err
 	}
 
-	return fromRecords(records), nil
+	return fromRecords(recs), nil
 }
 
 func (s *store) Save(ctx context.Context, albums ...*Album) error {
@@ -70,8 +70,8 @@ func (s *store) Delete(ctx context.Context, albums ...*Album) error {
 		ids = make([]string, len(albums))
 	)
 
-	for i, c := range albums {
-		ids[i] = c.ID
+	for i, album := range albums {
+		ids[i] = album.ID
 	}
 
 	_, err := s.db.ModelContext(postgres.WithQueryContext(ctx, "albums.Delete"), (*record)(nil)).
@@ -119,8 +119,8 @@ type record struct {
 }
 
 type settingsRecord struct {
-	Orientation string `pg:"orientation"`
-	Format      string `pg:"format"`
+	PageOrientation string `json:"pageOrientation"`
+	PageSize        string `json:"pageSize"`
 }
 
 type pageRecord struct {
@@ -133,6 +133,7 @@ func toRecord(album *Album) *record {
 		ID:         album.ID,
 		Name:       album.Name,
 		Version:    album.Version,
+		Settings:   toSettingsRecord(album.Settings),
 		Pages:      toPageRecords(album.Pages),
 		CreatedAt:  album.CreatedAt,
 		ModifiedAt: album.ModifiedAt,
@@ -152,49 +153,66 @@ func toRecords(albums []*Album) []*record {
 	return res
 }
 
-func fromRecords(records []*record) []*Album {
-	albums := make([]*Album, len(records))
+func fromRecords(recs []*record) []*Album {
+	var (
+		res = make([]*Album, len(recs))
+	)
 
-	for i, r := range records {
-		albums[i] = &Album{
-			ID:         r.ID,
-			Name:       r.Name,
-			Pages:      fromPageRecords(r.Pages),
-			CreatedAt:  r.CreatedAt,
-			ModifiedAt: r.ModifiedAt,
-			ProjectID:  r.ProjectID,
+	for i, rec := range recs {
+		res[i] = &Album{
+			ID:         rec.ID,
+			Name:       rec.Name,
+			Settings:   fromSettingsRecord(rec.Settings),
+			Pages:      fromPageRecords(rec.Pages),
+			CreatedAt:  rec.CreatedAt,
+			ModifiedAt: rec.ModifiedAt,
+			ProjectID:  rec.ProjectID,
 		}
 	}
 
-	return albums
+	return res
+}
+
+func toSettingsRecord(settings Settings) settingsRecord {
+	return settingsRecord{
+		PageOrientation: string(settings.PageOrientation),
+		PageSize:        string(settings.PageSize),
+	}
 }
 
 func toPageRecords(pages []AlbumPageVisualization) []pageRecord {
 	var (
-		records = make([]pageRecord, len(pages))
+		res = make([]pageRecord, len(pages))
 	)
 
 	for i, p := range pages {
-		records[i] = pageRecord{
+		res[i] = pageRecord{
 			VisualizationID: p.VisualizationID,
 			FileID:          p.FileID,
 		}
 	}
 
-	return records
+	return res
 }
 
-func fromPageRecords(records []pageRecord) []AlbumPageVisualization {
+func fromSettingsRecord(rec settingsRecord) Settings {
+	return Settings{
+		PageOrientation: PageOrientation(rec.PageOrientation),
+		PageSize:        PageSize(rec.PageSize),
+	}
+}
+
+func fromPageRecords(recs []pageRecord) []AlbumPageVisualization {
 	var (
-		pages = make([]AlbumPageVisualization, len(records))
+		res = make([]AlbumPageVisualization, len(recs))
 	)
 
-	for i, r := range records {
-		pages[i] = AlbumPageVisualization{
-			VisualizationID: r.VisualizationID,
-			FileID:          r.FileID,
+	for i, rec := range recs {
+		res[i] = AlbumPageVisualization{
+			VisualizationID: rec.VisualizationID,
+			FileID:          rec.FileID,
 		}
 	}
 
-	return pages
+	return res
 }

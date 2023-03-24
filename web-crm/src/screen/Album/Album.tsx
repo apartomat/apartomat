@@ -1,10 +1,12 @@
 import React, { useEffect, useRef, useState } from "react"
 import { useParams, Redirect } from "react-router-dom"
 
-import { Box, BoxExtendedProps, Button, Carousel, CheckBoxGroup, Drop, Grid, Heading, Image, Main } from "grommet"
-import { Close, Document, Icon, Previous, Next, Add, Sort } from "grommet-icons"
-import useAlbum, { AlbumScreenVisualizationFragment, AlbumScreenProjectFragment, AlbumScreenAlbumPageCoverFragment, AlbumScreenAlbumPageVisualizationFragment } from "./useAlbum"
+import { Box, BoxExtendedProps, Button, Carousel, Drop, Grid, Heading, Image, Main } from "grommet"
+import { Close, Previous, Next, Add, Sort } from "grommet-icons"
+import useAlbum, { AlbumScreenVisualizationFragment, AlbumScreenProjectFragment, AlbumScreenAlbumPageCoverFragment, AlbumScreenAlbumPageVisualizationFragment, AlbumScreenSettingsFragment } from "./useAlbum"
 import { useAddVisualizationsToAlbum } from "./useAddVisualizationsToAlbum"
+
+import { PageSize, PageOrientation } from "./Settings/"
 
 export function Album() {
     const { id } = useParams<{ id: string }>()
@@ -19,6 +21,9 @@ export function Album() {
 
     const { data } = useAlbum({ id })
 
+
+    const [ settings, setSettings ] = useState<AlbumScreenSettingsFragment | undefined>()
+
     useEffect(() => {
         if (data?.album?.__typename === "Album") {
             if (data?.album?.project?.__typename === "Project") {
@@ -32,6 +37,8 @@ export function Album() {
             if (data.album.pages.__typename === "AlbumPages") {
                 setPages(data.album.pages.items)
             }
+
+            setSettings(data.album.settings)
         }
         
     }, [ data ])
@@ -55,11 +62,14 @@ export function Album() {
                         } }
                     />
                 </Box>
-                <Box gap="small" align="end" margin={{ top: "large" }}>
-                    <Heading level={5}>Настройки для печати</Heading>
-                    <PaperSize />
-                    <Orientation/>
-                </Box>
+                {settings &&
+                    <Box gap="small" align="end" margin={{ top: "large" }}>
+                        <Heading level={5}>Настройки для печати</Heading>
+                        <PageSize albumId={id} size={settings.pageSize} />
+                        <PageOrientation albumId={id} orientation={settings.pageOrientation} />
+                    </Box>
+                }
+
             </Box>
 
             <Box style={{ position: "fixed", left: 0 }} gap="small" margin={{ horizontal: "large" }}>
@@ -165,63 +175,6 @@ function Paper({
     return (
         <Box {...boxProps} width={`calc(${scale} * 210mm)`} height={`calc(${scale} * 297mm)`}>
             {children}
-        </Box>
-    )
-}
-
-function PaperSize({
-    ...boxProps
-}: {} & BoxExtendedProps) {
-    return (
-        <Box {...boxProps}>
-            <CheckBoxGroup
-                options={[
-                    {value: "A3", title: "A3"},
-                    {value: "A4", title: "A4"},
-                ]}
-                direction="row"
-                round="small"
-                background="background-contrast"
-            >{(option: { value: string, title: string }, checked: boolean) => {
-                return (
-                    <Box
-                        width="xxsmall" height="xxsmall"
-                        align="center"
-                        justify="center"
-                    >
-                        {option.title}
-                    </Box>
-                )
-            }}</CheckBoxGroup>
-        </Box>
-    )
-}
-
-function Orientation({
-    ...boxProps
-}: {} & BoxExtendedProps) {
-    return (
-        <Box {...boxProps}>
-            <CheckBoxGroup
-                options={[
-                    {value: "portrait", title: "portrait", icon: <Document/> },
-                    {value: "landscape", title: "landscape", icon: <Document transform="rotate(-90)"/> },
-                ]}
-                direction="row"
-                round="small"
-                background="background-contrast"
-            >{({ icon }: { value: string, title: string, icon: Icon }, checked: boolean) => {
-                return (
-                    <Box
-                        width="xxsmall"
-                        height="xxsmall"
-                        align="center"
-                        justify="center"
-                    >
-                        {icon}
-                    </Box>
-                )
-            }}</CheckBoxGroup>
         </Box>
     )
 }

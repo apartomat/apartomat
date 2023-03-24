@@ -47,6 +47,14 @@ type AlbumResult interface {
 	IsAlbumResult()
 }
 
+type ChangeAlbumPageOrientationResult interface {
+	IsChangeAlbumPageOrientationResult()
+}
+
+type ChangeAlbumPageSizeResult interface {
+	IsChangeAlbumPageSizeResult()
+}
+
 type ChangeProjectDatesResult interface {
 	IsChangeProjectDatesResult()
 }
@@ -205,8 +213,8 @@ type AddHouseInput struct {
 
 type AddRoomInput struct {
 	Name   string   `json:"name"`
-	Square *float64 `json:"square"`
-	Level  *int     `json:"level"`
+	Square *float64 `json:"square,omitempty"`
+	Level  *int     `json:"level,omitempty"`
 }
 
 type Album struct {
@@ -237,6 +245,18 @@ type AlbumPageCover struct {
 
 func (AlbumPageCover) IsAlbumPage() {}
 
+type AlbumPageOrientationChanged struct {
+	Album *Album `json:"album"`
+}
+
+func (AlbumPageOrientationChanged) IsChangeAlbumPageOrientationResult() {}
+
+type AlbumPageSizeChanged struct {
+	Album *Album `json:"album"`
+}
+
+func (AlbumPageSizeChanged) IsChangeAlbumPageSizeResult() {}
+
 type AlbumPageVisualization struct {
 	Position      int                          `json:"position"`
 	Visualization AlbumPageVisualizationResult `json:"visualization"`
@@ -251,8 +271,8 @@ type AlbumPages struct {
 func (AlbumPages) IsAlbumPagesResult() {}
 
 type AlbumSettings struct {
-	PageSize    PageSize    `json:"pageSize"`
-	Orientation Orientation `json:"orientation"`
+	PageSize        PageSize        `json:"pageSize"`
+	PageOrientation PageOrientation `json:"pageOrientation"`
 }
 
 type AlreadyExists struct {
@@ -265,8 +285,8 @@ func (AlreadyExists) IsError()                {}
 func (this AlreadyExists) GetMessage() string { return this.Message }
 
 type ChangeProjectDatesInput struct {
-	StartAt *time.Time `json:"startAt"`
-	EndAt   *time.Time `json:"endAt"`
+	StartAt *time.Time `json:"startAt,omitempty"`
+	EndAt   *time.Time `json:"endAt,omitempty"`
 }
 
 type Contact struct {
@@ -306,11 +326,16 @@ type ContactUpdated struct {
 
 func (ContactUpdated) IsUpdateContactResult() {}
 
+type CreateAlbumSettingsInput struct {
+	PageSize    PageSize        `json:"pageSize"`
+	Orientation PageOrientation `json:"orientation"`
+}
+
 type CreateProjectInput struct {
 	WorkspaceID string     `json:"workspaceId"`
 	Name        string     `json:"name"`
-	StartAt     *time.Time `json:"startAt"`
-	EndAt       *time.Time `json:"endAt"`
+	StartAt     *time.Time `json:"startAt,omitempty"`
+	EndAt       *time.Time `json:"endAt,omitempty"`
 }
 
 type Enums struct {
@@ -353,6 +378,10 @@ func (Forbidden) IsAddHouseResult() {}
 func (Forbidden) IsAddRoomResult() {}
 
 func (Forbidden) IsAddVisualizationsToAlbumResult() {}
+
+func (Forbidden) IsChangeAlbumPageOrientationResult() {}
+
+func (Forbidden) IsChangeAlbumPageSizeResult() {}
 
 func (Forbidden) IsChangeProjectDatesResult() {}
 
@@ -516,6 +545,10 @@ func (NotFound) IsAddHouseResult() {}
 
 func (NotFound) IsAddRoomResult() {}
 
+func (NotFound) IsChangeAlbumPageOrientationResult() {}
+
+func (NotFound) IsChangeAlbumPageSizeResult() {}
+
 func (NotFound) IsChangeProjectDatesResult() {}
 
 func (NotFound) IsChangeProjectStatusResult() {}
@@ -558,9 +591,9 @@ type Project struct {
 	ID             string                 `json:"id"`
 	Name           string                 `json:"name"`
 	Status         ProjectStatus          `json:"status"`
-	StartAt        *time.Time             `json:"startAt"`
-	EndAt          *time.Time             `json:"endAt"`
-	Period         *string                `json:"period"`
+	StartAt        *time.Time             `json:"startAt,omitempty"`
+	EndAt          *time.Time             `json:"endAt,omitempty"`
+	Period         *string                `json:"period,omitempty"`
 	Contacts       *ProjectContacts       `json:"contacts"`
 	Houses         *ProjectHouses         `json:"houses"`
 	Visualizations *ProjectVisualizations `json:"visualizations"`
@@ -595,7 +628,7 @@ type ProjectContacts struct {
 }
 
 type ProjectContactsFilter struct {
-	Type []ContactType `json:"type"`
+	Type []ContactType `json:"type,omitempty"`
 }
 
 type ProjectContactsList struct {
@@ -638,7 +671,7 @@ type ProjectFilesList struct {
 func (ProjectFilesList) IsProjectFilesListResult() {}
 
 type ProjectFilesListFilter struct {
-	Type []FileType `json:"type"`
+	Type []FileType `json:"type,omitempty"`
 }
 
 type ProjectFilesTotal struct {
@@ -653,7 +686,7 @@ type ProjectHouses struct {
 }
 
 type ProjectHousesFilter struct {
-	ID []string `json:"ID"`
+	ID []string `json:"ID,omitempty"`
 }
 
 type ProjectHousesList struct {
@@ -684,7 +717,7 @@ type ProjectStatusEnumItem struct {
 }
 
 type ProjectVisualizationRoomIDFilter struct {
-	Eq []string `json:"eq"`
+	Eq []string `json:"eq,omitempty"`
 }
 
 type ProjectVisualizations struct {
@@ -699,12 +732,12 @@ type ProjectVisualizationsList struct {
 func (ProjectVisualizationsList) IsProjectVisualizationsListResult() {}
 
 type ProjectVisualizationsListFilter struct {
-	RoomID *ProjectVisualizationRoomIDFilter  `json:"roomID"`
-	Status *ProjectVisualizationsStatusFilter `json:"status"`
+	RoomID *ProjectVisualizationRoomIDFilter  `json:"roomID,omitempty"`
+	Status *ProjectVisualizationsStatusFilter `json:"status,omitempty"`
 }
 
 type ProjectVisualizationsStatusFilter struct {
-	Eq []VisualizationStatus `json:"eq"`
+	Eq []VisualizationStatus `json:"eq,omitempty"`
 }
 
 type ProjectVisualizationsTotal struct {
@@ -716,8 +749,8 @@ func (ProjectVisualizationsTotal) IsProjectVisualizationsTotalResult() {}
 type Room struct {
 	ID         string    `json:"id"`
 	Name       string    `json:"name"`
-	Square     *float64  `json:"square"`
-	Level      *int      `json:"level"`
+	Square     *float64  `json:"square,omitempty"`
+	Level      *int      `json:"level,omitempty"`
 	CreatedAt  time.Time `json:"createdAt"`
 	ModifiedAt time.Time `json:"modifiedAt"`
 }
@@ -749,6 +782,10 @@ func (ServerError) IsAddContactResult() {}
 func (ServerError) IsAddHouseResult() {}
 
 func (ServerError) IsAddVisualizationsToAlbumResult() {}
+
+func (ServerError) IsChangeAlbumPageOrientationResult() {}
+
+func (ServerError) IsChangeAlbumPageSizeResult() {}
 
 func (ServerError) IsChangeProjectDatesResult() {}
 
@@ -852,8 +889,8 @@ type UpdateHouseInput struct {
 
 type UpdateRoomInput struct {
 	Name   string   `json:"name"`
-	Square *float64 `json:"square"`
-	Level  *int     `json:"level"`
+	Square *float64 `json:"square,omitempty"`
+	Level  *int     `json:"level,omitempty"`
 }
 
 type UploadFileInput struct {
@@ -867,7 +904,7 @@ type UserProfile struct {
 	Email            string     `json:"email"`
 	FullName         string     `json:"fullName"`
 	Abbr             string     `json:"abbr"`
-	Gravatar         *Gravatar  `json:"gravatar"`
+	Gravatar         *Gravatar  `json:"gravatar,omitempty"`
 	DefaultWorkspace *Workspace `json:"defaultWorkspace"`
 }
 
@@ -882,7 +919,7 @@ type Visualization struct {
 	CreatedAt   time.Time           `json:"createdAt"`
 	ModifiedAt  time.Time           `json:"modifiedAt"`
 	File        *File               `json:"file"`
-	Room        *Room               `json:"room"`
+	Room        *Room               `json:"room,omitempty"`
 }
 
 func (Visualization) IsAlbumPageVisualizationResult() {}
@@ -926,7 +963,7 @@ type WorkspaceProjects struct {
 }
 
 type WorkspaceProjectsFilter struct {
-	Status []ProjectStatus `json:"status"`
+	Status []ProjectStatus `json:"status,omitempty"`
 }
 
 type WorkspaceProjectsList struct {
@@ -954,7 +991,7 @@ type WorkspaceUsers struct {
 }
 
 type WorkspaceUsersFilter struct {
-	Role []WorkspaceUserRole `json:"role"`
+	Role []WorkspaceUserRole `json:"role,omitempty"`
 }
 
 type WorkspaceUsersList struct {
@@ -1059,44 +1096,44 @@ func (e FileType) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 
-type Orientation string
+type PageOrientation string
 
 const (
-	OrientationPortrait  Orientation = "PORTRAIT"
-	OrientationLandscape Orientation = "LANDSCAPE"
+	PageOrientationPortrait  PageOrientation = "PORTRAIT"
+	PageOrientationLandscape PageOrientation = "LANDSCAPE"
 )
 
-var AllOrientation = []Orientation{
-	OrientationPortrait,
-	OrientationLandscape,
+var AllPageOrientation = []PageOrientation{
+	PageOrientationPortrait,
+	PageOrientationLandscape,
 }
 
-func (e Orientation) IsValid() bool {
+func (e PageOrientation) IsValid() bool {
 	switch e {
-	case OrientationPortrait, OrientationLandscape:
+	case PageOrientationPortrait, PageOrientationLandscape:
 		return true
 	}
 	return false
 }
 
-func (e Orientation) String() string {
+func (e PageOrientation) String() string {
 	return string(e)
 }
 
-func (e *Orientation) UnmarshalGQL(v interface{}) error {
+func (e *PageOrientation) UnmarshalGQL(v interface{}) error {
 	str, ok := v.(string)
 	if !ok {
 		return fmt.Errorf("enums must be strings")
 	}
 
-	*e = Orientation(str)
+	*e = PageOrientation(str)
 	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid Orientation", str)
+		return fmt.Errorf("%s is not a valid PageOrientation", str)
 	}
 	return nil
 }
 
-func (e Orientation) MarshalGQL(w io.Writer) {
+func (e PageOrientation) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 

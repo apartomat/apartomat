@@ -1,9 +1,18 @@
 extend type Mutation {
-    createAlbum(projectId: String! name: String!): CreateAlbumResult!
+    createAlbum(
+        projectId: String!
+        name: String!
+        settings: CreateAlbumSettingsInput! = {pageSize: A4, orientation: LANDSCAPE}
+    ): CreateAlbumResult!
 }
 
 union CreateAlbumResult = AlbumCreated | Forbidden | ServerError
 
 type AlbumCreated {
     album: Album!
+}
+
+input CreateAlbumSettingsInput {
+    pageSize: PageSize!
+    orientation: PageOrientation!
 }

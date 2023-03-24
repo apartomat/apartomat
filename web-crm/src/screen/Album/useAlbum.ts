@@ -7,7 +7,8 @@ export type {
     AlbumScreenProjectFragment,
     AlbumScreenVisualizationFragment,
     AlbumScreenAlbumPageCoverFragment,
-    AlbumScreenAlbumPageVisualizationFragment
+    AlbumScreenAlbumPageVisualizationFragment,
+    AlbumScreenSettingsFragment
 } from "api/types.d"
 
 export function useAlbum({

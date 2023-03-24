@@ -110,6 +110,7 @@ create table apartomat.albums (
     id char(21) primary key,
     name text not null,
     version integer not null default 0,
+    settings jsonb not null default '{}',
     pages jsonb not null default '[]',
     created_at timestamp with time zone not null default now(),
     modified_at timestamp with time zone not null default now(),

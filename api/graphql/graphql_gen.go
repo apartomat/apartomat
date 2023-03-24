@@ -81,6 +81,14 @@ type ComplexityRoot struct {
 		Position func(childComplexity int) int
 	}
 
+	AlbumPageOrientationChanged struct {
+		Album func(childComplexity int) int
+	}
+
+	AlbumPageSizeChanged struct {
+		Album func(childComplexity int) int
+	}
+
 	AlbumPageVisualization struct {
 		Position      func(childComplexity int) int
 		Visualization func(childComplexity int) int
@@ -91,8 +99,8 @@ type ComplexityRoot struct {
 	}
 
 	AlbumSettings struct {
-		Orientation func(childComplexity int) int
-		PageSize    func(childComplexity int) int
+		PageOrientation func(childComplexity int) int
+		PageSize        func(childComplexity int) int
 	}
 
 	AlreadyExists struct {
@@ -204,28 +212,30 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		AddContact               func(childComplexity int, projectID string, contact AddContactInput) int
-		AddHouse                 func(childComplexity int, projectID string, house AddHouseInput) int
-		AddRoom                  func(childComplexity int, houseID string, room AddRoomInput) int
-		AddVisualizationsToAlbum func(childComplexity int, albumID string, visualizations []string) int
-		ChangeProjectDates       func(childComplexity int, projectID string, dates ChangeProjectDatesInput) int
-		ChangeProjectStatus      func(childComplexity int, projectID string, status ProjectStatus) int
-		ConfirmLoginLink         func(childComplexity int, token string) int
-		ConfirmLoginPin          func(childComplexity int, token string, pin string) int
-		CreateAlbum              func(childComplexity int, projectID string, name string) int
-		CreateProject            func(childComplexity int, input CreateProjectInput) int
-		DeleteAlbum              func(childComplexity int, id string) int
-		DeleteContact            func(childComplexity int, id string) int
-		DeleteRoom               func(childComplexity int, id string) int
-		DeleteVisualizations     func(childComplexity int, id []string) int
-		LoginByEmail             func(childComplexity int, email string, workspaceName string) int
-		Ping                     func(childComplexity int) int
-		UpdateContact            func(childComplexity int, contactID string, data UpdateContactInput) int
-		UpdateHouse              func(childComplexity int, houseID string, data UpdateHouseInput) int
-		UpdateRoom               func(childComplexity int, roomID string, data UpdateRoomInput) int
-		UploadFile               func(childComplexity int, input UploadFileInput) int
-		UploadVisualization      func(childComplexity int, projectID string, file graphql.Upload, roomID *string) int
-		UploadVisualizations     func(childComplexity int, projectID string, files []*graphql.Upload, roomID *string) int
+		AddContact                 func(childComplexity int, projectID string, contact AddContactInput) int
+		AddHouse                   func(childComplexity int, projectID string, house AddHouseInput) int
+		AddRoom                    func(childComplexity int, houseID string, room AddRoomInput) int
+		AddVisualizationsToAlbum   func(childComplexity int, albumID string, visualizations []string) int
+		ChangeAlbumPageOrientation func(childComplexity int, albumID string, orientation PageOrientation) int
+		ChangeAlbumPageSize        func(childComplexity int, albumID string, size PageSize) int
+		ChangeProjectDates         func(childComplexity int, projectID string, dates ChangeProjectDatesInput) int
+		ChangeProjectStatus        func(childComplexity int, projectID string, status ProjectStatus) int
+		ConfirmLoginLink           func(childComplexity int, token string) int
+		ConfirmLoginPin            func(childComplexity int, token string, pin string) int
+		CreateAlbum                func(childComplexity int, projectID string, name string, settings CreateAlbumSettingsInput) int
+		CreateProject              func(childComplexity int, input CreateProjectInput) int
+		DeleteAlbum                func(childComplexity int, id string) int
+		DeleteContact              func(childComplexity int, id string) int
+		DeleteRoom                 func(childComplexity int, id string) int
+		DeleteVisualizations       func(childComplexity int, id []string) int
+		LoginByEmail               func(childComplexity int, email string, workspaceName string) int
+		Ping                       func(childComplexity int) int
+		UpdateContact              func(childComplexity int, contactID string, data UpdateContactInput) int
+		UpdateHouse                func(childComplexity int, houseID string, data UpdateHouseInput) int
+		UpdateRoom                 func(childComplexity int, roomID string, data UpdateRoomInput) int
+		UploadFile                 func(childComplexity int, input UploadFileInput) int
+		UploadVisualization        func(childComplexity int, projectID string, file graphql.Upload, roomID *string) int
+		UploadVisualizations       func(childComplexity int, projectID string, files []*graphql.Upload, roomID *string) int
 	}
 
 	NotFound struct {
@@ -481,11 +491,13 @@ type MutationResolver interface {
 	AddHouse(ctx context.Context, projectID string, house AddHouseInput) (AddHouseResult, error)
 	AddRoom(ctx context.Context, houseID string, room AddRoomInput) (AddRoomResult, error)
 	AddVisualizationsToAlbum(ctx context.Context, albumID string, visualizations []string) (AddVisualizationsToAlbumResult, error)
+	ChangeAlbumPageOrientation(ctx context.Context, albumID string, orientation PageOrientation) (ChangeAlbumPageOrientationResult, error)
+	ChangeAlbumPageSize(ctx context.Context, albumID string, size PageSize) (ChangeAlbumPageSizeResult, error)
 	ChangeProjectDates(ctx context.Context, projectID string, dates ChangeProjectDatesInput) (ChangeProjectDatesResult, error)
 	ChangeProjectStatus(ctx context.Context, projectID string, status ProjectStatus) (ChangeProjectStatusResult, error)
 	ConfirmLoginLink(ctx context.Context, token string) (ConfirmLoginLinkResult, error)
 	ConfirmLoginPin(ctx context.Context, token string, pin string) (ConfirmLoginPinResult, error)
-	CreateAlbum(ctx context.Context, projectID string, name string) (CreateAlbumResult, error)
+	CreateAlbum(ctx context.Context, projectID string, name string, settings CreateAlbumSettingsInput) (CreateAlbumResult, error)
 	CreateProject(ctx context.Context, input CreateProjectInput) (CreateProjectResult, error)
 	DeleteAlbum(ctx context.Context, id string) (DeleteAlbumResult, error)
 	DeleteContact(ctx context.Context, id string) (DeleteContactResult, error)
@@ -629,6 +641,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.AlbumPageCover.Position(childComplexity), true
 
+	case "AlbumPageOrientationChanged.album":
+		if e.complexity.AlbumPageOrientationChanged.Album == nil {
+			break
+		}
+
+		return e.complexity.AlbumPageOrientationChanged.Album(childComplexity), true
+
+	case "AlbumPageSizeChanged.album":
+		if e.complexity.AlbumPageSizeChanged.Album == nil {
+			break
+		}
+
+		return e.complexity.AlbumPageSizeChanged.Album(childComplexity), true
+
 	case "AlbumPageVisualization.position":
 		if e.complexity.AlbumPageVisualization.Position == nil {
 			break
@@ -650,12 +676,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.AlbumPages.Items(childComplexity), true
 
-	case "AlbumSettings.orientation":
-		if e.complexity.AlbumSettings.Orientation == nil {
+	case "AlbumSettings.pageOrientation":
+		if e.complexity.AlbumSettings.PageOrientation == nil {
 			break
 		}
 
-		return e.complexity.AlbumSettings.Orientation(childComplexity), true
+		return e.complexity.AlbumSettings.PageOrientation(childComplexity), true
 
 	case "AlbumSettings.pageSize":
 		if e.complexity.AlbumSettings.PageSize == nil {
@@ -990,6 +1016,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.AddVisualizationsToAlbum(childComplexity, args["albumId"].(string), args["visualizations"].([]string)), true
 
+	case "Mutation.changeAlbumPageOrientation":
+		if e.complexity.Mutation.ChangeAlbumPageOrientation == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_changeAlbumPageOrientation_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.ChangeAlbumPageOrientation(childComplexity, args["albumId"].(string), args["orientation"].(PageOrientation)), true
+
+	case "Mutation.changeAlbumPageSize":
+		if e.complexity.Mutation.ChangeAlbumPageSize == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_changeAlbumPageSize_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.ChangeAlbumPageSize(childComplexity, args["albumId"].(string), args["size"].(PageSize)), true
+
 	case "Mutation.changeProjectDates":
 		if e.complexity.Mutation.ChangeProjectDates == nil {
 			break
@@ -1048,7 +1098,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreateAlbum(childComplexity, args["projectId"].(string), args["name"].(string)), true
+		return e.complexity.Mutation.CreateAlbum(childComplexity, args["projectId"].(string), args["name"].(string), args["settings"].(CreateAlbumSettingsInput)), true
 
 	case "Mutation.createProject":
 		if e.complexity.Mutation.CreateProject == nil {
@@ -1957,6 +2007,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputAddRoomInput,
 		ec.unmarshalInputChangeProjectDatesInput,
 		ec.unmarshalInputContactDetailsInput,
+		ec.unmarshalInputCreateAlbumSettingsInput,
 		ec.unmarshalInputCreateProjectInput,
 		ec.unmarshalInputProjectContactsFilter,
 		ec.unmarshalInputProjectFilesListFilter,
@@ -2029,7 +2080,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 	return introspection.WrapTypeFromDef(parsedSchema, parsedSchema.Types[name]), nil
 }
 
-//go:embed "schema/mutation.graphql" "schema/mutation_add_contact.graphql" "schema/mutation_add_house.graphql" "schema/mutation_add_room.graphql" "schema/mutation_add_visualizations_to_album.graphql" "schema/mutation_change_project_dates.graphql" "schema/mutation_change_project_status.graphql" "schema/mutation_confirm_login.graphql" "schema/mutation_create_album.graphql" "schema/mutation_create_project.graphql" "schema/mutation_delete_album.graphql" "schema/mutation_delete_contact.graphql" "schema/mutation_delete_room.graphql" "schema/mutation_delete_visualizations.graphql" "schema/mutation_login_by_email.graphql" "schema/mutation_update_contact.graphql" "schema/mutation_update_house.graphql" "schema/mutation_update_room.graphql" "schema/mutation_upload_file.graphql" "schema/mutation_upload_visualization.graphql" "schema/mutation_upload_visualizations.graphql" "schema/query.graphql" "schema/query_album.graphql" "schema/query_enums.graphql" "schema/query_profile.graphql" "schema/query_project.graphql" "schema/query_workspace.graphql" "schema/root.graphql"
+//go:embed "schema/mutation.graphql" "schema/mutation_add_contact.graphql" "schema/mutation_add_house.graphql" "schema/mutation_add_room.graphql" "schema/mutation_add_visualizations_to_album.graphql" "schema/mutation_change_album_page_orientation.graphql" "schema/mutation_change_album_page_size.graphql" "schema/mutation_change_project_dates.graphql" "schema/mutation_change_project_status.graphql" "schema/mutation_confirm_login.graphql" "schema/mutation_create_album.graphql" "schema/mutation_create_project.graphql" "schema/mutation_delete_album.graphql" "schema/mutation_delete_contact.graphql" "schema/mutation_delete_room.graphql" "schema/mutation_delete_visualizations.graphql" "schema/mutation_login_by_email.graphql" "schema/mutation_update_contact.graphql" "schema/mutation_update_house.graphql" "schema/mutation_update_room.graphql" "schema/mutation_upload_file.graphql" "schema/mutation_upload_visualization.graphql" "schema/mutation_upload_visualizations.graphql" "schema/query.graphql" "schema/query_album.graphql" "schema/query_enums.graphql" "schema/query_profile.graphql" "schema/query_project.graphql" "schema/query_workspace.graphql" "schema/root.graphql"
 var sourcesFS embed.FS
 
 func sourceData(filename string) string {
@@ -2046,6 +2097,8 @@ var sources = []*ast.Source{
 	{Name: "schema/mutation_add_house.graphql", Input: sourceData("schema/mutation_add_house.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_add_room.graphql", Input: sourceData("schema/mutation_add_room.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_add_visualizations_to_album.graphql", Input: sourceData("schema/mutation_add_visualizations_to_album.graphql"), BuiltIn: false},
+	{Name: "schema/mutation_change_album_page_orientation.graphql", Input: sourceData("schema/mutation_change_album_page_orientation.graphql"), BuiltIn: false},
+	{Name: "schema/mutation_change_album_page_size.graphql", Input: sourceData("schema/mutation_change_album_page_size.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_change_project_dates.graphql", Input: sourceData("schema/mutation_change_project_dates.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_change_project_status.graphql", Input: sourceData("schema/mutation_change_project_status.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_confirm_login.graphql", Input: sourceData("schema/mutation_confirm_login.graphql"), BuiltIn: false},
@@ -2196,6 +2249,54 @@ func (ec *executionContext) field_Mutation_addVisualizationsToAlbum_args(ctx con
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_changeAlbumPageOrientation_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["albumId"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("albumId"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["albumId"] = arg0
+	var arg1 PageOrientation
+	if tmp, ok := rawArgs["orientation"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orientation"))
+		arg1, err = ec.unmarshalNPageOrientation2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐPageOrientation(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["orientation"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_changeAlbumPageSize_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["albumId"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("albumId"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["albumId"] = arg0
+	var arg1 PageSize
+	if tmp, ok := rawArgs["size"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("size"))
+		arg1, err = ec.unmarshalNPageSize2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐPageSize(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["size"] = arg1
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_changeProjectDates_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -2304,6 +2405,15 @@ func (ec *executionContext) field_Mutation_createAlbum_args(ctx context.Context,
 		}
 	}
 	args["name"] = arg1
+	var arg2 CreateAlbumSettingsInput
+	if tmp, ok := rawArgs["settings"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("settings"))
+		arg2, err = ec.unmarshalNCreateAlbumSettingsInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐCreateAlbumSettingsInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["settings"] = arg2
 	return args, nil
 }
 
@@ -3139,8 +3249,8 @@ func (ec *executionContext) fieldContext_Album_settings(ctx context.Context, fie
 			switch field.Name {
 			case "pageSize":
 				return ec.fieldContext_AlbumSettings_pageSize(ctx, field)
-			case "orientation":
-				return ec.fieldContext_AlbumSettings_orientation(ctx, field)
+			case "pageOrientation":
+				return ec.fieldContext_AlbumSettings_pageOrientation(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type AlbumSettings", field.Name)
 		},
@@ -3348,6 +3458,118 @@ func (ec *executionContext) fieldContext_AlbumPageCover_position(ctx context.Con
 	return fc, nil
 }
 
+func (ec *executionContext) _AlbumPageOrientationChanged_album(ctx context.Context, field graphql.CollectedField, obj *AlbumPageOrientationChanged) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AlbumPageOrientationChanged_album(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Album, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*Album)
+	fc.Result = res
+	return ec.marshalNAlbum2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbum(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AlbumPageOrientationChanged_album(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AlbumPageOrientationChanged",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Album_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Album_name(ctx, field)
+			case "project":
+				return ec.fieldContext_Album_project(ctx, field)
+			case "settings":
+				return ec.fieldContext_Album_settings(ctx, field)
+			case "pages":
+				return ec.fieldContext_Album_pages(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Album", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AlbumPageSizeChanged_album(ctx context.Context, field graphql.CollectedField, obj *AlbumPageSizeChanged) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AlbumPageSizeChanged_album(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Album, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*Album)
+	fc.Result = res
+	return ec.marshalNAlbum2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbum(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AlbumPageSizeChanged_album(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AlbumPageSizeChanged",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Album_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Album_name(ctx, field)
+			case "project":
+				return ec.fieldContext_Album_project(ctx, field)
+			case "settings":
+				return ec.fieldContext_Album_settings(ctx, field)
+			case "pages":
+				return ec.fieldContext_Album_pages(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Album", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _AlbumPageVisualization_position(ctx context.Context, field graphql.CollectedField, obj *AlbumPageVisualization) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_AlbumPageVisualization_position(ctx, field)
 	if err != nil {
@@ -3524,8 +3746,8 @@ func (ec *executionContext) fieldContext_AlbumSettings_pageSize(ctx context.Cont
 	return fc, nil
 }
 
-func (ec *executionContext) _AlbumSettings_orientation(ctx context.Context, field graphql.CollectedField, obj *AlbumSettings) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_AlbumSettings_orientation(ctx, field)
+func (ec *executionContext) _AlbumSettings_pageOrientation(ctx context.Context, field graphql.CollectedField, obj *AlbumSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AlbumSettings_pageOrientation(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -3538,7 +3760,7 @@ func (ec *executionContext) _AlbumSettings_orientation(ctx context.Context, fiel
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Orientation, nil
+		return obj.PageOrientation, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -3550,19 +3772,19 @@ func (ec *executionContext) _AlbumSettings_orientation(ctx context.Context, fiel
 		}
 		return graphql.Null
 	}
-	res := resTmp.(Orientation)
+	res := resTmp.(PageOrientation)
 	fc.Result = res
-	return ec.marshalNOrientation2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐOrientation(ctx, field.Selections, res)
+	return ec.marshalNPageOrientation2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐPageOrientation(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_AlbumSettings_orientation(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_AlbumSettings_pageOrientation(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "AlbumSettings",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Orientation does not have child fields")
+			return nil, errors.New("field of type PageOrientation does not have child fields")
 		},
 	}
 	return fc, nil
@@ -5673,6 +5895,116 @@ func (ec *executionContext) fieldContext_Mutation_addVisualizationsToAlbum(ctx c
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_changeAlbumPageOrientation(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_changeAlbumPageOrientation(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().ChangeAlbumPageOrientation(rctx, fc.Args["albumId"].(string), fc.Args["orientation"].(PageOrientation))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(ChangeAlbumPageOrientationResult)
+	fc.Result = res
+	return ec.marshalNChangeAlbumPageOrientationResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐChangeAlbumPageOrientationResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_changeAlbumPageOrientation(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ChangeAlbumPageOrientationResult does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_changeAlbumPageOrientation_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_changeAlbumPageSize(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_changeAlbumPageSize(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().ChangeAlbumPageSize(rctx, fc.Args["albumId"].(string), fc.Args["size"].(PageSize))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(ChangeAlbumPageSizeResult)
+	fc.Result = res
+	return ec.marshalNChangeAlbumPageSizeResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐChangeAlbumPageSizeResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_changeAlbumPageSize(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ChangeAlbumPageSizeResult does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_changeAlbumPageSize_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_changeProjectDates(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_changeProjectDates(ctx, field)
 	if err != nil {
@@ -5907,7 +6239,7 @@ func (ec *executionContext) _Mutation_createAlbum(ctx context.Context, field gra
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateAlbum(rctx, fc.Args["projectId"].(string), fc.Args["name"].(string))
+		return ec.resolvers.Mutation().CreateAlbum(rctx, fc.Args["projectId"].(string), fc.Args["name"].(string), fc.Args["settings"].(CreateAlbumSettingsInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -13447,6 +13779,42 @@ func (ec *executionContext) unmarshalInputContactDetailsInput(ctx context.Contex
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputCreateAlbumSettingsInput(ctx context.Context, obj interface{}) (CreateAlbumSettingsInput, error) {
+	var it CreateAlbumSettingsInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"pageSize", "orientation"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "pageSize":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pageSize"))
+			it.PageSize, err = ec.unmarshalNPageSize2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐPageSize(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "orientation":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orientation"))
+			it.Orientation, err = ec.unmarshalNPageOrientation2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐPageOrientation(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputCreateProjectInput(ctx context.Context, obj interface{}) (CreateProjectInput, error) {
 	var it CreateProjectInput
 	asMap := map[string]interface{}{}
@@ -14154,6 +14522,80 @@ func (ec *executionContext) _AlbumResult(ctx context.Context, sel ast.SelectionS
 			return graphql.Null
 		}
 		return ec._Album(ctx, sel, obj)
+	case NotFound:
+		return ec._NotFound(ctx, sel, &obj)
+	case *NotFound:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._NotFound(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
+func (ec *executionContext) _ChangeAlbumPageOrientationResult(ctx context.Context, sel ast.SelectionSet, obj ChangeAlbumPageOrientationResult) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case AlbumPageOrientationChanged:
+		return ec._AlbumPageOrientationChanged(ctx, sel, &obj)
+	case *AlbumPageOrientationChanged:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._AlbumPageOrientationChanged(ctx, sel, obj)
+	case NotFound:
+		return ec._NotFound(ctx, sel, &obj)
+	case *NotFound:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._NotFound(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
+func (ec *executionContext) _ChangeAlbumPageSizeResult(ctx context.Context, sel ast.SelectionSet, obj ChangeAlbumPageSizeResult) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case AlbumPageSizeChanged:
+		return ec._AlbumPageSizeChanged(ctx, sel, &obj)
+	case *AlbumPageSizeChanged:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._AlbumPageSizeChanged(ctx, sel, obj)
 	case NotFound:
 		return ec._NotFound(ctx, sel, &obj)
 	case *NotFound:
@@ -15577,6 +16019,62 @@ func (ec *executionContext) _AlbumPageCover(ctx context.Context, sel ast.Selecti
 	return out
 }
 
+var albumPageOrientationChangedImplementors = []string{"AlbumPageOrientationChanged", "ChangeAlbumPageOrientationResult"}
+
+func (ec *executionContext) _AlbumPageOrientationChanged(ctx context.Context, sel ast.SelectionSet, obj *AlbumPageOrientationChanged) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, albumPageOrientationChangedImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AlbumPageOrientationChanged")
+		case "album":
+
+			out.Values[i] = ec._AlbumPageOrientationChanged_album(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var albumPageSizeChangedImplementors = []string{"AlbumPageSizeChanged", "ChangeAlbumPageSizeResult"}
+
+func (ec *executionContext) _AlbumPageSizeChanged(ctx context.Context, sel ast.SelectionSet, obj *AlbumPageSizeChanged) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, albumPageSizeChangedImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AlbumPageSizeChanged")
+		case "album":
+
+			out.Values[i] = ec._AlbumPageSizeChanged_album(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var albumPageVisualizationImplementors = []string{"AlbumPageVisualization", "AlbumPage"}
 
 func (ec *executionContext) _AlbumPageVisualization(ctx context.Context, sel ast.SelectionSet, obj *AlbumPageVisualization) graphql.Marshaler {
@@ -15670,9 +16168,9 @@ func (ec *executionContext) _AlbumSettings(ctx context.Context, sel ast.Selectio
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "orientation":
+		case "pageOrientation":
 
-			out.Values[i] = ec._AlbumSettings_orientation(ctx, field, obj)
+			out.Values[i] = ec._AlbumSettings_pageOrientation(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
@@ -16038,7 +16536,7 @@ func (ec *executionContext) _FileUploaded(ctx context.Context, sel ast.Selection
 	return out
 }
 
-var forbiddenImplementors = []string{"Forbidden", "AddContactResult", "AddHouseResult", "AddRoomResult", "AddVisualizationsToAlbumResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "CreateAlbumResult", "CreateProjectResult", "DeleteAlbumResult", "DeleteContactResult", "DeleteRoomResult", "DeleteVisualizationsResult", "UpdateContactResult", "UpdateHouseResult", "UpdateRoomResult", "UploadFileResult", "UploadVisualizationResult", "UploadVisualizationsResult", "AlbumResult", "AlbumProjectResult", "UserProfileResult", "ProjectResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "ProjectVisualizationsListResult", "ProjectVisualizationsTotalResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectAlbumsListResult", "ProjectAlbumsTotalResult", "WorkspaceResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "WorkspaceUsersListResult", "WorkspaceUsersTotalResult", "Error"}
+var forbiddenImplementors = []string{"Forbidden", "AddContactResult", "AddHouseResult", "AddRoomResult", "AddVisualizationsToAlbumResult", "ChangeAlbumPageOrientationResult", "ChangeAlbumPageSizeResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "CreateAlbumResult", "CreateProjectResult", "DeleteAlbumResult", "DeleteContactResult", "DeleteRoomResult", "DeleteVisualizationsResult", "UpdateContactResult", "UpdateHouseResult", "UpdateRoomResult", "UploadFileResult", "UploadVisualizationResult", "UploadVisualizationsResult", "AlbumResult", "AlbumProjectResult", "UserProfileResult", "ProjectResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "ProjectVisualizationsListResult", "ProjectVisualizationsTotalResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectAlbumsListResult", "ProjectAlbumsTotalResult", "WorkspaceResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "WorkspaceUsersListResult", "WorkspaceUsersTotalResult", "Error"}
 
 func (ec *executionContext) _Forbidden(ctx context.Context, sel ast.SelectionSet, obj *Forbidden) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, forbiddenImplementors)
@@ -16534,6 +17032,24 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "changeAlbumPageOrientation":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_changeAlbumPageOrientation(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "changeAlbumPageSize":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_changeAlbumPageSize(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "changeProjectDates":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
@@ -16698,7 +17214,7 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 	return out
 }
 
-var notFoundImplementors = []string{"NotFound", "AddHouseResult", "AddRoomResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "DeleteAlbumResult", "DeleteContactResult", "DeleteRoomResult", "DeleteVisualizationsResult", "UpdateContactResult", "UpdateHouseResult", "UpdateRoomResult", "AlbumResult", "AlbumProjectResult", "AlbumPageVisualizationResult", "ProjectResult", "WorkspaceResult", "Error"}
+var notFoundImplementors = []string{"NotFound", "AddHouseResult", "AddRoomResult", "ChangeAlbumPageOrientationResult", "ChangeAlbumPageSizeResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "DeleteAlbumResult", "DeleteContactResult", "DeleteRoomResult", "DeleteVisualizationsResult", "UpdateContactResult", "UpdateHouseResult", "UpdateRoomResult", "AlbumResult", "AlbumProjectResult", "AlbumPageVisualizationResult", "ProjectResult", "WorkspaceResult", "Error"}
 
 func (ec *executionContext) _NotFound(ctx context.Context, sel ast.SelectionSet, obj *NotFound) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, notFoundImplementors)
@@ -18006,7 +18522,7 @@ func (ec *executionContext) _RoomUpdated(ctx context.Context, sel ast.SelectionS
 	return out
 }
 
-var serverErrorImplementors = []string{"ServerError", "AddContactResult", "AddHouseResult", "AddVisualizationsToAlbumResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "ConfirmLoginLinkResult", "ConfirmLoginPinResult", "CreateAlbumResult", "CreateProjectResult", "DeleteAlbumResult", "DeleteContactResult", "DeleteVisualizationsResult", "LoginByEmailResult", "UpdateContactResult", "UpdateHouseResult", "UploadFileResult", "UploadVisualizationResult", "UploadVisualizationsResult", "AlbumResult", "AlbumProjectResult", "AlbumPagesResult", "AlbumPageVisualizationResult", "UserProfileResult", "ProjectResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "ProjectVisualizationsListResult", "ProjectVisualizationsTotalResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectAlbumsListResult", "ProjectAlbumsTotalResult", "WorkspaceResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "WorkspaceUsersListResult", "WorkspaceUsersTotalResult", "Error"}
+var serverErrorImplementors = []string{"ServerError", "AddContactResult", "AddHouseResult", "AddVisualizationsToAlbumResult", "ChangeAlbumPageOrientationResult", "ChangeAlbumPageSizeResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "ConfirmLoginLinkResult", "ConfirmLoginPinResult", "CreateAlbumResult", "CreateProjectResult", "DeleteAlbumResult", "DeleteContactResult", "DeleteVisualizationsResult", "LoginByEmailResult", "UpdateContactResult", "UpdateHouseResult", "UploadFileResult", "UploadVisualizationResult", "UploadVisualizationsResult", "AlbumResult", "AlbumProjectResult", "AlbumPagesResult", "AlbumPageVisualizationResult", "UserProfileResult", "ProjectResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "ProjectVisualizationsListResult", "ProjectVisualizationsTotalResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectAlbumsListResult", "ProjectAlbumsTotalResult", "WorkspaceResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "WorkspaceUsersListResult", "WorkspaceUsersTotalResult", "Error"}
 
 func (ec *executionContext) _ServerError(ctx context.Context, sel ast.SelectionSet, obj *ServerError) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, serverErrorImplementors)
@@ -19353,6 +19869,26 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
+func (ec *executionContext) marshalNChangeAlbumPageOrientationResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐChangeAlbumPageOrientationResult(ctx context.Context, sel ast.SelectionSet, v ChangeAlbumPageOrientationResult) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._ChangeAlbumPageOrientationResult(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNChangeAlbumPageSizeResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐChangeAlbumPageSizeResult(ctx context.Context, sel ast.SelectionSet, v ChangeAlbumPageSizeResult) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._ChangeAlbumPageSizeResult(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNChangeProjectDatesInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐChangeProjectDatesInput(ctx context.Context, v interface{}) (ChangeProjectDatesInput, error) {
 	res, err := ec.unmarshalInputChangeProjectDatesInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -19546,6 +20082,11 @@ func (ec *executionContext) marshalNCreateAlbumResult2githubᚗcomᚋapartomat�
 		return graphql.Null
 	}
 	return ec._CreateAlbumResult(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNCreateAlbumSettingsInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐCreateAlbumSettingsInput(ctx context.Context, v interface{}) (CreateAlbumSettingsInput, error) {
+	res, err := ec.unmarshalInputCreateAlbumSettingsInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNCreateProjectInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐCreateProjectInput(ctx context.Context, v interface{}) (CreateProjectInput, error) {
@@ -19784,13 +20325,13 @@ func (ec *executionContext) marshalNLoginByEmailResult2githubᚗcomᚋapartomat�
 	return ec._LoginByEmailResult(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNOrientation2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐOrientation(ctx context.Context, v interface{}) (Orientation, error) {
-	var res Orientation
+func (ec *executionContext) unmarshalNPageOrientation2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐPageOrientation(ctx context.Context, v interface{}) (PageOrientation, error) {
+	var res PageOrientation
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNOrientation2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐOrientation(ctx context.Context, sel ast.SelectionSet, v Orientation) graphql.Marshaler {
+func (ec *executionContext) marshalNPageOrientation2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐPageOrientation(ctx context.Context, sel ast.SelectionSet, v PageOrientation) graphql.Marshaler {
 	return v
 }
 

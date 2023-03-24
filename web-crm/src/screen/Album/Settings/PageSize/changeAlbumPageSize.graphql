@@ -1,0 +1,21 @@
+mutation changeAlbumPageSize($albumId: String! $size: PageSize!) {
+    changeAlbumPageSize(albumId: $albumId size: $size) {
+        __typename
+        ...on AlbumPageSizeChanged {
+            album {
+                settings {
+                    pageSize
+                }
+            }
+        }
+        ...on NotFound {
+            message
+        }
+        ...on Forbidden {
+            message
+        }
+        ...on ServerError {
+            message
+        }
+    }
+}

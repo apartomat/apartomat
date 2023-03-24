@@ -36,6 +36,14 @@ fragment AlbumScreenAlbum on Album {
             message
         }
     }
+    settings {
+        ...AlbumScreenSettings
+    }
+}
+
+fragment AlbumScreenSettings on AlbumSettings {
+    pageSize
+    pageOrientation
 }
 
 fragment AlbumScreenProject on Project {

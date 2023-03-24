@@ -9,10 +9,11 @@ type Album struct {
 	ID         string
 	Name       string
 	Version    int
+	Settings   Settings
+	Pages      []AlbumPageVisualization
 	CreatedAt  time.Time
 	ModifiedAt time.Time
 	ProjectID  string
-	Pages      []AlbumPageVisualization
 }
 
 func NewAlbum(id, name, projectID string) *Album {
@@ -27,6 +28,31 @@ func NewAlbum(id, name, projectID string) *Album {
 		ProjectID:  projectID,
 	}
 }
+
+type Settings struct {
+	PageOrientation PageOrientation
+	PageSize        PageSize
+}
+
+type PageOrientation string
+
+const (
+	Landscape PageOrientation = "LANDSCAPE"
+	Portrait  PageOrientation = "PORTRAIT"
+)
+
+type PageSize string
+
+const (
+	A3 PageSize = "A3"
+	A4 PageSize = "A4"
+)
+
+type AlbumPageVisualization struct {
+	VisualizationID string
+	FileID          string
+}
+
 func (album *Album) AddPageWithVisualization(vis *visualizations.Visualization) (int, error) {
 	album.Pages = append(
 		album.Pages,
@@ -39,7 +65,10 @@ func (album *Album) AddPageWithVisualization(vis *visualizations.Visualization) 
 	return len(album.Pages) - 1, nil
 }
 
-type AlbumPageVisualization struct {
-	VisualizationID string
-	FileID          string
+func (album *Album) ChangePageSize(size PageSize) {
+	album.Settings.PageSize = size
+}
+
+func (album *Album) ChangePageOrientation(orientation PageOrientation) {
+	album.Settings.PageOrientation = orientation
 }

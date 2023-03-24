@@ -312,3 +312,86 @@ func (u *Apartomat) CanAddPageToAlbum(ctx context.Context, subj *UserCtx, obj *A
 
 	return u.isProjectUser(ctx, subj, project)
 }
+
+func (u *Apartomat) ChangeAlbumPageSize(
+	ctx context.Context,
+	albumID string,
+	size PageSize,
+) (*Album, error) {
+	list, err := u.Albums.List(ctx, IDIn(albumID), 1, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(list) == 0 {
+		return nil, fmt.Errorf("album (id=%s): %w", albumID, ErrNotFound)
+	}
+
+	var (
+		album = list[0]
+	)
+
+	if ok, err := u.CanChangeAlbumSettings(ctx, UserFromCtx(ctx), album); err != nil {
+		return nil, err
+	} else if !ok {
+		return nil, fmt.Errorf("can't change album (id=%s) settings: %w", album.ID, ErrForbidden)
+	}
+
+	album.ChangePageSize(size)
+
+	if err := u.Albums.Save(ctx, album); err != nil {
+		return nil, err
+	}
+
+	return album, nil
+}
+
+func (u *Apartomat) ChangeAlbumPageOrientation(
+	ctx context.Context,
+	albumID string,
+	orientation PageOrientation,
+) (*Album, error) {
+	list, err := u.Albums.List(ctx, IDIn(albumID), 1, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(list) == 0 {
+		return nil, fmt.Errorf("album (id=%s): %w", albumID, ErrNotFound)
+	}
+
+	var (
+		album = list[0]
+	)
+
+	if ok, err := u.CanChangeAlbumSettings(ctx, UserFromCtx(ctx), album); err != nil {
+		return nil, err
+	} else if !ok {
+		return nil, fmt.Errorf("can't change album (id=%s) settings: %w", album.ID, ErrForbidden)
+	}
+
+	album.ChangePageOrientation(orientation)
+
+	if err := u.Albums.Save(ctx, album); err != nil {
+		return nil, err
+	}
+
+	return album, nil
+}
+
+func (u *Apartomat) CanChangeAlbumSettings(ctx context.Context, subj *UserCtx, obj *Album) (bool, error) {
+	prjs, err := u.Projects.List(ctx, projects.IDIn(obj.ProjectID), 1, 0)
+	if err != nil {
+		return false, err
+	}
+
+	if len(prjs) == 0 {
+		return false, nil
+	}
+
+	var (
+		project = prjs[0]
+	)
+
+	return u.isProjectUser(ctx, subj, project)
+}

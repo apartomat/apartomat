@@ -16,7 +16,7 @@ union AlbumProjectResult = Project | NotFound | Forbidden | ServerError
 
 type AlbumSettings {
     pageSize: PageSize!
-    orientation: Orientation!
+    pageOrientation: PageOrientation!
 }
 
 enum PageSize {
@@ -24,7 +24,7 @@ enum PageSize {
     A3
 }
 
-enum Orientation {
+enum PageOrientation {
     PORTRAIT
     LANDSCAPE
 }
