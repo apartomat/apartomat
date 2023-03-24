@@ -974,42 +974,12 @@ export type WorkspaceUsersTotal = {
 
 export type WorkspaceUsersTotalResult = Forbidden | ServerError | WorkspaceUsersTotal;
 
-export type ChangeProjectStatusMutationVariables = Exact<{
-  projectId: Scalars['String'];
-  status: ProjectStatus;
-}>;
-
-
-export type ChangeProjectStatusMutation = { __typename?: 'Mutation', changeProjectStatus: { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'ProjectStatusChanged', project: { __typename?: 'Project', status: ProjectStatus } } | { __typename: 'ServerError', message: string } };
-
-export type ConfirmLoginLinkMutationVariables = Exact<{
-  token: Scalars['String'];
-}>;
-
-
-export type ConfirmLoginLinkMutation = { __typename?: 'Mutation', confirmLoginLink: { __typename: 'ExpiredToken', message: string } | { __typename: 'InvalidToken', message: string } | { __typename: 'LoginConfirmed', token: string } | { __typename: 'ServerError', message: string } };
-
-export type ConfirmLoginPinMutationVariables = Exact<{
-  token: Scalars['String'];
-  pin: Scalars['String'];
-}>;
-
-
-export type ConfirmLoginPinMutation = { __typename?: 'Mutation', confirmLoginPin: { __typename: 'ExpiredToken', message: string } | { __typename: 'InvalidPin', message: string } | { __typename: 'InvalidToken', message: string } | { __typename: 'LoginConfirmed', token: string } | { __typename: 'ServerError', message: string } };
-
 export type CreateProjectMutationVariables = Exact<{
   input: CreateProjectInput;
 }>;
 
 
 export type CreateProjectMutation = { __typename?: 'Mutation', createProject: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectCreated', project: { __typename?: 'Project', id: string, name: string, startAt?: any | null | undefined, endAt?: any | null | undefined } } | { __typename: 'ServerError', message: string } };
-
-export type LoginByEmailMutationVariables = Exact<{
-  email: Scalars['String'];
-}>;
-
-
-export type LoginByEmailMutation = { __typename?: 'Mutation', loginByEmail: { __typename: 'InvalidEmail', message: string } | { __typename: 'LinkSentByEmail', email: string } | { __typename: 'PinSentByEmail', email: string, token: string } | { __typename: 'ServerError', message: string } };
 
 export type ProfileQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -1066,12 +1036,42 @@ export type AlbumScreenAlbumPageCoverFragment = { __typename?: 'AlbumPageCover',
 
 export type AlbumScreenAlbumPageVisualizationFragment = { __typename?: 'AlbumPageVisualization', position: number, visualization: { __typename?: 'NotFound', message: string } | { __typename?: 'ServerError', message: string } | { __typename?: 'Visualization', id: string, file: { __typename?: 'File', url: any } } };
 
+export type ConfirmLoginLinkMutationVariables = Exact<{
+  token: Scalars['String'];
+}>;
+
+
+export type ConfirmLoginLinkMutation = { __typename?: 'Mutation', confirmLoginLink: { __typename: 'ExpiredToken', message: string } | { __typename: 'InvalidToken', message: string } | { __typename: 'LoginConfirmed', token: string } | { __typename: 'ServerError', message: string } };
+
+export type ConfirmLoginPinMutationVariables = Exact<{
+  token: Scalars['String'];
+  pin: Scalars['String'];
+}>;
+
+
+export type ConfirmLoginPinMutation = { __typename?: 'Mutation', confirmLoginPin: { __typename: 'ExpiredToken', message: string } | { __typename: 'InvalidPin', message: string } | { __typename: 'InvalidToken', message: string } | { __typename: 'LoginConfirmed', token: string } | { __typename: 'ServerError', message: string } };
+
+export type LoginByEmailMutationVariables = Exact<{
+  email: Scalars['String'];
+}>;
+
+
+export type LoginByEmailMutation = { __typename?: 'Mutation', loginByEmail: { __typename: 'InvalidEmail', message: string } | { __typename: 'LinkSentByEmail', email: string } | { __typename: 'PinSentByEmail', email: string, token: string } | { __typename: 'ServerError', message: string } };
+
 export type DeleteAlbumMutationVariables = Exact<{
   id: Scalars['String'];
 }>;
 
 
 export type DeleteAlbumMutation = { __typename?: 'Mutation', deleteAlbum: { __typename: 'AlbumDeleted', album: { __typename?: 'Album', id: string } } | { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'ServerError', message: string } };
+
+export type ChangeProjectStatusMutationVariables = Exact<{
+  projectId: Scalars['String'];
+  status: ProjectStatus;
+}>;
+
+
+export type ChangeProjectStatusMutation = { __typename?: 'Mutation', changeProjectStatus: { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'ProjectStatusChanged', project: { __typename?: 'Project', status: ProjectStatus } } | { __typename: 'ServerError', message: string } };
 
 export type AddContactMutationVariables = Exact<{
   projectId: Scalars['String'];
@@ -1701,148 +1701,6 @@ export const WorkspaceScreenFragmentDoc = gql`
     ${WorkspaceScreenUsersFragmentDoc}
 ${WorkspaceScreenCurrentProjectsFragmentDoc}
 ${WorkspaceScreenArchiveProjectsFragmentDoc}`;
-export const ChangeProjectStatusDocument = gql`
-    mutation changeProjectStatus($projectId: String!, $status: ProjectStatus!) {
-  changeProjectStatus(projectId: $projectId, status: $status) {
-    __typename
-    ... on ProjectStatusChanged {
-      project {
-        status
-      }
-    }
-    ... on NotFound {
-      message
-    }
-    ... on Forbidden {
-      message
-    }
-    ... on ServerError {
-      message
-    }
-  }
-}
-    `;
-export type ChangeProjectStatusMutationFn = Apollo.MutationFunction<ChangeProjectStatusMutation, ChangeProjectStatusMutationVariables>;
-
-/**
- * __useChangeProjectStatusMutation__
- *
- * To run a mutation, you first call `useChangeProjectStatusMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useChangeProjectStatusMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [changeProjectStatusMutation, { data, loading, error }] = useChangeProjectStatusMutation({
- *   variables: {
- *      projectId: // value for 'projectId'
- *      status: // value for 'status'
- *   },
- * });
- */
-export function useChangeProjectStatusMutation(baseOptions?: Apollo.MutationHookOptions<ChangeProjectStatusMutation, ChangeProjectStatusMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<ChangeProjectStatusMutation, ChangeProjectStatusMutationVariables>(ChangeProjectStatusDocument, options);
-      }
-export type ChangeProjectStatusMutationHookResult = ReturnType<typeof useChangeProjectStatusMutation>;
-export type ChangeProjectStatusMutationResult = Apollo.MutationResult<ChangeProjectStatusMutation>;
-export type ChangeProjectStatusMutationOptions = Apollo.BaseMutationOptions<ChangeProjectStatusMutation, ChangeProjectStatusMutationVariables>;
-export const ConfirmLoginLinkDocument = gql`
-    mutation confirmLoginLink($token: String!) {
-  confirmLoginLink(token: $token) {
-    __typename
-    ... on LoginConfirmed {
-      token
-    }
-    ... on InvalidToken {
-      message
-    }
-    ... on ExpiredToken {
-      message
-    }
-    ... on ServerError {
-      message
-    }
-  }
-}
-    `;
-export type ConfirmLoginLinkMutationFn = Apollo.MutationFunction<ConfirmLoginLinkMutation, ConfirmLoginLinkMutationVariables>;
-
-/**
- * __useConfirmLoginLinkMutation__
- *
- * To run a mutation, you first call `useConfirmLoginLinkMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useConfirmLoginLinkMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [confirmLoginLinkMutation, { data, loading, error }] = useConfirmLoginLinkMutation({
- *   variables: {
- *      token: // value for 'token'
- *   },
- * });
- */
-export function useConfirmLoginLinkMutation(baseOptions?: Apollo.MutationHookOptions<ConfirmLoginLinkMutation, ConfirmLoginLinkMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<ConfirmLoginLinkMutation, ConfirmLoginLinkMutationVariables>(ConfirmLoginLinkDocument, options);
-      }
-export type ConfirmLoginLinkMutationHookResult = ReturnType<typeof useConfirmLoginLinkMutation>;
-export type ConfirmLoginLinkMutationResult = Apollo.MutationResult<ConfirmLoginLinkMutation>;
-export type ConfirmLoginLinkMutationOptions = Apollo.BaseMutationOptions<ConfirmLoginLinkMutation, ConfirmLoginLinkMutationVariables>;
-export const ConfirmLoginPinDocument = gql`
-    mutation confirmLoginPin($token: String!, $pin: String!) {
-  confirmLoginPin(token: $token, pin: $pin) {
-    __typename
-    ... on LoginConfirmed {
-      token
-    }
-    ... on InvalidPin {
-      message
-    }
-    ... on InvalidToken {
-      message
-    }
-    ... on ExpiredToken {
-      message
-    }
-    ... on ServerError {
-      message
-    }
-  }
-}
-    `;
-export type ConfirmLoginPinMutationFn = Apollo.MutationFunction<ConfirmLoginPinMutation, ConfirmLoginPinMutationVariables>;
-
-/**
- * __useConfirmLoginPinMutation__
- *
- * To run a mutation, you first call `useConfirmLoginPinMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useConfirmLoginPinMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [confirmLoginPinMutation, { data, loading, error }] = useConfirmLoginPinMutation({
- *   variables: {
- *      token: // value for 'token'
- *      pin: // value for 'pin'
- *   },
- * });
- */
-export function useConfirmLoginPinMutation(baseOptions?: Apollo.MutationHookOptions<ConfirmLoginPinMutation, ConfirmLoginPinMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<ConfirmLoginPinMutation, ConfirmLoginPinMutationVariables>(ConfirmLoginPinDocument, options);
-      }
-export type ConfirmLoginPinMutationHookResult = ReturnType<typeof useConfirmLoginPinMutation>;
-export type ConfirmLoginPinMutationResult = Apollo.MutationResult<ConfirmLoginPinMutation>;
-export type ConfirmLoginPinMutationOptions = Apollo.BaseMutationOptions<ConfirmLoginPinMutation, ConfirmLoginPinMutationVariables>;
 export const CreateProjectDocument = gql`
     mutation createProject($input: CreateProjectInput!) {
   createProject(input: $input) {
@@ -1890,52 +1748,6 @@ export function useCreateProjectMutation(baseOptions?: Apollo.MutationHookOption
 export type CreateProjectMutationHookResult = ReturnType<typeof useCreateProjectMutation>;
 export type CreateProjectMutationResult = Apollo.MutationResult<CreateProjectMutation>;
 export type CreateProjectMutationOptions = Apollo.BaseMutationOptions<CreateProjectMutation, CreateProjectMutationVariables>;
-export const LoginByEmailDocument = gql`
-    mutation loginByEmail($email: String!) {
-  loginByEmail(email: $email) {
-    __typename
-    ... on LinkSentByEmail {
-      email
-    }
-    ... on PinSentByEmail {
-      email
-      token
-    }
-    ... on InvalidEmail {
-      message
-    }
-    ... on ServerError {
-      message
-    }
-  }
-}
-    `;
-export type LoginByEmailMutationFn = Apollo.MutationFunction<LoginByEmailMutation, LoginByEmailMutationVariables>;
-
-/**
- * __useLoginByEmailMutation__
- *
- * To run a mutation, you first call `useLoginByEmailMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useLoginByEmailMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [loginByEmailMutation, { data, loading, error }] = useLoginByEmailMutation({
- *   variables: {
- *      email: // value for 'email'
- *   },
- * });
- */
-export function useLoginByEmailMutation(baseOptions?: Apollo.MutationHookOptions<LoginByEmailMutation, LoginByEmailMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<LoginByEmailMutation, LoginByEmailMutationVariables>(LoginByEmailDocument, options);
-      }
-export type LoginByEmailMutationHookResult = ReturnType<typeof useLoginByEmailMutation>;
-export type LoginByEmailMutationResult = Apollo.MutationResult<LoginByEmailMutation>;
-export type LoginByEmailMutationOptions = Apollo.BaseMutationOptions<LoginByEmailMutation, LoginByEmailMutationVariables>;
 export const ProfileDocument = gql`
     query profile {
   profile {
@@ -2182,6 +1994,146 @@ export function useAlbumScreenLazyQuery(baseOptions?: Apollo.LazyQueryHookOption
 export type AlbumScreenQueryHookResult = ReturnType<typeof useAlbumScreenQuery>;
 export type AlbumScreenLazyQueryHookResult = ReturnType<typeof useAlbumScreenLazyQuery>;
 export type AlbumScreenQueryResult = Apollo.QueryResult<AlbumScreenQuery, AlbumScreenQueryVariables>;
+export const ConfirmLoginLinkDocument = gql`
+    mutation confirmLoginLink($token: String!) {
+  confirmLoginLink(token: $token) {
+    __typename
+    ... on LoginConfirmed {
+      token
+    }
+    ... on InvalidToken {
+      message
+    }
+    ... on ExpiredToken {
+      message
+    }
+    ... on ServerError {
+      message
+    }
+  }
+}
+    `;
+export type ConfirmLoginLinkMutationFn = Apollo.MutationFunction<ConfirmLoginLinkMutation, ConfirmLoginLinkMutationVariables>;
+
+/**
+ * __useConfirmLoginLinkMutation__
+ *
+ * To run a mutation, you first call `useConfirmLoginLinkMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useConfirmLoginLinkMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [confirmLoginLinkMutation, { data, loading, error }] = useConfirmLoginLinkMutation({
+ *   variables: {
+ *      token: // value for 'token'
+ *   },
+ * });
+ */
+export function useConfirmLoginLinkMutation(baseOptions?: Apollo.MutationHookOptions<ConfirmLoginLinkMutation, ConfirmLoginLinkMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ConfirmLoginLinkMutation, ConfirmLoginLinkMutationVariables>(ConfirmLoginLinkDocument, options);
+      }
+export type ConfirmLoginLinkMutationHookResult = ReturnType<typeof useConfirmLoginLinkMutation>;
+export type ConfirmLoginLinkMutationResult = Apollo.MutationResult<ConfirmLoginLinkMutation>;
+export type ConfirmLoginLinkMutationOptions = Apollo.BaseMutationOptions<ConfirmLoginLinkMutation, ConfirmLoginLinkMutationVariables>;
+export const ConfirmLoginPinDocument = gql`
+    mutation confirmLoginPin($token: String!, $pin: String!) {
+  confirmLoginPin(token: $token, pin: $pin) {
+    __typename
+    ... on LoginConfirmed {
+      token
+    }
+    ... on InvalidPin {
+      message
+    }
+    ... on InvalidToken {
+      message
+    }
+    ... on ExpiredToken {
+      message
+    }
+    ... on ServerError {
+      message
+    }
+  }
+}
+    `;
+export type ConfirmLoginPinMutationFn = Apollo.MutationFunction<ConfirmLoginPinMutation, ConfirmLoginPinMutationVariables>;
+
+/**
+ * __useConfirmLoginPinMutation__
+ *
+ * To run a mutation, you first call `useConfirmLoginPinMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useConfirmLoginPinMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [confirmLoginPinMutation, { data, loading, error }] = useConfirmLoginPinMutation({
+ *   variables: {
+ *      token: // value for 'token'
+ *      pin: // value for 'pin'
+ *   },
+ * });
+ */
+export function useConfirmLoginPinMutation(baseOptions?: Apollo.MutationHookOptions<ConfirmLoginPinMutation, ConfirmLoginPinMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ConfirmLoginPinMutation, ConfirmLoginPinMutationVariables>(ConfirmLoginPinDocument, options);
+      }
+export type ConfirmLoginPinMutationHookResult = ReturnType<typeof useConfirmLoginPinMutation>;
+export type ConfirmLoginPinMutationResult = Apollo.MutationResult<ConfirmLoginPinMutation>;
+export type ConfirmLoginPinMutationOptions = Apollo.BaseMutationOptions<ConfirmLoginPinMutation, ConfirmLoginPinMutationVariables>;
+export const LoginByEmailDocument = gql`
+    mutation loginByEmail($email: String!) {
+  loginByEmail(email: $email) {
+    __typename
+    ... on LinkSentByEmail {
+      email
+    }
+    ... on PinSentByEmail {
+      email
+      token
+    }
+    ... on InvalidEmail {
+      message
+    }
+    ... on ServerError {
+      message
+    }
+  }
+}
+    `;
+export type LoginByEmailMutationFn = Apollo.MutationFunction<LoginByEmailMutation, LoginByEmailMutationVariables>;
+
+/**
+ * __useLoginByEmailMutation__
+ *
+ * To run a mutation, you first call `useLoginByEmailMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useLoginByEmailMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [loginByEmailMutation, { data, loading, error }] = useLoginByEmailMutation({
+ *   variables: {
+ *      email: // value for 'email'
+ *   },
+ * });
+ */
+export function useLoginByEmailMutation(baseOptions?: Apollo.MutationHookOptions<LoginByEmailMutation, LoginByEmailMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<LoginByEmailMutation, LoginByEmailMutationVariables>(LoginByEmailDocument, options);
+      }
+export type LoginByEmailMutationHookResult = ReturnType<typeof useLoginByEmailMutation>;
+export type LoginByEmailMutationResult = Apollo.MutationResult<LoginByEmailMutation>;
+export type LoginByEmailMutationOptions = Apollo.BaseMutationOptions<LoginByEmailMutation, LoginByEmailMutationVariables>;
 export const DeleteAlbumDocument = gql`
     mutation deleteAlbum($id: String!) {
   deleteAlbum(id: $id) {
@@ -2224,6 +2176,54 @@ export function useDeleteAlbumMutation(baseOptions?: Apollo.MutationHookOptions<
 export type DeleteAlbumMutationHookResult = ReturnType<typeof useDeleteAlbumMutation>;
 export type DeleteAlbumMutationResult = Apollo.MutationResult<DeleteAlbumMutation>;
 export type DeleteAlbumMutationOptions = Apollo.BaseMutationOptions<DeleteAlbumMutation, DeleteAlbumMutationVariables>;
+export const ChangeProjectStatusDocument = gql`
+    mutation changeProjectStatus($projectId: String!, $status: ProjectStatus!) {
+  changeProjectStatus(projectId: $projectId, status: $status) {
+    __typename
+    ... on ProjectStatusChanged {
+      project {
+        status
+      }
+    }
+    ... on NotFound {
+      message
+    }
+    ... on Forbidden {
+      message
+    }
+    ... on ServerError {
+      message
+    }
+  }
+}
+    `;
+export type ChangeProjectStatusMutationFn = Apollo.MutationFunction<ChangeProjectStatusMutation, ChangeProjectStatusMutationVariables>;
+
+/**
+ * __useChangeProjectStatusMutation__
+ *
+ * To run a mutation, you first call `useChangeProjectStatusMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useChangeProjectStatusMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [changeProjectStatusMutation, { data, loading, error }] = useChangeProjectStatusMutation({
+ *   variables: {
+ *      projectId: // value for 'projectId'
+ *      status: // value for 'status'
+ *   },
+ * });
+ */
+export function useChangeProjectStatusMutation(baseOptions?: Apollo.MutationHookOptions<ChangeProjectStatusMutation, ChangeProjectStatusMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ChangeProjectStatusMutation, ChangeProjectStatusMutationVariables>(ChangeProjectStatusDocument, options);
+      }
+export type ChangeProjectStatusMutationHookResult = ReturnType<typeof useChangeProjectStatusMutation>;
+export type ChangeProjectStatusMutationResult = Apollo.MutationResult<ChangeProjectStatusMutation>;
+export type ChangeProjectStatusMutationOptions = Apollo.BaseMutationOptions<ChangeProjectStatusMutation, ChangeProjectStatusMutationVariables>;
 export const AddContactDocument = gql`
     mutation addContact($projectId: String!, $contact: AddContactInput!) {
   addContact(projectId: $projectId, contact: $contact) {
