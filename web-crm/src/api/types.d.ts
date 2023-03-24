@@ -974,14 +974,6 @@ export type WorkspaceUsersTotal = {
 
 export type WorkspaceUsersTotalResult = Forbidden | ServerError | WorkspaceUsersTotal;
 
-export type AddContactMutationVariables = Exact<{
-  projectId: Scalars['String'];
-  contact: AddContactInput;
-}>;
-
-
-export type AddContactMutation = { __typename?: 'Mutation', addContact: { __typename: 'ContactAdded', contact: { __typename?: 'Contact', id: string, fullName: string, photo: string, details: Array<{ __typename?: 'ContactDetails', type: ContactType, value: string }> } } | { __typename: 'Forbidden', message: string } | { __typename: 'ServerError', message: string } };
-
 export type AddHouseFragment = { __typename?: 'House', id: string, city: string, address: string, housingComplex: string, createdAt: any, modifiedAt: any };
 
 export type AddHouseMutationVariables = Exact<{
@@ -991,14 +983,6 @@ export type AddHouseMutationVariables = Exact<{
 
 
 export type AddHouseMutation = { __typename?: 'Mutation', addHouse: { __typename: 'Forbidden', message: string } | { __typename: 'HouseAdded', house: { __typename?: 'House', id: string, city: string, address: string, housingComplex: string, createdAt: any, modifiedAt: any } } | { __typename: 'NotFound', message: string } | { __typename: 'ServerError', message: string } };
-
-export type ChangeProjectDatesMutationVariables = Exact<{
-  projectId: Scalars['String'];
-  dates: ChangeProjectDatesInput;
-}>;
-
-
-export type ChangeProjectDatesMutation = { __typename?: 'Mutation', changeProjectDates: { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'ProjectDatesChanged', project: { __typename?: 'Project', startAt?: any | null | undefined, endAt?: any | null | undefined } } | { __typename: 'ServerError', message: string } };
 
 export type ChangeProjectStatusMutationVariables = Exact<{
   projectId: Scalars['String'];
@@ -1030,13 +1014,6 @@ export type CreateProjectMutationVariables = Exact<{
 
 export type CreateProjectMutation = { __typename?: 'Mutation', createProject: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectCreated', project: { __typename?: 'Project', id: string, name: string, startAt?: any | null | undefined, endAt?: any | null | undefined } } | { __typename: 'ServerError', message: string } };
 
-export type DeleteContactMutationVariables = Exact<{
-  id: Scalars['String'];
-}>;
-
-
-export type DeleteContactMutation = { __typename?: 'Mutation', deleteContact: { __typename: 'ContactDeleted', contact: { __typename?: 'Contact', id: string } } | { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'ServerError', message: string } };
-
 export type LoginByEmailMutationVariables = Exact<{
   email: Scalars['String'];
 }>;
@@ -1048,14 +1025,6 @@ export type ProfileQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type ProfileQuery = { __typename?: 'Query', profile: { __typename: 'Forbidden', message: string } | { __typename: 'ServerError', message: string } | { __typename: 'UserProfile', id: string, email: string, gravatar?: { __typename?: 'Gravatar', url: string } | null | undefined, defaultWorkspace: { __typename?: 'Workspace', id: string, name: string } } };
-
-export type UpdateContactMutationVariables = Exact<{
-  contactId: Scalars['String'];
-  data: UpdateContactInput;
-}>;
-
-
-export type UpdateContactMutation = { __typename?: 'Mutation', updateContact: { __typename: 'ContactUpdated', contact: { __typename?: 'Contact', id: string, fullName: string, photo: string, details: Array<{ __typename?: 'ContactDetails', type: ContactType, value: string }> } } | { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'ServerError', message: string } };
 
 export type UpdateHouseFragment = { __typename?: 'House', id: string, city: string, address: string, housingComplex: string, createdAt: any, modifiedAt: any };
 
@@ -1124,6 +1093,29 @@ export type DeleteAlbumMutationVariables = Exact<{
 
 export type DeleteAlbumMutation = { __typename?: 'Mutation', deleteAlbum: { __typename: 'AlbumDeleted', album: { __typename?: 'Album', id: string } } | { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'ServerError', message: string } };
 
+export type AddContactMutationVariables = Exact<{
+  projectId: Scalars['String'];
+  contact: AddContactInput;
+}>;
+
+
+export type AddContactMutation = { __typename?: 'Mutation', addContact: { __typename: 'ContactAdded', contact: { __typename?: 'Contact', id: string, fullName: string, photo: string, details: Array<{ __typename?: 'ContactDetails', type: ContactType, value: string }> } } | { __typename: 'Forbidden', message: string } | { __typename: 'ServerError', message: string } };
+
+export type DeleteContactMutationVariables = Exact<{
+  id: Scalars['String'];
+}>;
+
+
+export type DeleteContactMutation = { __typename?: 'Mutation', deleteContact: { __typename: 'ContactDeleted', contact: { __typename?: 'Contact', id: string } } | { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'ServerError', message: string } };
+
+export type UpdateContactMutationVariables = Exact<{
+  contactId: Scalars['String'];
+  data: UpdateContactInput;
+}>;
+
+
+export type UpdateContactMutation = { __typename?: 'Mutation', updateContact: { __typename: 'ContactUpdated', contact: { __typename?: 'Contact', id: string, fullName: string, photo: string, details: Array<{ __typename?: 'ContactDetails', type: ContactType, value: string }> } } | { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'ServerError', message: string } };
+
 export type CreateAlbumMutationVariables = Exact<{
   projectId: Scalars['String'];
   name: Scalars['String'];
@@ -1131,6 +1123,14 @@ export type CreateAlbumMutationVariables = Exact<{
 
 
 export type CreateAlbumMutation = { __typename?: 'Mutation', createAlbum: { __typename: 'AlbumCreated', album: { __typename?: 'Album', id: string, name: string } } | { __typename: 'Forbidden', message: string } | { __typename: 'ServerError', message: string } };
+
+export type ChangeProjectDatesMutationVariables = Exact<{
+  projectId: Scalars['String'];
+  dates: ChangeProjectDatesInput;
+}>;
+
+
+export type ChangeProjectDatesMutation = { __typename?: 'Mutation', changeProjectDates: { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'ProjectDatesChanged', project: { __typename?: 'Project', startAt?: any | null | undefined, endAt?: any | null | undefined } } | { __typename: 'ServerError', message: string } };
 
 export type AddRoomMutationVariables = Exact<{
   houseId: Scalars['String'];
@@ -1701,57 +1701,6 @@ export const WorkspaceScreenFragmentDoc = gql`
     ${WorkspaceScreenUsersFragmentDoc}
 ${WorkspaceScreenCurrentProjectsFragmentDoc}
 ${WorkspaceScreenArchiveProjectsFragmentDoc}`;
-export const AddContactDocument = gql`
-    mutation addContact($projectId: String!, $contact: AddContactInput!) {
-  addContact(projectId: $projectId, contact: $contact) {
-    __typename
-    ... on ContactAdded {
-      contact {
-        id
-        fullName
-        photo
-        details {
-          type
-          value
-        }
-      }
-    }
-    ... on Forbidden {
-      message
-    }
-    ... on ServerError {
-      message
-    }
-  }
-}
-    `;
-export type AddContactMutationFn = Apollo.MutationFunction<AddContactMutation, AddContactMutationVariables>;
-
-/**
- * __useAddContactMutation__
- *
- * To run a mutation, you first call `useAddContactMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useAddContactMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [addContactMutation, { data, loading, error }] = useAddContactMutation({
- *   variables: {
- *      projectId: // value for 'projectId'
- *      contact: // value for 'contact'
- *   },
- * });
- */
-export function useAddContactMutation(baseOptions?: Apollo.MutationHookOptions<AddContactMutation, AddContactMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<AddContactMutation, AddContactMutationVariables>(AddContactDocument, options);
-      }
-export type AddContactMutationHookResult = ReturnType<typeof useAddContactMutation>;
-export type AddContactMutationResult = Apollo.MutationResult<AddContactMutation>;
-export type AddContactMutationOptions = Apollo.BaseMutationOptions<AddContactMutation, AddContactMutationVariables>;
 export const AddHouseDocument = gql`
     mutation addHouse($projectId: String!, $house: AddHouseInput!) {
   addHouse(projectId: $projectId, house: $house) {
@@ -1795,55 +1744,6 @@ export function useAddHouseMutation(baseOptions?: Apollo.MutationHookOptions<Add
 export type AddHouseMutationHookResult = ReturnType<typeof useAddHouseMutation>;
 export type AddHouseMutationResult = Apollo.MutationResult<AddHouseMutation>;
 export type AddHouseMutationOptions = Apollo.BaseMutationOptions<AddHouseMutation, AddHouseMutationVariables>;
-export const ChangeProjectDatesDocument = gql`
-    mutation changeProjectDates($projectId: String!, $dates: ChangeProjectDatesInput!) {
-  changeProjectDates(projectId: $projectId, dates: $dates) {
-    __typename
-    ... on ProjectDatesChanged {
-      project {
-        startAt
-        endAt
-      }
-    }
-    ... on NotFound {
-      message
-    }
-    ... on Forbidden {
-      message
-    }
-    ... on ServerError {
-      message
-    }
-  }
-}
-    `;
-export type ChangeProjectDatesMutationFn = Apollo.MutationFunction<ChangeProjectDatesMutation, ChangeProjectDatesMutationVariables>;
-
-/**
- * __useChangeProjectDatesMutation__
- *
- * To run a mutation, you first call `useChangeProjectDatesMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useChangeProjectDatesMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [changeProjectDatesMutation, { data, loading, error }] = useChangeProjectDatesMutation({
- *   variables: {
- *      projectId: // value for 'projectId'
- *      dates: // value for 'dates'
- *   },
- * });
- */
-export function useChangeProjectDatesMutation(baseOptions?: Apollo.MutationHookOptions<ChangeProjectDatesMutation, ChangeProjectDatesMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<ChangeProjectDatesMutation, ChangeProjectDatesMutationVariables>(ChangeProjectDatesDocument, options);
-      }
-export type ChangeProjectDatesMutationHookResult = ReturnType<typeof useChangeProjectDatesMutation>;
-export type ChangeProjectDatesMutationResult = Apollo.MutationResult<ChangeProjectDatesMutation>;
-export type ChangeProjectDatesMutationOptions = Apollo.BaseMutationOptions<ChangeProjectDatesMutation, ChangeProjectDatesMutationVariables>;
 export const ChangeProjectStatusDocument = gql`
     mutation changeProjectStatus($projectId: String!, $status: ProjectStatus!) {
   changeProjectStatus(projectId: $projectId, status: $status) {
@@ -2033,53 +1933,6 @@ export function useCreateProjectMutation(baseOptions?: Apollo.MutationHookOption
 export type CreateProjectMutationHookResult = ReturnType<typeof useCreateProjectMutation>;
 export type CreateProjectMutationResult = Apollo.MutationResult<CreateProjectMutation>;
 export type CreateProjectMutationOptions = Apollo.BaseMutationOptions<CreateProjectMutation, CreateProjectMutationVariables>;
-export const DeleteContactDocument = gql`
-    mutation deleteContact($id: String!) {
-  deleteContact(id: $id) {
-    __typename
-    ... on ContactDeleted {
-      contact {
-        id
-      }
-    }
-    ... on Forbidden {
-      message
-    }
-    ... on NotFound {
-      message
-    }
-    ... on ServerError {
-      message
-    }
-  }
-}
-    `;
-export type DeleteContactMutationFn = Apollo.MutationFunction<DeleteContactMutation, DeleteContactMutationVariables>;
-
-/**
- * __useDeleteContactMutation__
- *
- * To run a mutation, you first call `useDeleteContactMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useDeleteContactMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [deleteContactMutation, { data, loading, error }] = useDeleteContactMutation({
- *   variables: {
- *      id: // value for 'id'
- *   },
- * });
- */
-export function useDeleteContactMutation(baseOptions?: Apollo.MutationHookOptions<DeleteContactMutation, DeleteContactMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<DeleteContactMutation, DeleteContactMutationVariables>(DeleteContactDocument, options);
-      }
-export type DeleteContactMutationHookResult = ReturnType<typeof useDeleteContactMutation>;
-export type DeleteContactMutationResult = Apollo.MutationResult<DeleteContactMutation>;
-export type DeleteContactMutationOptions = Apollo.BaseMutationOptions<DeleteContactMutation, DeleteContactMutationVariables>;
 export const LoginByEmailDocument = gql`
     mutation loginByEmail($email: String!) {
   loginByEmail(email: $email) {
@@ -2177,60 +2030,6 @@ export function useProfileLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Pr
 export type ProfileQueryHookResult = ReturnType<typeof useProfileQuery>;
 export type ProfileLazyQueryHookResult = ReturnType<typeof useProfileLazyQuery>;
 export type ProfileQueryResult = Apollo.QueryResult<ProfileQuery, ProfileQueryVariables>;
-export const UpdateContactDocument = gql`
-    mutation updateContact($contactId: String!, $data: UpdateContactInput!) {
-  updateContact(contactId: $contactId, data: $data) {
-    __typename
-    ... on ContactUpdated {
-      contact {
-        id
-        fullName
-        photo
-        details {
-          type
-          value
-        }
-      }
-    }
-    ... on NotFound {
-      message
-    }
-    ... on Forbidden {
-      message
-    }
-    ... on ServerError {
-      message
-    }
-  }
-}
-    `;
-export type UpdateContactMutationFn = Apollo.MutationFunction<UpdateContactMutation, UpdateContactMutationVariables>;
-
-/**
- * __useUpdateContactMutation__
- *
- * To run a mutation, you first call `useUpdateContactMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useUpdateContactMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [updateContactMutation, { data, loading, error }] = useUpdateContactMutation({
- *   variables: {
- *      contactId: // value for 'contactId'
- *      data: // value for 'data'
- *   },
- * });
- */
-export function useUpdateContactMutation(baseOptions?: Apollo.MutationHookOptions<UpdateContactMutation, UpdateContactMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<UpdateContactMutation, UpdateContactMutationVariables>(UpdateContactDocument, options);
-      }
-export type UpdateContactMutationHookResult = ReturnType<typeof useUpdateContactMutation>;
-export type UpdateContactMutationResult = Apollo.MutationResult<UpdateContactMutation>;
-export type UpdateContactMutationOptions = Apollo.BaseMutationOptions<UpdateContactMutation, UpdateContactMutationVariables>;
 export const UpdateHouseDocument = gql`
     mutation updateHouse($houseId: String!, $house: UpdateHouseInput!) {
   updateHouse(houseId: $houseId, data: $house) {
@@ -2511,6 +2310,158 @@ export function useDeleteAlbumMutation(baseOptions?: Apollo.MutationHookOptions<
 export type DeleteAlbumMutationHookResult = ReturnType<typeof useDeleteAlbumMutation>;
 export type DeleteAlbumMutationResult = Apollo.MutationResult<DeleteAlbumMutation>;
 export type DeleteAlbumMutationOptions = Apollo.BaseMutationOptions<DeleteAlbumMutation, DeleteAlbumMutationVariables>;
+export const AddContactDocument = gql`
+    mutation addContact($projectId: String!, $contact: AddContactInput!) {
+  addContact(projectId: $projectId, contact: $contact) {
+    __typename
+    ... on ContactAdded {
+      contact {
+        id
+        fullName
+        photo
+        details {
+          type
+          value
+        }
+      }
+    }
+    ... on Forbidden {
+      message
+    }
+    ... on ServerError {
+      message
+    }
+  }
+}
+    `;
+export type AddContactMutationFn = Apollo.MutationFunction<AddContactMutation, AddContactMutationVariables>;
+
+/**
+ * __useAddContactMutation__
+ *
+ * To run a mutation, you first call `useAddContactMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddContactMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addContactMutation, { data, loading, error }] = useAddContactMutation({
+ *   variables: {
+ *      projectId: // value for 'projectId'
+ *      contact: // value for 'contact'
+ *   },
+ * });
+ */
+export function useAddContactMutation(baseOptions?: Apollo.MutationHookOptions<AddContactMutation, AddContactMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AddContactMutation, AddContactMutationVariables>(AddContactDocument, options);
+      }
+export type AddContactMutationHookResult = ReturnType<typeof useAddContactMutation>;
+export type AddContactMutationResult = Apollo.MutationResult<AddContactMutation>;
+export type AddContactMutationOptions = Apollo.BaseMutationOptions<AddContactMutation, AddContactMutationVariables>;
+export const DeleteContactDocument = gql`
+    mutation deleteContact($id: String!) {
+  deleteContact(id: $id) {
+    __typename
+    ... on ContactDeleted {
+      contact {
+        id
+      }
+    }
+    ... on Forbidden {
+      message
+    }
+    ... on NotFound {
+      message
+    }
+    ... on ServerError {
+      message
+    }
+  }
+}
+    `;
+export type DeleteContactMutationFn = Apollo.MutationFunction<DeleteContactMutation, DeleteContactMutationVariables>;
+
+/**
+ * __useDeleteContactMutation__
+ *
+ * To run a mutation, you first call `useDeleteContactMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteContactMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteContactMutation, { data, loading, error }] = useDeleteContactMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useDeleteContactMutation(baseOptions?: Apollo.MutationHookOptions<DeleteContactMutation, DeleteContactMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteContactMutation, DeleteContactMutationVariables>(DeleteContactDocument, options);
+      }
+export type DeleteContactMutationHookResult = ReturnType<typeof useDeleteContactMutation>;
+export type DeleteContactMutationResult = Apollo.MutationResult<DeleteContactMutation>;
+export type DeleteContactMutationOptions = Apollo.BaseMutationOptions<DeleteContactMutation, DeleteContactMutationVariables>;
+export const UpdateContactDocument = gql`
+    mutation updateContact($contactId: String!, $data: UpdateContactInput!) {
+  updateContact(contactId: $contactId, data: $data) {
+    __typename
+    ... on ContactUpdated {
+      contact {
+        id
+        fullName
+        photo
+        details {
+          type
+          value
+        }
+      }
+    }
+    ... on NotFound {
+      message
+    }
+    ... on Forbidden {
+      message
+    }
+    ... on ServerError {
+      message
+    }
+  }
+}
+    `;
+export type UpdateContactMutationFn = Apollo.MutationFunction<UpdateContactMutation, UpdateContactMutationVariables>;
+
+/**
+ * __useUpdateContactMutation__
+ *
+ * To run a mutation, you first call `useUpdateContactMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateContactMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateContactMutation, { data, loading, error }] = useUpdateContactMutation({
+ *   variables: {
+ *      contactId: // value for 'contactId'
+ *      data: // value for 'data'
+ *   },
+ * });
+ */
+export function useUpdateContactMutation(baseOptions?: Apollo.MutationHookOptions<UpdateContactMutation, UpdateContactMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateContactMutation, UpdateContactMutationVariables>(UpdateContactDocument, options);
+      }
+export type UpdateContactMutationHookResult = ReturnType<typeof useUpdateContactMutation>;
+export type UpdateContactMutationResult = Apollo.MutationResult<UpdateContactMutation>;
+export type UpdateContactMutationOptions = Apollo.BaseMutationOptions<UpdateContactMutation, UpdateContactMutationVariables>;
 export const CreateAlbumDocument = gql`
     mutation createAlbum($projectId: String!, $name: String!) {
   createAlbum(projectId: $projectId, name: $name) {
@@ -2554,6 +2505,55 @@ export function useCreateAlbumMutation(baseOptions?: Apollo.MutationHookOptions<
 export type CreateAlbumMutationHookResult = ReturnType<typeof useCreateAlbumMutation>;
 export type CreateAlbumMutationResult = Apollo.MutationResult<CreateAlbumMutation>;
 export type CreateAlbumMutationOptions = Apollo.BaseMutationOptions<CreateAlbumMutation, CreateAlbumMutationVariables>;
+export const ChangeProjectDatesDocument = gql`
+    mutation changeProjectDates($projectId: String!, $dates: ChangeProjectDatesInput!) {
+  changeProjectDates(projectId: $projectId, dates: $dates) {
+    __typename
+    ... on ProjectDatesChanged {
+      project {
+        startAt
+        endAt
+      }
+    }
+    ... on NotFound {
+      message
+    }
+    ... on Forbidden {
+      message
+    }
+    ... on ServerError {
+      message
+    }
+  }
+}
+    `;
+export type ChangeProjectDatesMutationFn = Apollo.MutationFunction<ChangeProjectDatesMutation, ChangeProjectDatesMutationVariables>;
+
+/**
+ * __useChangeProjectDatesMutation__
+ *
+ * To run a mutation, you first call `useChangeProjectDatesMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useChangeProjectDatesMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [changeProjectDatesMutation, { data, loading, error }] = useChangeProjectDatesMutation({
+ *   variables: {
+ *      projectId: // value for 'projectId'
+ *      dates: // value for 'dates'
+ *   },
+ * });
+ */
+export function useChangeProjectDatesMutation(baseOptions?: Apollo.MutationHookOptions<ChangeProjectDatesMutation, ChangeProjectDatesMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ChangeProjectDatesMutation, ChangeProjectDatesMutationVariables>(ChangeProjectDatesDocument, options);
+      }
+export type ChangeProjectDatesMutationHookResult = ReturnType<typeof useChangeProjectDatesMutation>;
+export type ChangeProjectDatesMutationResult = Apollo.MutationResult<ChangeProjectDatesMutation>;
+export type ChangeProjectDatesMutationOptions = Apollo.BaseMutationOptions<ChangeProjectDatesMutation, ChangeProjectDatesMutationVariables>;
 export const AddRoomDocument = gql`
     mutation addRoom($houseId: String!, $room: AddRoomInput!) {
   addRoom(houseId: $houseId, room: $room) {

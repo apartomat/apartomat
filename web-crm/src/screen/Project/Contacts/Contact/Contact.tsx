@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from "react"
 import { Box, BoxExtendedProps, Button, Drop, Card, CardHeader, CardBody, CardFooter } from "grommet"
 import { Instagram, Trash } from "grommet-icons"
 
-import useDeleteContact, { Contact as ProjectContact, ContactType } from "../useDeleteContact"
+import useDeleteContact, { Contact as ProjectContact, ContactType } from "./useDeleteContact"
 
 export default function Contact({
     contact,
