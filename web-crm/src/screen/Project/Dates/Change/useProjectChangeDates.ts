@@ -1,7 +1,7 @@
 import { FetchResult, useApolloClient } from "@apollo/client"
 import { useChangeProjectDatesMutation, ChangeProjectDatesMutation, ChangeProjectDatesInput, ChangeProjectDatesMutationResult } from "api/types.d"
 
-export function useChangeDates(): [
+export function useChangeProjectDates(): [
     (projectId: string, dates: ChangeProjectDatesInput) => Promise<FetchResult<ChangeProjectDatesMutation>>,
     ChangeProjectDatesMutationResult
 ] {
