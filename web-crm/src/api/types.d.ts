@@ -974,16 +974,6 @@ export type WorkspaceUsersTotal = {
 
 export type WorkspaceUsersTotalResult = Forbidden | ServerError | WorkspaceUsersTotal;
 
-export type AddHouseFragment = { __typename?: 'House', id: string, city: string, address: string, housingComplex: string, createdAt: any, modifiedAt: any };
-
-export type AddHouseMutationVariables = Exact<{
-  projectId: Scalars['String'];
-  house: AddHouseInput;
-}>;
-
-
-export type AddHouseMutation = { __typename?: 'Mutation', addHouse: { __typename: 'Forbidden', message: string } | { __typename: 'HouseAdded', house: { __typename?: 'House', id: string, city: string, address: string, housingComplex: string, createdAt: any, modifiedAt: any } } | { __typename: 'NotFound', message: string } | { __typename: 'ServerError', message: string } };
-
 export type ChangeProjectStatusMutationVariables = Exact<{
   projectId: Scalars['String'];
   status: ProjectStatus;
@@ -1025,16 +1015,6 @@ export type ProfileQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type ProfileQuery = { __typename?: 'Query', profile: { __typename: 'Forbidden', message: string } | { __typename: 'ServerError', message: string } | { __typename: 'UserProfile', id: string, email: string, gravatar?: { __typename?: 'Gravatar', url: string } | null | undefined, defaultWorkspace: { __typename?: 'Workspace', id: string, name: string } } };
-
-export type UpdateHouseFragment = { __typename?: 'House', id: string, city: string, address: string, housingComplex: string, createdAt: any, modifiedAt: any };
-
-export type UpdateHouseMutationVariables = Exact<{
-  houseId: Scalars['String'];
-  house: UpdateHouseInput;
-}>;
-
-
-export type UpdateHouseMutation = { __typename?: 'Mutation', updateHouse: { __typename: 'Forbidden', message: string } | { __typename: 'HouseUpdated', house: { __typename?: 'House', id: string, city: string, address: string, housingComplex: string, createdAt: any, modifiedAt: any } } | { __typename: 'NotFound', message: string } | { __typename: 'ServerError', message: string } };
 
 export type ChangeAlbumPageOrientationMutationVariables = Exact<{
   albumId: Scalars['String'];
@@ -1131,6 +1111,26 @@ export type ChangeProjectDatesMutationVariables = Exact<{
 
 
 export type ChangeProjectDatesMutation = { __typename?: 'Mutation', changeProjectDates: { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'ProjectDatesChanged', project: { __typename?: 'Project', startAt?: any | null | undefined, endAt?: any | null | undefined } } | { __typename: 'ServerError', message: string } };
+
+export type AddHouseFragment = { __typename?: 'House', id: string, city: string, address: string, housingComplex: string, createdAt: any, modifiedAt: any };
+
+export type AddHouseMutationVariables = Exact<{
+  projectId: Scalars['String'];
+  house: AddHouseInput;
+}>;
+
+
+export type AddHouseMutation = { __typename?: 'Mutation', addHouse: { __typename: 'Forbidden', message: string } | { __typename: 'HouseAdded', house: { __typename?: 'House', id: string, city: string, address: string, housingComplex: string, createdAt: any, modifiedAt: any } } | { __typename: 'NotFound', message: string } | { __typename: 'ServerError', message: string } };
+
+export type UpdateHouseFragment = { __typename?: 'House', id: string, city: string, address: string, housingComplex: string, createdAt: any, modifiedAt: any };
+
+export type UpdateHouseMutationVariables = Exact<{
+  houseId: Scalars['String'];
+  house: UpdateHouseInput;
+}>;
+
+
+export type UpdateHouseMutation = { __typename?: 'Mutation', updateHouse: { __typename: 'Forbidden', message: string } | { __typename: 'HouseUpdated', house: { __typename?: 'House', id: string, city: string, address: string, housingComplex: string, createdAt: any, modifiedAt: any } } | { __typename: 'NotFound', message: string } | { __typename: 'ServerError', message: string } };
 
 export type AddRoomMutationVariables = Exact<{
   houseId: Scalars['String'];
@@ -1232,26 +1232,6 @@ export type WorkspaceScreenArchiveProjectsFragment = { __typename?: 'WorkspacePr
 
 export type WorkspaceScreenProjectFragment = { __typename?: 'Project', id: string, name: string, status: ProjectStatus, startAt?: any | null | undefined, endAt?: any | null | undefined, period?: string | null | undefined };
 
-export const AddHouseFragmentDoc = gql`
-    fragment AddHouse on House {
-  id
-  city
-  address
-  housingComplex
-  createdAt
-  modifiedAt
-}
-    `;
-export const UpdateHouseFragmentDoc = gql`
-    fragment UpdateHouse on House {
-  id
-  city
-  address
-  housingComplex
-  createdAt
-  modifiedAt
-}
-    `;
 export const AlbumScreenHouseRoomFragmentDoc = gql`
     fragment AlbumScreenHouseRoom on Room {
   id
@@ -1393,6 +1373,26 @@ export const AlbumScreenAlbumFragmentDoc = gql`
 ${AlbumScreenAlbumPageCoverFragmentDoc}
 ${AlbumScreenAlbumPageVisualizationFragmentDoc}
 ${AlbumScreenSettingsFragmentDoc}`;
+export const AddHouseFragmentDoc = gql`
+    fragment AddHouse on House {
+  id
+  city
+  address
+  housingComplex
+  createdAt
+  modifiedAt
+}
+    `;
+export const UpdateHouseFragmentDoc = gql`
+    fragment UpdateHouse on House {
+  id
+  city
+  address
+  housingComplex
+  createdAt
+  modifiedAt
+}
+    `;
 export const ProjectScreenHouseFragmentDoc = gql`
     fragment ProjectScreenHouse on House {
   id
@@ -1701,49 +1701,6 @@ export const WorkspaceScreenFragmentDoc = gql`
     ${WorkspaceScreenUsersFragmentDoc}
 ${WorkspaceScreenCurrentProjectsFragmentDoc}
 ${WorkspaceScreenArchiveProjectsFragmentDoc}`;
-export const AddHouseDocument = gql`
-    mutation addHouse($projectId: String!, $house: AddHouseInput!) {
-  addHouse(projectId: $projectId, house: $house) {
-    __typename
-    ... on HouseAdded {
-      house {
-        ...AddHouse
-      }
-    }
-    ... on Error {
-      __typename
-      message
-    }
-  }
-}
-    ${AddHouseFragmentDoc}`;
-export type AddHouseMutationFn = Apollo.MutationFunction<AddHouseMutation, AddHouseMutationVariables>;
-
-/**
- * __useAddHouseMutation__
- *
- * To run a mutation, you first call `useAddHouseMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useAddHouseMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [addHouseMutation, { data, loading, error }] = useAddHouseMutation({
- *   variables: {
- *      projectId: // value for 'projectId'
- *      house: // value for 'house'
- *   },
- * });
- */
-export function useAddHouseMutation(baseOptions?: Apollo.MutationHookOptions<AddHouseMutation, AddHouseMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<AddHouseMutation, AddHouseMutationVariables>(AddHouseDocument, options);
-      }
-export type AddHouseMutationHookResult = ReturnType<typeof useAddHouseMutation>;
-export type AddHouseMutationResult = Apollo.MutationResult<AddHouseMutation>;
-export type AddHouseMutationOptions = Apollo.BaseMutationOptions<AddHouseMutation, AddHouseMutationVariables>;
 export const ChangeProjectStatusDocument = gql`
     mutation changeProjectStatus($projectId: String!, $status: ProjectStatus!) {
   changeProjectStatus(projectId: $projectId, status: $status) {
@@ -2030,49 +1987,6 @@ export function useProfileLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Pr
 export type ProfileQueryHookResult = ReturnType<typeof useProfileQuery>;
 export type ProfileLazyQueryHookResult = ReturnType<typeof useProfileLazyQuery>;
 export type ProfileQueryResult = Apollo.QueryResult<ProfileQuery, ProfileQueryVariables>;
-export const UpdateHouseDocument = gql`
-    mutation updateHouse($houseId: String!, $house: UpdateHouseInput!) {
-  updateHouse(houseId: $houseId, data: $house) {
-    __typename
-    ... on HouseUpdated {
-      house {
-        ...UpdateHouse
-      }
-    }
-    ... on Error {
-      __typename
-      message
-    }
-  }
-}
-    ${UpdateHouseFragmentDoc}`;
-export type UpdateHouseMutationFn = Apollo.MutationFunction<UpdateHouseMutation, UpdateHouseMutationVariables>;
-
-/**
- * __useUpdateHouseMutation__
- *
- * To run a mutation, you first call `useUpdateHouseMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useUpdateHouseMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [updateHouseMutation, { data, loading, error }] = useUpdateHouseMutation({
- *   variables: {
- *      houseId: // value for 'houseId'
- *      house: // value for 'house'
- *   },
- * });
- */
-export function useUpdateHouseMutation(baseOptions?: Apollo.MutationHookOptions<UpdateHouseMutation, UpdateHouseMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<UpdateHouseMutation, UpdateHouseMutationVariables>(UpdateHouseDocument, options);
-      }
-export type UpdateHouseMutationHookResult = ReturnType<typeof useUpdateHouseMutation>;
-export type UpdateHouseMutationResult = Apollo.MutationResult<UpdateHouseMutation>;
-export type UpdateHouseMutationOptions = Apollo.BaseMutationOptions<UpdateHouseMutation, UpdateHouseMutationVariables>;
 export const ChangeAlbumPageOrientationDocument = gql`
     mutation changeAlbumPageOrientation($albumId: String!, $orientation: PageOrientation!) {
   changeAlbumPageOrientation(albumId: $albumId, orientation: $orientation) {
@@ -2554,6 +2468,92 @@ export function useChangeProjectDatesMutation(baseOptions?: Apollo.MutationHookO
 export type ChangeProjectDatesMutationHookResult = ReturnType<typeof useChangeProjectDatesMutation>;
 export type ChangeProjectDatesMutationResult = Apollo.MutationResult<ChangeProjectDatesMutation>;
 export type ChangeProjectDatesMutationOptions = Apollo.BaseMutationOptions<ChangeProjectDatesMutation, ChangeProjectDatesMutationVariables>;
+export const AddHouseDocument = gql`
+    mutation addHouse($projectId: String!, $house: AddHouseInput!) {
+  addHouse(projectId: $projectId, house: $house) {
+    __typename
+    ... on HouseAdded {
+      house {
+        ...AddHouse
+      }
+    }
+    ... on Error {
+      __typename
+      message
+    }
+  }
+}
+    ${AddHouseFragmentDoc}`;
+export type AddHouseMutationFn = Apollo.MutationFunction<AddHouseMutation, AddHouseMutationVariables>;
+
+/**
+ * __useAddHouseMutation__
+ *
+ * To run a mutation, you first call `useAddHouseMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddHouseMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addHouseMutation, { data, loading, error }] = useAddHouseMutation({
+ *   variables: {
+ *      projectId: // value for 'projectId'
+ *      house: // value for 'house'
+ *   },
+ * });
+ */
+export function useAddHouseMutation(baseOptions?: Apollo.MutationHookOptions<AddHouseMutation, AddHouseMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AddHouseMutation, AddHouseMutationVariables>(AddHouseDocument, options);
+      }
+export type AddHouseMutationHookResult = ReturnType<typeof useAddHouseMutation>;
+export type AddHouseMutationResult = Apollo.MutationResult<AddHouseMutation>;
+export type AddHouseMutationOptions = Apollo.BaseMutationOptions<AddHouseMutation, AddHouseMutationVariables>;
+export const UpdateHouseDocument = gql`
+    mutation updateHouse($houseId: String!, $house: UpdateHouseInput!) {
+  updateHouse(houseId: $houseId, data: $house) {
+    __typename
+    ... on HouseUpdated {
+      house {
+        ...UpdateHouse
+      }
+    }
+    ... on Error {
+      __typename
+      message
+    }
+  }
+}
+    ${UpdateHouseFragmentDoc}`;
+export type UpdateHouseMutationFn = Apollo.MutationFunction<UpdateHouseMutation, UpdateHouseMutationVariables>;
+
+/**
+ * __useUpdateHouseMutation__
+ *
+ * To run a mutation, you first call `useUpdateHouseMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateHouseMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateHouseMutation, { data, loading, error }] = useUpdateHouseMutation({
+ *   variables: {
+ *      houseId: // value for 'houseId'
+ *      house: // value for 'house'
+ *   },
+ * });
+ */
+export function useUpdateHouseMutation(baseOptions?: Apollo.MutationHookOptions<UpdateHouseMutation, UpdateHouseMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateHouseMutation, UpdateHouseMutationVariables>(UpdateHouseDocument, options);
+      }
+export type UpdateHouseMutationHookResult = ReturnType<typeof useUpdateHouseMutation>;
+export type UpdateHouseMutationResult = Apollo.MutationResult<UpdateHouseMutation>;
+export type UpdateHouseMutationOptions = Apollo.BaseMutationOptions<UpdateHouseMutation, UpdateHouseMutationVariables>;
 export const AddRoomDocument = gql`
     mutation addRoom($houseId: String!, $room: AddRoomInput!) {
   addRoom(houseId: $houseId, room: $room) {
