@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from "react"
 
-import { useChangeStatus } from "./useChangeStatus"
+import { useChangeStatus } from "./useChangeProjectStatus"
 
 import { ProjectStatus, ProjectStatusEnum, ProjectStatusEnumItem } from "api/types.d"
 
