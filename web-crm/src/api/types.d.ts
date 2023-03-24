@@ -974,13 +974,6 @@ export type WorkspaceUsersTotal = {
 
 export type WorkspaceUsersTotalResult = Forbidden | ServerError | WorkspaceUsersTotal;
 
-export type CreateProjectMutationVariables = Exact<{
-  input: CreateProjectInput;
-}>;
-
-
-export type CreateProjectMutation = { __typename?: 'Mutation', createProject: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectCreated', project: { __typename?: 'Project', id: string, name: string, startAt?: any | null | undefined, endAt?: any | null | undefined } } | { __typename: 'ServerError', message: string } };
-
 export type ProfileQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -1211,6 +1204,13 @@ export type VisualizationsScreenHouseRoomFragment = { __typename?: 'Room', id: s
 export type VisualizationsScreenHousesFragment = { __typename?: 'ProjectHouses', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectHousesList', items: Array<{ __typename?: 'House', rooms: { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined }> } | { __typename?: 'ServerError', message: string } } }> } | { __typename: 'ServerError', message: string } };
 
 export type VisualizationsScreenHouseRoomsFragment = { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null | undefined, level?: number | null | undefined }> } | { __typename?: 'ServerError', message: string } };
+
+export type CreateProjectMutationVariables = Exact<{
+  input: CreateProjectInput;
+}>;
+
+
+export type CreateProjectMutation = { __typename?: 'Mutation', createProject: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectCreated', project: { __typename?: 'Project', id: string, name: string, startAt?: any | null | undefined, endAt?: any | null | undefined } } | { __typename: 'ServerError', message: string } };
 
 export type WorkspaceScreenQueryVariables = Exact<{
   id: Scalars['String'];
@@ -1701,53 +1701,6 @@ export const WorkspaceScreenFragmentDoc = gql`
     ${WorkspaceScreenUsersFragmentDoc}
 ${WorkspaceScreenCurrentProjectsFragmentDoc}
 ${WorkspaceScreenArchiveProjectsFragmentDoc}`;
-export const CreateProjectDocument = gql`
-    mutation createProject($input: CreateProjectInput!) {
-  createProject(input: $input) {
-    __typename
-    ... on ProjectCreated {
-      project {
-        id
-        name
-        startAt
-        endAt
-      }
-    }
-    ... on ServerError {
-      message
-    }
-    ... on Forbidden {
-      message
-    }
-  }
-}
-    `;
-export type CreateProjectMutationFn = Apollo.MutationFunction<CreateProjectMutation, CreateProjectMutationVariables>;
-
-/**
- * __useCreateProjectMutation__
- *
- * To run a mutation, you first call `useCreateProjectMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useCreateProjectMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [createProjectMutation, { data, loading, error }] = useCreateProjectMutation({
- *   variables: {
- *      input: // value for 'input'
- *   },
- * });
- */
-export function useCreateProjectMutation(baseOptions?: Apollo.MutationHookOptions<CreateProjectMutation, CreateProjectMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<CreateProjectMutation, CreateProjectMutationVariables>(CreateProjectDocument, options);
-      }
-export type CreateProjectMutationHookResult = ReturnType<typeof useCreateProjectMutation>;
-export type CreateProjectMutationResult = Apollo.MutationResult<CreateProjectMutation>;
-export type CreateProjectMutationOptions = Apollo.BaseMutationOptions<CreateProjectMutation, CreateProjectMutationVariables>;
 export const ProfileDocument = gql`
     query profile {
   profile {
@@ -2903,6 +2856,53 @@ export function useVisualizationsScreenLazyQuery(baseOptions?: Apollo.LazyQueryH
 export type VisualizationsScreenQueryHookResult = ReturnType<typeof useVisualizationsScreenQuery>;
 export type VisualizationsScreenLazyQueryHookResult = ReturnType<typeof useVisualizationsScreenLazyQuery>;
 export type VisualizationsScreenQueryResult = Apollo.QueryResult<VisualizationsScreenQuery, VisualizationsScreenQueryVariables>;
+export const CreateProjectDocument = gql`
+    mutation createProject($input: CreateProjectInput!) {
+  createProject(input: $input) {
+    __typename
+    ... on ProjectCreated {
+      project {
+        id
+        name
+        startAt
+        endAt
+      }
+    }
+    ... on ServerError {
+      message
+    }
+    ... on Forbidden {
+      message
+    }
+  }
+}
+    `;
+export type CreateProjectMutationFn = Apollo.MutationFunction<CreateProjectMutation, CreateProjectMutationVariables>;
+
+/**
+ * __useCreateProjectMutation__
+ *
+ * To run a mutation, you first call `useCreateProjectMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateProjectMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createProjectMutation, { data, loading, error }] = useCreateProjectMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateProjectMutation(baseOptions?: Apollo.MutationHookOptions<CreateProjectMutation, CreateProjectMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateProjectMutation, CreateProjectMutationVariables>(CreateProjectDocument, options);
+      }
+export type CreateProjectMutationHookResult = ReturnType<typeof useCreateProjectMutation>;
+export type CreateProjectMutationResult = Apollo.MutationResult<CreateProjectMutation>;
+export type CreateProjectMutationOptions = Apollo.BaseMutationOptions<CreateProjectMutation, CreateProjectMutationVariables>;
 export const WorkspaceScreenDocument = gql`
     query workspaceScreen($id: String!, $timezone: String) {
   workspace(id: $id) {
