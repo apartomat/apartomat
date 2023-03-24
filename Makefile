@@ -2,7 +2,7 @@ include .env
 export
 
 dev:
-	SERVER_ADDR=0.0.0.0:8010 go run ./cmd/apartomat run
+	env $(cat .env | xargs) go run ./cmd/apartomat run
 
 gen:
 	go generate ./...
