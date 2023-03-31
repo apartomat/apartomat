@@ -264,7 +264,7 @@ func (u *Apartomat) AddVisualizationsToAlbum(
 	}
 
 	if len(list) != len(visualizationID) {
-		return nil, fmt.Errorf("visualization: %w", visualizationID, ErrNotFound)
+		return nil, fmt.Errorf("visualization (id=%s): %w", visualizationID, ErrNotFound)
 	}
 
 	var (
