@@ -3,15 +3,15 @@ package graphql
 import (
 	"context"
 	"errors"
-	"github.com/apartomat/apartomat/internal/token"
+	"github.com/apartomat/apartomat/internal/auth/paseto"
 	"log"
 )
 
 func (r *mutationResolver) ConfirmLoginLink(ctx context.Context, str string) (ConfirmLoginLinkResult, error) {
 	str, err := r.useCases.ConfirmEmailByToken(ctx, str)
 	if err != nil {
-		if errors.Is(err, token.ErrTokenValidationError) {
-			return InvalidToken{Message: "token expired or not valid"}, nil
+		if errors.Is(err, paseto.ErrTokenValidationError) {
+			return InvalidToken{Message: "token is expired or not valid"}, nil
 		}
 
 		log.Printf("can't verify token: %s", err)
