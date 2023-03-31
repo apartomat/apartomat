@@ -30,6 +30,7 @@ const theme = {
 
 const authLink = setContext((_, { headers }) => {
     const token = JSON.parse(localStorage.getItem("token") || `""`)
+
     return {
         headers: {
             ...headers,
@@ -54,8 +55,8 @@ function App() {
                         <Route path="/login" element={<Login />} />
                         <Route path="/logout" element={<Logout />} />
                         <Route path="/confirm" element={<Confirm />} />
-                        <Route path="/" element={<RedirectToDefaultWorkspace />} />
                         <Route element={<AuthRequired />}>
+                            <Route path="/" element={<RedirectToDefaultWorkspace />} />
                             <Route path="/:id" element={<Workspace />}/>
                             <Route path="/p/:id" element={<Project />} />
                             <Route path="/vis/:id" element={<Visualizations />}/>
