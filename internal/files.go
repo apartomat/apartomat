@@ -3,6 +3,7 @@ package apartomat
 import (
 	"context"
 	"fmt"
+	"github.com/apartomat/apartomat/internal/auth"
 	"io"
 	"path/filepath"
 
@@ -36,7 +37,7 @@ func (u *Apartomat) GetFiles(
 		project = prjs[0]
 	)
 
-	if ok, err := u.CanGetFiles(ctx, UserFromCtx(ctx), project); err != nil {
+	if ok, err := u.CanGetFiles(ctx, auth.UserFromCtx(ctx), project); err != nil {
 		return nil, err
 	} else if !ok {
 		return nil, fmt.Errorf("can't get project (id=%s) files: %w", project.ID, ErrForbidden)
@@ -55,7 +56,7 @@ func (u *Apartomat) GetFiles(
 	return p, nil
 }
 
-func (u *Apartomat) CanGetFiles(ctx context.Context, subj *UserCtx, obj *projects.Project) (bool, error) {
+func (u *Apartomat) CanGetFiles(ctx context.Context, subj *auth.UserCtx, obj *projects.Project) (bool, error) {
 	return u.isProjectUser(ctx, subj, obj)
 }
 
@@ -77,7 +78,7 @@ func (u *Apartomat) CountFiles(
 		project = prjs[0]
 	)
 
-	if ok, err := u.CanCountFiles(ctx, UserFromCtx(ctx), project); err != nil {
+	if ok, err := u.CanCountFiles(ctx, auth.UserFromCtx(ctx), project); err != nil {
 		return 0, err
 	} else if !ok {
 		return 0, fmt.Errorf("can't get project (id=%s) files: %w", project.ID, ErrForbidden)
@@ -89,7 +90,7 @@ func (u *Apartomat) CountFiles(
 	)
 }
 
-func (u *Apartomat) CanCountFiles(ctx context.Context, subj *UserCtx, obj *projects.Project) (bool, error) {
+func (u *Apartomat) CanCountFiles(ctx context.Context, subj *auth.UserCtx, obj *projects.Project) (bool, error) {
 	return u.isProjectUser(ctx, subj, obj)
 }
 
@@ -112,7 +113,7 @@ func (u *Apartomat) UploadFile(
 		project = prjs[0]
 	)
 
-	if ok, err := u.CanUploadFile(ctx, UserFromCtx(ctx), project); err != nil {
+	if ok, err := u.CanUploadFile(ctx, auth.UserFromCtx(ctx), project); err != nil {
 		return nil, err
 	} else if !ok {
 		return nil, fmt.Errorf("can't get project (id=%s) files: %w", project.ID, ErrForbidden)
@@ -139,6 +140,6 @@ func (u *Apartomat) UploadFile(
 	return f, nil
 }
 
-func (u *Apartomat) CanUploadFile(ctx context.Context, subj *UserCtx, obj *projects.Project) (bool, error) {
+func (u *Apartomat) CanUploadFile(ctx context.Context, subj *auth.UserCtx, obj *projects.Project) (bool, error) {
 	return u.isProjectUser(ctx, subj, obj)
 }

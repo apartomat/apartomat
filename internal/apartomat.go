@@ -2,6 +2,7 @@ package apartomat
 
 import (
 	"errors"
+	"github.com/apartomat/apartomat/internal/auth"
 	"github.com/apartomat/apartomat/internal/image"
 	"github.com/apartomat/apartomat/internal/mail"
 	"github.com/apartomat/apartomat/internal/store/albums"
@@ -18,14 +19,14 @@ import (
 )
 
 type Apartomat struct {
-	AuthTokenIssuer   AuthTokenIssuer
-	AuthTokenVerifier AuthTokenVerifier
+	AuthTokenIssuer   auth.AuthTokenIssuer
+	AuthTokenVerifier auth.AuthTokenVerifier
 
-	ConfirmTokenByEmailIssuer   EmailConfirmTokenIssuer
-	ConfirmTokenByEmailVerifier EmailConfirmTokenVerifier
+	ConfirmTokenByEmailIssuer   auth.EmailConfirmTokenIssuer
+	ConfirmTokenByEmailVerifier auth.EmailConfirmTokenVerifier
 
-	ConfirmEmailPINTokenIssuer   ConfirmEmailPINTokenIssuer
-	ConfirmEmailPINTokenVerifier ConfirmEmailPINTokenVerifier
+	ConfirmEmailPINTokenIssuer   auth.ConfirmEmailPINTokenIssuer
+	ConfirmEmailPINTokenVerifier auth.ConfirmEmailPINTokenVerifier
 
 	Mailer      mail.Sender
 	MailFactory *mail.Factory

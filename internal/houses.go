@@ -3,6 +3,7 @@ package apartomat
 import (
 	"context"
 	"fmt"
+	"github.com/apartomat/apartomat/internal/auth"
 	. "github.com/apartomat/apartomat/internal/store/houses"
 	"github.com/apartomat/apartomat/internal/store/projects"
 	"github.com/apartomat/apartomat/internal/store/workspace_users"
@@ -22,7 +23,7 @@ func (u *Apartomat) GetHouses(ctx context.Context, projectID string, limit, offs
 		project = prjs[0]
 	)
 
-	if ok, err := u.CanGetHouses(ctx, UserFromCtx(ctx), project); err != nil {
+	if ok, err := u.CanGetHouses(ctx, auth.UserFromCtx(ctx), project); err != nil {
 		return nil, err
 	} else if !ok {
 		return nil, fmt.Errorf("can't get project (id=%s) houses: %w", project.ID, ErrForbidden)
@@ -31,7 +32,7 @@ func (u *Apartomat) GetHouses(ctx context.Context, projectID string, limit, offs
 	return u.Houses.List(ctx, ProjectIDIn(project.ID), limit, offset)
 }
 
-func (u *Apartomat) CanGetHouses(ctx context.Context, subj *UserCtx, obj *projects.Project) (bool, error) {
+func (u *Apartomat) CanGetHouses(ctx context.Context, subj *auth.UserCtx, obj *projects.Project) (bool, error) {
 	if subj == nil {
 		return false, nil
 	}
@@ -74,7 +75,7 @@ func (u *Apartomat) AddHouse(
 		project = prjs[0]
 	)
 
-	if ok, err := u.CanAddHouse(ctx, UserFromCtx(ctx), project); err != nil {
+	if ok, err := u.CanAddHouse(ctx, auth.UserFromCtx(ctx), project); err != nil {
 		return nil, err
 	} else if !ok {
 		return nil, fmt.Errorf("can't add house to project (id=%s): %w", project.ID, ErrForbidden)
@@ -94,7 +95,7 @@ func (u *Apartomat) AddHouse(
 	return house, nil
 }
 
-func (u *Apartomat) CanAddHouse(ctx context.Context, subj *UserCtx, obj *projects.Project) (bool, error) {
+func (u *Apartomat) CanAddHouse(ctx context.Context, subj *auth.UserCtx, obj *projects.Project) (bool, error) {
 	if subj == nil {
 		return false, nil
 	}
@@ -137,7 +138,7 @@ func (u *Apartomat) UpdateHouse(
 		house = houses[0]
 	)
 
-	if ok, err := u.CanUpdateHouse(ctx, UserFromCtx(ctx), house); err != nil {
+	if ok, err := u.CanUpdateHouse(ctx, auth.UserFromCtx(ctx), house); err != nil {
 		return nil, err
 	} else if !ok {
 		return nil, fmt.Errorf("can't update house (id=%s): %w", houseID, ErrForbidden)
@@ -152,7 +153,7 @@ func (u *Apartomat) UpdateHouse(
 	return house, nil
 }
 
-func (u *Apartomat) CanUpdateHouse(ctx context.Context, subj *UserCtx, obj *House) (bool, error) {
+func (u *Apartomat) CanUpdateHouse(ctx context.Context, subj *auth.UserCtx, obj *House) (bool, error) {
 	if subj == nil {
 		return false, nil
 	}

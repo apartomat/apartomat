@@ -1,4 +1,4 @@
-package token
+package paseto
 
 import (
 	"errors"
@@ -7,8 +7,8 @@ import (
 )
 
 var (
-	ErrTokenVerificationError = errors.New("incorrect token format")
-	ErrTokenValidationError   = errors.New("token expired or not valid")
+	ErrTokenVerificationError = errors.New("incorrect auth format")
+	ErrTokenValidationError   = errors.New("auth expired or not valid")
 )
 
 const (
@@ -25,7 +25,7 @@ var (
 func hasClaim(key, value string) paseto.Validator {
 	return func(token *paseto.JSONToken) error {
 		if token.Get(key) != value {
-			return fmt.Errorf("incorrect token claim %s: %w", value, paseto.ErrTokenValidationError)
+			return fmt.Errorf("incorrect auth claim %s: %w", value, paseto.ErrTokenValidationError)
 		}
 
 		return nil

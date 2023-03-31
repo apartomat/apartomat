@@ -1,9 +1,9 @@
-package token
+package paseto
 
 import (
 	"crypto/ed25519"
 	"fmt"
-	apartomat "github.com/apartomat/apartomat/internal"
+	"github.com/apartomat/apartomat/internal/auth"
 	"github.com/o1egl/paseto"
 	"time"
 )
@@ -48,16 +48,16 @@ func (token ConfirmEmailPINToken) Validate(validators ...paseto.Validator) error
 	return token.JSONToken.Validate(validators...)
 }
 
-type pasetoConfirmEmailPINTokenIssuerVerifier struct {
+type confirmEmailPINTokenIssuerVerifier struct {
 	privateKey ed25519.PrivateKey
 	secret     []byte
 }
 
-func NewPasetoConfirmEmailPINTokenIssuerVerifier(key ed25519.PrivateKey) *pasetoConfirmEmailPINTokenIssuerVerifier {
-	return &pasetoConfirmEmailPINTokenIssuerVerifier{key, []byte("YELLOW SUBMARINE, BLACK WIZARDRY")}
+func NewConfirmEmailPINTokenIssuerVerifier(key ed25519.PrivateKey) *confirmEmailPINTokenIssuerVerifier {
+	return &confirmEmailPINTokenIssuerVerifier{key, []byte("YELLOW SUBMARINE, BLACK WIZARDRY")}
 }
 
-func (p *pasetoConfirmEmailPINTokenIssuerVerifier) Issue(email, pin string) (string, error) {
+func (p *confirmEmailPINTokenIssuerVerifier) Issue(email, pin string) (string, error) {
 	token := NewConfirmEmailPINToken(email, pin)
 	str, err := paseto.NewV2().Encrypt(p.secret, token, "")
 
@@ -68,7 +68,7 @@ func (p *pasetoConfirmEmailPINTokenIssuerVerifier) Issue(email, pin string) (str
 	return str, nil
 }
 
-func (p *pasetoConfirmEmailPINTokenIssuerVerifier) Verify(str, pin string) (apartomat.ConfirmEmailPINToken, error) {
+func (p *confirmEmailPINTokenIssuerVerifier) Verify(str, pin string) (auth.ConfirmEmailPINToken, error) {
 	var (
 		token  ConfirmEmailPINToken
 		footer string

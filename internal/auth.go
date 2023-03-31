@@ -4,57 +4,19 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math/rand"
+
+	"github.com/apartomat/apartomat/internal/auth"
 	"github.com/apartomat/apartomat/internal/store/projects"
 	. "github.com/apartomat/apartomat/internal/store/users"
 	"github.com/apartomat/apartomat/internal/store/workspace_users"
 	"github.com/apartomat/apartomat/internal/store/workspaces"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
-	"math/rand"
 )
 
-const userCtxKey = "user"
-
-type UserCtx struct {
-	ID    string
-	Email string
-}
-
-func WithUserCtx(ctx context.Context, userCtx *UserCtx) context.Context {
-	return context.WithValue(ctx, userCtxKey, userCtx)
-}
-
-func UserFromCtx(ctx context.Context) *UserCtx {
-	user, _ := ctx.Value(userCtxKey).(*UserCtx)
-	return user
-}
-
-type AuthToken interface {
-	UserID() string
-}
-
-type AuthTokenIssuer interface {
-	Issue(id string) (string, error)
-}
-
-type AuthTokenVerifier interface {
-	Verify(str string) (AuthToken, error)
-}
-
-func (u *Apartomat) CheckAuthToken(str string) (AuthToken, error) {
+func (u *Apartomat) CheckAuthToken(str string) (auth.AuthToken, error) {
 	return u.AuthTokenVerifier.Verify(str)
-}
-
-type EmailConfirmToken interface {
-	Email() string
-}
-
-type EmailConfirmTokenIssuer interface {
-	Issue(email string) (string, error)
-}
-
-type EmailConfirmTokenVerifier interface {
-	Verify(str string) (EmailConfirmToken, error)
 }
 
 func (u *Apartomat) ConfirmEmailByToken(ctx context.Context, str string) (string, error) {
@@ -154,56 +116,6 @@ func (u *Apartomat) LoginByEmail(ctx context.Context, email string, workspaceNam
 	return email, nil
 }
 
-func (u *Apartomat) isWorkspaceUser(ctx context.Context, subj *UserCtx, obj *workspaces.Workspace) (bool, error) {
-	if subj == nil {
-		return false, nil
-	}
-
-	wu, err := u.WorkspaceUsers.List(
-		ctx,
-		workspace_users.And(
-			workspace_users.WorkspaceIDIn(obj.ID),
-			workspace_users.UserIDIn(subj.ID),
-		),
-		1,
-		0,
-	)
-	if err != nil {
-		return false, err
-	}
-
-	if len(wu) == 0 {
-		return false, nil
-	}
-
-	return wu[0].UserID == subj.ID, nil
-}
-
-func (u *Apartomat) isProjectUser(ctx context.Context, subj *UserCtx, obj *projects.Project) (bool, error) {
-	if subj == nil {
-		return false, nil
-	}
-
-	wu, err := u.WorkspaceUsers.List(
-		ctx,
-		workspace_users.And(
-			workspace_users.WorkspaceIDIn(obj.WorkspaceID),
-			workspace_users.UserIDIn(subj.ID),
-		),
-		1,
-		0,
-	)
-	if err != nil {
-		return false, err
-	}
-
-	if len(wu) == 0 {
-		return false, nil
-	}
-
-	return wu[0].UserID == subj.ID, nil
-}
-
 func (u *Apartomat) LoginEmailPIN(ctx context.Context, email string, workspaceName string) (string, string, error) {
 	if err := validation.Validate(email, is.EmailFormat); err != nil {
 		return "", "", ErrInvalidEmail
@@ -278,33 +190,6 @@ func (u *Apartomat) LoginEmailPIN(ctx context.Context, email string, workspaceNa
 	return email, token, nil
 }
 
-func randn(n int) string {
-	var (
-		digits = []rune("1234567890")
-
-		res = make([]rune, n)
-	)
-
-	for i := range res {
-		res[i] = digits[rand.Intn(len(digits))]
-	}
-
-	return string(res)
-}
-
-type ConfirmEmailPINToken interface {
-	Email() string
-	PIN() string
-}
-
-type ConfirmEmailPINTokenIssuer interface {
-	Issue(email, pin string) (string, error)
-}
-
-type ConfirmEmailPINTokenVerifier interface {
-	Verify(str, pin string) (ConfirmEmailPINToken, error)
-}
-
 func (u *Apartomat) CheckConfirmEmailPINToken(ctx context.Context, str, pin string) (string, error) {
 	confirmToken, err := u.ConfirmEmailPINTokenVerifier.Verify(str, pin)
 	if err != nil {
@@ -327,4 +212,68 @@ func (u *Apartomat) CheckConfirmEmailPINToken(ctx context.Context, str, pin stri
 	}
 
 	return u.AuthTokenIssuer.Issue(users[0].ID)
+}
+
+func (u *Apartomat) isWorkspaceUser(ctx context.Context, subj *auth.UserCtx, obj *workspaces.Workspace) (bool, error) {
+	if subj == nil {
+		return false, nil
+	}
+
+	wu, err := u.WorkspaceUsers.List(
+		ctx,
+		workspace_users.And(
+			workspace_users.WorkspaceIDIn(obj.ID),
+			workspace_users.UserIDIn(subj.ID),
+		),
+		1,
+		0,
+	)
+	if err != nil {
+		return false, err
+	}
+
+	if len(wu) == 0 {
+		return false, nil
+	}
+
+	return wu[0].UserID == subj.ID, nil
+}
+
+func (u *Apartomat) isProjectUser(ctx context.Context, subj *auth.UserCtx, obj *projects.Project) (bool, error) {
+	if subj == nil {
+		return false, nil
+	}
+
+	wu, err := u.WorkspaceUsers.List(
+		ctx,
+		workspace_users.And(
+			workspace_users.WorkspaceIDIn(obj.WorkspaceID),
+			workspace_users.UserIDIn(subj.ID),
+		),
+		1,
+		0,
+	)
+	if err != nil {
+		return false, err
+	}
+
+	if len(wu) == 0 {
+		return false, nil
+	}
+
+	return wu[0].UserID == subj.ID, nil
+}
+
+func randn(n int) string {
+	var (
+		digits = []rune("1234567890")
+
+		res = make([]rune, n)
+	)
+
+	for i := range res {
+		res[i] = digits[rand.Intn(len(digits))]
+	}
+
+	return string(res)
 }

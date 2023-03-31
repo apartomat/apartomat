@@ -3,6 +3,7 @@ package apartomat
 import (
 	"context"
 	"fmt"
+	"github.com/apartomat/apartomat/internal/auth"
 	. "github.com/apartomat/apartomat/internal/store/albums"
 	"github.com/apartomat/apartomat/internal/store/projects"
 	"github.com/apartomat/apartomat/internal/store/visualizations"
@@ -27,7 +28,7 @@ func (u *Apartomat) CreateAlbum(
 		project = prjs[0]
 	)
 
-	if ok, err := u.CanCreateAlbum(ctx, UserFromCtx(ctx), project); err != nil {
+	if ok, err := u.CanCreateAlbum(ctx, auth.UserFromCtx(ctx), project); err != nil {
 		return nil, err
 	} else if !ok {
 		return nil, fmt.Errorf("can't create album in project (id=%s): %w", project.ID, ErrForbidden)
@@ -47,7 +48,7 @@ func (u *Apartomat) CreateAlbum(
 	return album, nil
 }
 
-func (u *Apartomat) CanCreateAlbum(ctx context.Context, subj *UserCtx, obj *projects.Project) (bool, error) {
+func (u *Apartomat) CanCreateAlbum(ctx context.Context, subj *auth.UserCtx, obj *projects.Project) (bool, error) {
 	if subj == nil {
 		return false, nil
 	}
@@ -90,7 +91,7 @@ func (u *Apartomat) GetAlbums(
 		project = prjs[0]
 	)
 
-	if ok, err := u.CanGetAlbums(ctx, UserFromCtx(ctx), project); err != nil {
+	if ok, err := u.CanGetAlbums(ctx, auth.UserFromCtx(ctx), project); err != nil {
 		return nil, err
 	} else if !ok {
 		return nil, fmt.Errorf("can't get project (id=%s) albums: %w", project.ID, ErrForbidden)
@@ -108,7 +109,7 @@ func (u *Apartomat) GetAlbums(
 	return p, nil
 }
 
-func (u *Apartomat) CanGetAlbums(ctx context.Context, subj *UserCtx, obj *projects.Project) (bool, error) {
+func (u *Apartomat) CanGetAlbums(ctx context.Context, subj *auth.UserCtx, obj *projects.Project) (bool, error) {
 	return u.isProjectUser(ctx, subj, obj)
 }
 
@@ -143,7 +144,7 @@ func (u *Apartomat) GetAlbum(
 		project = prjs[0]
 	)
 
-	if ok, err := u.CanGetAlbums(ctx, UserFromCtx(ctx), project); err != nil {
+	if ok, err := u.CanGetAlbums(ctx, auth.UserFromCtx(ctx), project); err != nil {
 		return nil, err
 	} else if !ok {
 		return nil, fmt.Errorf("can't get project (id=%s) album (id=%s): %w", project.ID, album.ID, ErrForbidden)
@@ -169,7 +170,7 @@ func (u *Apartomat) CountAlbums(
 		project = prjs[0]
 	)
 
-	if ok, err := u.CanCountAlbums(ctx, UserFromCtx(ctx), project); err != nil {
+	if ok, err := u.CanCountAlbums(ctx, auth.UserFromCtx(ctx), project); err != nil {
 		return 0, err
 	} else if !ok {
 		return 0, fmt.Errorf("can't get project (id=%s) albums: %w", project.ID, ErrForbidden)
@@ -182,7 +183,7 @@ func (u *Apartomat) CountAlbums(
 	return u.Albums.Count(ctx, spec)
 }
 
-func (u *Apartomat) CanCountAlbums(ctx context.Context, subj *UserCtx, obj *projects.Project) (bool, error) {
+func (u *Apartomat) CanCountAlbums(ctx context.Context, subj *auth.UserCtx, obj *projects.Project) (bool, error) {
 	return u.isProjectUser(ctx, subj, obj)
 }
 
@@ -200,7 +201,7 @@ func (u *Apartomat) DeleteAlbum(ctx context.Context, id string) (*Album, error) 
 		album = albums[0]
 	)
 
-	if ok, err := u.CanDeleteAlbum(ctx, UserFromCtx(ctx), album); err != nil {
+	if ok, err := u.CanDeleteAlbum(ctx, auth.UserFromCtx(ctx), album); err != nil {
 		return nil, err
 	} else if !ok {
 		return nil, fmt.Errorf("can't delete album (id=%s): %w", album.ID, ErrForbidden)
@@ -211,7 +212,7 @@ func (u *Apartomat) DeleteAlbum(ctx context.Context, id string) (*Album, error) 
 	return album, err
 }
 
-func (u *Apartomat) CanDeleteAlbum(ctx context.Context, subj *UserCtx, obj *Album) (bool, error) {
+func (u *Apartomat) CanDeleteAlbum(ctx context.Context, subj *auth.UserCtx, obj *Album) (bool, error) {
 	prjs, err := u.Projects.List(ctx, projects.IDIn(obj.ProjectID), 1, 0)
 	if err != nil {
 		return false, err
@@ -251,7 +252,7 @@ func (u *Apartomat) AddVisualizationsToAlbum(
 		album = albums[0]
 	)
 
-	if ok, err := u.CanAddPageToAlbum(ctx, UserFromCtx(ctx), album); err != nil {
+	if ok, err := u.CanAddPageToAlbum(ctx, auth.UserFromCtx(ctx), album); err != nil {
 		return nil, err
 	} else if !ok {
 		return nil, fmt.Errorf("can't add visualization to album (id=%s): %w", album.ID, ErrForbidden)
@@ -296,7 +297,7 @@ visLoop:
 	return res, nil
 }
 
-func (u *Apartomat) CanAddPageToAlbum(ctx context.Context, subj *UserCtx, obj *Album) (bool, error) {
+func (u *Apartomat) CanAddPageToAlbum(ctx context.Context, subj *auth.UserCtx, obj *Album) (bool, error) {
 	prjs, err := u.Projects.List(ctx, projects.IDIn(obj.ProjectID), 1, 0)
 	if err != nil {
 		return false, err
@@ -331,7 +332,7 @@ func (u *Apartomat) ChangeAlbumPageSize(
 		album = list[0]
 	)
 
-	if ok, err := u.CanChangeAlbumSettings(ctx, UserFromCtx(ctx), album); err != nil {
+	if ok, err := u.CanChangeAlbumSettings(ctx, auth.UserFromCtx(ctx), album); err != nil {
 		return nil, err
 	} else if !ok {
 		return nil, fmt.Errorf("can't change album (id=%s) settings: %w", album.ID, ErrForbidden)
@@ -364,7 +365,7 @@ func (u *Apartomat) ChangeAlbumPageOrientation(
 		album = list[0]
 	)
 
-	if ok, err := u.CanChangeAlbumSettings(ctx, UserFromCtx(ctx), album); err != nil {
+	if ok, err := u.CanChangeAlbumSettings(ctx, auth.UserFromCtx(ctx), album); err != nil {
 		return nil, err
 	} else if !ok {
 		return nil, fmt.Errorf("can't change album (id=%s) settings: %w", album.ID, ErrForbidden)
@@ -379,7 +380,7 @@ func (u *Apartomat) ChangeAlbumPageOrientation(
 	return album, nil
 }
 
-func (u *Apartomat) CanChangeAlbumSettings(ctx context.Context, subj *UserCtx, obj *Album) (bool, error) {
+func (u *Apartomat) CanChangeAlbumSettings(ctx context.Context, subj *auth.UserCtx, obj *Album) (bool, error) {
 	prjs, err := u.Projects.List(ctx, projects.IDIn(obj.ProjectID), 1, 0)
 	if err != nil {
 		return false, err

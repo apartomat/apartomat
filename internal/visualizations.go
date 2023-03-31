@@ -3,6 +3,7 @@ package apartomat
 import (
 	"context"
 	"fmt"
+	"github.com/apartomat/apartomat/internal/auth"
 	"github.com/apartomat/apartomat/internal/store/files"
 	"github.com/apartomat/apartomat/internal/store/projects"
 	. "github.com/apartomat/apartomat/internal/store/visualizations"
@@ -62,7 +63,7 @@ func (u *Apartomat) UploadVisualizations(
 		project = prjs[0]
 	)
 
-	if ok, err := u.CanUploadFile(ctx, UserFromCtx(ctx), project); err != nil {
+	if ok, err := u.CanUploadFile(ctx, auth.UserFromCtx(ctx), project); err != nil {
 		return nil, err
 	} else if !ok {
 		return nil, fmt.Errorf("can't get project (id=%s) files: %w", project.ID, ErrForbidden)
@@ -123,7 +124,7 @@ func (u *Apartomat) GetVisualizations(
 		project = prjs[0]
 	)
 
-	if ok, err := u.CanGetVisualizations(ctx, UserFromCtx(ctx), project); err != nil {
+	if ok, err := u.CanGetVisualizations(ctx, auth.UserFromCtx(ctx), project); err != nil {
 		return nil, err
 	} else if !ok {
 		return nil, fmt.Errorf("can't get project (id=%s) visualizations: %w", project.ID, ErrForbidden)
@@ -132,7 +133,7 @@ func (u *Apartomat) GetVisualizations(
 	return u.Visualizations.List(ctx, And(spec, ProjectIDIn(project.ID)), limit, offset)
 }
 
-func (u *Apartomat) CanGetVisualizations(ctx context.Context, subj *UserCtx, obj *projects.Project) (bool, error) {
+func (u *Apartomat) CanGetVisualizations(ctx context.Context, subj *auth.UserCtx, obj *projects.Project) (bool, error) {
 	return u.isProjectUser(ctx, subj, obj)
 }
 
@@ -146,7 +147,7 @@ func (u *Apartomat) DeleteVisualizations(
 	}
 
 	for _, v := range vis {
-		if ok, err := u.CanDeleteVisualization(ctx, UserFromCtx(ctx), v); err != nil {
+		if ok, err := u.CanDeleteVisualization(ctx, auth.UserFromCtx(ctx), v); err != nil {
 			return nil, err
 		} else if !ok {
 			return nil, fmt.Errorf("can't delete visualization (id=%s): %w", v.ID, ErrForbidden)
@@ -162,7 +163,7 @@ func (u *Apartomat) DeleteVisualizations(
 	return vis, err
 }
 
-func (u *Apartomat) CanDeleteVisualization(ctx context.Context, subj *UserCtx, obj *Visualization) (bool, error) {
+func (u *Apartomat) CanDeleteVisualization(ctx context.Context, subj *auth.UserCtx, obj *Visualization) (bool, error) {
 	var (
 		project *projects.Project
 	)
@@ -209,7 +210,7 @@ func (u *Apartomat) GetVisualization(
 		project = prjs[0]
 	)
 
-	if ok, err := u.CanGetVisualizations(ctx, UserFromCtx(ctx), project); err != nil {
+	if ok, err := u.CanGetVisualizations(ctx, auth.UserFromCtx(ctx), project); err != nil {
 		return nil, err
 	} else if !ok {
 		return nil, fmt.Errorf("can't get project (id=%s) visualizations: %w", project.ID, ErrForbidden)

@@ -1,11 +1,15 @@
-package token
+package paseto
 
 import (
 	"crypto/ed25519"
 	"fmt"
-	apartomat "github.com/apartomat/apartomat/internal"
+	"github.com/apartomat/apartomat/internal/auth"
 	"github.com/o1egl/paseto"
 	"time"
+)
+
+const (
+	authPurpose = "auth"
 )
 
 type AuthToken struct {
@@ -16,14 +20,8 @@ func (token AuthToken) UserID() string {
 	return token.Subject
 }
 
-type ClaimKey string
-
-const (
-	PurposeAuth = "auth"
-)
-
-func NewAuthToken(id string) *AuthToken {
-	token := &AuthToken{
+func NewAuthToken(id string) AuthToken {
+	token := AuthToken{
 		JSONToken: paseto.JSONToken{
 			Subject:    id,
 			IssuedAt:   time.Now(),
@@ -31,28 +29,28 @@ func NewAuthToken(id string) *AuthToken {
 		},
 	}
 
-	token.Set(ClaimKeyPurpose, PurposeAuth)
+	token.Set(ClaimKeyPurpose, authPurpose)
 
 	return token
 }
 
-func (token *AuthToken) Validate(validators ...paseto.Validator) error {
+func (token AuthToken) Validate(validators ...paseto.Validator) error {
 	if len(validators) == 0 {
-		validators = append(validators, paseto.ValidAt(time.Now()), hasPurpose(PurposeAuth))
+		validators = append(validators, paseto.ValidAt(time.Now()), hasPurpose(authPurpose))
 	}
 
 	return token.JSONToken.Validate(validators...)
 }
 
-type pasetoAuthTokenIssuerVerifier struct {
+type authTokenIssuerVerifier struct {
 	privateKey ed25519.PrivateKey
 }
 
-func NewPasetoAuthTokenIssuerVerifier(key ed25519.PrivateKey) *pasetoAuthTokenIssuerVerifier {
-	return &pasetoAuthTokenIssuerVerifier{key}
+func NewAuthTokenIssuerVerifier(key ed25519.PrivateKey) *authTokenIssuerVerifier {
+	return &authTokenIssuerVerifier{key}
 }
 
-func (p *pasetoAuthTokenIssuerVerifier) Issue(id string) (string, error) {
+func (p *authTokenIssuerVerifier) Issue(id string) (string, error) {
 	token := NewAuthToken(id)
 	str, err := paseto.NewV2().Sign(p.privateKey, token, "")
 
@@ -63,7 +61,7 @@ func (p *pasetoAuthTokenIssuerVerifier) Issue(id string) (string, error) {
 	return str, nil
 }
 
-func (p *pasetoAuthTokenIssuerVerifier) Verify(str string) (apartomat.AuthToken, error) {
+func (p *authTokenIssuerVerifier) Verify(str string) (auth.AuthToken, error) {
 	var (
 		token  AuthToken
 		footer string

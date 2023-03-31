@@ -3,6 +3,7 @@ package apartomat
 import (
 	"context"
 	"fmt"
+	"github.com/apartomat/apartomat/internal/auth"
 	"github.com/apartomat/apartomat/internal/dataloader"
 	"github.com/apartomat/apartomat/internal/store/projects"
 	"github.com/apartomat/apartomat/internal/store/users"
@@ -22,7 +23,7 @@ func (u *Apartomat) GetWorkspace(ctx context.Context, id string) (*workspaces.Wo
 
 	workspace := ws[0]
 
-	if ok, err := u.CanGetWorkspace(ctx, UserFromCtx(ctx), workspace); err != nil {
+	if ok, err := u.CanGetWorkspace(ctx, auth.UserFromCtx(ctx), workspace); err != nil {
 		return nil, err
 	} else if !ok {
 		return nil, fmt.Errorf("can't get workspace (id=%s): %w", workspace.ID, ErrForbidden)
@@ -31,7 +32,7 @@ func (u *Apartomat) GetWorkspace(ctx context.Context, id string) (*workspaces.Wo
 	return ws[0], nil
 }
 
-func (u *Apartomat) CanGetWorkspace(ctx context.Context, subj *UserCtx, obj *workspaces.Workspace) (bool, error) {
+func (u *Apartomat) CanGetWorkspace(ctx context.Context, subj *auth.UserCtx, obj *workspaces.Workspace) (bool, error) {
 	if subj == nil {
 		return false, nil
 	}
@@ -87,7 +88,7 @@ func (u *Apartomat) GetWorkspaceProjects(
 
 	workspace := ws[0]
 
-	if ok, err := u.CanGetWorkspaceProjects(ctx, UserFromCtx(ctx), workspace); err != nil {
+	if ok, err := u.CanGetWorkspaceProjects(ctx, auth.UserFromCtx(ctx), workspace); err != nil {
 		return nil, err
 	} else if !ok {
 		return nil, fmt.Errorf("can't get workspace (id=%s) projects: %w", workspace.ID, ErrForbidden)
@@ -108,7 +109,7 @@ func (u *Apartomat) GetWorkspaceProjects(
 	return p, nil
 }
 
-func (u *Apartomat) CanGetWorkspaceProjects(ctx context.Context, subj *UserCtx, obj *workspaces.Workspace) (bool, error) {
+func (u *Apartomat) CanGetWorkspaceProjects(ctx context.Context, subj *auth.UserCtx, obj *workspaces.Workspace) (bool, error) {
 	return u.isWorkspaceUser(ctx, subj, obj)
 }
 
@@ -124,7 +125,7 @@ func (u *Apartomat) GetWorkspaceUserProfile(ctx context.Context, workspaceID, us
 
 	workspace := ws[0]
 
-	if ok, err := u.CanGetWorkspaceUsers(ctx, UserFromCtx(ctx), workspace); err != nil {
+	if ok, err := u.CanGetWorkspaceUsers(ctx, auth.UserFromCtx(ctx), workspace); err != nil {
 		return nil, err
 	} else if !ok {
 		return nil, fmt.Errorf("can't get workspace (id=%s) users: %w", workspace.ID, ErrForbidden)
@@ -155,7 +156,7 @@ func (u *Apartomat) GetWorkspaceUsers(ctx context.Context, id string, limit, off
 
 	workspace := ws[0]
 
-	if ok, err := u.CanGetWorkspaceUsers(ctx, UserFromCtx(ctx), workspace); err != nil {
+	if ok, err := u.CanGetWorkspaceUsers(ctx, auth.UserFromCtx(ctx), workspace); err != nil {
 		return nil, err
 	} else if !ok {
 		return nil, fmt.Errorf("can't get workspace (id=%s) users: %w", workspace.ID, ErrForbidden)
@@ -174,6 +175,6 @@ func (u *Apartomat) GetWorkspaceUsers(ctx context.Context, id string, limit, off
 	return wu, nil
 }
 
-func (u *Apartomat) CanGetWorkspaceUsers(ctx context.Context, subj *UserCtx, obj *workspaces.Workspace) (bool, error) {
+func (u *Apartomat) CanGetWorkspaceUsers(ctx context.Context, subj *auth.UserCtx, obj *workspaces.Workspace) (bool, error) {
 	return u.isWorkspaceUser(ctx, subj, obj)
 }

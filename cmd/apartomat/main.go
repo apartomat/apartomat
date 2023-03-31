@@ -6,17 +6,13 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
-	"github.com/apartomat/apartomat/internal/postgres"
-	"github.com/prometheus/client_golang/prometheus"
-	"io/ioutil"
-	"log"
-	"os"
-
 	apartomat "github.com/apartomat/apartomat/internal"
+	"github.com/apartomat/apartomat/internal/auth/paseto"
 	"github.com/apartomat/apartomat/internal/dataloader"
 	"github.com/apartomat/apartomat/internal/image/minio"
 	"github.com/apartomat/apartomat/internal/mail"
 	"github.com/apartomat/apartomat/internal/mail/smtp"
+	"github.com/apartomat/apartomat/internal/postgres"
 	albums "github.com/apartomat/apartomat/internal/store/albums/postgres"
 	contacts "github.com/apartomat/apartomat/internal/store/contacts/postgres"
 	files "github.com/apartomat/apartomat/internal/store/files/postgres"
@@ -27,8 +23,11 @@ import (
 	visualizations "github.com/apartomat/apartomat/internal/store/visualizations/postgres"
 	workspace_users "github.com/apartomat/apartomat/internal/store/workspace_users/postgres"
 	workspaces "github.com/apartomat/apartomat/internal/store/workspaces/postgres"
-	"github.com/apartomat/apartomat/internal/token"
 	"github.com/go-pg/pg/v10"
+	"github.com/prometheus/client_golang/prometheus"
+	"io/ioutil"
+	"log"
+	"os"
 )
 
 func main() {
@@ -55,9 +54,9 @@ func main() {
 			log.Fatalf("cant read private key from file: %s", err)
 		}
 
-		confirmLoginIssuerVerifier := token.NewPasetoMailConfirmTokenIssuerVerifier(privateKey)
-		authIssuerVerifier := token.NewPasetoAuthTokenIssuerVerifier(privateKey)
-		confirmEmailPin := token.NewPasetoConfirmEmailPINTokenIssuerVerifier(privateKey)
+		confirmLoginIssuerVerifier := paseto.NewConfirmEmailTokenIssuerVerifier(privateKey)
+		authIssuerVerifier := paseto.NewAuthTokenIssuerVerifier(privateKey)
+		confirmEmailPin := paseto.NewConfirmEmailPINTokenIssuerVerifier(privateKey)
 
 		mailer := smtp.NewMailSender(smtp.Config{
 			Addr:     os.Getenv("SMTP_ADDR"),

@@ -3,6 +3,7 @@ package apartomat
 import (
 	"context"
 	"fmt"
+	"github.com/apartomat/apartomat/internal/auth"
 	. "github.com/apartomat/apartomat/internal/store/users"
 )
 
@@ -20,7 +21,7 @@ func (u *Apartomat) GetUserProfile(ctx context.Context, id string) (*User, error
 		user = users[0]
 	)
 
-	if ok, err := u.CanGetUserProfile(ctx, UserFromCtx(ctx), user); err != nil {
+	if ok, err := u.CanGetUserProfile(ctx, auth.UserFromCtx(ctx), user); err != nil {
 		return nil, err
 	} else if !ok {
 		return nil, fmt.Errorf("can't get user profile (id=%s): %w", user.ID, ErrForbidden)
@@ -29,7 +30,7 @@ func (u *Apartomat) GetUserProfile(ctx context.Context, id string) (*User, error
 	return user, nil
 }
 
-func (u *Apartomat) CanGetUserProfile(ctx context.Context, subj *UserCtx, obj *User) (bool, error) {
+func (u *Apartomat) CanGetUserProfile(ctx context.Context, subj *auth.UserCtx, obj *User) (bool, error) {
 	if subj == nil {
 		return false, nil
 	}

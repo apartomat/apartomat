@@ -3,6 +3,7 @@ package apartomat
 import (
 	"context"
 	"fmt"
+	"github.com/apartomat/apartomat/internal/auth"
 	. "github.com/apartomat/apartomat/internal/store/projects"
 	"github.com/apartomat/apartomat/internal/store/workspace_users"
 	"github.com/apartomat/apartomat/internal/store/workspaces"
@@ -28,7 +29,7 @@ func (u *Apartomat) CreateProject(
 		workspace = ws[0]
 	)
 
-	if ok, err := u.CanCreateProject(ctx, UserFromCtx(ctx), workspace); err != nil {
+	if ok, err := u.CanCreateProject(ctx, auth.UserFromCtx(ctx), workspace); err != nil {
 		return nil, err
 	} else if !ok {
 		return nil, fmt.Errorf("can't create project in workspace (id=%s): %w", workspace.ID, ErrForbidden)
@@ -48,7 +49,7 @@ func (u *Apartomat) CreateProject(
 	return project, nil
 }
 
-func (u *Apartomat) CanCreateProject(ctx context.Context, subj *UserCtx, obj *workspaces.Workspace) (bool, error) {
+func (u *Apartomat) CanCreateProject(ctx context.Context, subj *auth.UserCtx, obj *workspaces.Workspace) (bool, error) {
 	if subj == nil {
 		return false, nil
 	}
@@ -87,7 +88,7 @@ func (u *Apartomat) ChangeProjectStatus(ctx context.Context, projectID string, s
 		project = projects[0]
 	)
 
-	if ok, err := u.CanUpdateProject(ctx, UserFromCtx(ctx), project); err != nil {
+	if ok, err := u.CanUpdateProject(ctx, auth.UserFromCtx(ctx), project); err != nil {
 		return nil, err
 	} else if !ok {
 		return nil, fmt.Errorf("can't update project (id=%s): %w", project.ID, ErrForbidden)
@@ -116,7 +117,7 @@ func (u *Apartomat) ChangeProjectDates(ctx context.Context, projectID string, st
 		project = projects[0]
 	)
 
-	if ok, err := u.CanUpdateProject(ctx, UserFromCtx(ctx), project); err != nil {
+	if ok, err := u.CanUpdateProject(ctx, auth.UserFromCtx(ctx), project); err != nil {
 		return nil, err
 	} else if !ok {
 		return nil, fmt.Errorf("can't update project (id=%s): %w", project.ID, ErrForbidden)
@@ -131,7 +132,7 @@ func (u *Apartomat) ChangeProjectDates(ctx context.Context, projectID string, st
 	return project, nil
 }
 
-func (u *Apartomat) CanUpdateProject(ctx context.Context, subj *UserCtx, obj *Project) (bool, error) {
+func (u *Apartomat) CanUpdateProject(ctx context.Context, subj *auth.UserCtx, obj *Project) (bool, error) {
 	if subj == nil {
 		return false, nil
 	}
@@ -170,7 +171,7 @@ func (u *Apartomat) GetProject(ctx context.Context, id string) (*Project, error)
 		project = prjs[0]
 	)
 
-	if ok, err := u.CanGetProject(ctx, UserFromCtx(ctx), project); err != nil {
+	if ok, err := u.CanGetProject(ctx, auth.UserFromCtx(ctx), project); err != nil {
 		return nil, err
 	} else if !ok {
 		return nil, fmt.Errorf("can't get project (id=%s): %w", project.ID, ErrForbidden)
@@ -179,6 +180,6 @@ func (u *Apartomat) GetProject(ctx context.Context, id string) (*Project, error)
 	return project, nil
 }
 
-func (u *Apartomat) CanGetProject(ctx context.Context, subj *UserCtx, obj *Project) (bool, error) {
+func (u *Apartomat) CanGetProject(ctx context.Context, subj *auth.UserCtx, obj *Project) (bool, error) {
 	return u.isProjectUser(ctx, subj, obj)
 }

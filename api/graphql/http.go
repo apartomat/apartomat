@@ -3,13 +3,13 @@ package graphql
 import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
-	apartomat "github.com/apartomat/apartomat/internal"
+	"github.com/apartomat/apartomat/internal/auth"
 	"github.com/apartomat/apartomat/internal/dataloader"
 	"net/http"
 	"strings"
 )
 
-type CheckAuthTokenFn func(str string) (apartomat.AuthToken, error)
+type CheckAuthTokenFn func(str string) (auth.AuthToken, error)
 
 func Handler(
 	ch CheckAuthTokenFn,
@@ -40,8 +40,8 @@ func WithUserHandler(checkAuthToken CheckAuthTokenFn, next http.Handler) http.Ha
 
 		t, _ := checkAuthToken(strings.TrimPrefix(header, "Bearer "))
 		if t != nil {
-			userCtx := &apartomat.UserCtx{ID: t.UserID()}
-			r = r.WithContext(apartomat.WithUserCtx(r.Context(), userCtx))
+			userCtx := &auth.UserCtx{ID: t.UserID()}
+			r = r.WithContext(auth.WithUserCtx(r.Context(), userCtx))
 		}
 
 		next.ServeHTTP(w, r)

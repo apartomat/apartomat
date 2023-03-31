@@ -3,6 +3,7 @@ package apartomat
 import (
 	"context"
 	"fmt"
+	"github.com/apartomat/apartomat/internal/auth"
 	. "github.com/apartomat/apartomat/internal/store/contacts"
 	"github.com/apartomat/apartomat/internal/store/projects"
 	"github.com/apartomat/apartomat/internal/store/workspace_users"
@@ -28,7 +29,7 @@ func (u *Apartomat) AddContact(ctx context.Context, projectID string, params Add
 		project = prjs[0]
 	)
 
-	if ok, err := u.CanAddContact(ctx, UserFromCtx(ctx), project); err != nil {
+	if ok, err := u.CanAddContact(ctx, auth.UserFromCtx(ctx), project); err != nil {
 		return nil, err
 	} else if !ok {
 		return nil, fmt.Errorf("can't add contact to project (id=%s): %w", project.ID, ErrForbidden)
@@ -48,7 +49,7 @@ func (u *Apartomat) AddContact(ctx context.Context, projectID string, params Add
 	return contact, nil
 }
 
-func (u *Apartomat) CanAddContact(ctx context.Context, subj *UserCtx, obj *projects.Project) (bool, error) {
+func (u *Apartomat) CanAddContact(ctx context.Context, subj *auth.UserCtx, obj *projects.Project) (bool, error) {
 	if subj == nil {
 		return false, nil
 	}
@@ -87,7 +88,7 @@ func (u *Apartomat) GetContacts(ctx context.Context, projectID string, limit, of
 		project = prjs[0]
 	)
 
-	if ok, err := u.CanGetContacts(ctx, UserFromCtx(ctx), project); err != nil {
+	if ok, err := u.CanGetContacts(ctx, auth.UserFromCtx(ctx), project); err != nil {
 		return nil, err
 	} else if !ok {
 		return nil, fmt.Errorf("can't get project (id=%s) contacts: %w", project.ID, ErrForbidden)
@@ -96,7 +97,7 @@ func (u *Apartomat) GetContacts(ctx context.Context, projectID string, limit, of
 	return u.Contacts.List(ctx, ProjectIDIn(project.ID), limit, offset)
 }
 
-func (u *Apartomat) CanGetContacts(ctx context.Context, subj *UserCtx, obj *projects.Project) (bool, error) {
+func (u *Apartomat) CanGetContacts(ctx context.Context, subj *auth.UserCtx, obj *projects.Project) (bool, error) {
 	if subj == nil {
 		return false, nil
 	}
@@ -141,7 +142,7 @@ func (u *Apartomat) UpdateContact(ctx context.Context, contactID string, params 
 		contact = contacts[0]
 	)
 
-	if ok, err := u.CanUpdateContact(ctx, UserFromCtx(ctx), contact); err != nil {
+	if ok, err := u.CanUpdateContact(ctx, auth.UserFromCtx(ctx), contact); err != nil {
 		return nil, err
 	} else if !ok {
 		return nil, fmt.Errorf("can't update contact (id=%s): %w", contact.ID, ErrForbidden)
@@ -156,7 +157,7 @@ func (u *Apartomat) UpdateContact(ctx context.Context, contactID string, params 
 	return contact, nil
 }
 
-func (u *Apartomat) CanUpdateContact(ctx context.Context, subj *UserCtx, obj *Contact) (bool, error) {
+func (u *Apartomat) CanUpdateContact(ctx context.Context, subj *auth.UserCtx, obj *Contact) (bool, error) {
 	if subj == nil {
 		return false, nil
 	}
@@ -208,7 +209,7 @@ func (u *Apartomat) DeleteContact(ctx context.Context, contactID string) (*Conta
 		contact = contacts[0]
 	)
 
-	if ok, err := u.CanDeleteContact(ctx, UserFromCtx(ctx), contact); err != nil {
+	if ok, err := u.CanDeleteContact(ctx, auth.UserFromCtx(ctx), contact); err != nil {
 		return nil, err
 	} else if !ok {
 		return nil, fmt.Errorf("can't delete contact (id=%s): %w", contact.ID, ErrForbidden)
@@ -219,7 +220,7 @@ func (u *Apartomat) DeleteContact(ctx context.Context, contactID string) (*Conta
 	return contact, err
 }
 
-func (u *Apartomat) CanDeleteContact(ctx context.Context, subj *UserCtx, obj *Contact) (bool, error) {
+func (u *Apartomat) CanDeleteContact(ctx context.Context, subj *auth.UserCtx, obj *Contact) (bool, error) {
 	if subj == nil {
 		return false, nil
 	}

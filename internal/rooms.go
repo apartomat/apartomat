@@ -3,6 +3,7 @@ package apartomat
 import (
 	"context"
 	"fmt"
+	"github.com/apartomat/apartomat/internal/auth"
 	"github.com/apartomat/apartomat/internal/store/houses"
 	projects "github.com/apartomat/apartomat/internal/store/projects"
 	. "github.com/apartomat/apartomat/internal/store/rooms"
@@ -24,7 +25,7 @@ func (u *Apartomat) GetRooms(ctx context.Context, houseID string, limit, offset 
 		house = h[0]
 	}
 
-	if ok, err := u.CanGetRooms(ctx, UserFromCtx(ctx), house); err != nil {
+	if ok, err := u.CanGetRooms(ctx, auth.UserFromCtx(ctx), house); err != nil {
 		return nil, err
 	} else if !ok {
 		return nil, fmt.Errorf("can't get rooms of house (id=%s): %w", houseID, ErrForbidden)
@@ -33,7 +34,7 @@ func (u *Apartomat) GetRooms(ctx context.Context, houseID string, limit, offset 
 	return u.Rooms.List(ctx, HouseIDIn(houseID), limit, offset)
 }
 
-func (u *Apartomat) CanGetRooms(ctx context.Context, subj *UserCtx, obj *houses.House) (bool, error) {
+func (u *Apartomat) CanGetRooms(ctx context.Context, subj *auth.UserCtx, obj *houses.House) (bool, error) {
 	if subj == nil {
 		return false, nil
 	}
@@ -91,7 +92,7 @@ func (u *Apartomat) AddRoom(
 		house = h[0]
 	}
 
-	if ok, err := u.CanAddRoom(ctx, UserFromCtx(ctx), house); err != nil {
+	if ok, err := u.CanAddRoom(ctx, auth.UserFromCtx(ctx), house); err != nil {
 		return nil, err
 	} else if !ok {
 		return nil, fmt.Errorf("can't add room to house (id=%s): %w", house.ID, ErrForbidden)
@@ -113,7 +114,7 @@ func (u *Apartomat) AddRoom(
 	return room, nil
 }
 
-func (u *Apartomat) CanAddRoom(ctx context.Context, subj *UserCtx, obj *houses.House) (bool, error) {
+func (u *Apartomat) CanAddRoom(ctx context.Context, subj *auth.UserCtx, obj *houses.House) (bool, error) {
 	return u.CanGetRooms(ctx, subj, obj)
 }
 
@@ -138,7 +139,7 @@ func (u *Apartomat) UpdateRoom(
 		room = r[0]
 	}
 
-	if ok, err := u.CanUpdateRoom(ctx, UserFromCtx(ctx), room); err != nil {
+	if ok, err := u.CanUpdateRoom(ctx, auth.UserFromCtx(ctx), room); err != nil {
 		return nil, err
 	} else if !ok {
 		return nil, fmt.Errorf("can't update room (id=%s): %w", room.ID, ErrForbidden)
@@ -155,7 +156,7 @@ func (u *Apartomat) UpdateRoom(
 	return room, nil
 }
 
-func (u *Apartomat) CanUpdateRoom(ctx context.Context, subj *UserCtx, obj *Room) (bool, error) {
+func (u *Apartomat) CanUpdateRoom(ctx context.Context, subj *auth.UserCtx, obj *Room) (bool, error) {
 	if subj == nil || obj == nil {
 		return false, nil
 	}
@@ -217,7 +218,7 @@ func (u *Apartomat) DeleteRoom(ctx context.Context, roomID string) (*Room, error
 		room = rooms[0]
 	)
 
-	if ok, err := u.CanDeleteRoom(ctx, UserFromCtx(ctx), room); err != nil {
+	if ok, err := u.CanDeleteRoom(ctx, auth.UserFromCtx(ctx), room); err != nil {
 		return nil, err
 	} else if !ok {
 		return nil, fmt.Errorf("can't delete room (id=%s): %w", room.ID, ErrForbidden)
@@ -228,6 +229,6 @@ func (u *Apartomat) DeleteRoom(ctx context.Context, roomID string) (*Room, error
 	return room, err
 }
 
-func (u *Apartomat) CanDeleteRoom(ctx context.Context, subj *UserCtx, obj *Room) (bool, error) {
+func (u *Apartomat) CanDeleteRoom(ctx context.Context, subj *auth.UserCtx, obj *Room) (bool, error) {
 	return u.CanUpdateRoom(ctx, subj, obj)
 }
