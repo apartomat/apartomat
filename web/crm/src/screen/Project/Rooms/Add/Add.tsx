@@ -21,7 +21,7 @@ export function Add({
     const [ addRoom, { data, loading, error } ] = useAddRoom()
 
     const handleSubmit = (event: React.FormEvent) => {
-        const { name, square } = value;
+        const { name, square } = value
         
         addRoom(houseId, { name, square: parseFloat(square.replace(",", ".")) })
 

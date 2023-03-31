@@ -1,5 +1,3 @@
-import React from "react"
-
 import { UserContext, UserContextStatus } from "context/auth/useAuthContext"
 
 import { Avatar } from "grommet"
@@ -9,10 +7,10 @@ export function UserAvatar ({ user, className }: {user: UserContext, className?:
         case UserContextStatus.LOGGED:
             return (
                 <Avatar src={user.avatar} />
-            );
+            )
         default:
-            return null;
+            return null
     }
 }
 
-export default UserAvatar;
+export default UserAvatar

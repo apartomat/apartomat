@@ -1,6 +1,6 @@
 import { useApolloClient } from "@apollo/client"
 import { ProjectVisualizationsListFilter, useVisualizationsScreenQuery } from "api/graphql"
-import { useState } from "react";
+import { useState } from "react"
 
 export { VisualizationStatus } from  "api/graphql"
 
@@ -8,7 +8,7 @@ export function useVisualizations(id: string, filter: ProjectVisualizationsListF
 
     const [ first, setFirst] = useState(true)
 
-    const client = useApolloClient();
+    const client = useApolloClient()
 
     const result = useVisualizationsScreenQuery({
         client,

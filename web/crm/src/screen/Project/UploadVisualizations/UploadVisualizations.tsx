@@ -30,7 +30,7 @@ export default function UploadVisualizations({
     const [ upload, { loading, error, data } ] = useUploadVisualizations()
 
     useEffect(() => {
-        const complete = data?.uploadVisualizations.__typename === "VisualizationsUploaded";
+        const complete = data?.uploadVisualizations.__typename === "VisualizationsUploaded"
 
         if (complete) {
             onUploadComplete && onUploadComplete({ files })
@@ -38,7 +38,7 @@ export default function UploadVisualizations({
     }, [ data, files, onUploadComplete ])
 
     useEffect(() => {
-        const complete = data?.uploadVisualizations.__typename === "SomeVisualizationsUploaded";
+        const complete = data?.uploadVisualizations.__typename === "SomeVisualizationsUploaded"
 
         if (complete) {
             onUploadComplete && onUploadComplete({ files })
@@ -46,7 +46,7 @@ export default function UploadVisualizations({
     }, [ data, files, onUploadComplete ])
 
     useEffect(() => {
-        const error = data?.uploadVisualizations.__typename === "Forbidden";
+        const error = data?.uploadVisualizations.__typename === "Forbidden"
 
         if (error) {
             setErrorMessage("Доступ запрещен")

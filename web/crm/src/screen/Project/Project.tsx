@@ -95,7 +95,7 @@ export function Project () {
         }
     }, [ data ])
 
-    const [showUploadVisualizations, setShowUploadVisualizations] = useState(false);
+    const [showUploadVisualizations, setShowUploadVisualizations] = useState(false)
 
     const [ redirectTo, setRedirectTo ] = useState<string | undefined>(undefined)
 
@@ -111,7 +111,7 @@ export function Project () {
                     <Text>Загрузка...</Text>
                 </Box>
             </Main>
-        );
+        )
     }
 
     if (error) {
@@ -309,7 +309,7 @@ export function Project () {
                     }}
                 />    
             </Main>
-        );
+        )
     } else {
         return <></>
     }

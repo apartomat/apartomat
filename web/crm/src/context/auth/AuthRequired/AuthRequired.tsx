@@ -33,14 +33,14 @@ function AuthRequired() {
                         <Text>Авторизация...</Text>
                     </Box>
                 </Main>
-            );
+            )
         case UserContextStatus.SERVER_ERROR:
             return (
                 <Main pad="large">
                     <Heading level={2}>Ошибка</Heading>
                     <Paragraph>Не удалось получить профиль пользователя</Paragraph>
                 </Main>
-            );
+            )
         case UserContextStatus.LOGGED:
             return (
                 <Outlet/>

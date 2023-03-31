@@ -175,7 +175,7 @@ export default function Visualizations() {
                     <Text>Загрузка...</Text>
                 </Box>
             </Main>
-        );
+        )
     }
 
     if (error) {

@@ -19,7 +19,7 @@ export function PageOrientation({
     const options = [
         {value: PageOrientationEnum.Portrait, title: "portrait", icon: <Document/> },
         {value: PageOrientationEnum.Landscape, title: "landscape", icon: <Document transform="rotate(-90)"/> }
-    ];
+    ]
 
     const [ pageOrientation, setPageOrientation ] = useState<string>(orientation)
 

@@ -4,7 +4,7 @@ import { useProjectScreenQuery } from "api/graphql"
 import type { Contact, ProjectContactsTotal, Forbidden, ServerError } from "api/graphql"
 
 export function useProject(id: string) {
-    const client = useApolloClient();
+    const client = useApolloClient()
     const result = useProjectScreenQuery({ client, errorPolicy: "all", variables: { id }, notifyOnNetworkStatusChange: true })
 
     return { ...result, refetching: result.networkStatus === NetworkStatus.refetch }
@@ -40,4 +40,4 @@ export type ProjectContacts = (
     { __typename: 'ProjectContactsTotal' }
     & Pick<ProjectContactsTotal, 'total'>
   ) | { __typename: 'Forbidden' } | { __typename: 'ServerError' } }
-);
+)

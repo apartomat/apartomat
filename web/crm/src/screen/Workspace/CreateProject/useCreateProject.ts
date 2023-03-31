@@ -47,8 +47,8 @@ export function useCreateProject(): [
     CreateProjectMutationResult,
     Result
 ] {
-    const client = useApolloClient(); 
-    const [create, result] = useCreateProjectMutation({ client, errorPolicy: 'all' });
+    const client = useApolloClient()
+    const [create, result] = useCreateProjectMutation({ client, errorPolicy: 'all' })
 
     const state = new Proxy<Result>({ state: State.INITIAL }, {
         get: (target: Result, name: string) => {

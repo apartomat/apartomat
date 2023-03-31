@@ -10,11 +10,11 @@ function LoginForm( { loading, login, error }:
     const [email, setEmail] = useState("")
 
     function handleInput(event: React.ChangeEvent<HTMLInputElement>) {
-        setEmail(event.target.value);
+        setEmail(event.target.value)
     }
 
     function handleSubmit(event: React.FormEvent) {
-        login(email);
+        login(email)
         event.preventDefault()
     }
 

@@ -17,7 +17,7 @@ const defaultSuggestions = [
     "Санузел",
     "Спальня",
     "Туалет",
-];
+]
 
 const filterSuggestions = (vals: string[], val: string) => {
     const re = new RegExp(`${val}`, 'i')

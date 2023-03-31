@@ -7,10 +7,10 @@ export function UserAvatar ({ user }: { user: UserContext }) {
         case UserContextStatus.LOGGED:
             return (
                 <Avatar src={user.avatar} />
-            );
+            )
         default:
-            return null;
+            return null
     }
 }
 
-export default UserAvatar;
+export default UserAvatar

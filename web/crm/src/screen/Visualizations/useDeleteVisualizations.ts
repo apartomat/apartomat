@@ -7,7 +7,7 @@ export function useDeleteVisualizations(): [
     DeleteContactFn,
     DeleteVisualizationsMutationResult
 ]  {
-    const client = useApolloClient();
+    const client = useApolloClient()
     const [ deleteVisualizations, result ] = useDeleteVisualizationsMutation({ client, errorPolicy: "all" })
 
     return [

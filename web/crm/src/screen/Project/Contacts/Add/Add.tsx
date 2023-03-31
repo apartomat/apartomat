@@ -20,20 +20,20 @@ export default function Add(
     const [ add, { data, loading, error } ] = useAddContact()
 
     const handleSubmit = (event: React.FormEvent) => {
-        const { fullName } = value;
+        const { fullName } = value
 
-        const details = [];
+        const details = []
 
         if (value.phone) {
-            details.push({type: ContactType.Phone, value: value.phone});
+            details.push({type: ContactType.Phone, value: value.phone})
         }
 
         if (value.email) {
-            details.push({type: ContactType.Email, value: value.email});
+            details.push({type: ContactType.Email, value: value.email})
         }
 
         if (value.instagram) {
-            details.push({type: ContactType.Instagram, value: value.instagram});
+            details.push({type: ContactType.Instagram, value: value.instagram})
         }
 
         add(projectId, { fullName, details })

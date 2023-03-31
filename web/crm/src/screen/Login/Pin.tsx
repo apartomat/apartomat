@@ -26,7 +26,7 @@ function Pin({ email, token, redirectTo = "/" }: { email: string, token: string,
     }, [ data, saveToken, check, redirectTo, history ])
 
     function handleInputPin({ target: { value }}: React.ChangeEvent<HTMLInputElement>) {
-        setPin(value);
+        setPin(value)
     }
 
     function handleSubmit(event: React.FormEvent) {
