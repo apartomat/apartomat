@@ -68,8 +68,6 @@ models:
     fields:
       projects:
         resolver: true
-      users:
-        resolver: true
   WorkspaceProjects:
     fields:
       list:
@@ -79,10 +77,4 @@ models:
   WorkspaceUser:
     fields:
       profile:
-        resolver: true
-  WorkspaceUsers:
-    fields:
-      list:
-        resolver: true
-      total:
         resolver: true

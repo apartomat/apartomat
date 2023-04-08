@@ -8,7 +8,7 @@ type Workspace {
     id: String!
     name: String!
 	projects: WorkspaceProjects!
-	users: WorkspaceUsers!
+	users: WorkspaceUsers! @goField(forceResolver: true)
 }
 
 
@@ -35,8 +35,8 @@ type WorkspaceProjectsTotal {
 
 
 type WorkspaceUsers {
-	list(filter: WorkspaceUsersFilter! = {} limit: Int! = 10): WorkspaceUsersListResult!
-	total(filter: WorkspaceUsersFilter! = {}): WorkspaceUsersTotalResult!
+	list(filter: WorkspaceUsersFilter! = {} limit: Int! = 10): WorkspaceUsersListResult! @goField(forceResolver: true)
+	total(filter: WorkspaceUsersFilter! = {}): WorkspaceUsersTotalResult! @goField(forceResolver: true)
 }
 
 input WorkspaceUsersFilter {

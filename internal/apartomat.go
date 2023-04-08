@@ -28,6 +28,9 @@ type Apartomat struct {
 	ConfirmEmailPINTokenIssuer   auth.ConfirmEmailPINTokenIssuer
 	ConfirmEmailPINTokenVerifier auth.ConfirmEmailPINTokenVerifier
 
+	InviteTokenIssuer   auth.InviteTokenIssuer
+	InviteTokenVerifier auth.InviteTokenVerifier
+
 	Mailer      mail.Sender
 	MailFactory *mail.Factory
 

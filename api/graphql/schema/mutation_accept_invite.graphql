@@ -1,0 +1,9 @@
+extend type Mutation {
+    acceptInvite(token: String!): AcceptInviteResult!
+}
+
+union AcceptInviteResult = InviteAccepted | InvalidToken | ExpiredToken | ServerError
+
+type InviteAccepted {
+    token: String!
+}

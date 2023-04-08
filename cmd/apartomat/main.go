@@ -57,6 +57,7 @@ func main() {
 		confirmLoginIssuerVerifier := paseto.NewConfirmEmailTokenIssuerVerifier(privateKey)
 		authIssuerVerifier := paseto.NewAuthTokenIssuerVerifier(privateKey)
 		confirmEmailPin := paseto.NewConfirmEmailPINTokenIssuerVerifier(privateKey)
+		invite := paseto.NewInviteTokenIssuerVerifier(privateKey)
 
 		mailer := smtp.NewMailSender(smtp.Config{
 			Addr:     os.Getenv("SMTP_ADDR"),
@@ -115,6 +116,8 @@ func main() {
 			ConfirmTokenByEmailVerifier:  confirmLoginIssuerVerifier,
 			ConfirmEmailPINTokenIssuer:   confirmEmailPin,
 			ConfirmEmailPINTokenVerifier: confirmEmailPin,
+			InviteTokenIssuer:            invite,
+			InviteTokenVerifier:          invite,
 			Mailer:                       mailer,
 			MailFactory:                  mail.NewFactory("https://crm.apartomat.ru", "apartomat@yandex.ru"),
 			Uploader:                     uploader,

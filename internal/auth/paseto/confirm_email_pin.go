@@ -10,6 +10,8 @@ import (
 
 const (
 	confirmEmailPINPurpose = "confirm-email-pin"
+
+	claimKeyPIN = "pin"
 )
 
 type ConfirmEmailPINToken struct {
@@ -21,7 +23,7 @@ func (token ConfirmEmailPINToken) Email() string {
 }
 
 func (token ConfirmEmailPINToken) PIN() string {
-	return token.Get(ClaimKeyPIN)
+	return token.Get(claimKeyPIN)
 }
 
 func NewConfirmEmailPINToken(email, pin string) ConfirmEmailPINToken {
@@ -33,9 +35,9 @@ func NewConfirmEmailPINToken(email, pin string) ConfirmEmailPINToken {
 		},
 	}
 
-	token.Set(ClaimKeyPIN, pin)
+	token.Set(claimKeyPIN, pin)
 
-	token.Set(ClaimKeyPurpose, confirmEmailPINPurpose)
+	token.Set(claimKeyPurpose, confirmEmailPINPurpose)
 
 	return token
 }
@@ -85,4 +87,8 @@ func (p *confirmEmailPINTokenIssuerVerifier) Verify(str, pin string) (auth.Confi
 	}
 
 	return &token, nil
+}
+
+func hasPIN(pin string) paseto.Validator {
+	return hasClaim(claimKeyPIN, pin)
 }

@@ -29,7 +29,7 @@ func NewAuthToken(id string) AuthToken {
 		},
 	}
 
-	token.Set(ClaimKeyPurpose, authPurpose)
+	token.Set(claimKeyPurpose, authPurpose)
 
 	return token
 }

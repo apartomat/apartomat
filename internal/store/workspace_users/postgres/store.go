@@ -81,7 +81,7 @@ func toRecord(user *WorkspaceUser) *record {
 	return &record{
 		ID:          user.ID,
 		WorkspaceID: user.WorkspaceID,
-		UserID:      user.WorkspaceID,
+		UserID:      user.UserID,
 		Role:        string(user.Role),
 		CreatedAt:   user.CreatedAt,
 		ModifiedAt:  user.ModifiedAt,

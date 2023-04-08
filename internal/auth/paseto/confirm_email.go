@@ -29,7 +29,7 @@ func NewConfirmEmailToken(email string) ConfirmEmailToken {
 		},
 	}
 
-	token.Set(ClaimKeyPurpose, confirmEmailPurpose)
+	token.Set(claimKeyPurpose, confirmEmailPurpose)
 
 	return token
 }

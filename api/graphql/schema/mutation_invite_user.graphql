@@ -1,0 +1,13 @@
+extend type Mutation {
+    inviteUser(workspaceID: String! email: String! role: WorkspaceUserRole!): InviteUserToWorkspaceResult!
+}
+
+union InviteUserToWorkspaceResult = InviteSent | AlreadyInWorkspace | Forbidden | NotFound | ServerError
+
+type InviteSent {
+    to: String!
+}
+
+type AlreadyInWorkspace implements Error {
+    message: String!
+}

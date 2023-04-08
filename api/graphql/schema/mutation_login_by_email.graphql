@@ -1,5 +1,5 @@
 extend type Mutation {
-    loginByEmail(email: String!, workspaceName: String! = "Workspace"): LoginByEmailResult!
+    loginByEmail(email: String! workspaceName: String! = "Workspace"): LoginByEmailResult!
 }
 
 union LoginByEmailResult = LinkSentByEmail | PinSentByEmail | InvalidEmail | ServerError

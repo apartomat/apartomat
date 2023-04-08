@@ -12,15 +12,12 @@ var (
 )
 
 const (
-	ClaimKeyPurpose = "pur"
-	ClaimKeyPIN     = "pin"
+	claimKeyPurpose = "pur"
 )
 
-var (
-	hasPurpose = func(purpose string) paseto.Validator {
-		return hasClaim(ClaimKeyPurpose, purpose)
-	}
-)
+func hasPurpose(purpose string) paseto.Validator {
+	return hasClaim(claimKeyPurpose, purpose)
+}
 
 func hasClaim(key, value string) paseto.Validator {
 	return func(token *paseto.JSONToken) error {
@@ -30,8 +27,4 @@ func hasClaim(key, value string) paseto.Validator {
 
 		return nil
 	}
-}
-
-func hasPIN(pin string) paseto.Validator {
-	return hasClaim(ClaimKeyPIN, pin)
 }

@@ -1,0 +1,9 @@
+extend type Mutation {
+    confirmLoginPin(token: String! pin: String!): ConfirmLoginPinResult!
+}
+
+union ConfirmLoginPinResult = LoginConfirmed | InvalidPin | InvalidToken | ExpiredToken | ServerError
+
+type InvalidPin implements Error {
+    message: String!
+}

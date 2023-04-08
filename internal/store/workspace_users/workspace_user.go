@@ -3,8 +3,8 @@ package workspace_users
 import "time"
 
 const (
-	WorkspaceUserRoleAdmin = "admin"
-	WorkspaceUserRoleUser  = "user"
+	WorkspaceUserRoleAdmin = "ADMIN"
+	WorkspaceUserRoleUser  = "USER"
 )
 
 type WorkspaceUserRole string

@@ -11,6 +11,10 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 )
 
+type AcceptInviteResult interface {
+	IsAcceptInviteResult()
+}
+
 type AddContactResult interface {
 	IsAddContactResult()
 }
@@ -102,6 +106,10 @@ type Error interface {
 
 type HouseRoomsListResult interface {
 	IsHouseRoomsListResult()
+}
+
+type InviteUserToWorkspaceResult interface {
+	IsInviteUserToWorkspaceResult()
 }
 
 type LoginByEmailResult interface {
@@ -284,6 +292,15 @@ func (AlreadyExists) IsUploadFileResult() {}
 func (AlreadyExists) IsError()                {}
 func (this AlreadyExists) GetMessage() string { return this.Message }
 
+type AlreadyInWorkspace struct {
+	Message string `json:"message"`
+}
+
+func (AlreadyInWorkspace) IsInviteUserToWorkspaceResult() {}
+
+func (AlreadyInWorkspace) IsError()                {}
+func (this AlreadyInWorkspace) GetMessage() string { return this.Message }
+
 type ChangeProjectDatesInput struct {
 	StartAt *time.Time `json:"startAt,omitempty"`
 	EndAt   *time.Time `json:"endAt,omitempty"`
@@ -346,6 +363,8 @@ type ExpiredToken struct {
 	Message string `json:"message"`
 }
 
+func (ExpiredToken) IsAcceptInviteResult() {}
+
 func (ExpiredToken) IsConfirmLoginLinkResult() {}
 
 func (ExpiredToken) IsError()                {}
@@ -398,6 +417,8 @@ func (Forbidden) IsDeleteContactResult() {}
 func (Forbidden) IsDeleteRoomResult() {}
 
 func (Forbidden) IsDeleteVisualizationsResult() {}
+
+func (Forbidden) IsInviteUserToWorkspaceResult() {}
 
 func (Forbidden) IsUpdateContactResult() {}
 
@@ -516,12 +537,26 @@ type InvalidToken struct {
 	Message string `json:"message"`
 }
 
+func (InvalidToken) IsAcceptInviteResult() {}
+
 func (InvalidToken) IsConfirmLoginLinkResult() {}
 
 func (InvalidToken) IsError()                {}
 func (this InvalidToken) GetMessage() string { return this.Message }
 
 func (InvalidToken) IsConfirmLoginPinResult() {}
+
+type InviteAccepted struct {
+	Token string `json:"token"`
+}
+
+func (InviteAccepted) IsAcceptInviteResult() {}
+
+type InviteSent struct {
+	To string `json:"to"`
+}
+
+func (InviteSent) IsInviteUserToWorkspaceResult() {}
 
 type LinkSentByEmail struct {
 	Email string `json:"email"`
@@ -560,6 +595,8 @@ func (NotFound) IsDeleteContactResult() {}
 func (NotFound) IsDeleteRoomResult() {}
 
 func (NotFound) IsDeleteVisualizationsResult() {}
+
+func (NotFound) IsInviteUserToWorkspaceResult() {}
 
 func (NotFound) IsUpdateContactResult() {}
 
@@ -777,6 +814,8 @@ type ServerError struct {
 	Message string `json:"message"`
 }
 
+func (ServerError) IsAcceptInviteResult() {}
+
 func (ServerError) IsAddContactResult() {}
 
 func (ServerError) IsAddHouseResult() {}
@@ -804,6 +843,8 @@ func (ServerError) IsDeleteAlbumResult() {}
 func (ServerError) IsDeleteContactResult() {}
 
 func (ServerError) IsDeleteVisualizationsResult() {}
+
+func (ServerError) IsInviteUserToWorkspaceResult() {}
 
 func (ServerError) IsLoginByEmailResult() {}
 

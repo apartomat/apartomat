@@ -107,6 +107,10 @@ type ComplexityRoot struct {
 		Message func(childComplexity int) int
 	}
 
+	AlreadyInWorkspace struct {
+		Message func(childComplexity int) int
+	}
+
 	Contact struct {
 		CreatedAt  func(childComplexity int) int
 		Details    func(childComplexity int) int
@@ -203,6 +207,14 @@ type ComplexityRoot struct {
 		Message func(childComplexity int) int
 	}
 
+	InviteAccepted struct {
+		Token func(childComplexity int) int
+	}
+
+	InviteSent struct {
+		To func(childComplexity int) int
+	}
+
 	LinkSentByEmail struct {
 		Email func(childComplexity int) int
 	}
@@ -212,6 +224,7 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
+		AcceptInvite               func(childComplexity int, token string) int
 		AddContact                 func(childComplexity int, projectID string, contact AddContactInput) int
 		AddHouse                   func(childComplexity int, projectID string, house AddHouseInput) int
 		AddRoom                    func(childComplexity int, houseID string, room AddRoomInput) int
@@ -228,6 +241,7 @@ type ComplexityRoot struct {
 		DeleteContact              func(childComplexity int, id string) int
 		DeleteRoom                 func(childComplexity int, id string) int
 		DeleteVisualizations       func(childComplexity int, id []string) int
+		InviteUser                 func(childComplexity int, workspaceID string, email string, role WorkspaceUserRole) int
 		LoginByEmail               func(childComplexity int, email string, workspaceName string) int
 		Ping                       func(childComplexity int) int
 		UpdateContact              func(childComplexity int, contactID string, data UpdateContactInput) int
@@ -487,6 +501,7 @@ type HouseRoomsResolver interface {
 }
 type MutationResolver interface {
 	Ping(ctx context.Context) (string, error)
+	AcceptInvite(ctx context.Context, token string) (AcceptInviteResult, error)
 	AddContact(ctx context.Context, projectID string, contact AddContactInput) (AddContactResult, error)
 	AddHouse(ctx context.Context, projectID string, house AddHouseInput) (AddHouseResult, error)
 	AddRoom(ctx context.Context, houseID string, room AddRoomInput) (AddRoomResult, error)
@@ -503,6 +518,7 @@ type MutationResolver interface {
 	DeleteContact(ctx context.Context, id string) (DeleteContactResult, error)
 	DeleteRoom(ctx context.Context, id string) (DeleteRoomResult, error)
 	DeleteVisualizations(ctx context.Context, id []string) (DeleteVisualizationsResult, error)
+	InviteUser(ctx context.Context, workspaceID string, email string, role WorkspaceUserRole) (InviteUserToWorkspaceResult, error)
 	LoginByEmail(ctx context.Context, email string, workspaceName string) (LoginByEmailResult, error)
 	UpdateContact(ctx context.Context, contactID string, data UpdateContactInput) (UpdateContactResult, error)
 	UpdateHouse(ctx context.Context, houseID string, data UpdateHouseInput) (UpdateHouseResult, error)
@@ -696,6 +712,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.AlreadyExists.Message(childComplexity), true
+
+	case "AlreadyInWorkspace.message":
+		if e.complexity.AlreadyInWorkspace.Message == nil {
+			break
+		}
+
+		return e.complexity.AlreadyInWorkspace.Message(childComplexity), true
 
 	case "Contact.createdAt":
 		if e.complexity.Contact.CreatedAt == nil {
@@ -954,6 +977,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.InvalidToken.Message(childComplexity), true
 
+	case "InviteAccepted.token":
+		if e.complexity.InviteAccepted.Token == nil {
+			break
+		}
+
+		return e.complexity.InviteAccepted.Token(childComplexity), true
+
+	case "InviteSent.to":
+		if e.complexity.InviteSent.To == nil {
+			break
+		}
+
+		return e.complexity.InviteSent.To(childComplexity), true
+
 	case "LinkSentByEmail.email":
 		if e.complexity.LinkSentByEmail.Email == nil {
 			break
@@ -967,6 +1004,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.LoginConfirmed.Token(childComplexity), true
+
+	case "Mutation.acceptInvite":
+		if e.complexity.Mutation.AcceptInvite == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_acceptInvite_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AcceptInvite(childComplexity, args["token"].(string)), true
 
 	case "Mutation.addContact":
 		if e.complexity.Mutation.AddContact == nil {
@@ -1159,6 +1208,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.DeleteVisualizations(childComplexity, args["id"].([]string)), true
+
+	case "Mutation.inviteUser":
+		if e.complexity.Mutation.InviteUser == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_inviteUser_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.InviteUser(childComplexity, args["workspaceID"].(string), args["email"].(string), args["role"].(WorkspaceUserRole)), true
 
 	case "Mutation.loginByEmail":
 		if e.complexity.Mutation.LoginByEmail == nil {
@@ -2080,7 +2141,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 	return introspection.WrapTypeFromDef(parsedSchema, parsedSchema.Types[name]), nil
 }
 
-//go:embed "schema/mutation.graphql" "schema/mutation_add_contact.graphql" "schema/mutation_add_house.graphql" "schema/mutation_add_room.graphql" "schema/mutation_add_visualizations_to_album.graphql" "schema/mutation_change_album_page_orientation.graphql" "schema/mutation_change_album_page_size.graphql" "schema/mutation_change_project_dates.graphql" "schema/mutation_change_project_status.graphql" "schema/mutation_confirm_login.graphql" "schema/mutation_create_album.graphql" "schema/mutation_create_project.graphql" "schema/mutation_delete_album.graphql" "schema/mutation_delete_contact.graphql" "schema/mutation_delete_room.graphql" "schema/mutation_delete_visualizations.graphql" "schema/mutation_login_by_email.graphql" "schema/mutation_update_contact.graphql" "schema/mutation_update_house.graphql" "schema/mutation_update_room.graphql" "schema/mutation_upload_file.graphql" "schema/mutation_upload_visualization.graphql" "schema/mutation_upload_visualizations.graphql" "schema/query.graphql" "schema/query_album.graphql" "schema/query_enums.graphql" "schema/query_profile.graphql" "schema/query_project.graphql" "schema/query_workspace.graphql" "schema/root.graphql"
+//go:embed "schema/mutation.graphql" "schema/mutation_accept_invite.graphql" "schema/mutation_add_contact.graphql" "schema/mutation_add_house.graphql" "schema/mutation_add_room.graphql" "schema/mutation_add_visualizations_to_album.graphql" "schema/mutation_change_album_page_orientation.graphql" "schema/mutation_change_album_page_size.graphql" "schema/mutation_change_project_dates.graphql" "schema/mutation_change_project_status.graphql" "schema/mutation_confirm_login_link.graphql" "schema/mutation_confirm_login_pin.graphql" "schema/mutation_create_album.graphql" "schema/mutation_create_project.graphql" "schema/mutation_delete_album.graphql" "schema/mutation_delete_contact.graphql" "schema/mutation_delete_room.graphql" "schema/mutation_delete_visualizations.graphql" "schema/mutation_invite_user.graphql" "schema/mutation_login_by_email.graphql" "schema/mutation_update_contact.graphql" "schema/mutation_update_house.graphql" "schema/mutation_update_room.graphql" "schema/mutation_upload_file.graphql" "schema/mutation_upload_visualization.graphql" "schema/mutation_upload_visualizations.graphql" "schema/query.graphql" "schema/query_album.graphql" "schema/query_enums.graphql" "schema/query_profile.graphql" "schema/query_project.graphql" "schema/query_workspace.graphql" "schema/root.graphql"
 var sourcesFS embed.FS
 
 func sourceData(filename string) string {
@@ -2093,6 +2154,7 @@ func sourceData(filename string) string {
 
 var sources = []*ast.Source{
 	{Name: "schema/mutation.graphql", Input: sourceData("schema/mutation.graphql"), BuiltIn: false},
+	{Name: "schema/mutation_accept_invite.graphql", Input: sourceData("schema/mutation_accept_invite.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_add_contact.graphql", Input: sourceData("schema/mutation_add_contact.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_add_house.graphql", Input: sourceData("schema/mutation_add_house.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_add_room.graphql", Input: sourceData("schema/mutation_add_room.graphql"), BuiltIn: false},
@@ -2101,13 +2163,15 @@ var sources = []*ast.Source{
 	{Name: "schema/mutation_change_album_page_size.graphql", Input: sourceData("schema/mutation_change_album_page_size.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_change_project_dates.graphql", Input: sourceData("schema/mutation_change_project_dates.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_change_project_status.graphql", Input: sourceData("schema/mutation_change_project_status.graphql"), BuiltIn: false},
-	{Name: "schema/mutation_confirm_login.graphql", Input: sourceData("schema/mutation_confirm_login.graphql"), BuiltIn: false},
+	{Name: "schema/mutation_confirm_login_link.graphql", Input: sourceData("schema/mutation_confirm_login_link.graphql"), BuiltIn: false},
+	{Name: "schema/mutation_confirm_login_pin.graphql", Input: sourceData("schema/mutation_confirm_login_pin.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_create_album.graphql", Input: sourceData("schema/mutation_create_album.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_create_project.graphql", Input: sourceData("schema/mutation_create_project.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_delete_album.graphql", Input: sourceData("schema/mutation_delete_album.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_delete_contact.graphql", Input: sourceData("schema/mutation_delete_contact.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_delete_room.graphql", Input: sourceData("schema/mutation_delete_room.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_delete_visualizations.graphql", Input: sourceData("schema/mutation_delete_visualizations.graphql"), BuiltIn: false},
+	{Name: "schema/mutation_invite_user.graphql", Input: sourceData("schema/mutation_invite_user.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_login_by_email.graphql", Input: sourceData("schema/mutation_login_by_email.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_update_contact.graphql", Input: sourceData("schema/mutation_update_contact.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_update_house.graphql", Input: sourceData("schema/mutation_update_house.graphql"), BuiltIn: false},
@@ -2150,6 +2214,21 @@ func (ec *executionContext) field_HouseRooms_list_args(ctx context.Context, rawA
 		}
 	}
 	args["offset"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_acceptInvite_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["token"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("token"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["token"] = arg0
 	return args, nil
 }
 
@@ -2489,6 +2568,39 @@ func (ec *executionContext) field_Mutation_deleteVisualizations_args(ctx context
 		}
 	}
 	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_inviteUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["workspaceID"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("workspaceID"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["workspaceID"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["email"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["email"] = arg1
+	var arg2 WorkspaceUserRole
+	if tmp, ok := rawArgs["role"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role"))
+		arg2, err = ec.unmarshalNWorkspaceUserRole2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserRole(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["role"] = arg2
 	return args, nil
 }
 
@@ -3824,6 +3936,50 @@ func (ec *executionContext) _AlreadyExists_message(ctx context.Context, field gr
 func (ec *executionContext) fieldContext_AlreadyExists_message(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "AlreadyExists",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AlreadyInWorkspace_message(ctx context.Context, field graphql.CollectedField, obj *AlreadyInWorkspace) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AlreadyInWorkspace_message(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Message, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AlreadyInWorkspace_message(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AlreadyInWorkspace",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -5543,6 +5699,94 @@ func (ec *executionContext) fieldContext_InvalidToken_message(ctx context.Contex
 	return fc, nil
 }
 
+func (ec *executionContext) _InviteAccepted_token(ctx context.Context, field graphql.CollectedField, obj *InviteAccepted) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_InviteAccepted_token(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Token, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_InviteAccepted_token(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "InviteAccepted",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _InviteSent_to(ctx context.Context, field graphql.CollectedField, obj *InviteSent) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_InviteSent_to(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.To, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_InviteSent_to(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "InviteSent",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _LinkSentByEmail_email(ctx context.Context, field graphql.CollectedField, obj *LinkSentByEmail) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_LinkSentByEmail_email(ctx, field)
 	if err != nil {
@@ -5671,6 +5915,61 @@ func (ec *executionContext) fieldContext_Mutation_ping(ctx context.Context, fiel
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
 		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_acceptInvite(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_acceptInvite(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().AcceptInvite(rctx, fc.Args["token"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(AcceptInviteResult)
+	fc.Result = res
+	return ec.marshalNAcceptInviteResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAcceptInviteResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_acceptInvite(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type AcceptInviteResult does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_acceptInvite_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
 	}
 	return fc, nil
 }
@@ -6549,6 +6848,61 @@ func (ec *executionContext) fieldContext_Mutation_deleteVisualizations(ctx conte
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteVisualizations_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_inviteUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_inviteUser(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().InviteUser(rctx, fc.Args["workspaceID"].(string), fc.Args["email"].(string), fc.Args["role"].(WorkspaceUserRole))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(InviteUserToWorkspaceResult)
+	fc.Result = res
+	return ec.marshalNInviteUserToWorkspaceResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐInviteUserToWorkspaceResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_inviteUser(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type InviteUserToWorkspaceResult does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_inviteUser_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -14271,6 +14625,43 @@ func (ec *executionContext) unmarshalInputWorkspaceUsersFilter(ctx context.Conte
 
 // region    ************************** interface.gotpl ***************************
 
+func (ec *executionContext) _AcceptInviteResult(ctx context.Context, sel ast.SelectionSet, obj AcceptInviteResult) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case InviteAccepted:
+		return ec._InviteAccepted(ctx, sel, &obj)
+	case *InviteAccepted:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._InviteAccepted(ctx, sel, obj)
+	case InvalidToken:
+		return ec._InvalidToken(ctx, sel, &obj)
+	case *InvalidToken:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._InvalidToken(ctx, sel, obj)
+	case ExpiredToken:
+		return ec._ExpiredToken(ctx, sel, &obj)
+	case *ExpiredToken:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ExpiredToken(ctx, sel, obj)
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
 func (ec *executionContext) _AddContactResult(ctx context.Context, sel ast.SelectionSet, obj AddContactResult) graphql.Marshaler {
 	switch obj := (obj).(type) {
 	case nil:
@@ -15010,6 +15401,13 @@ func (ec *executionContext) _Error(ctx context.Context, sel ast.SelectionSet, ob
 			return graphql.Null
 		}
 		return ec._InvalidPin(ctx, sel, obj)
+	case AlreadyInWorkspace:
+		return ec._AlreadyInWorkspace(ctx, sel, &obj)
+	case *AlreadyInWorkspace:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._AlreadyInWorkspace(ctx, sel, obj)
 	case InvalidEmail:
 		return ec._InvalidEmail(ctx, sel, &obj)
 	case *InvalidEmail:
@@ -15068,6 +15466,50 @@ func (ec *executionContext) _HouseRoomsListResult(ctx context.Context, sel ast.S
 			return graphql.Null
 		}
 		return ec._Forbidden(ctx, sel, obj)
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
+func (ec *executionContext) _InviteUserToWorkspaceResult(ctx context.Context, sel ast.SelectionSet, obj InviteUserToWorkspaceResult) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case InviteSent:
+		return ec._InviteSent(ctx, sel, &obj)
+	case *InviteSent:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._InviteSent(ctx, sel, obj)
+	case AlreadyInWorkspace:
+		return ec._AlreadyInWorkspace(ctx, sel, &obj)
+	case *AlreadyInWorkspace:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._AlreadyInWorkspace(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
+	case NotFound:
+		return ec._NotFound(ctx, sel, &obj)
+	case *NotFound:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._NotFound(ctx, sel, obj)
 	case ServerError:
 		return ec._ServerError(ctx, sel, &obj)
 	case *ServerError:
@@ -16214,6 +16656,34 @@ func (ec *executionContext) _AlreadyExists(ctx context.Context, sel ast.Selectio
 	return out
 }
 
+var alreadyInWorkspaceImplementors = []string{"AlreadyInWorkspace", "InviteUserToWorkspaceResult", "Error"}
+
+func (ec *executionContext) _AlreadyInWorkspace(ctx context.Context, sel ast.SelectionSet, obj *AlreadyInWorkspace) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, alreadyInWorkspaceImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AlreadyInWorkspace")
+		case "message":
+
+			out.Values[i] = ec._AlreadyInWorkspace_message(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var contactImplementors = []string{"Contact"}
 
 func (ec *executionContext) _Contact(ctx context.Context, sel ast.SelectionSet, obj *Contact) graphql.Marshaler {
@@ -16424,7 +16894,7 @@ func (ec *executionContext) _Enums(ctx context.Context, sel ast.SelectionSet, ob
 	return out
 }
 
-var expiredTokenImplementors = []string{"ExpiredToken", "ConfirmLoginLinkResult", "Error", "ConfirmLoginPinResult"}
+var expiredTokenImplementors = []string{"ExpiredToken", "AcceptInviteResult", "ConfirmLoginLinkResult", "Error", "ConfirmLoginPinResult"}
 
 func (ec *executionContext) _ExpiredToken(ctx context.Context, sel ast.SelectionSet, obj *ExpiredToken) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, expiredTokenImplementors)
@@ -16536,7 +17006,7 @@ func (ec *executionContext) _FileUploaded(ctx context.Context, sel ast.Selection
 	return out
 }
 
-var forbiddenImplementors = []string{"Forbidden", "AddContactResult", "AddHouseResult", "AddRoomResult", "AddVisualizationsToAlbumResult", "ChangeAlbumPageOrientationResult", "ChangeAlbumPageSizeResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "CreateAlbumResult", "CreateProjectResult", "DeleteAlbumResult", "DeleteContactResult", "DeleteRoomResult", "DeleteVisualizationsResult", "UpdateContactResult", "UpdateHouseResult", "UpdateRoomResult", "UploadFileResult", "UploadVisualizationResult", "UploadVisualizationsResult", "AlbumResult", "AlbumProjectResult", "UserProfileResult", "ProjectResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "ProjectVisualizationsListResult", "ProjectVisualizationsTotalResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectAlbumsListResult", "ProjectAlbumsTotalResult", "WorkspaceResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "WorkspaceUsersListResult", "WorkspaceUsersTotalResult", "Error"}
+var forbiddenImplementors = []string{"Forbidden", "AddContactResult", "AddHouseResult", "AddRoomResult", "AddVisualizationsToAlbumResult", "ChangeAlbumPageOrientationResult", "ChangeAlbumPageSizeResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "CreateAlbumResult", "CreateProjectResult", "DeleteAlbumResult", "DeleteContactResult", "DeleteRoomResult", "DeleteVisualizationsResult", "InviteUserToWorkspaceResult", "UpdateContactResult", "UpdateHouseResult", "UpdateRoomResult", "UploadFileResult", "UploadVisualizationResult", "UploadVisualizationsResult", "AlbumResult", "AlbumProjectResult", "UserProfileResult", "ProjectResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "ProjectVisualizationsListResult", "ProjectVisualizationsTotalResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectAlbumsListResult", "ProjectAlbumsTotalResult", "WorkspaceResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "WorkspaceUsersListResult", "WorkspaceUsersTotalResult", "Error"}
 
 func (ec *executionContext) _Forbidden(ctx context.Context, sel ast.SelectionSet, obj *Forbidden) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, forbiddenImplementors)
@@ -16884,7 +17354,7 @@ func (ec *executionContext) _InvalidPin(ctx context.Context, sel ast.SelectionSe
 	return out
 }
 
-var invalidTokenImplementors = []string{"InvalidToken", "ConfirmLoginLinkResult", "Error", "ConfirmLoginPinResult"}
+var invalidTokenImplementors = []string{"InvalidToken", "AcceptInviteResult", "ConfirmLoginLinkResult", "Error", "ConfirmLoginPinResult"}
 
 func (ec *executionContext) _InvalidToken(ctx context.Context, sel ast.SelectionSet, obj *InvalidToken) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, invalidTokenImplementors)
@@ -16897,6 +17367,62 @@ func (ec *executionContext) _InvalidToken(ctx context.Context, sel ast.Selection
 		case "message":
 
 			out.Values[i] = ec._InvalidToken_message(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var inviteAcceptedImplementors = []string{"InviteAccepted", "AcceptInviteResult"}
+
+func (ec *executionContext) _InviteAccepted(ctx context.Context, sel ast.SelectionSet, obj *InviteAccepted) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, inviteAcceptedImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("InviteAccepted")
+		case "token":
+
+			out.Values[i] = ec._InviteAccepted_token(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var inviteSentImplementors = []string{"InviteSent", "InviteUserToWorkspaceResult"}
+
+func (ec *executionContext) _InviteSent(ctx context.Context, sel ast.SelectionSet, obj *InviteSent) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, inviteSentImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("InviteSent")
+		case "to":
+
+			out.Values[i] = ec._InviteSent_to(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
@@ -16991,6 +17517,15 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_ping(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "acceptInvite":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_acceptInvite(ctx, field)
 			})
 
 			if out.Values[i] == graphql.Null {
@@ -17140,6 +17675,15 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "inviteUser":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_inviteUser(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "loginByEmail":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
@@ -17214,7 +17758,7 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 	return out
 }
 
-var notFoundImplementors = []string{"NotFound", "AddHouseResult", "AddRoomResult", "ChangeAlbumPageOrientationResult", "ChangeAlbumPageSizeResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "DeleteAlbumResult", "DeleteContactResult", "DeleteRoomResult", "DeleteVisualizationsResult", "UpdateContactResult", "UpdateHouseResult", "UpdateRoomResult", "AlbumResult", "AlbumProjectResult", "AlbumPageVisualizationResult", "ProjectResult", "WorkspaceResult", "Error"}
+var notFoundImplementors = []string{"NotFound", "AddHouseResult", "AddRoomResult", "ChangeAlbumPageOrientationResult", "ChangeAlbumPageSizeResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "DeleteAlbumResult", "DeleteContactResult", "DeleteRoomResult", "DeleteVisualizationsResult", "InviteUserToWorkspaceResult", "UpdateContactResult", "UpdateHouseResult", "UpdateRoomResult", "AlbumResult", "AlbumProjectResult", "AlbumPageVisualizationResult", "ProjectResult", "WorkspaceResult", "Error"}
 
 func (ec *executionContext) _NotFound(ctx context.Context, sel ast.SelectionSet, obj *NotFound) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, notFoundImplementors)
@@ -18522,7 +19066,7 @@ func (ec *executionContext) _RoomUpdated(ctx context.Context, sel ast.SelectionS
 	return out
 }
 
-var serverErrorImplementors = []string{"ServerError", "AddContactResult", "AddHouseResult", "AddVisualizationsToAlbumResult", "ChangeAlbumPageOrientationResult", "ChangeAlbumPageSizeResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "ConfirmLoginLinkResult", "ConfirmLoginPinResult", "CreateAlbumResult", "CreateProjectResult", "DeleteAlbumResult", "DeleteContactResult", "DeleteVisualizationsResult", "LoginByEmailResult", "UpdateContactResult", "UpdateHouseResult", "UploadFileResult", "UploadVisualizationResult", "UploadVisualizationsResult", "AlbumResult", "AlbumProjectResult", "AlbumPagesResult", "AlbumPageVisualizationResult", "UserProfileResult", "ProjectResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "ProjectVisualizationsListResult", "ProjectVisualizationsTotalResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectAlbumsListResult", "ProjectAlbumsTotalResult", "WorkspaceResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "WorkspaceUsersListResult", "WorkspaceUsersTotalResult", "Error"}
+var serverErrorImplementors = []string{"ServerError", "AcceptInviteResult", "AddContactResult", "AddHouseResult", "AddVisualizationsToAlbumResult", "ChangeAlbumPageOrientationResult", "ChangeAlbumPageSizeResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "ConfirmLoginLinkResult", "ConfirmLoginPinResult", "CreateAlbumResult", "CreateProjectResult", "DeleteAlbumResult", "DeleteContactResult", "DeleteVisualizationsResult", "InviteUserToWorkspaceResult", "LoginByEmailResult", "UpdateContactResult", "UpdateHouseResult", "UploadFileResult", "UploadVisualizationResult", "UploadVisualizationsResult", "AlbumResult", "AlbumProjectResult", "AlbumPagesResult", "AlbumPageVisualizationResult", "UserProfileResult", "ProjectResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "ProjectVisualizationsListResult", "ProjectVisualizationsTotalResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectAlbumsListResult", "ProjectAlbumsTotalResult", "WorkspaceResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "WorkspaceUsersListResult", "WorkspaceUsersTotalResult", "Error"}
 
 func (ec *executionContext) _ServerError(ctx context.Context, sel ast.SelectionSet, obj *ServerError) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, serverErrorImplementors)
@@ -19587,6 +20131,16 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 
 // region    ***************************** type.gotpl *****************************
 
+func (ec *executionContext) marshalNAcceptInviteResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAcceptInviteResult(ctx context.Context, sel ast.SelectionSet, v AcceptInviteResult) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._AcceptInviteResult(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNAddContactInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAddContactInput(ctx context.Context, v interface{}) (AddContactInput, error) {
 	res, err := ec.unmarshalInputAddContactInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -20313,6 +20867,16 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) marshalNInviteUserToWorkspaceResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐInviteUserToWorkspaceResult(ctx context.Context, sel ast.SelectionSet, v InviteUserToWorkspaceResult) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._InviteUserToWorkspaceResult(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNLoginByEmailResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐLoginByEmailResult(ctx context.Context, sel ast.SelectionSet, v LoginByEmailResult) graphql.Marshaler {

@@ -58,6 +58,24 @@ func UserIDIn(vals ...string) Spec {
 	return UserIDInSpec{UserID: vals}
 }
 
+type RoleInSpec struct {
+	Role []WorkspaceUserRole
+}
+
+func (s RoleInSpec) Is(c *WorkspaceUser) bool {
+	for _, val := range s.Role {
+		if c.Role == val {
+			return true
+		}
+	}
+
+	return false
+}
+
+func RoleIn(vals ...WorkspaceUserRole) Spec {
+	return RoleInSpec{Role: vals}
+}
+
 type AndSpec struct {
 	Specs []Spec
 }

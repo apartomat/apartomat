@@ -239,6 +239,38 @@ func (u *Apartomat) isWorkspaceUser(ctx context.Context, subj *auth.UserCtx, obj
 	return wu[0].UserID == subj.ID, nil
 }
 
+func (u *Apartomat) isWorkspaceUserAndRoleIs(
+	ctx context.Context,
+	subj *auth.UserCtx, obj *workspaces.Workspace,
+	role workspace_users.WorkspaceUserRole,
+) (bool, error) {
+	if subj == nil {
+		return false, nil
+	}
+
+	wu, err := u.WorkspaceUsers.List(
+		ctx,
+		workspace_users.And(
+			workspace_users.WorkspaceIDIn(obj.ID),
+			workspace_users.UserIDIn(subj.ID),
+		),
+		1,
+		0,
+	)
+	if err != nil {
+		return false, err
+	}
+
+	if len(wu) == 0 {
+		return false, nil
+	}
+
+	return workspace_users.And(
+		workspace_users.UserIDIn(subj.ID),
+		workspace_users.RoleIn(role),
+	).Is(wu[0]), nil
+}
+
 func (u *Apartomat) isProjectUser(ctx context.Context, subj *auth.UserCtx, obj *projects.Project) (bool, error) {
 	if subj == nil {
 		return false, nil
