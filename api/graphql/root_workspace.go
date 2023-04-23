@@ -17,3 +17,12 @@ func (r *workspaceResolver) Projects(ctx context.Context, obj *Workspace) (*Work
 func (r *workspaceResolver) Users(ctx context.Context, obj *Workspace) (*WorkspaceUsers, error) {
 	return &WorkspaceUsers{}, nil
 }
+
+func (r *workspaceResolver) Roles(ctx context.Context, obj *Workspace) (*WorkspaceUserRoleDictionary, error) {
+	return &WorkspaceUserRoleDictionary{
+		Items: []*WorkspaceUserRoleDictionaryItem{
+			{WorkspaceUserRoleAdmin, "Администратор"},
+			{WorkspaceUserRoleUser, "Пользователь"},
+		},
+	}, nil
+}

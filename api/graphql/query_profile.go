@@ -30,13 +30,21 @@ func (r *queryResolver) Profile(ctx context.Context) (UserProfileResult, error) 
 			grava = &Gravatar{URL: gravatar.Url(user.Email)}
 		}
 
-		return UserProfile{
+		profile := UserProfile{
 			ID:       user.ID,
 			Email:    user.Email,
 			FullName: user.FullName,
 			Gravatar: grava,
 			Abbr:     userAbbr(user.FullName, user.Email),
-		}, nil
+		}
+
+		if user.DefaultWorkspaceID != nil {
+			profile.DefaultWorkspace = &Workspace{
+				ID: *user.DefaultWorkspaceID,
+			}
+		}
+
+		return profile, nil
 	}
 
 	return forbidden()

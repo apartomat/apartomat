@@ -296,6 +296,8 @@ type AlreadyInWorkspace struct {
 	Message string `json:"message"`
 }
 
+func (AlreadyInWorkspace) IsAcceptInviteResult() {}
+
 func (AlreadyInWorkspace) IsInviteUserToWorkspaceResult() {}
 
 func (AlreadyInWorkspace) IsError()                {}
@@ -554,6 +556,8 @@ func (InviteAccepted) IsAcceptInviteResult() {}
 
 type InviteSent struct {
 	To string `json:"to"`
+	//  token lifetime in seconds
+	TokenExpiration int `json:"tokenExpiration"`
 }
 
 func (InviteSent) IsInviteUserToWorkspaceResult() {}
@@ -990,10 +994,11 @@ type VisualizationsUploaded struct {
 func (VisualizationsUploaded) IsUploadVisualizationsResult() {}
 
 type Workspace struct {
-	ID       string             `json:"id"`
-	Name     string             `json:"name"`
-	Projects *WorkspaceProjects `json:"projects"`
-	Users    *WorkspaceUsers    `json:"users"`
+	ID       string                       `json:"id"`
+	Name     string                       `json:"name"`
+	Projects *WorkspaceProjects           `json:"projects"`
+	Users    *WorkspaceUsers              `json:"users"`
+	Roles    *WorkspaceUserRoleDictionary `json:"roles"`
 }
 
 func (Workspace) IsWorkspaceResult() {}
@@ -1024,6 +1029,15 @@ type WorkspaceUser struct {
 	Workspace *ID               `json:"workspace"`
 	Role      WorkspaceUserRole `json:"role"`
 	Profile   *UserProfile      `json:"profile"`
+}
+
+type WorkspaceUserRoleDictionary struct {
+	Items []*WorkspaceUserRoleDictionaryItem `json:"items"`
+}
+
+type WorkspaceUserRoleDictionaryItem struct {
+	Key   WorkspaceUserRole `json:"key"`
+	Value string            `json:"value"`
 }
 
 type WorkspaceUsers struct {

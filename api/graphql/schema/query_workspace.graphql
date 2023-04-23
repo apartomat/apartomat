@@ -9,6 +9,7 @@ type Workspace {
     name: String!
 	projects: WorkspaceProjects!
 	users: WorkspaceUsers! @goField(forceResolver: true)
+	roles: WorkspaceUserRoleDictionary! @goField(forceResolver: true)
 }
 
 
@@ -53,7 +54,7 @@ type WorkspaceUser {
 	id: String!
 	workspace: Id!
 	role: WorkspaceUserRole!
-	profile: UserProfile!
+	profile: UserProfile! @goField(forceResolver: true)
 }
 
 enum WorkspaceUserRole {
@@ -65,4 +66,13 @@ union WorkspaceUsersTotalResult = WorkspaceUsersTotal | Forbidden | ServerError
 
 type WorkspaceUsersTotal {
 	total: Int!
+}
+
+type WorkspaceUserRoleDictionary {
+	items: [WorkspaceUserRoleDictionaryItem!]!
+}
+
+type WorkspaceUserRoleDictionaryItem {
+	key: WorkspaceUserRole!
+	value: String!
 }

@@ -13,9 +13,18 @@ type userProfileResolver struct {
 func (r *rootResolver) UserProfile() UserProfileResolver { return &userProfileResolver{r} }
 
 func (r *userProfileResolver) DefaultWorkspace(ctx context.Context, obj *UserProfile) (*Workspace, error) {
-	w, err := r.useCases.GetDefaultWorkspace(ctx, obj.ID)
+	if obj.DefaultWorkspace == nil {
+		return nil, nil
+	}
+
+	if obj.DefaultWorkspace.ID == "" {
+		return obj.DefaultWorkspace, nil
+	}
+
+	w, err := r.useCases.GetWorkspace(ctx, obj.DefaultWorkspace.ID)
 	if err != nil {
 		log.Printf("can't get default workspace: %s", err)
+
 		return nil, errors.New("internal server error")
 	}
 

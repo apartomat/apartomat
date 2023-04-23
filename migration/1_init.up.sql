@@ -6,6 +6,7 @@ create table apartomat.users (
     full_name text not null,
     is_active boolean not null,
     use_gravatar boolean not null,
+    default_workspace_id text,
     created_at timestamp with time zone not null default now(),
     modified_at timestamp with time zone not null default now(),
     constraint users_email_ukey unique (email)
@@ -20,6 +21,9 @@ create table apartomat.workspaces (
     user_id char(21) not null,
     constraint workspaces_user_id_fkey foreign key (user_id) references apartomat.users on delete cascade
 );
+
+alter table apartomat.users
+    add constraint users_default_workspace_id_fkey foreign key (default_workspace_id) references apartomat.workspaces (id);
 
 create table apartomat.workspace_users (
     id char(21) primary key,

@@ -2,7 +2,7 @@ extend type Mutation {
     acceptInvite(token: String!): AcceptInviteResult!
 }
 
-union AcceptInviteResult = InviteAccepted | InvalidToken | ExpiredToken | ServerError
+union AcceptInviteResult = InviteAccepted | AlreadyInWorkspace | InvalidToken | ExpiredToken | ServerError
 
 type InviteAccepted {
     token: String!

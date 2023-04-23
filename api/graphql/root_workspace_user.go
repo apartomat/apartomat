@@ -38,13 +38,21 @@ func (r *workspaceUserResolver) Profile(ctx context.Context, obj *WorkspaceUser)
 		grava = &Gravatar{URL: gravatar.Url(user.Email)}
 	}
 
-	return &UserProfile{
+	profile := &UserProfile{
 		ID:       obj.ID,
 		Email:    user.Email,
 		Gravatar: grava,
 		FullName: user.FullName,
 		Abbr:     userAbbr(user.FullName, user.Email),
-	}, nil
+	}
+
+	if user.DefaultWorkspaceID != nil {
+		profile.DefaultWorkspace = &Workspace{
+			ID: *user.DefaultWorkspaceID,
+		}
+	}
+
+	return profile, nil
 }
 
 func abbr(str string) string {

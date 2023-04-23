@@ -3,13 +3,14 @@ package users
 import "time"
 
 type User struct {
-	ID          string
-	Email       string
-	FullName    string
-	IsActive    bool
-	UseGravatar bool
-	CreatedAt   time.Time
-	ModifiedAt  time.Time
+	ID                 string
+	Email              string
+	FullName           string
+	IsActive           bool
+	UseGravatar        bool
+	DefaultWorkspaceID *string
+	CreatedAt          time.Time
+	ModifiedAt         time.Time
 }
 
 func NewUser(id, email, fullName string, isActive, useGravatar bool) *User {

@@ -38,3 +38,16 @@ Your PIN is: %s
 `, pin),
 	}
 }
+
+func (f *Factory) MailInvite(to, token string) *Mail {
+	return &Mail{
+		From:    f.From,
+		To:      to,
+		Subject: "Invite to Apartomat...",
+		Body: fmt.Sprintf(`
+Hello!
+
+Please, open %s/accept-invite?token=%s
+`, f.Hostname, token),
+	}
+}

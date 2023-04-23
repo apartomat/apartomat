@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/apartomat/apartomat/internal/store/workspace_users"
 	"log"
+	"math"
 
 	apartomat "github.com/apartomat/apartomat/internal"
 )
@@ -15,7 +16,7 @@ func (r *mutationResolver) InviteUser(
 	email string,
 	role WorkspaceUserRole,
 ) (InviteUserToWorkspaceResult, error) {
-	res, err := r.useCases.InviteUserToWorkspace(ctx, workspaceID, email, workspace_users.WorkspaceUserRole(role))
+	res, expiration, err := r.useCases.InviteUserToWorkspace(ctx, workspaceID, email, workspace_users.WorkspaceUserRole(role))
 	if err != nil {
 		if errors.Is(err, apartomat.ErrForbidden) {
 			return Forbidden{}, nil
@@ -34,5 +35,5 @@ func (r *mutationResolver) InviteUser(
 		return ServerError{Message: "can't invite user"}, nil
 	}
 
-	return InviteSent{To: res}, nil
+	return InviteSent{To: res, TokenExpiration: int(math.Round(expiration.Seconds()))}, nil
 }

@@ -113,6 +113,14 @@ func (u *Apartomat) LoginByEmail(ctx context.Context, email string, workspaceNam
 		}
 	}
 
+	if user.DefaultWorkspaceID == nil {
+		user.DefaultWorkspaceID = &workspace.ID
+
+		if err := u.Users.Save(ctx, user); err != nil {
+			return "", err
+		}
+	}
+
 	return email, nil
 }
 
@@ -187,6 +195,14 @@ func (u *Apartomat) LoginEmailPIN(ctx context.Context, email string, workspaceNa
 		}
 	}
 
+	if user.DefaultWorkspaceID == nil {
+		user.DefaultWorkspaceID = &workspace.ID
+
+		if err := u.Users.Save(ctx, user); err != nil {
+			return "", "", err
+		}
+	}
+
 	return email, token, nil
 }
 
@@ -212,6 +228,91 @@ func (u *Apartomat) CheckConfirmEmailPINToken(ctx context.Context, str, pin stri
 	}
 
 	return u.AuthTokenIssuer.Issue(users[0].ID)
+}
+
+func (u *Apartomat) AcceptInviteToWorkspace(ctx context.Context, str string) (string, error) {
+	confirmToken, err := u.InviteTokenVerifier.Verify(str)
+	if err != nil {
+		return "", err
+	}
+
+	var (
+		user      *User
+		workspace *workspaces.Workspace
+	)
+
+	ws, err := u.Workspaces.List(ctx, workspaces.IDIn(confirmToken.WorkspaceID()), 1, 0)
+	if err != nil {
+		return "", err
+	}
+
+	if len(ws) == 0 {
+		return "", fmt.Errorf("can't find workspace (id=%s): %w", confirmToken.WorkspaceID(), ErrNotFound)
+	}
+
+	workspace = ws[0]
+
+	us, err := u.Users.List(ctx, EmailIn(confirmToken.Email()), 1, 0)
+	if err != nil {
+		return "", err
+	}
+
+	if len(us) != 0 {
+		user = us[0]
+
+		wus, err := u.WorkspaceUsers.List(
+			ctx,
+			workspace_users.And(
+				workspace_users.UserIDIn(user.ID),
+				workspace_users.WorkspaceIDIn(workspace.ID),
+			),
+			1,
+			0,
+		)
+		if err != nil {
+			return "", err
+		}
+
+		if len(wus) != 0 {
+			return "", fmt.Errorf("user is in workspace (id=%s) already: %w", confirmToken.WorkspaceID(), ErrAlreadyExists)
+		}
+
+	} else {
+		id, err := NewNanoID()
+		if err != nil {
+			return "", err
+		}
+
+		user = NewUser(id, confirmToken.Email(), "", true, true)
+	}
+
+	{
+		id, err := NewNanoID()
+		if err != nil {
+			return "", err
+		}
+
+		wuser := workspace_users.NewWorkspaceUser(
+			id,
+			workspace_users.WorkspaceUserRole(confirmToken.Role()),
+			workspace.ID,
+			user.ID,
+		)
+
+		if user.DefaultWorkspaceID == nil {
+			user.DefaultWorkspaceID = &workspace.ID
+		}
+
+		if err := u.Users.Save(ctx, user); err != nil {
+			return "", err
+		}
+
+		if err := u.WorkspaceUsers.Save(ctx, wuser); err != nil {
+			return "", err
+		}
+	}
+
+	return u.AuthTokenIssuer.Issue(user.ID)
 }
 
 func (u *Apartomat) isWorkspaceUser(ctx context.Context, subj *auth.UserCtx, obj *workspaces.Workspace) (bool, error) {

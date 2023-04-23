@@ -3,6 +3,7 @@ package graphql
 import (
 	"context"
 	"errors"
+	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/auth/paseto"
 	"log"
 )
@@ -14,9 +15,17 @@ func (r *mutationResolver) AcceptInvite(ctx context.Context, str string) (Accept
 			return InvalidToken{Message: "token is expired or not valid"}, nil
 		}
 
-		log.Printf("can't verify token: %s", err)
+		if errors.Is(err, paseto.ErrTokenValidationError) {
+			return InvalidToken{Message: "token is expired or not valid"}, nil
+		}
 
-		return ServerError{Message: "can't verify token"}, nil
+		if errors.Is(err, apartomat.ErrAlreadyExists) {
+			return AlreadyInWorkspace{Message: "user already in workspace"}, nil
+		}
+
+		log.Printf("can't accept invite: %s", err)
+
+		return ServerError{Message: "can't accept invite"}, nil
 	}
 
 	return InviteAccepted{Token: str}, nil

@@ -63,25 +63,27 @@ func (s *store) Save(ctx context.Context, users ...*User) error {
 }
 
 type record struct {
-	tableName    struct{}  `pg:"apartomat.users"`
-	ID           string    `pg:"id,pk"`
-	Email        string    `pg:"email"`
-	FullName     string    `pg:"full_name,use_zero"`
-	IsActive     bool      `pg:"is_active"`
-	UserGravatar bool      `pg:"use_gravatar"`
-	CreatedAt    time.Time `pg:"created_at"`
-	ModifiedAt   time.Time `pg:"modified_at"`
+	tableName          struct{}  `pg:"apartomat.users"`
+	ID                 string    `pg:"id,pk"`
+	Email              string    `pg:"email"`
+	FullName           string    `pg:"full_name,use_zero"`
+	IsActive           bool      `pg:"is_active"`
+	UserGravatar       bool      `pg:"use_gravatar,use_zero"`
+	DefaultWorkspaceID *string   `pg:"default_workspace_id,"`
+	CreatedAt          time.Time `pg:"created_at"`
+	ModifiedAt         time.Time `pg:"modified_at"`
 }
 
 func toRecord(user *User) *record {
 	return &record{
-		ID:           user.ID,
-		Email:        user.Email,
-		FullName:     user.FullName,
-		IsActive:     user.IsActive,
-		UserGravatar: user.UseGravatar,
-		CreatedAt:    user.CreatedAt,
-		ModifiedAt:   user.ModifiedAt,
+		ID:                 user.ID,
+		Email:              user.Email,
+		FullName:           user.FullName,
+		IsActive:           user.IsActive,
+		UserGravatar:       user.UseGravatar,
+		DefaultWorkspaceID: user.DefaultWorkspaceID,
+		CreatedAt:          user.CreatedAt,
+		ModifiedAt:         user.ModifiedAt,
 	}
 }
 
@@ -102,13 +104,14 @@ func fromRecords(records []*record) []*User {
 
 	for i, r := range records {
 		files[i] = &User{
-			ID:          r.ID,
-			Email:       r.Email,
-			FullName:    r.FullName,
-			IsActive:    r.IsActive,
-			UseGravatar: r.UserGravatar,
-			CreatedAt:   r.CreatedAt,
-			ModifiedAt:  r.ModifiedAt,
+			ID:                 r.ID,
+			Email:              r.Email,
+			FullName:           r.FullName,
+			IsActive:           r.IsActive,
+			UseGravatar:        r.UserGravatar,
+			DefaultWorkspaceID: r.DefaultWorkspaceID,
+			CreatedAt:          r.CreatedAt,
+			ModifiedAt:         r.ModifiedAt,
 		}
 	}
 

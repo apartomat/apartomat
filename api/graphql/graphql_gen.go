@@ -212,7 +212,8 @@ type ComplexityRoot struct {
 	}
 
 	InviteSent struct {
-		To func(childComplexity int) int
+		To              func(childComplexity int) int
+		TokenExpiration func(childComplexity int) int
 	}
 
 	LinkSentByEmail struct {
@@ -448,6 +449,7 @@ type ComplexityRoot struct {
 		ID       func(childComplexity int) int
 		Name     func(childComplexity int) int
 		Projects func(childComplexity int) int
+		Roles    func(childComplexity int) int
 		Users    func(childComplexity int) int
 	}
 
@@ -469,6 +471,15 @@ type ComplexityRoot struct {
 		Profile   func(childComplexity int) int
 		Role      func(childComplexity int) int
 		Workspace func(childComplexity int) int
+	}
+
+	WorkspaceUserRoleDictionary struct {
+		Items func(childComplexity int) int
+	}
+
+	WorkspaceUserRoleDictionaryItem struct {
+		Key   func(childComplexity int) int
+		Value func(childComplexity int) int
 	}
 
 	WorkspaceUsers struct {
@@ -573,6 +584,7 @@ type VisualizationResolver interface {
 type WorkspaceResolver interface {
 	Projects(ctx context.Context, obj *Workspace) (*WorkspaceProjects, error)
 	Users(ctx context.Context, obj *Workspace) (*WorkspaceUsers, error)
+	Roles(ctx context.Context, obj *Workspace) (*WorkspaceUserRoleDictionary, error)
 }
 type WorkspaceProjectsResolver interface {
 	List(ctx context.Context, obj *WorkspaceProjects, filter WorkspaceProjectsFilter, limit int) (WorkspaceProjectsListResult, error)
@@ -991,6 +1003,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.InviteSent.To(childComplexity), true
 
+	case "InviteSent.tokenExpiration":
+		if e.complexity.InviteSent.TokenExpiration == nil {
+			break
+		}
+
+		return e.complexity.InviteSent.TokenExpiration(childComplexity), true
+
 	case "LinkSentByEmail.email":
 		if e.complexity.LinkSentByEmail.Email == nil {
 			break
@@ -1219,7 +1238,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.InviteUser(childComplexity, args["workspaceID"].(string), args["email"].(string), args["role"].(WorkspaceUserRole)), true
+		return e.complexity.Mutation.InviteUser(childComplexity, args["workspaceId"].(string), args["email"].(string), args["role"].(WorkspaceUserRole)), true
 
 	case "Mutation.loginByEmail":
 		if e.complexity.Mutation.LoginByEmail == nil {
@@ -1944,6 +1963,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Workspace.Projects(childComplexity), true
 
+	case "Workspace.roles":
+		if e.complexity.Workspace.Roles == nil {
+			break
+		}
+
+		return e.complexity.Workspace.Roles(childComplexity), true
+
 	case "Workspace.users":
 		if e.complexity.Workspace.Users == nil {
 			break
@@ -2016,6 +2042,27 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.WorkspaceUser.Workspace(childComplexity), true
+
+	case "WorkspaceUserRoleDictionary.items":
+		if e.complexity.WorkspaceUserRoleDictionary.Items == nil {
+			break
+		}
+
+		return e.complexity.WorkspaceUserRoleDictionary.Items(childComplexity), true
+
+	case "WorkspaceUserRoleDictionaryItem.key":
+		if e.complexity.WorkspaceUserRoleDictionaryItem.Key == nil {
+			break
+		}
+
+		return e.complexity.WorkspaceUserRoleDictionaryItem.Key(childComplexity), true
+
+	case "WorkspaceUserRoleDictionaryItem.value":
+		if e.complexity.WorkspaceUserRoleDictionaryItem.Value == nil {
+			break
+		}
+
+		return e.complexity.WorkspaceUserRoleDictionaryItem.Value(childComplexity), true
 
 	case "WorkspaceUsers.list":
 		if e.complexity.WorkspaceUsers.List == nil {
@@ -2575,14 +2622,14 @@ func (ec *executionContext) field_Mutation_inviteUser_args(ctx context.Context, 
 	var err error
 	args := map[string]interface{}{}
 	var arg0 string
-	if tmp, ok := rawArgs["workspaceID"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("workspaceID"))
+	if tmp, ok := rawArgs["workspaceId"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("workspaceId"))
 		arg0, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["workspaceID"] = arg0
+	args["workspaceId"] = arg0
 	var arg1 string
 	if tmp, ok := rawArgs["email"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
@@ -5787,6 +5834,50 @@ func (ec *executionContext) fieldContext_InviteSent_to(ctx context.Context, fiel
 	return fc, nil
 }
 
+func (ec *executionContext) _InviteSent_tokenExpiration(ctx context.Context, field graphql.CollectedField, obj *InviteSent) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_InviteSent_tokenExpiration(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TokenExpiration, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_InviteSent_tokenExpiration(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "InviteSent",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _LinkSentByEmail_email(ctx context.Context, field graphql.CollectedField, obj *LinkSentByEmail) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_LinkSentByEmail_email(ctx, field)
 	if err != nil {
@@ -6868,7 +6959,7 @@ func (ec *executionContext) _Mutation_inviteUser(ctx context.Context, field grap
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().InviteUser(rctx, fc.Args["workspaceID"].(string), fc.Args["email"].(string), fc.Args["role"].(WorkspaceUserRole))
+		return ec.resolvers.Mutation().InviteUser(rctx, fc.Args["workspaceId"].(string), fc.Args["email"].(string), fc.Args["role"].(WorkspaceUserRole))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -10684,6 +10775,8 @@ func (ec *executionContext) fieldContext_UserProfile_defaultWorkspace(ctx contex
 				return ec.fieldContext_Workspace_projects(ctx, field)
 			case "users":
 				return ec.fieldContext_Workspace_users(ctx, field)
+			case "roles":
+				return ec.fieldContext_Workspace_roles(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Workspace", field.Name)
 		},
@@ -11540,6 +11633,54 @@ func (ec *executionContext) fieldContext_Workspace_users(ctx context.Context, fi
 	return fc, nil
 }
 
+func (ec *executionContext) _Workspace_roles(ctx context.Context, field graphql.CollectedField, obj *Workspace) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Workspace_roles(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Workspace().Roles(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*WorkspaceUserRoleDictionary)
+	fc.Result = res
+	return ec.marshalNWorkspaceUserRoleDictionary2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserRoleDictionary(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Workspace_roles(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Workspace",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "items":
+				return ec.fieldContext_WorkspaceUserRoleDictionary_items(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type WorkspaceUserRoleDictionary", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _WorkspaceProjects_list(ctx context.Context, field graphql.CollectedField, obj *WorkspaceProjects) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_WorkspaceProjects_list(ctx, field)
 	if err != nil {
@@ -11951,6 +12092,144 @@ func (ec *executionContext) fieldContext_WorkspaceUser_profile(ctx context.Conte
 				return ec.fieldContext_UserProfile_defaultWorkspace(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type UserProfile", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _WorkspaceUserRoleDictionary_items(ctx context.Context, field graphql.CollectedField, obj *WorkspaceUserRoleDictionary) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_WorkspaceUserRoleDictionary_items(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Items, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*WorkspaceUserRoleDictionaryItem)
+	fc.Result = res
+	return ec.marshalNWorkspaceUserRoleDictionaryItem2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserRoleDictionaryItemᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_WorkspaceUserRoleDictionary_items(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "WorkspaceUserRoleDictionary",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "key":
+				return ec.fieldContext_WorkspaceUserRoleDictionaryItem_key(ctx, field)
+			case "value":
+				return ec.fieldContext_WorkspaceUserRoleDictionaryItem_value(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type WorkspaceUserRoleDictionaryItem", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _WorkspaceUserRoleDictionaryItem_key(ctx context.Context, field graphql.CollectedField, obj *WorkspaceUserRoleDictionaryItem) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_WorkspaceUserRoleDictionaryItem_key(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Key, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(WorkspaceUserRole)
+	fc.Result = res
+	return ec.marshalNWorkspaceUserRole2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserRole(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_WorkspaceUserRoleDictionaryItem_key(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "WorkspaceUserRoleDictionaryItem",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type WorkspaceUserRole does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _WorkspaceUserRoleDictionaryItem_value(ctx context.Context, field graphql.CollectedField, obj *WorkspaceUserRoleDictionaryItem) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_WorkspaceUserRoleDictionaryItem_value(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Value, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_WorkspaceUserRoleDictionaryItem_value(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "WorkspaceUserRoleDictionaryItem",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -14636,6 +14915,13 @@ func (ec *executionContext) _AcceptInviteResult(ctx context.Context, sel ast.Sel
 			return graphql.Null
 		}
 		return ec._InviteAccepted(ctx, sel, obj)
+	case AlreadyInWorkspace:
+		return ec._AlreadyInWorkspace(ctx, sel, &obj)
+	case *AlreadyInWorkspace:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._AlreadyInWorkspace(ctx, sel, obj)
 	case InvalidToken:
 		return ec._InvalidToken(ctx, sel, &obj)
 	case *InvalidToken:
@@ -16656,7 +16942,7 @@ func (ec *executionContext) _AlreadyExists(ctx context.Context, sel ast.Selectio
 	return out
 }
 
-var alreadyInWorkspaceImplementors = []string{"AlreadyInWorkspace", "InviteUserToWorkspaceResult", "Error"}
+var alreadyInWorkspaceImplementors = []string{"AlreadyInWorkspace", "AcceptInviteResult", "InviteUserToWorkspaceResult", "Error"}
 
 func (ec *executionContext) _AlreadyInWorkspace(ctx context.Context, sel ast.SelectionSet, obj *AlreadyInWorkspace) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, alreadyInWorkspaceImplementors)
@@ -17423,6 +17709,13 @@ func (ec *executionContext) _InviteSent(ctx context.Context, sel ast.SelectionSe
 		case "to":
 
 			out.Values[i] = ec._InviteSent_to(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "tokenExpiration":
+
+			out.Values[i] = ec._InviteSent_tokenExpiration(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
@@ -19506,6 +19799,26 @@ func (ec *executionContext) _Workspace(ctx context.Context, sel ast.SelectionSet
 				return innerFunc(ctx)
 
 			})
+		case "roles":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Workspace_roles(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -19685,6 +19998,69 @@ func (ec *executionContext) _WorkspaceUser(ctx context.Context, sel ast.Selectio
 				return innerFunc(ctx)
 
 			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var workspaceUserRoleDictionaryImplementors = []string{"WorkspaceUserRoleDictionary"}
+
+func (ec *executionContext) _WorkspaceUserRoleDictionary(ctx context.Context, sel ast.SelectionSet, obj *WorkspaceUserRoleDictionary) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, workspaceUserRoleDictionaryImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("WorkspaceUserRoleDictionary")
+		case "items":
+
+			out.Values[i] = ec._WorkspaceUserRoleDictionary_items(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var workspaceUserRoleDictionaryItemImplementors = []string{"WorkspaceUserRoleDictionaryItem"}
+
+func (ec *executionContext) _WorkspaceUserRoleDictionaryItem(ctx context.Context, sel ast.SelectionSet, obj *WorkspaceUserRoleDictionaryItem) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, workspaceUserRoleDictionaryItemImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("WorkspaceUserRoleDictionaryItem")
+		case "key":
+
+			out.Values[i] = ec._WorkspaceUserRoleDictionaryItem_key(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "value":
+
+			out.Values[i] = ec._WorkspaceUserRoleDictionaryItem_value(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -21739,6 +22115,74 @@ func (ec *executionContext) unmarshalNWorkspaceUserRole2githubᚗcomᚋapartomat
 
 func (ec *executionContext) marshalNWorkspaceUserRole2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserRole(ctx context.Context, sel ast.SelectionSet, v WorkspaceUserRole) graphql.Marshaler {
 	return v
+}
+
+func (ec *executionContext) marshalNWorkspaceUserRoleDictionary2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserRoleDictionary(ctx context.Context, sel ast.SelectionSet, v WorkspaceUserRoleDictionary) graphql.Marshaler {
+	return ec._WorkspaceUserRoleDictionary(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNWorkspaceUserRoleDictionary2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserRoleDictionary(ctx context.Context, sel ast.SelectionSet, v *WorkspaceUserRoleDictionary) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._WorkspaceUserRoleDictionary(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNWorkspaceUserRoleDictionaryItem2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserRoleDictionaryItemᚄ(ctx context.Context, sel ast.SelectionSet, v []*WorkspaceUserRoleDictionaryItem) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNWorkspaceUserRoleDictionaryItem2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserRoleDictionaryItem(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNWorkspaceUserRoleDictionaryItem2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserRoleDictionaryItem(ctx context.Context, sel ast.SelectionSet, v *WorkspaceUserRoleDictionaryItem) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._WorkspaceUserRoleDictionaryItem(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNWorkspaceUsers2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUsers(ctx context.Context, sel ast.SelectionSet, v WorkspaceUsers) graphql.Marshaler {

@@ -54,10 +54,6 @@ models:
         resolver: true
       total:
         resolver: true
-  UserProfile:
-    fields:
-      defaultWorkspace:
-        resolver: true
   Visualization:
     fields:
       file:
@@ -73,8 +69,4 @@ models:
       list:
         resolver: true
       total:
-        resolver: true
-  WorkspaceUser:
-    fields:
-      profile:
         resolver: true

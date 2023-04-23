@@ -9,6 +9,7 @@ import (
 	"github.com/apartomat/apartomat/internal/store/users"
 	"github.com/apartomat/apartomat/internal/store/workspace_users"
 	"github.com/apartomat/apartomat/internal/store/workspaces"
+	"time"
 )
 
 func (u *Apartomat) GetWorkspace(ctx context.Context, id string) (*workspaces.Workspace, error) {
@@ -184,14 +185,14 @@ func (u *Apartomat) InviteUserToWorkspace(
 	workspaceID string,
 	email string,
 	role workspace_users.WorkspaceUserRole,
-) (string, error) {
+) (string, time.Duration, error) {
 	ws, err := u.Workspaces.List(ctx, workspaces.IDIn(workspaceID), 1, 0)
 	if err != nil {
-		return "", err
+		return "", 0, err
 	}
 
 	if len(ws) == 0 {
-		return "", fmt.Errorf("workspace (id=%s): %w", workspaceID, ErrNotFound)
+		return "", 0, fmt.Errorf("workspace (id=%s): %w", workspaceID, ErrNotFound)
 	}
 
 	var (
@@ -199,77 +200,20 @@ func (u *Apartomat) InviteUserToWorkspace(
 	)
 
 	if ok, err := u.CanInviteUsersToWorkspace(ctx, auth.UserFromCtx(ctx), workspace); err != nil {
-		return "", err
+		return "", 0, err
 	} else if !ok {
-		return "", fmt.Errorf("can't invite users to workspace (id=%s): %w", workspace.ID, ErrForbidden)
+		return "", 0, fmt.Errorf("can't invite users to workspace (id=%s): %w", workspace.ID, ErrForbidden)
 	}
 
 	us, err := u.Users.List(ctx, users.EmailIn(email), 1, 0)
 	if err != nil {
-		return "", err
+		return "", 0, err
 	}
 
 	if len(us) != 0 {
 		var (
 			user = us[0]
 		)
-
-		wus, err := u.WorkspaceUsers.List(ctx, workspace_users.UserIDIn(user.ID), 1, 0)
-		if err != nil {
-			return "", err
-		}
-
-		if len(wus) == 1 {
-			return "", fmt.Errorf("user (email=%s): %w", email, ErrAlreadyExists)
-		}
-	}
-
-	token, err := u.InviteTokenIssuer.Issue(email, workspace.ID, string(role))
-	if err != nil {
-		return "", err
-	}
-
-	err = u.Mailer.Send(u.MailFactory.MailAuth(email, token))
-	if err != nil {
-		return "", fmt.Errorf("can't send email to %s: %w", email, err)
-	}
-
-	return email, err
-}
-
-func (u *Apartomat) CanInviteUsersToWorkspace(ctx context.Context, subj *auth.UserCtx, obj *workspaces.Workspace) (bool, error) {
-	return u.isWorkspaceUserAndRoleIs(ctx, subj, obj, workspace_users.WorkspaceUserRoleAdmin)
-}
-
-func (u *Apartomat) AcceptInviteToWorkspace(ctx context.Context, str string) (string, error) {
-	confirmToken, err := u.InviteTokenVerifier.Verify(str)
-	if err != nil {
-		return "", err
-	}
-
-	var (
-		user      *users.User
-		workspace *workspaces.Workspace
-	)
-
-	ws, err := u.Workspaces.List(ctx, workspaces.IDIn(confirmToken.WorkspaceID()), 1, 0)
-	if err != nil {
-		return "", err
-	}
-
-	if len(ws) == 0 {
-		return "", fmt.Errorf("can't find workspace (id=%s): %w", confirmToken.WorkspaceID(), ErrNotFound)
-	}
-
-	workspace = ws[0]
-
-	us, err := u.Users.List(ctx, users.EmailIn(confirmToken.Email()), 1, 0)
-	if err != nil {
-		return "", err
-	}
-
-	if len(us) != 0 {
-		user = us[0]
 
 		wus, err := u.WorkspaceUsers.List(
 			ctx,
@@ -281,43 +225,31 @@ func (u *Apartomat) AcceptInviteToWorkspace(ctx context.Context, str string) (st
 			0,
 		)
 		if err != nil {
-			return "", err
+			return "", 0, err
 		}
 
-		if len(wus) != 0 {
-			return "", fmt.Errorf("user is in workspace (id=%s) already: %w", confirmToken.WorkspaceID(), ErrAlreadyExists)
-		}
-
-	} else {
-		id, err := NewNanoID()
-		if err != nil {
-			return "", err
-		}
-
-		user = users.NewUser(id, confirmToken.Email(), "", true, true)
-
-		if err := u.Users.Save(ctx, user); err != nil {
-			return "", err
+		if len(wus) == 1 {
+			return "", 0, fmt.Errorf("user (email=%s): %w", email, ErrAlreadyExists)
 		}
 	}
 
-	{
-		id, err := NewNanoID()
-		if err != nil {
-			return "", err
-		}
+	const (
+		tokenExpiration = 60 * time.Minute
+	)
 
-		wuser := workspace_users.NewWorkspaceUser(
-			id,
-			workspace_users.WorkspaceUserRole(confirmToken.Role()),
-			workspace.ID,
-			user.ID,
-		)
-
-		if err := u.WorkspaceUsers.Save(ctx, wuser); err != nil {
-			return "", err
-		}
+	token, err := u.InviteTokenIssuer.Issue(email, workspace.ID, string(role), tokenExpiration)
+	if err != nil {
+		return "", 0, err
 	}
 
-	return u.AuthTokenIssuer.Issue(us[0].ID)
+	err = u.Mailer.Send(u.MailFactory.MailInvite(email, token))
+	if err != nil {
+		return "", 0, fmt.Errorf("can't send email to %s: %w", email, err)
+	}
+
+	return email, tokenExpiration, err
+}
+
+func (u *Apartomat) CanInviteUsersToWorkspace(ctx context.Context, subj *auth.UserCtx, obj *workspaces.Workspace) (bool, error) {
+	return u.isWorkspaceUserAndRoleIs(ctx, subj, obj, workspace_users.WorkspaceUserRoleAdmin)
 }

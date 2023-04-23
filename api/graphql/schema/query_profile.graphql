@@ -10,5 +10,5 @@ type UserProfile {
     fullName: String!
     abbr: String!
     gravatar: Gravatar
-    defaultWorkspace: Workspace!
+    defaultWorkspace: Workspace! @goField(forceResolver: true)
 }

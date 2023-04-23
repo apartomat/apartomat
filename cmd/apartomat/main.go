@@ -119,18 +119,29 @@ func main() {
 			InviteTokenIssuer:            invite,
 			InviteTokenVerifier:          invite,
 			Mailer:                       mailer,
-			MailFactory:                  mail.NewFactory("https://crm.apartomat.ru", "apartomat@yandex.ru"),
-			Uploader:                     uploader,
-			Albums:                       albumsStore,
-			Contacts:                     contactsStore,
-			Houses:                       housesStore,
-			Projects:                     projectsStore,
-			Files:                        filesStore,
-			Rooms:                        roomsStore,
-			Users:                        usersStore,
-			Visualizations:               visualizationsStore,
-			Workspaces:                   workspacesStore,
-			WorkspaceUsers:               workspaceUsersStore,
+			MailFactory: mail.NewFactory(
+				os.Getenv("BASE_URL"),
+				os.Getenv("MAIL_FROM"),
+			),
+			Uploader:       uploader,
+			Albums:         albumsStore,
+			Contacts:       contactsStore,
+			Houses:         housesStore,
+			Projects:       projectsStore,
+			Files:          filesStore,
+			Rooms:          roomsStore,
+			Users:          usersStore,
+			Visualizations: visualizationsStore,
+			Workspaces:     workspacesStore,
+			WorkspaceUsers: workspaceUsersStore,
+		}
+
+		var (
+			addr = WithAddr(fmt.Sprintf(":%s", os.Getenv("PORT")))
+		)
+
+		if os.Getenv("SERVER_ADDR") != "" {
+			addr = WithAddr(os.Getenv("SERVER_ADDR"))
 		}
 
 		NewServer(
@@ -140,7 +151,7 @@ func main() {
 			},
 			reg,
 			logger,
-		).Run(WithAddr(os.Getenv("SERVER_ADDR")))
+		).Run(addr)
 
 	default:
 		log.Print("expect command (run or gen-key-pair)")
