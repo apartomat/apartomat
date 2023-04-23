@@ -1,38 +1,43 @@
-import React, { useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 
 import { useLocation, useNavigate } from "react-router-dom"
 
-import useConfirmLogin from "./useConfirmLogin"
+import useAcceptInvite from "./useAcceptInvite"
 import useAuthContext from "context/auth/useAuthContext"
 import useToken from "context/auth/useToken"
 
-export function Confirm({ redrectTo = "/"}) {
+export function AcceptInvite({ redrectTo = "/"}) {
     const location = useLocation()
     const navigate = useNavigate()
     const { check } = useAuthContext()
     const [, saveToken ] = useToken()
 
-    const [confirmLogin, { data: confirmLoginResult, loading }] = useConfirmLogin()
+    const [confirmLogin, { data, error, loading }] = useAcceptInvite()
+
     const [sent, setSent] = useState(false)
 
     useEffect(() => {
         const token = new URLSearchParams(location.search).get("token")
-        if (token && confirmLoginResult === undefined && !sent && !loading) {
+        if (token && data === undefined && !sent && !loading) {
             confirmLogin(token)
             setSent(true)
         }
-    }, [location, sent, setSent, confirmLogin, confirmLoginResult, loading])
+    }, [location, sent, setSent, confirmLogin, data, loading])
 
     useEffect(() => {
-        if (confirmLoginResult?.confirmLoginLink.__typename === "LoginConfirmed") {
-            saveToken(confirmLoginResult?.confirmLoginLink.token)
-            check()
-            navigate(redrectTo)
+        switch (data?.acceptInvite.__typename) {
+            case "InviteAccepted":
+                saveToken(data?.acceptInvite.token)
+                check()
+                navigate(redrectTo)
+                return
+            case "AlreadyInWorkspace":
+                navigate(redrectTo)
+                return
         }
-    }, [ confirmLoginResult, history, redrectTo, check, saveToken, loading ])
+    }, [ data, history, redrectTo, check, saveToken, loading ])
 
-
-    switch (confirmLoginResult?.confirmLoginLink.__typename) {
+    switch (data?.acceptInvite.__typename) {
         case "InvalidToken":
             return (
                 <div>
@@ -57,4 +62,4 @@ export function Confirm({ redrectTo = "/"}) {
     }
 }
 
-export default Confirm
+export default AcceptInvite

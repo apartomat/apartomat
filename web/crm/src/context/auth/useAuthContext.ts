@@ -63,14 +63,19 @@ export function useAuthContext() {
 export function useAuthProvider() {
     const [ user, setUser ] = useState<UserContext>(userContextUndefined)
 
-    const [ loadProfile, { data,  error, loading } ] = useProfileLazyQuery()
+    const [ loadProfile, { data,  error, loading, refetch } ] = useProfileLazyQuery()
 
     const [ concreteUser, setConcreteUser ] = useState<User>(userEmpty)
 
     function check() {
         if (user.status === UserContextStatus.UNDEFINED) {
             setUser({ status: UserContextStatus.CHEKING } as UserCheckingContext)
-            loadProfile()
+
+            if (data) {
+                refetch()
+            } else {
+                loadProfile()
+            }
         }
     }
 
@@ -80,7 +85,7 @@ export function useAuthProvider() {
 
     useEffect(() => {
         switch (data?.profile.__typename) {
-            case 'UserProfile':
+            case "UserProfile":
                 setUser({
                     status: UserContextStatus.LOGGED,
                     id: data?.profile.id,
@@ -97,14 +102,14 @@ export function useAuthProvider() {
                 } as User)
 
                 break
-            case 'Forbidden':
+            case "Forbidden":
                 setUser({status: UserContextStatus.UNAUTHORIZED} as UserUnauthorizedContext)
                 break
-            case 'ServerError':
+            case "ServerError":
                 setUser({status: UserContextStatus.SERVER_ERROR} as UserServerErrorContext)
                 break
         }
-    }, [data, error, loading])
+    }, [ data, error, loading ])
 
     return { user, concreteUser, check, reset, error: error?.message }
 }

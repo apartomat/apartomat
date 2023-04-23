@@ -1,0 +1,20 @@
+mutation inviteUser($workspaceId: String! $email: String! $role: WorkspaceUserRole!) {
+    inviteUser(workspaceId: $workspaceId email: $email role: $role) {
+        ...on InviteSent {
+            to
+            tokenExpiration
+        }
+        ...on AlreadyInWorkspace {
+            message
+        }
+        ...on Forbidden {
+            message
+        }
+        ...on NotFound {
+            message
+        }
+        ...on ServerError {
+            message
+        }
+    }
+}

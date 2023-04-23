@@ -47,7 +47,6 @@ export function Add({
         }
 
         if (error) {
-            console.error(error)
             setErrorMessage("Ошибка сервера")
         }
 

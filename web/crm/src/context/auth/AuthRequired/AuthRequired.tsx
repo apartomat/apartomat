@@ -12,7 +12,7 @@ function AuthRequired() {
         if (user.status === UserContextStatus.UNDEFINED) {
             check()
         }
-    }, [user, check])
+    }, [ user, check ])
 
     if (error !== undefined) {
         return (

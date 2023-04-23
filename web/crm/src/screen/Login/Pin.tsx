@@ -10,7 +10,7 @@ import { Main, Heading, Box, Form, FormField, Button, MaskedInput, Text } from "
 
 function Pin({ email, token, redirectTo = "/" }: { email: string, token: string, redirectTo?: string}) {
     const [ confirmLogin, { data, loading } ] = useConfirmLoginPin()
-    const { check } = useAuthContext()
+    const { reset, check } = useAuthContext()
     const [, saveToken ] = useToken()
 
     const navigate = useNavigate()
@@ -20,6 +20,7 @@ function Pin({ email, token, redirectTo = "/" }: { email: string, token: string,
     useEffect(() => {
         if (data?.confirmLoginPin.__typename === "LoginConfirmed") {
             saveToken(data?.confirmLoginPin?.token)
+            reset()
             check()
             navigate(redirectTo)
         }

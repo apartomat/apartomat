@@ -18,6 +18,8 @@ export type Scalars = {
   Url: any;
 };
 
+export type AcceptInviteResult = AlreadyInWorkspace | ExpiredToken | InvalidToken | InviteAccepted | ServerError;
+
 export type AddContactInput = {
   details: Array<ContactDetailsInput>;
   fullName: Scalars['String'];
@@ -106,6 +108,11 @@ export type AlbumSettings = {
 
 export type AlreadyExists = Error & {
   __typename?: 'AlreadyExists';
+  message: Scalars['String'];
+};
+
+export type AlreadyInWorkspace = Error & {
+  __typename?: 'AlreadyInWorkspace';
   message: Scalars['String'];
 };
 
@@ -297,6 +304,20 @@ export type InvalidToken = Error & {
   message: Scalars['String'];
 };
 
+export type InviteAccepted = {
+  __typename?: 'InviteAccepted';
+  token: Scalars['String'];
+};
+
+export type InviteSent = {
+  __typename?: 'InviteSent';
+  to: Scalars['String'];
+  /**  token lifetime in seconds  */
+  tokenExpiration: Scalars['Int'];
+};
+
+export type InviteUserToWorkspaceResult = AlreadyInWorkspace | Forbidden | InviteSent | NotFound | ServerError;
+
 export type LinkSentByEmail = {
   __typename?: 'LinkSentByEmail';
   email: Scalars['String'];
@@ -311,6 +332,7 @@ export type LoginConfirmed = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  acceptInvite: AcceptInviteResult;
   addContact: AddContactResult;
   addHouse: AddHouseResult;
   addRoom: AddRoomResult;
@@ -327,6 +349,7 @@ export type Mutation = {
   deleteContact: DeleteContactResult;
   deleteRoom: DeleteRoomResult;
   deleteVisualizations: DeleteVisualizationsResult;
+  inviteUser: InviteUserToWorkspaceResult;
   loginByEmail: LoginByEmailResult;
   ping: Scalars['String'];
   updateContact: UpdateContactResult;
@@ -335,6 +358,11 @@ export type Mutation = {
   uploadFile: UploadFileResult;
   uploadVisualization: UploadVisualizationResult;
   uploadVisualizations: UploadVisualizationsResult;
+};
+
+
+export type MutationAcceptInviteArgs = {
+  token: Scalars['String'];
 };
 
 
@@ -426,6 +454,13 @@ export type MutationDeleteRoomArgs = {
 
 export type MutationDeleteVisualizationsArgs = {
   id: Array<Scalars['String']>;
+};
+
+
+export type MutationInviteUserArgs = {
+  email: Scalars['String'];
+  role: WorkspaceUserRole;
+  workspaceId: Scalars['String'];
 };
 
 
@@ -887,6 +922,7 @@ export type Workspace = {
   id: Scalars['String'];
   name: Scalars['String'];
   projects: WorkspaceProjects;
+  roles: WorkspaceUserRoleDictionary;
   users: WorkspaceUsers;
 };
 
@@ -940,6 +976,17 @@ export enum WorkspaceUserRole {
   User = 'USER'
 }
 
+export type WorkspaceUserRoleDictionary = {
+  __typename?: 'WorkspaceUserRoleDictionary';
+  items: Array<WorkspaceUserRoleDictionaryItem>;
+};
+
+export type WorkspaceUserRoleDictionaryItem = {
+  __typename?: 'WorkspaceUserRoleDictionaryItem';
+  key: WorkspaceUserRole;
+  value: Scalars['String'];
+};
+
 export type WorkspaceUsers = {
   __typename?: 'WorkspaceUsers';
   list: WorkspaceUsersListResult;
@@ -979,6 +1026,13 @@ export type ProfileQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type ProfileQuery = { __typename?: 'Query', profile: { __typename: 'Forbidden', message: string } | { __typename: 'ServerError', message: string } | { __typename: 'UserProfile', id: string, email: string, gravatar?: { __typename?: 'Gravatar', url: string } | null, defaultWorkspace: { __typename?: 'Workspace', id: string, name: string } } };
+
+export type AcceptInviteMutationVariables = Exact<{
+  token: Scalars['String'];
+}>;
+
+
+export type AcceptInviteMutation = { __typename?: 'Mutation', acceptInvite: { __typename: 'AlreadyInWorkspace', message: string } | { __typename: 'ExpiredToken', message: string } | { __typename: 'InvalidToken', message: string } | { __typename: 'InviteAccepted', token: string } | { __typename: 'ServerError', message: string } };
 
 export type ChangeAlbumPageOrientationMutationVariables = Exact<{
   albumId: Scalars['String'];
@@ -1213,15 +1267,24 @@ export type CreateProjectMutationVariables = Exact<{
 
 export type CreateProjectMutation = { __typename?: 'Mutation', createProject: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectCreated', project: { __typename?: 'Project', id: string, name: string, startAt?: any | null, endAt?: any | null } } | { __typename: 'ServerError', message: string } };
 
+export type InviteUserMutationVariables = Exact<{
+  workspaceId: Scalars['String'];
+  email: Scalars['String'];
+  role: WorkspaceUserRole;
+}>;
+
+
+export type InviteUserMutation = { __typename?: 'Mutation', inviteUser: { __typename?: 'AlreadyInWorkspace', message: string } | { __typename?: 'Forbidden', message: string } | { __typename?: 'InviteSent', to: string, tokenExpiration: number } | { __typename?: 'NotFound', message: string } | { __typename?: 'ServerError', message: string } };
+
 export type WorkspaceScreenQueryVariables = Exact<{
   id: Scalars['String'];
   timezone?: InputMaybe<Scalars['String']>;
 }>;
 
 
-export type WorkspaceScreenQuery = { __typename?: 'Query', workspace: { __typename?: 'Forbidden', message: string } | { __typename?: 'NotFound', message: string } | { __typename?: 'ServerError', message: string } | { __typename?: 'Workspace', id: string, name: string, users: { __typename?: 'WorkspaceUsers', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'ServerError', message: string } | { __typename?: 'WorkspaceUsersList', items: Array<{ __typename?: 'WorkspaceUser', id: string, role: WorkspaceUserRole, workspace: { __typename?: 'Id', id: string }, profile: { __typename?: 'UserProfile', id: string, email: string, fullName: string, abbr: string, gravatar?: { __typename?: 'Gravatar', url: string } | null } }> } }, projects: { __typename?: 'WorkspaceProjects', current: { __typename?: 'Forbidden', message: string } | { __typename?: 'ServerError', message: string } | { __typename?: 'WorkspaceProjectsList', items: Array<{ __typename?: 'Project', id: string, name: string, status: ProjectStatus, startAt?: any | null, endAt?: any | null, period?: string | null }> }, done: { __typename: 'Forbidden', message: string } | { __typename: 'ServerError', message: string } | { __typename: 'WorkspaceProjectsList', items: Array<{ __typename?: 'Project', id: string, name: string, status: ProjectStatus, startAt?: any | null, endAt?: any | null, period?: string | null }> } } } };
+export type WorkspaceScreenQuery = { __typename?: 'Query', workspace: { __typename?: 'Forbidden', message: string } | { __typename?: 'NotFound', message: string } | { __typename?: 'ServerError', message: string } | { __typename?: 'Workspace', id: string, name: string, users: { __typename?: 'WorkspaceUsers', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'ServerError', message: string } | { __typename?: 'WorkspaceUsersList', items: Array<{ __typename?: 'WorkspaceUser', id: string, role: WorkspaceUserRole, workspace: { __typename?: 'Id', id: string }, profile: { __typename?: 'UserProfile', id: string, email: string, fullName: string, abbr: string, gravatar?: { __typename?: 'Gravatar', url: string } | null } }> } }, projects: { __typename?: 'WorkspaceProjects', current: { __typename?: 'Forbidden', message: string } | { __typename?: 'ServerError', message: string } | { __typename?: 'WorkspaceProjectsList', items: Array<{ __typename?: 'Project', id: string, name: string, status: ProjectStatus, startAt?: any | null, endAt?: any | null, period?: string | null }> }, done: { __typename: 'Forbidden', message: string } | { __typename: 'ServerError', message: string } | { __typename: 'WorkspaceProjectsList', items: Array<{ __typename?: 'Project', id: string, name: string, status: ProjectStatus, startAt?: any | null, endAt?: any | null, period?: string | null }> } }, roles: { __typename?: 'WorkspaceUserRoleDictionary', items: Array<{ __typename?: 'WorkspaceUserRoleDictionaryItem', key: WorkspaceUserRole, value: string }> } } };
 
-export type WorkspaceScreenFragment = { __typename?: 'Workspace', id: string, name: string, users: { __typename?: 'WorkspaceUsers', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'ServerError', message: string } | { __typename?: 'WorkspaceUsersList', items: Array<{ __typename?: 'WorkspaceUser', id: string, role: WorkspaceUserRole, workspace: { __typename?: 'Id', id: string }, profile: { __typename?: 'UserProfile', id: string, email: string, fullName: string, abbr: string, gravatar?: { __typename?: 'Gravatar', url: string } | null } }> } }, projects: { __typename?: 'WorkspaceProjects', current: { __typename?: 'Forbidden', message: string } | { __typename?: 'ServerError', message: string } | { __typename?: 'WorkspaceProjectsList', items: Array<{ __typename?: 'Project', id: string, name: string, status: ProjectStatus, startAt?: any | null, endAt?: any | null, period?: string | null }> }, done: { __typename: 'Forbidden', message: string } | { __typename: 'ServerError', message: string } | { __typename: 'WorkspaceProjectsList', items: Array<{ __typename?: 'Project', id: string, name: string, status: ProjectStatus, startAt?: any | null, endAt?: any | null, period?: string | null }> } } };
+export type WorkspaceScreenFragment = { __typename?: 'Workspace', id: string, name: string, users: { __typename?: 'WorkspaceUsers', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'ServerError', message: string } | { __typename?: 'WorkspaceUsersList', items: Array<{ __typename?: 'WorkspaceUser', id: string, role: WorkspaceUserRole, workspace: { __typename?: 'Id', id: string }, profile: { __typename?: 'UserProfile', id: string, email: string, fullName: string, abbr: string, gravatar?: { __typename?: 'Gravatar', url: string } | null } }> } }, projects: { __typename?: 'WorkspaceProjects', current: { __typename?: 'Forbidden', message: string } | { __typename?: 'ServerError', message: string } | { __typename?: 'WorkspaceProjectsList', items: Array<{ __typename?: 'Project', id: string, name: string, status: ProjectStatus, startAt?: any | null, endAt?: any | null, period?: string | null }> }, done: { __typename: 'Forbidden', message: string } | { __typename: 'ServerError', message: string } | { __typename: 'WorkspaceProjectsList', items: Array<{ __typename?: 'Project', id: string, name: string, status: ProjectStatus, startAt?: any | null, endAt?: any | null, period?: string | null }> } }, roles: { __typename?: 'WorkspaceUserRoleDictionary', items: Array<{ __typename?: 'WorkspaceUserRoleDictionaryItem', key: WorkspaceUserRole, value: string }> } };
 
 export type WorkspaceScreenUsersFragment = { __typename?: 'WorkspaceUsers', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'ServerError', message: string } | { __typename?: 'WorkspaceUsersList', items: Array<{ __typename?: 'WorkspaceUser', id: string, role: WorkspaceUserRole, workspace: { __typename?: 'Id', id: string }, profile: { __typename?: 'UserProfile', id: string, email: string, fullName: string, abbr: string, gravatar?: { __typename?: 'Gravatar', url: string } | null } }> } };
 
@@ -1698,6 +1761,12 @@ export const WorkspaceScreenFragmentDoc = gql`
     ...WorkspaceScreenCurrentProjects
     ...WorkspaceScreenArchiveProjects
   }
+  roles {
+    items {
+      key
+      value
+    }
+  }
 }
     ${WorkspaceScreenUsersFragmentDoc}
 ${WorkspaceScreenCurrentProjectsFragmentDoc}
@@ -1753,6 +1822,45 @@ export function useProfileLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Pr
 export type ProfileQueryHookResult = ReturnType<typeof useProfileQuery>;
 export type ProfileLazyQueryHookResult = ReturnType<typeof useProfileLazyQuery>;
 export type ProfileQueryResult = Apollo.QueryResult<ProfileQuery, ProfileQueryVariables>;
+export const AcceptInviteDocument = gql`
+    mutation acceptInvite($token: String!) {
+  acceptInvite(token: $token) {
+    __typename
+    ... on InviteAccepted {
+      token
+    }
+    ... on Error {
+      message
+    }
+  }
+}
+    `;
+export type AcceptInviteMutationFn = Apollo.MutationFunction<AcceptInviteMutation, AcceptInviteMutationVariables>;
+
+/**
+ * __useAcceptInviteMutation__
+ *
+ * To run a mutation, you first call `useAcceptInviteMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAcceptInviteMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [acceptInviteMutation, { data, loading, error }] = useAcceptInviteMutation({
+ *   variables: {
+ *      token: // value for 'token'
+ *   },
+ * });
+ */
+export function useAcceptInviteMutation(baseOptions?: Apollo.MutationHookOptions<AcceptInviteMutation, AcceptInviteMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AcceptInviteMutation, AcceptInviteMutationVariables>(AcceptInviteDocument, options);
+      }
+export type AcceptInviteMutationHookResult = ReturnType<typeof useAcceptInviteMutation>;
+export type AcceptInviteMutationResult = Apollo.MutationResult<AcceptInviteMutation>;
+export type AcceptInviteMutationOptions = Apollo.BaseMutationOptions<AcceptInviteMutation, AcceptInviteMutationVariables>;
 export const ChangeAlbumPageOrientationDocument = gql`
     mutation changeAlbumPageOrientation($albumId: String!, $orientation: PageOrientation!) {
   changeAlbumPageOrientation(albumId: $albumId, orientation: $orientation) {
@@ -2904,6 +3012,56 @@ export function useCreateProjectMutation(baseOptions?: Apollo.MutationHookOption
 export type CreateProjectMutationHookResult = ReturnType<typeof useCreateProjectMutation>;
 export type CreateProjectMutationResult = Apollo.MutationResult<CreateProjectMutation>;
 export type CreateProjectMutationOptions = Apollo.BaseMutationOptions<CreateProjectMutation, CreateProjectMutationVariables>;
+export const InviteUserDocument = gql`
+    mutation inviteUser($workspaceId: String!, $email: String!, $role: WorkspaceUserRole!) {
+  inviteUser(workspaceId: $workspaceId, email: $email, role: $role) {
+    ... on InviteSent {
+      to
+      tokenExpiration
+    }
+    ... on AlreadyInWorkspace {
+      message
+    }
+    ... on Forbidden {
+      message
+    }
+    ... on NotFound {
+      message
+    }
+    ... on ServerError {
+      message
+    }
+  }
+}
+    `;
+export type InviteUserMutationFn = Apollo.MutationFunction<InviteUserMutation, InviteUserMutationVariables>;
+
+/**
+ * __useInviteUserMutation__
+ *
+ * To run a mutation, you first call `useInviteUserMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useInviteUserMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [inviteUserMutation, { data, loading, error }] = useInviteUserMutation({
+ *   variables: {
+ *      workspaceId: // value for 'workspaceId'
+ *      email: // value for 'email'
+ *      role: // value for 'role'
+ *   },
+ * });
+ */
+export function useInviteUserMutation(baseOptions?: Apollo.MutationHookOptions<InviteUserMutation, InviteUserMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<InviteUserMutation, InviteUserMutationVariables>(InviteUserDocument, options);
+      }
+export type InviteUserMutationHookResult = ReturnType<typeof useInviteUserMutation>;
+export type InviteUserMutationResult = Apollo.MutationResult<InviteUserMutation>;
+export type InviteUserMutationOptions = Apollo.BaseMutationOptions<InviteUserMutation, InviteUserMutationVariables>;
 export const WorkspaceScreenDocument = gql`
     query workspaceScreen($id: String!, $timezone: String) {
   workspace(id: $id) {

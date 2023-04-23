@@ -15,11 +15,10 @@ export function Login () {
     const navigate = useNavigate()
 
     useEffect(() => {
-        if (user.status === UserContextStatus.LOGGED) {
+        if (user.status === UserContextStatus.LOGGED || user.status === UserContextStatus.UNDEFINED) {
             navigate("/")
         }
     }, [ user ])
-
 
     const [ login, { data, loading, error } ] = useLoginByEmail()
 

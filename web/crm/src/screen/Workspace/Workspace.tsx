@@ -11,6 +11,7 @@ import Loading from "./Loading/Loading"
 import Projects from "./Projects/Projects"
 import Users from "./Users/Users"
 import Archive from "./Archive/Archive"
+import Notification from "./Notification/Notification"
 
 export default function Workspace () {
     const { id } = useParams<"id">() as { id: string }
@@ -26,6 +27,29 @@ export default function Workspace () {
     useEffect(() => {
         setError(fetchError ? "Ошибка сервера" : undefined)
     }, [ fetchError ])
+
+    const [ notification, setNotification ] = useState<string | undefined>(undefined)
+
+    const notify = ({
+        message,
+        callback,
+        timeout = 250,
+        duration = 1500
+    }: {
+        message: string,
+        callback?: () => void,
+        timeout?: number,
+        duration?: number
+    }) => {
+        setTimeout(() => {
+            setNotification(message)
+
+            setTimeout(() => {
+                setNotification(undefined)
+                callback && callback()
+            }, duration)
+        }, timeout)
+    }
 
     useEffect(() => {
         if (data) {
@@ -76,6 +100,8 @@ export default function Workspace () {
 
     return (
         <Main>
+            {notification && <Notification message={notification}/>}
+
             <Header background="white" margin={{ top:"large", horizontal:"large", bottom:"medium" }}>
                 <Box>
                     <Text size="xlarge" weight="bold" color="brand">apartomat</Text>
@@ -87,7 +113,7 @@ export default function Workspace () {
                 <Box margin={{bottom: "medium"}}>
                     <Box direction="row" margin={{vertical: "medium"}} justify="between">
                         <Heading level={2} margin="none">{screen.name}</Heading>
-                        <Box>
+                        <Box justify="center">
                             <Button color="brand" label="Новый проект" onClick={() => setShowCreateProjectLayer(true)} />
                         </Box>
                     </Box>
@@ -97,9 +123,15 @@ export default function Workspace () {
 
                 <Archive projects={projects}/>
 
-                <Box margin={{vertical: "medium"}}>
-                    <Users users={users}/>
-                </Box>
+                <Users
+                    workspaceId={screen.id}
+                    users={users}
+                    margin={{ vertical: "medium" }}
+                    roles={screen.roles}
+                    onUserInviteSent={(email) => {
+                        notify({ message: `Приглашение отправлено на ${email}` })
+                    }}
+                />
             </Box>
 
             {showCreateProjectLayer && <CreateProject workspaceId={screen.id} setShow={setShowCreateProjectLayer} />}

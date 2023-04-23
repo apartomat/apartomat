@@ -1,0 +1,11 @@
+mutation acceptInvite($token: String!) {
+    acceptInvite(token: $token) {
+        __typename
+        ...on InviteAccepted {
+            token
+        }
+        ...on Error {
+            message
+        }
+    }
+}

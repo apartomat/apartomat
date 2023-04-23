@@ -19,7 +19,12 @@ fragment WorkspaceScreen on Workspace {
         ...WorkspaceScreenCurrentProjects
         ...WorkspaceScreenArchiveProjects
     }
-
+    roles {
+        items {
+            key
+            value
+        }
+    }
 }
 
 fragment WorkspaceScreenUsers on WorkspaceUsers {

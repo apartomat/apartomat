@@ -13,6 +13,7 @@ import RedirectToDefaultWorkspace from "context/auth/RedirectToDefaultWorkspace/
 import Login from "screen/Login/Login"
 import Logout from "screen/Logout/Logout"
 import Confirm from "screen/Confirm/Confirm"
+import AcceptInvite from "screen/AcceptInvite/AcceptInvite"
 import Workspace from "screen/Workspace/Workspace"
 import Project from "screen/Project/Project"
 import Visualizations from "screen/Visualizations/Visualizations"
@@ -55,6 +56,7 @@ function App() {
                         <Route path="/login" element={<Login />} />
                         <Route path="/logout" element={<Logout />} />
                         <Route path="/confirm" element={<Confirm />} />
+                        <Route path="/accept-invite" element={<AcceptInvite />} />
                         <Route element={<AuthRequired />}>
                             <Route path="/" element={<RedirectToDefaultWorkspace />} />
                             <Route path="/:id" element={<Workspace />}/>
