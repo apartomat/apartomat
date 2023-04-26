@@ -6,7 +6,7 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/store/albums"
-	"log"
+	"go.uber.org/zap"
 )
 
 func (r *rootResolver) ProjectAlbums() ProjectAlbumsResolver {
@@ -24,11 +24,11 @@ func (r *projectAlbumsResolver) List(
 	offset int,
 ) (ProjectAlbumsListResult, error) {
 	if project, ok := graphql.GetFieldContext(ctx).Parent.Parent.Result.(*Project); !ok {
-		log.Printf("can't resolve project albums: %s", errors.New("unknown project"))
+		r.logger.Error("can't resolve project albums list", zap.Error(errors.New("unknown project")))
 
 		return serverError()
 	} else {
-		albums, err := r.useCases.GetAlbums(
+		items, err := r.useCases.GetAlbums(
 			ctx,
 			project.ID,
 			limit,
@@ -36,15 +36,19 @@ func (r *projectAlbumsResolver) List(
 		)
 		if err != nil {
 			if errors.Is(err, apartomat.ErrForbidden) {
-				return Forbidden{}, nil
+				return forbidden()
 			}
 
-			log.Printf("can't resolve project (id=%s) albums: %s", project.ID, err)
+			r.logger.Error(
+				"can't resolve project albums list",
+				zap.String("project", project.ID),
+				zap.Error(err),
+			)
 
-			return ServerError{Message: "internal server error"}, nil
+			return serverError()
 		}
 
-		return ProjectAlbumsList{Items: albumsToGraphQL(albums)}, nil
+		return ProjectAlbumsList{Items: albumsToGraphQL(items)}, nil
 	}
 }
 
@@ -64,9 +68,9 @@ func (r *projectAlbumsResolver) Total(
 	obj *ProjectAlbums,
 ) (ProjectAlbumsTotalResult, error) {
 	if project, ok := graphql.GetFieldContext(ctx).Parent.Parent.Result.(*Project); !ok {
-		log.Printf("can't resolve project files: %s", errors.New("unknown project"))
+		r.logger.Error("can't resolve project albums total", zap.Error(errors.New("unknown project")))
 
-		return nil, errors.New("server error: can't resolver project albums")
+		return serverError()
 	} else {
 		tot, err := r.useCases.CountAlbums(
 			ctx,
@@ -74,12 +78,16 @@ func (r *projectAlbumsResolver) Total(
 		)
 		if err != nil {
 			if errors.Is(err, apartomat.ErrForbidden) {
-				return Forbidden{}, nil
+				return forbidden()
 			}
 
-			log.Printf("can't resolve project (id=%s) files: %s", project.ID, err)
+			r.logger.Error(
+				"can't resolve project albums total",
+				zap.String("project", project.ID),
+				zap.Error(err),
+			)
 
-			return nil, errors.New("server error: can't resolver project albums")
+			return serverError()
 		}
 
 		return ProjectAlbumsTotal{Total: tot}, nil

@@ -3,9 +3,10 @@ package graphql
 import (
 	"context"
 	"errors"
+
 	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/store/albums"
-	"log"
+	"go.uber.org/zap"
 )
 
 func (r *mutationResolver) CreateAlbum(
@@ -20,12 +21,12 @@ func (r *mutationResolver) CreateAlbum(
 	)
 	if err != nil {
 		if errors.Is(err, apartomat.ErrForbidden) {
-			return Forbidden{}, nil
+			return forbidden()
 		}
 
-		log.Printf("can't create album: %s", err)
+		r.logger.Error("can't create album", zap.Error(err))
 
-		return ServerError{Message: "can't create album"}, nil
+		return serverError()
 	}
 
 	return AlbumCreated{Album: albumToGraphQL(album)}, nil

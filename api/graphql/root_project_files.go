@@ -3,10 +3,11 @@ package graphql
 import (
 	"context"
 	"errors"
+
 	"github.com/99designs/gqlgen/graphql"
 	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/store/files"
-	"log"
+	"go.uber.org/zap"
 )
 
 func (r *rootResolver) ProjectFiles() ProjectFilesResolver {
@@ -25,11 +26,11 @@ func (r *projectFilesResolver) List(
 	offset int,
 ) (ProjectFilesListResult, error) {
 	if project, ok := graphql.GetFieldContext(ctx).Parent.Parent.Result.(*Project); !ok {
-		log.Printf("can't resolve project files: %s", errors.New("unknown project"))
+		r.logger.Error("can't resolve project files", zap.Error(errors.New("unknown project")))
 
 		return serverError()
 	} else {
-		files, err := r.useCases.GetFiles(
+		items, err := r.useCases.GetFiles(
 			ctx,
 			project.ID,
 			toProjectFileTypes(filter.Type),
@@ -38,15 +39,15 @@ func (r *projectFilesResolver) List(
 		)
 		if err != nil {
 			if errors.Is(err, apartomat.ErrForbidden) {
-				return Forbidden{}, nil
+				return forbidden()
 			}
 
-			log.Printf("can't resolve project (id=%s) files: %s", project.ID, err)
+			r.logger.Error("can't resolve project files", zap.String("project", project.ID), zap.Error(err))
 
-			return ServerError{Message: "internal server error"}, nil
+			return serverError()
 		}
 
-		return ProjectFilesList{Items: projectFilesToGraphQL(files)}, nil
+		return ProjectFilesList{Items: projectFilesToGraphQL(items)}, nil
 	}
 }
 
@@ -76,7 +77,7 @@ func (r *projectFilesResolver) Total(
 	filter ProjectFilesListFilter,
 ) (ProjectFilesTotalResult, error) {
 	if project, ok := graphql.GetFieldContext(ctx).Parent.Parent.Result.(*Project); !ok {
-		log.Printf("can't resolve project files: %s", errors.New("unknown project"))
+		r.logger.Error("can't resolve project files", zap.Error(errors.New("unknown project")))
 
 		return nil, errors.New("server error: can't resolver project files")
 	} else {
@@ -87,10 +88,10 @@ func (r *projectFilesResolver) Total(
 		)
 		if err != nil {
 			if errors.Is(err, apartomat.ErrForbidden) {
-				return Forbidden{}, nil
+				return forbidden()
 			}
 
-			log.Printf("can't resolve project (id=%s) files: %s", project.ID, err)
+			r.logger.Error("can't resolve project files", zap.String("project", project.ID), zap.Error(err))
 
 			return nil, errors.New("server error: can't resolver project files")
 		}

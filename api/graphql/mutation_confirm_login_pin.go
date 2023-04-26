@@ -3,8 +3,9 @@ package graphql
 import (
 	"context"
 	"errors"
+
 	"github.com/apartomat/apartomat/internal/auth/paseto"
-	"log"
+	"go.uber.org/zap"
 )
 
 func (r *mutationResolver) ConfirmLoginPin(ctx context.Context, t, pin string) (ConfirmLoginPinResult, error) {
@@ -14,9 +15,9 @@ func (r *mutationResolver) ConfirmLoginPin(ctx context.Context, t, pin string) (
 			return InvalidToken{Message: "token is expired or not valid"}, nil
 		}
 
-		log.Printf("can't verify token: %s", err)
+		r.logger.Error("can't verify token", zap.Error(err))
 
-		return ServerError{Message: "can't verify token"}, nil
+		return serverError()
 	}
 
 	return LoginConfirmed{Token: str}, nil

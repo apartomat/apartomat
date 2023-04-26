@@ -3,10 +3,11 @@ package graphql
 import (
 	"context"
 	"errors"
+
 	"github.com/99designs/gqlgen/graphql"
 	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/store/visualizations"
-	"log"
+	"go.uber.org/zap"
 )
 
 func (r *rootResolver) ProjectVisualizations() ProjectVisualizationsResolver {
@@ -25,7 +26,7 @@ func (r *projectVisualizationsResolver) List(
 	offset int,
 ) (ProjectVisualizationsListResult, error) {
 	if project, ok := graphql.GetFieldContext(ctx).Parent.Parent.Result.(*Project); !ok {
-		log.Printf("can't resolve project visualizations: %s", errors.New("unknown project"))
+		r.logger.Error("can't resolve project visualizations", zap.Error(errors.New("unknown project")))
 
 		return serverError()
 	} else {
@@ -38,12 +39,16 @@ func (r *projectVisualizationsResolver) List(
 		)
 		if err != nil {
 			if errors.Is(err, apartomat.ErrForbidden) {
-				return Forbidden{}, nil
+				return forbidden()
 			}
 
-			log.Printf("can't resolve project (id=%s) visualizations: %s", project.ID, err)
+			r.logger.Error(
+				"can't resolve project visualizations",
+				zap.String("project", project.ID),
+				zap.Error(err),
+			)
 
-			return ServerError{Message: "internal server error"}, nil
+			return serverError()
 		}
 
 		return ProjectVisualizationsList{Items: visualizationsToGraphQL(res)}, nil

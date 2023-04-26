@@ -3,10 +3,11 @@ package graphql
 import (
 	"context"
 	"errors"
+
 	"github.com/99designs/gqlgen/graphql"
 	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/store/rooms"
-	"log"
+	"go.uber.org/zap"
 )
 
 func (r *rootResolver) HouseRooms() HouseRoomsResolver {
@@ -19,13 +20,13 @@ type houseRoomsResolver struct {
 
 func (r *houseRoomsResolver) List(ctx context.Context, obj *HouseRooms, limit int, offset int) (HouseRoomsListResult, error) {
 	if phouse, ok := graphql.GetFieldContext(ctx).Parent.Parent.Result.(**House); !ok {
-		log.Printf("can't resolve house rooms: %s", errors.New("unknown house"))
+		r.logger.Error("can't resolve house rooms", zap.Error(errors.New("unknown house")))
 
 		return serverError()
 	} else {
 		house := *phouse
 
-		rooms, err := r.useCases.GetRooms(
+		items, err := r.useCases.GetRooms(
 			ctx,
 			house.ID,
 			limit,
@@ -33,15 +34,15 @@ func (r *houseRoomsResolver) List(ctx context.Context, obj *HouseRooms, limit in
 		)
 		if err != nil {
 			if errors.Is(err, apartomat.ErrForbidden) {
-				return Forbidden{}, nil
+				return forbidden()
 			}
 
-			log.Printf("can't resolve house (id=%s) rooms: %s", house.ID, err)
+			r.logger.Error("can't resolve house rooms", zap.String("house", house.ID), zap.Error(err))
 
-			return ServerError{Message: "internal server error"}, nil
+			return serverError()
 		}
 
-		return HouseRoomsList{Items: roomsToGraphQL(rooms)}, nil
+		return HouseRoomsList{Items: roomsToGraphQL(items)}, nil
 	}
 }
 

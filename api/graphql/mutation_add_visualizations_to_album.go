@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	apartomat "github.com/apartomat/apartomat/internal"
-	"log"
+	"go.uber.org/zap"
 )
 
 func (r *mutationResolver) AddVisualizationsToAlbum(
@@ -15,12 +15,12 @@ func (r *mutationResolver) AddVisualizationsToAlbum(
 	pages, err := r.useCases.AddVisualizationsToAlbum(ctx, albumID, visualizations)
 	if err != nil {
 		if errors.Is(err, apartomat.ErrForbidden) {
-			return Forbidden{}, nil
+			return forbidden()
 		}
 
-		log.Printf("can't add visualization to album (id=%s): %s", albumID, err)
+		r.logger.Error("can't add visualization to album", zap.String("album", albumID), zap.Error(err))
 
-		return ServerError{Message: "can't add visualization to album"}, nil
+		return serverError()
 	}
 
 	var (

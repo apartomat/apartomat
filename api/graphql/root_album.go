@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	apartomat "github.com/apartomat/apartomat/internal"
-	"log"
+	"go.uber.org/zap"
 )
 
 func (r *rootResolver) Album() AlbumResolver { return &albumResolver{r} }
@@ -41,7 +41,7 @@ func (r *albumResolver) Project(ctx context.Context, obj *Album) (AlbumProjectRe
 			return notFound()
 		}
 
-		log.Printf("can't resolve project (id=%s): %s", gp.ID, err)
+		r.logger.Error("can't resolve project", zap.String("project", gp.ID), zap.Error(err))
 
 		return nil, fmt.Errorf("can't resolve project (id=%s): %w", gp.ID, err)
 	}

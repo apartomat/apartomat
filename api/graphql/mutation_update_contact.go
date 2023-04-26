@@ -3,8 +3,9 @@ package graphql
 import (
 	"context"
 	"errors"
+
 	apartomat "github.com/apartomat/apartomat/internal"
-	"log"
+	"go.uber.org/zap"
 )
 
 func (r *mutationResolver) UpdateContact(
@@ -22,12 +23,12 @@ func (r *mutationResolver) UpdateContact(
 	)
 	if err != nil {
 		if errors.Is(err, apartomat.ErrForbidden) {
-			return Forbidden{}, nil
+			return forbidden()
 		}
 
-		log.Printf("can't update contact: %s", err)
+		r.logger.Error("can't update contact", zap.Error(err))
 
-		return ServerError{Message: "can't update contact"}, nil
+		return serverError()
 	}
 
 	return ContactUpdated{Contact: contactToGraphQL(contact)}, nil

@@ -3,10 +3,11 @@ package graphql
 import (
 	"context"
 	"errors"
+
 	"github.com/99designs/gqlgen/graphql"
 	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/store/projects"
-	"log"
+	"go.uber.org/zap"
 )
 
 type workspaceProjectsResolver struct {
@@ -26,12 +27,12 @@ func (r *workspaceProjectsResolver) List(
 	workspace, ok := graphql.GetFieldContext(ctx).Parent.Parent.Result.(*Workspace)
 
 	if !ok {
-		log.Printf("can't resolve workspace projects: %s", errors.New("unknown workspace"))
+		r.logger.Error("can't resolve workspace projects", zap.Error(errors.New("unknown workspace")))
 
 		return serverError()
 	}
 
-	projects, err := r.useCases.GetWorkspaceProjects(
+	items, err := r.useCases.GetWorkspaceProjects(
 		ctx,
 		workspace.ID,
 		toProjectStatuses(filter.Status),
@@ -40,15 +41,19 @@ func (r *workspaceProjectsResolver) List(
 	)
 	if err != nil {
 		if errors.Is(err, apartomat.ErrForbidden) {
-			return Forbidden{}, nil
+			return forbidden()
 		}
 
-		log.Printf("can't resolve workspace (id=%s) projects: %s", workspace.ID, err)
+		r.logger.Error(
+			"can't resolve workspace projects",
+			zap.String("workspace", workspace.ID),
+			zap.Error(err),
+		)
 
-		return ServerError{Message: "internal server error"}, nil
+		return serverError()
 	}
 
-	return WorkspaceProjectsList{Items: projectsToGraphQL(projects)}, nil
+	return WorkspaceProjectsList{Items: projectsToGraphQL(items)}, nil
 }
 
 func (r *workspaceProjectsResolver) Total(

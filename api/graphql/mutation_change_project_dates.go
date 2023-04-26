@@ -3,8 +3,9 @@ package graphql
 import (
 	"context"
 	"errors"
+
 	apartomat "github.com/apartomat/apartomat/internal"
-	"log"
+	"go.uber.org/zap"
 )
 
 func (r *mutationResolver) ChangeProjectDates(
@@ -20,16 +21,16 @@ func (r *mutationResolver) ChangeProjectDates(
 	)
 	if err != nil {
 		if errors.Is(err, apartomat.ErrForbidden) {
-			return Forbidden{}, nil
+			return forbidden()
 		}
 
 		if errors.Is(err, apartomat.ErrNotFound) {
-			return NotFound{}, nil
+			return notFound()
 		}
 
-		log.Printf("can't change project dates: %s", err)
+		r.logger.Error("can't change project dates", zap.String("project", projectID), zap.Error(err))
 
-		return ServerError{Message: "can't change project dates"}, nil
+		return serverError()
 	}
 
 	return ProjectDatesChanged{Project: projectToGraphQL(project)}, nil

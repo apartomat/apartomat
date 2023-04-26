@@ -3,9 +3,10 @@ package graphql
 import (
 	"context"
 	"errors"
+
 	"github.com/99designs/gqlgen/graphql"
 	apartomat "github.com/apartomat/apartomat/internal"
-	"log"
+	"go.uber.org/zap"
 )
 
 func (r *mutationResolver) UploadVisualizations(
@@ -30,10 +31,10 @@ func (r *mutationResolver) UploadVisualizations(
 	res, err := r.useCases.UploadVisualizations(ctx, projectID, uploads, roomID)
 	if err != nil {
 		if errors.Is(err, apartomat.ErrForbidden) {
-			return Forbidden{}, nil
+			return forbidden()
 		}
 
-		log.Printf("can't upload file to project (id=%s): %s", projectID, err)
+		r.logger.Error("can't upload file to project", zap.String("project", projectID), zap.Error(err))
 
 		return nil, err
 	}

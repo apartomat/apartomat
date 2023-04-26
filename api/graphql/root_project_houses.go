@@ -6,7 +6,7 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/store/houses"
-	"log"
+	"go.uber.org/zap"
 )
 
 func (r *rootResolver) ProjectHouses() ProjectHousesResolver {
@@ -25,11 +25,11 @@ func (r *projectHousesResolver) List(
 	offset int,
 ) (ProjectHousesListResult, error) {
 	if project, ok := graphql.GetFieldContext(ctx).Parent.Parent.Result.(*Project); !ok {
-		log.Printf("can't resolve project houses: %s", errors.New("unknown project"))
+		r.logger.Error("can't resolve project houses", zap.Error(errors.New("unknown project")))
 
 		return serverError()
 	} else {
-		houses, err := r.useCases.GetHouses(
+		items, err := r.useCases.GetHouses(
 			ctx,
 			project.ID,
 			limit,
@@ -37,15 +37,19 @@ func (r *projectHousesResolver) List(
 		)
 		if err != nil {
 			if errors.Is(err, apartomat.ErrForbidden) {
-				return Forbidden{}, nil
+				return forbidden()
 			}
 
-			log.Printf("can't resolve project (id=%s) houses: %s", project.ID, err)
+			r.logger.Error(
+				"can't resolve project houses",
+				zap.String("project", project.ID),
+				zap.Error(err),
+			)
 
-			return ServerError{Message: "internal server error"}, nil
+			return serverError()
 		}
 
-		return ProjectHousesList{Items: projectHousesToGraphQL(houses)}, nil
+		return ProjectHousesList{Items: projectHousesToGraphQL(items)}, nil
 	}
 }
 

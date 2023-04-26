@@ -5,23 +5,23 @@ import (
 	"errors"
 	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/store/workspaces"
-	"log"
+	"go.uber.org/zap"
 )
 
 func (r *queryResolver) Workspace(ctx context.Context, id string) (WorkspaceResult, error) {
 	ws, err := r.useCases.GetWorkspace(ctx, id)
 	if err != nil {
 		if errors.Is(err, apartomat.ErrForbidden) {
-			return Forbidden{}, nil
+			return forbidden()
 		}
 
 		if errors.Is(err, apartomat.ErrNotFound) {
-			return NotFound{}, nil
+			return notFound()
 		}
 
-		log.Printf("can't resolve workspace (id=%s): %s", id, err)
+		r.logger.Error("can't resolve workspace", zap.String("workspace", id), zap.Error(err))
 
-		return ServerError{}, nil
+		return serverError()
 	}
 	return workspaceToGraphQL(ws), nil
 }

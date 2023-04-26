@@ -3,10 +3,11 @@ package graphql
 import (
 	"context"
 	"errors"
+
 	"github.com/99designs/gqlgen/graphql"
 	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/store/workspace_users"
-	"log"
+	"go.uber.org/zap"
 )
 
 func (r *rootResolver) WorkspaceUsers() WorkspaceUsersResolver {
@@ -28,7 +29,7 @@ func (r *workspaceUsersResolver) List(
 	)
 
 	if w, ok := graphql.GetFieldContext(ctx).Parent.Parent.Result.(*Workspace); !ok {
-		log.Printf("can't resolve project contacts: %s", errors.New("unknown workspace"))
+		r.logger.Error("can't resolve project contacts", zap.Error(errors.New("unknown workspace")))
 
 		return serverError()
 	} else {
@@ -38,10 +39,10 @@ func (r *workspaceUsersResolver) List(
 	users, err := r.useCases.GetWorkspaceUsers(ctx, workspace.ID, limit, 0)
 	if err != nil {
 		if errors.Is(err, apartomat.ErrForbidden) {
-			return Forbidden{}, nil
+			return forbidden()
 		}
 
-		log.Printf("can't resolve workspace (id=%s) users: %s", workspace.ID, err)
+		r.logger.Error("can't resolve workspace users", zap.String("workspace", workspace.ID), zap.Error(err))
 
 		return serverError()
 	}

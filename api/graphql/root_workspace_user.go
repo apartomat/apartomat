@@ -3,9 +3,11 @@ package graphql
 import (
 	"context"
 	"errors"
-	"github.com/apartomat/apartomat/internal/pkg/gravatar"
-	"log"
+	"fmt"
 	"strings"
+
+	"github.com/apartomat/apartomat/internal/pkg/gravatar"
+	"go.uber.org/zap"
 )
 
 type workspaceUserResolver struct {
@@ -19,13 +21,17 @@ func (r *rootResolver) WorkspaceUser() WorkspaceUserResolver {
 func (r *workspaceUserResolver) Profile(ctx context.Context, obj *WorkspaceUser) (*UserProfile, error) {
 	user, err := r.useCases.GetWorkspaceUserProfile(ctx, obj.Workspace.ID, obj.ID)
 	if err != nil {
-		log.Printf("can't resolve workspace user (id=%s) profile: %s", obj.ID, err)
+		r.logger.Error("can't resolve workspace user profile", zap.String("user", obj.ID), zap.Error(err))
 
 		return nil, errors.New("internal server error")
 	}
 
 	if user == nil {
-		log.Printf("can't resolve workspace user profile: user (id=%s) not found", obj.ID)
+		r.logger.Error(
+			"can't resolve workspace user profile",
+			zap.String("user", obj.ID),
+			zap.Error(fmt.Errorf("user (id=%s) not found", obj.ID)),
+		)
 
 		return nil, errors.New("internal server error")
 	}

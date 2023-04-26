@@ -3,9 +3,10 @@ package graphql
 import (
 	"context"
 	"errors"
+
 	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/store/albums"
-	"log"
+	"go.uber.org/zap"
 )
 
 func (r *mutationResolver) ChangeAlbumPageOrientation(
@@ -17,16 +18,16 @@ func (r *mutationResolver) ChangeAlbumPageOrientation(
 
 	if err != nil {
 		if errors.Is(err, apartomat.ErrForbidden) {
-			return Forbidden{}, nil
+			return forbidden()
 		}
 
 		if errors.Is(err, apartomat.ErrNotFound) {
-			return NotFound{}, nil
+			return notFound()
 		}
 
-		log.Printf("can't change album page orientation: %s", err)
+		r.logger.Error("can't change album page orientation", zap.Error(err))
 
-		return ServerError{Message: "can't change album page orientation"}, nil
+		return serverError()
 	}
 
 	return AlbumPageOrientationChanged{Album: albumToGraphQL(album)}, nil

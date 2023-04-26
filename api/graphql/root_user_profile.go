@@ -3,7 +3,7 @@ package graphql
 import (
 	"context"
 	"errors"
-	"log"
+	"go.uber.org/zap"
 )
 
 type userProfileResolver struct {
@@ -23,7 +23,7 @@ func (r *userProfileResolver) DefaultWorkspace(ctx context.Context, obj *UserPro
 
 	w, err := r.useCases.GetWorkspace(ctx, obj.DefaultWorkspace.ID)
 	if err != nil {
-		log.Printf("can't get default workspace: %s", err)
+		r.logger.Error("can't get default workspace", zap.Error(err))
 
 		return nil, errors.New("internal server error")
 	}

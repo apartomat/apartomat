@@ -3,8 +3,9 @@ package graphql
 import (
 	"context"
 	"errors"
+
 	apartomat "github.com/apartomat/apartomat/internal"
-	"log"
+	"go.uber.org/zap"
 )
 
 func (r *mutationResolver) CreateProject(ctx context.Context, input CreateProjectInput) (CreateProjectResult, error) {
@@ -14,7 +15,11 @@ func (r *mutationResolver) CreateProject(ctx context.Context, input CreateProjec
 			return forbidden()
 		}
 
-		log.Printf("can't create project in workspace (id=%s): %s", input.WorkspaceID, err)
+		r.logger.Error(
+			"can't create project in workspace",
+			zap.String("workspace", input.WorkspaceID),
+			zap.Error(err),
+		)
 
 		return serverError()
 	}

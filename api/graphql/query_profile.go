@@ -3,10 +3,11 @@ package graphql
 import (
 	"context"
 	"errors"
+
 	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/auth"
 	"github.com/apartomat/apartomat/internal/pkg/gravatar"
-	"log"
+	"go.uber.org/zap"
 )
 
 func (r *queryResolver) Profile(ctx context.Context) (UserProfileResult, error) {
@@ -14,12 +15,12 @@ func (r *queryResolver) Profile(ctx context.Context) (UserProfileResult, error) 
 		user, err := r.useCases.GetUserProfile(ctx, userCtx.ID)
 		if err != nil {
 			if errors.Is(err, apartomat.ErrForbidden) {
-				return Forbidden{}, nil
+				return forbidden()
 			}
 
-			log.Printf("can't get profile (id=%s): %s", userCtx.ID, err)
+			r.logger.Error("can't get profile", zap.String("user", userCtx.ID), zap.Error(err))
 
-			return ServerError{}, nil
+			return serverError()
 		}
 
 		var (

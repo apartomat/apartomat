@@ -5,7 +5,7 @@ import (
 	"errors"
 	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/store/houses"
-	"log"
+	"go.uber.org/zap"
 )
 
 func (r *mutationResolver) AddHouse(
@@ -22,12 +22,12 @@ func (r *mutationResolver) AddHouse(
 	)
 	if err != nil {
 		if errors.Is(err, apartomat.ErrForbidden) {
-			return Forbidden{}, nil
+			return forbidden()
 		}
 
-		log.Printf("can't add house: %s", err)
+		r.logger.Error("can't add house", zap.Error(err))
 
-		return ServerError{Message: "can't add house"}, nil
+		return serverError()
 	}
 
 	return HouseAdded{House: houseToGraphQL(contact)}, nil

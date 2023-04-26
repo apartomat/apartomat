@@ -3,9 +3,10 @@ package graphql
 import (
 	"context"
 	"errors"
+
 	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/store/albums"
-	"log"
+	"go.uber.org/zap"
 )
 
 func (r *mutationResolver) ChangeAlbumPageSize(
@@ -17,16 +18,16 @@ func (r *mutationResolver) ChangeAlbumPageSize(
 
 	if err != nil {
 		if errors.Is(err, apartomat.ErrForbidden) {
-			return Forbidden{}, nil
+			return forbidden()
 		}
 
 		if errors.Is(err, apartomat.ErrNotFound) {
-			return NotFound{}, nil
+			return notFound()
 		}
 
-		log.Printf("can't change album page size: %s", err)
+		r.logger.Error("can't change album page size", zap.Error(err))
 
-		return ServerError{Message: "can't change album page size"}, nil
+		return serverError()
 	}
 
 	return AlbumPageSizeChanged{Album: albumToGraphQL(album)}, nil

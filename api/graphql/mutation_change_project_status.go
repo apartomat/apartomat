@@ -3,9 +3,9 @@ package graphql
 import (
 	"context"
 	"errors"
+
 	apartomat "github.com/apartomat/apartomat/internal"
-	"log"
-	"time"
+	"go.uber.org/zap"
 )
 
 func (r *mutationResolver) ChangeProjectStatus(
@@ -13,7 +13,6 @@ func (r *mutationResolver) ChangeProjectStatus(
 	projectID string,
 	status ProjectStatus,
 ) (ChangeProjectStatusResult, error) {
-	time.Sleep(1 * time.Second)
 	project, err := r.useCases.ChangeProjectStatus(
 		ctx,
 		projectID,
@@ -21,16 +20,16 @@ func (r *mutationResolver) ChangeProjectStatus(
 	)
 	if err != nil {
 		if errors.Is(err, apartomat.ErrForbidden) {
-			return Forbidden{}, nil
+			return forbidden()
 		}
 
 		if errors.Is(err, apartomat.ErrNotFound) {
-			return NotFound{}, nil
+			return notFound()
 		}
 
-		log.Printf("can't change project status: %s", err)
+		r.logger.Error("can't change project status", zap.Error(err))
 
-		return ServerError{Message: "can't change project status"}, nil
+		return serverError()
 	}
 
 	return ProjectStatusChanged{Project: projectToGraphQL(project)}, nil

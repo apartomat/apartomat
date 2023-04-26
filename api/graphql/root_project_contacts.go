@@ -3,10 +3,11 @@ package graphql
 import (
 	"context"
 	"errors"
+
 	"github.com/99designs/gqlgen/graphql"
 	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/store/contacts"
-	"log"
+	"go.uber.org/zap"
 )
 
 func (r *rootResolver) ProjectContacts() ProjectContactsResolver {
@@ -25,11 +26,11 @@ func (r *projectContactsResolver) List(
 	offset int,
 ) (ProjectContactsListResult, error) {
 	if project, ok := graphql.GetFieldContext(ctx).Parent.Parent.Result.(*Project); !ok {
-		log.Printf("can't resolve project contacts: %s", errors.New("unknown project"))
+		r.logger.Error("can't resolve project contacts", zap.Error(errors.New("unknown project")))
 
 		return serverError()
 	} else {
-		res, err := r.useCases.GetContacts(
+		items, err := r.useCases.GetContacts(
 			ctx,
 			project.ID,
 			limit,
@@ -37,15 +38,19 @@ func (r *projectContactsResolver) List(
 		)
 		if err != nil {
 			if errors.Is(err, apartomat.ErrForbidden) {
-				return Forbidden{}, nil
+				return forbidden()
 			}
 
-			log.Printf("can't resolve project (id=%s) contacts: %s", project.ID, err)
+			r.logger.Error(
+				"can't resolve project contacts",
+				zap.String("project", project.ID),
+				zap.Error(err),
+			)
 
-			return ServerError{Message: "internal server error"}, nil
+			return serverError()
 		}
 
-		return ProjectContactsList{Items: contactsToGraphQL(res)}, nil
+		return ProjectContactsList{Items: contactsToGraphQL(items)}, nil
 	}
 }
 

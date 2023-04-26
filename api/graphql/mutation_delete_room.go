@@ -3,8 +3,9 @@ package graphql
 import (
 	"context"
 	"errors"
+
 	apartomat "github.com/apartomat/apartomat/internal"
-	"log"
+	"go.uber.org/zap"
 )
 
 func (r *mutationResolver) DeleteRoom(ctx context.Context, id string) (DeleteRoomResult, error) {
@@ -21,7 +22,7 @@ func (r *mutationResolver) DeleteRoom(ctx context.Context, id string) (DeleteRoo
 			return notFound()
 		}
 
-		log.Printf("can't delete room: %s", err)
+		r.logger.Error("can't delete room", zap.Error(err))
 
 		return nil, errors.New("server error: can't delete room")
 	}

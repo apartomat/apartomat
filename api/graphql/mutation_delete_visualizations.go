@@ -4,23 +4,23 @@ import (
 	"context"
 	"errors"
 	apartomat "github.com/apartomat/apartomat/internal"
-	"log"
+	"go.uber.org/zap"
 )
 
 func (r *mutationResolver) DeleteVisualizations(ctx context.Context, id []string) (DeleteVisualizationsResult, error) {
 	res, err := r.useCases.DeleteVisualizations(ctx, id)
 	if err != nil {
 		if errors.Is(err, apartomat.ErrForbidden) {
-			return Forbidden{}, nil
+			return forbidden()
 		}
 
 		if errors.Is(err, apartomat.ErrNotFound) {
-			return NotFound{}, nil
+			return notFound()
 		}
 
-		log.Printf("can't delete visualizations: %s", err)
+		r.logger.Error("can't delete visualizations", zap.Error(err))
 
-		return nil, err
+		return serverError()
 	}
 
 	if len(res) != len(id) {

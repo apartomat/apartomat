@@ -3,9 +3,10 @@ package graphql
 import (
 	"context"
 	"errors"
+
 	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/store/contacts"
-	"log"
+	"go.uber.org/zap"
 )
 
 func (r *mutationResolver) AddContact(
@@ -23,12 +24,12 @@ func (r *mutationResolver) AddContact(
 	)
 	if err != nil {
 		if errors.Is(err, apartomat.ErrForbidden) {
-			return Forbidden{}, nil
+			return forbidden()
 		}
 
-		log.Printf("can't add contact: %s", err)
+		r.logger.Error("can't add contact", zap.Error(err))
 
-		return ServerError{Message: "can't add contact"}, nil
+		return serverError()
 	}
 
 	return ContactAdded{Contact: contactToGraphQL(contact)}, nil
