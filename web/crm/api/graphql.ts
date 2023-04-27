@@ -202,11 +202,6 @@ export type DeleteRoomResult = Forbidden | NotFound | RoomDeleted;
 
 export type DeleteVisualizationsResult = Forbidden | NotFound | ServerError | SomeVisualizationsDeleted | VisualizationsDeleted;
 
-export type Enums = {
-  __typename?: 'Enums';
-  project: ProjectEnums;
-};
-
 export type Error = {
   message: Scalars['String'];
 };
@@ -539,6 +534,7 @@ export type Project = {
   period?: Maybe<Scalars['String']>;
   startAt?: Maybe<Scalars['Time']>;
   status: ProjectStatus;
+  statuses: ProjectStatusDictionary;
   visualizations: ProjectVisualizations;
 };
 
@@ -617,11 +613,6 @@ export type ProjectCreated = {
 export type ProjectDatesChanged = {
   __typename?: 'ProjectDatesChanged';
   project: Project;
-};
-
-export type ProjectEnums = {
-  __typename?: 'ProjectEnums';
-  status: ProjectStatusEnum;
 };
 
 export type ProjectFiles = {
@@ -710,13 +701,13 @@ export type ProjectStatusChanged = {
   project: Project;
 };
 
-export type ProjectStatusEnum = {
-  __typename?: 'ProjectStatusEnum';
-  items: Array<ProjectStatusEnumItem>;
+export type ProjectStatusDictionary = {
+  __typename?: 'ProjectStatusDictionary';
+  items: Array<ProjectStatusDictionaryItem>;
 };
 
-export type ProjectStatusEnumItem = {
-  __typename?: 'ProjectStatusEnumItem';
+export type ProjectStatusDictionaryItem = {
+  __typename?: 'ProjectStatusDictionaryItem';
   key: ProjectStatus;
   value: Scalars['String'];
 };
@@ -769,7 +760,6 @@ export type ProjectVisualizationsTotalResult = Forbidden | ProjectVisualizations
 export type Query = {
   __typename?: 'Query';
   album: AlbumResult;
-  enums?: Maybe<Enums>;
   profile: UserProfileResult;
   project: ProjectResult;
   version: Scalars['String'];
@@ -1217,9 +1207,9 @@ export type ProjectScreenQueryVariables = Exact<{
 }>;
 
 
-export type ProjectScreenQuery = { __typename?: 'Query', project: { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'Project', id: string, name: string, startAt?: any | null, endAt?: any | null, status: ProjectStatus, contacts: { __typename?: 'ProjectContacts', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectContactsList', items: Array<{ __typename?: 'Contact', id: string, fullName: string, photo: string, details: Array<{ __typename?: 'ContactDetails', type: ContactType, value: string }> }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectContactsTotal', total: number } | { __typename: 'ServerError' } }, houses: { __typename?: 'ProjectHouses', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectHousesList', items: Array<{ __typename?: 'House', id: string, city: string, address: string, housingComplex: string, createdAt: any, modifiedAt: any, rooms: { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null, level?: number | null }> } | { __typename?: 'ServerError', message: string } } }> } | { __typename: 'ServerError', message: string } }, visualizations: { __typename?: 'ProjectVisualizations', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectVisualizationsList', items: Array<{ __typename?: 'Visualization', id: string, name: string, description: string, version: number, file: { __typename?: 'File', id: string, name: string, url: any, type: FileType, mimeType: string }, room?: { __typename?: 'Room', id: string, name: string, square?: number | null, level?: number | null } | null }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectVisualizationsTotal', total: number } | { __typename: 'ServerError' } }, albums: { __typename?: 'ProjectAlbums', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectAlbumsList', items: Array<{ __typename: 'Album', id: string, name: string }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectAlbumsTotal', total: number } | { __typename: 'ServerError' } } } | { __typename: 'ServerError', message: string }, enums?: { __typename?: 'Enums', project: { __typename?: 'ProjectEnums', status: { __typename?: 'ProjectStatusEnum', items: Array<{ __typename?: 'ProjectStatusEnumItem', key: ProjectStatus, value: string }> } } } | null };
+export type ProjectScreenQuery = { __typename?: 'Query', project: { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'Project', id: string, name: string, startAt?: any | null, endAt?: any | null, status: ProjectStatus, statuses: { __typename?: 'ProjectStatusDictionary', items: Array<{ __typename?: 'ProjectStatusDictionaryItem', key: ProjectStatus, value: string }> }, contacts: { __typename?: 'ProjectContacts', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectContactsList', items: Array<{ __typename?: 'Contact', id: string, fullName: string, photo: string, details: Array<{ __typename?: 'ContactDetails', type: ContactType, value: string }> }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectContactsTotal', total: number } | { __typename: 'ServerError' } }, houses: { __typename?: 'ProjectHouses', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectHousesList', items: Array<{ __typename?: 'House', id: string, city: string, address: string, housingComplex: string, createdAt: any, modifiedAt: any, rooms: { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null, level?: number | null }> } | { __typename?: 'ServerError', message: string } } }> } | { __typename: 'ServerError', message: string } }, visualizations: { __typename?: 'ProjectVisualizations', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectVisualizationsList', items: Array<{ __typename?: 'Visualization', id: string, name: string, description: string, version: number, file: { __typename?: 'File', id: string, name: string, url: any, type: FileType, mimeType: string }, room?: { __typename?: 'Room', id: string, name: string, square?: number | null, level?: number | null } | null }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectVisualizationsTotal', total: number } | { __typename: 'ServerError' } }, albums: { __typename?: 'ProjectAlbums', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectAlbumsList', items: Array<{ __typename: 'Album', id: string, name: string }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectAlbumsTotal', total: number } | { __typename: 'ServerError' } } } | { __typename: 'ServerError', message: string } };
 
-export type ProjectScreenProjectFragment = { __typename?: 'Project', id: string, name: string, startAt?: any | null, endAt?: any | null, status: ProjectStatus, contacts: { __typename?: 'ProjectContacts', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectContactsList', items: Array<{ __typename?: 'Contact', id: string, fullName: string, photo: string, details: Array<{ __typename?: 'ContactDetails', type: ContactType, value: string }> }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectContactsTotal', total: number } | { __typename: 'ServerError' } }, houses: { __typename?: 'ProjectHouses', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectHousesList', items: Array<{ __typename?: 'House', id: string, city: string, address: string, housingComplex: string, createdAt: any, modifiedAt: any, rooms: { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null, level?: number | null }> } | { __typename?: 'ServerError', message: string } } }> } | { __typename: 'ServerError', message: string } }, visualizations: { __typename?: 'ProjectVisualizations', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectVisualizationsList', items: Array<{ __typename?: 'Visualization', id: string, name: string, description: string, version: number, file: { __typename?: 'File', id: string, name: string, url: any, type: FileType, mimeType: string }, room?: { __typename?: 'Room', id: string, name: string, square?: number | null, level?: number | null } | null }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectVisualizationsTotal', total: number } | { __typename: 'ServerError' } }, albums: { __typename?: 'ProjectAlbums', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectAlbumsList', items: Array<{ __typename: 'Album', id: string, name: string }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectAlbumsTotal', total: number } | { __typename: 'ServerError' } } };
+export type ProjectScreenProjectFragment = { __typename?: 'Project', id: string, name: string, startAt?: any | null, endAt?: any | null, status: ProjectStatus, statuses: { __typename?: 'ProjectStatusDictionary', items: Array<{ __typename?: 'ProjectStatusDictionaryItem', key: ProjectStatus, value: string }> }, contacts: { __typename?: 'ProjectContacts', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectContactsList', items: Array<{ __typename?: 'Contact', id: string, fullName: string, photo: string, details: Array<{ __typename?: 'ContactDetails', type: ContactType, value: string }> }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectContactsTotal', total: number } | { __typename: 'ServerError' } }, houses: { __typename?: 'ProjectHouses', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectHousesList', items: Array<{ __typename?: 'House', id: string, city: string, address: string, housingComplex: string, createdAt: any, modifiedAt: any, rooms: { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null, level?: number | null }> } | { __typename?: 'ServerError', message: string } } }> } | { __typename: 'ServerError', message: string } }, visualizations: { __typename?: 'ProjectVisualizations', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectVisualizationsList', items: Array<{ __typename?: 'Visualization', id: string, name: string, description: string, version: number, file: { __typename?: 'File', id: string, name: string, url: any, type: FileType, mimeType: string }, room?: { __typename?: 'Room', id: string, name: string, square?: number | null, level?: number | null } | null }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectVisualizationsTotal', total: number } | { __typename: 'ServerError' } }, albums: { __typename?: 'ProjectAlbums', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectAlbumsList', items: Array<{ __typename: 'Album', id: string, name: string }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectAlbumsTotal', total: number } | { __typename: 'ServerError' } } };
 
 export type ProjectScreenVisualizationsFragment = { __typename?: 'ProjectVisualizations', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectVisualizationsList', items: Array<{ __typename?: 'Visualization', id: string, name: string, description: string, version: number, file: { __typename?: 'File', id: string, name: string, url: any, type: FileType, mimeType: string }, room?: { __typename?: 'Room', id: string, name: string, square?: number | null, level?: number | null } | null }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectVisualizationsTotal', total: number } | { __typename: 'ServerError' } };
 
@@ -1584,6 +1574,12 @@ export const ProjectScreenProjectFragmentDoc = gql`
   startAt
   endAt
   status
+  statuses {
+    items {
+      key
+      value
+    }
+  }
   contacts {
     list(filter: {}, limit: 10, offset: 0) {
       __typename
@@ -2812,16 +2808,6 @@ export const ProjectScreenDocument = gql`
     }
     ... on Error {
       message
-    }
-  }
-  enums {
-    project {
-      status {
-        items {
-          key
-          value
-        }
-      }
     }
   }
 }

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useRef } from "react"
 
 import { useChangeStatus } from "./useChangeProjectStatus"
 
-import { ProjectStatus, ProjectStatusEnum, ProjectStatusEnumItem } from "api/graphql"
+import { ProjectStatus, ProjectStatusDictionary, ProjectStatusDictionaryItem } from "api/graphql"
 
 import { Box, BoxExtendedProps, Button, Drop, Text } from "grommet"
 
@@ -15,7 +15,7 @@ export default function ChangeStatus({
 }: {
     projectId: string,
     status: ProjectStatus,
-    values?: ProjectStatusEnum,
+    values?: ProjectStatusDictionary,
     onProjectStatusChanged?: ({ status }: { status: ProjectStatus }) => void
 } & BoxExtendedProps) {
     const [ show, setShow ] = useState<Boolean>(false)
@@ -85,7 +85,7 @@ export default function ChangeStatus({
     )
 }
 
-function statusToLabel({ status, items }: { status: ProjectStatus, items?: ProjectStatusEnumItem[] }): string {
+function statusToLabel({ status, items }: { status: ProjectStatus, items?: ProjectStatusDictionaryItem[] }): string {
     if (!items) {
         return ""
     }

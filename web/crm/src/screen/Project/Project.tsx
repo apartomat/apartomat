@@ -10,7 +10,7 @@ import UserAvatar from "./UserAvatar/UserAvatar"
 import { useAuthContext } from "context/auth/useAuthContext"
 
 import { useProject, Project  as ProjectType } from "./useProject"
-import { ProjectEnums } from "api/graphql"
+import { ProjectStatusDictionary } from "api/graphql"
 
 import ChangeStatus from "./ChangeStatus/ChangeStatus"
 import Contacts from "./Contacts/Contacts"
@@ -67,7 +67,7 @@ export function Project () {
 
     const [ project, setProject ] = useState<ProjectType | undefined>(undefined)
 
-    const [ projectEnums, setProjectEnums ] = useState<ProjectEnums | undefined>(undefined)
+    const [ projectStatusDictionary, setProjectStatusDictionary ] = useState<ProjectStatusDictionary | undefined>(undefined)
 
     useEffect(() => {
         if (fetchError) {
@@ -80,6 +80,7 @@ export function Project () {
             switch (data.project.__typename) {
                 case "Project":
                     setProject(data.project)
+                    setProjectStatusDictionary(data.project.statuses)
                     break
                 case "NotFound":
                     setError("Проект не найден")
@@ -90,9 +91,6 @@ export function Project () {
             }
         }
 
-        if (data?.enums) {
-            setProjectEnums(data.enums.project)
-        }
     }, [ data ])
 
     const [showUploadVisualizations, setShowUploadVisualizations] = useState(false)
@@ -176,7 +174,7 @@ export function Project () {
                                 margin={{ horizontal: "medium"}}
                                 projectId={project.id}
                                 status={project.status}
-                                values={projectEnums?.status}
+                                values={projectStatusDictionary}
                                 onProjectStatusChanged={({ status }) => {
                                     setProject({ ...project, status })
                                 }}

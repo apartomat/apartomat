@@ -357,10 +357,6 @@ type CreateProjectInput struct {
 	EndAt       *time.Time `json:"endAt,omitempty"`
 }
 
-type Enums struct {
-	Project *ProjectEnums `json:"project"`
-}
-
 type ExpiredToken struct {
 	Message string `json:"message"`
 }
@@ -629,17 +625,18 @@ type PinSentByEmail struct {
 func (PinSentByEmail) IsLoginByEmailResult() {}
 
 type Project struct {
-	ID             string                 `json:"id"`
-	Name           string                 `json:"name"`
-	Status         ProjectStatus          `json:"status"`
-	StartAt        *time.Time             `json:"startAt,omitempty"`
-	EndAt          *time.Time             `json:"endAt,omitempty"`
-	Period         *string                `json:"period,omitempty"`
-	Contacts       *ProjectContacts       `json:"contacts"`
-	Houses         *ProjectHouses         `json:"houses"`
-	Visualizations *ProjectVisualizations `json:"visualizations"`
-	Files          *ProjectFiles          `json:"files"`
-	Albums         *ProjectAlbums         `json:"albums"`
+	ID             string                   `json:"id"`
+	Name           string                   `json:"name"`
+	Status         ProjectStatus            `json:"status"`
+	StartAt        *time.Time               `json:"startAt,omitempty"`
+	EndAt          *time.Time               `json:"endAt,omitempty"`
+	Period         *string                  `json:"period,omitempty"`
+	Contacts       *ProjectContacts         `json:"contacts"`
+	Houses         *ProjectHouses           `json:"houses"`
+	Visualizations *ProjectVisualizations   `json:"visualizations"`
+	Files          *ProjectFiles            `json:"files"`
+	Albums         *ProjectAlbums           `json:"albums"`
+	Statuses       *ProjectStatusDictionary `json:"statuses"`
 }
 
 func (Project) IsAlbumProjectResult() {}
@@ -696,10 +693,6 @@ type ProjectDatesChanged struct {
 
 func (ProjectDatesChanged) IsChangeProjectDatesResult() {}
 
-type ProjectEnums struct {
-	Status *ProjectStatusEnum `json:"status"`
-}
-
 type ProjectFiles struct {
 	List  ProjectFilesListResult  `json:"list"`
 	Total ProjectFilesTotalResult `json:"total"`
@@ -748,11 +741,11 @@ type ProjectStatusChanged struct {
 
 func (ProjectStatusChanged) IsChangeProjectStatusResult() {}
 
-type ProjectStatusEnum struct {
-	Items []*ProjectStatusEnumItem `json:"items"`
+type ProjectStatusDictionary struct {
+	Items []*ProjectStatusDictionaryItem `json:"items"`
 }
 
-type ProjectStatusEnumItem struct {
+type ProjectStatusDictionaryItem struct {
 	Key   ProjectStatus `json:"key"`
 	Value string        `json:"value"`
 }

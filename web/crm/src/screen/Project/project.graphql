@@ -8,16 +8,6 @@ query projectScreen($id: String!) {
             message
         }
     }
-    enums {
-        project {
-            status {
-                items {
-                    key
-                    value
-                }
-            }
-        }
-    }
 }
 
 fragment ProjectScreenProject on Project {
@@ -26,6 +16,12 @@ fragment ProjectScreenProject on Project {
     startAt
     endAt
     status
+    statuses {
+        items {
+            key
+            value
+        }
+    }
     contacts {
         list(filter: {} limit: 10 offset: 0) {
             __typename

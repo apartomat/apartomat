@@ -16,6 +16,7 @@ type Project {
     visualizations: ProjectVisualizations!
     files: ProjectFiles!
     albums: ProjectAlbums! @goField(forceResolver: true)
+    statuses: ProjectStatusDictionary! @goField(forceResolver: true)
 }
 
 enum ProjectStatus {
@@ -216,4 +217,13 @@ union ProjectAlbumsTotalResult = ProjectAlbumsTotal | Forbidden | ServerError
 
 type ProjectAlbumsTotal {
     total: Int!
+}
+
+type ProjectStatusDictionary {
+    items: [ProjectStatusDictionaryItem!]!
+}
+
+type ProjectStatusDictionaryItem {
+    key: ProjectStatus!
+    value: String!
 }

@@ -137,10 +137,6 @@ type ComplexityRoot struct {
 		Contact func(childComplexity int) int
 	}
 
-	Enums struct {
-		Project func(childComplexity int) int
-	}
-
 	ExpiredToken struct {
 		Message func(childComplexity int) int
 	}
@@ -273,6 +269,7 @@ type ComplexityRoot struct {
 		Period         func(childComplexity int, timezone *string) int
 		StartAt        func(childComplexity int) int
 		Status         func(childComplexity int) int
+		Statuses       func(childComplexity int) int
 		Visualizations func(childComplexity int) int
 	}
 
@@ -310,10 +307,6 @@ type ComplexityRoot struct {
 		Project func(childComplexity int) int
 	}
 
-	ProjectEnums struct {
-		Status func(childComplexity int) int
-	}
-
 	ProjectFiles struct {
 		List  func(childComplexity int, filter ProjectFilesListFilter, limit int, offset int) int
 		Total func(childComplexity int, filter ProjectFilesListFilter) int
@@ -344,11 +337,11 @@ type ComplexityRoot struct {
 		Project func(childComplexity int) int
 	}
 
-	ProjectStatusEnum struct {
+	ProjectStatusDictionary struct {
 		Items func(childComplexity int) int
 	}
 
-	ProjectStatusEnumItem struct {
+	ProjectStatusDictionaryItem struct {
 		Key   func(childComplexity int) int
 		Value func(childComplexity int) int
 	}
@@ -368,7 +361,6 @@ type ComplexityRoot struct {
 
 	Query struct {
 		Album     func(childComplexity int, id string) int
-		Enums     func(childComplexity int) int
 		Profile   func(childComplexity int) int
 		Project   func(childComplexity int, id string) int
 		Version   func(childComplexity int) int
@@ -545,6 +537,7 @@ type ProjectResolver interface {
 	Visualizations(ctx context.Context, obj *Project) (*ProjectVisualizations, error)
 	Files(ctx context.Context, obj *Project) (*ProjectFiles, error)
 	Albums(ctx context.Context, obj *Project) (*ProjectAlbums, error)
+	Statuses(ctx context.Context, obj *Project) (*ProjectStatusDictionary, error)
 }
 type ProjectAlbumsResolver interface {
 	List(ctx context.Context, obj *ProjectAlbums, limit int, offset int) (ProjectAlbumsListResult, error)
@@ -569,7 +562,6 @@ type ProjectVisualizationsResolver interface {
 type QueryResolver interface {
 	Version(ctx context.Context) (string, error)
 	Album(ctx context.Context, id string) (AlbumResult, error)
-	Enums(ctx context.Context) (*Enums, error)
 	Profile(ctx context.Context) (UserProfileResult, error)
 	Project(ctx context.Context, id string) (ProjectResult, error)
 	Workspace(ctx context.Context, id string) (WorkspaceResult, error)
@@ -808,13 +800,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ContactUpdated.Contact(childComplexity), true
-
-	case "Enums.project":
-		if e.complexity.Enums.Project == nil {
-			break
-		}
-
-		return e.complexity.Enums.Project(childComplexity), true
 
 	case "ExpiredToken.message":
 		if e.complexity.ExpiredToken.Message == nil {
@@ -1427,6 +1412,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Project.Status(childComplexity), true
 
+	case "Project.statuses":
+		if e.complexity.Project.Statuses == nil {
+			break
+		}
+
+		return e.complexity.Project.Statuses(childComplexity), true
+
 	case "Project.visualizations":
 		if e.complexity.Project.Visualizations == nil {
 			break
@@ -1519,13 +1511,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ProjectDatesChanged.Project(childComplexity), true
 
-	case "ProjectEnums.status":
-		if e.complexity.ProjectEnums.Status == nil {
-			break
-		}
-
-		return e.complexity.ProjectEnums.Status(childComplexity), true
-
 	case "ProjectFiles.list":
 		if e.complexity.ProjectFiles.List == nil {
 			break
@@ -1609,26 +1594,26 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ProjectStatusChanged.Project(childComplexity), true
 
-	case "ProjectStatusEnum.items":
-		if e.complexity.ProjectStatusEnum.Items == nil {
+	case "ProjectStatusDictionary.items":
+		if e.complexity.ProjectStatusDictionary.Items == nil {
 			break
 		}
 
-		return e.complexity.ProjectStatusEnum.Items(childComplexity), true
+		return e.complexity.ProjectStatusDictionary.Items(childComplexity), true
 
-	case "ProjectStatusEnumItem.key":
-		if e.complexity.ProjectStatusEnumItem.Key == nil {
+	case "ProjectStatusDictionaryItem.key":
+		if e.complexity.ProjectStatusDictionaryItem.Key == nil {
 			break
 		}
 
-		return e.complexity.ProjectStatusEnumItem.Key(childComplexity), true
+		return e.complexity.ProjectStatusDictionaryItem.Key(childComplexity), true
 
-	case "ProjectStatusEnumItem.value":
-		if e.complexity.ProjectStatusEnumItem.Value == nil {
+	case "ProjectStatusDictionaryItem.value":
+		if e.complexity.ProjectStatusDictionaryItem.Value == nil {
 			break
 		}
 
-		return e.complexity.ProjectStatusEnumItem.Value(childComplexity), true
+		return e.complexity.ProjectStatusDictionaryItem.Value(childComplexity), true
 
 	case "ProjectVisualizations.list":
 		if e.complexity.ProjectVisualizations.List == nil {
@@ -1679,13 +1664,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.Album(childComplexity, args["id"].(string)), true
-
-	case "Query.enums":
-		if e.complexity.Query.Enums == nil {
-			break
-		}
-
-		return e.complexity.Query.Enums(childComplexity), true
 
 	case "Query.profile":
 		if e.complexity.Query.Profile == nil {
@@ -2188,7 +2166,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 	return introspection.WrapTypeFromDef(parsedSchema, parsedSchema.Types[name]), nil
 }
 
-//go:embed "schema/mutation.graphql" "schema/mutation_accept_invite.graphql" "schema/mutation_add_contact.graphql" "schema/mutation_add_house.graphql" "schema/mutation_add_room.graphql" "schema/mutation_add_visualizations_to_album.graphql" "schema/mutation_change_album_page_orientation.graphql" "schema/mutation_change_album_page_size.graphql" "schema/mutation_change_project_dates.graphql" "schema/mutation_change_project_status.graphql" "schema/mutation_confirm_login_link.graphql" "schema/mutation_confirm_login_pin.graphql" "schema/mutation_create_album.graphql" "schema/mutation_create_project.graphql" "schema/mutation_delete_album.graphql" "schema/mutation_delete_contact.graphql" "schema/mutation_delete_room.graphql" "schema/mutation_delete_visualizations.graphql" "schema/mutation_invite_user.graphql" "schema/mutation_login_by_email.graphql" "schema/mutation_update_contact.graphql" "schema/mutation_update_house.graphql" "schema/mutation_update_room.graphql" "schema/mutation_upload_file.graphql" "schema/mutation_upload_visualization.graphql" "schema/mutation_upload_visualizations.graphql" "schema/query.graphql" "schema/query_album.graphql" "schema/query_enums.graphql" "schema/query_profile.graphql" "schema/query_project.graphql" "schema/query_workspace.graphql" "schema/root.graphql"
+//go:embed "schema/mutation.graphql" "schema/mutation_accept_invite.graphql" "schema/mutation_add_contact.graphql" "schema/mutation_add_house.graphql" "schema/mutation_add_room.graphql" "schema/mutation_add_visualizations_to_album.graphql" "schema/mutation_change_album_page_orientation.graphql" "schema/mutation_change_album_page_size.graphql" "schema/mutation_change_project_dates.graphql" "schema/mutation_change_project_status.graphql" "schema/mutation_confirm_login_link.graphql" "schema/mutation_confirm_login_pin.graphql" "schema/mutation_create_album.graphql" "schema/mutation_create_project.graphql" "schema/mutation_delete_album.graphql" "schema/mutation_delete_contact.graphql" "schema/mutation_delete_room.graphql" "schema/mutation_delete_visualizations.graphql" "schema/mutation_invite_user.graphql" "schema/mutation_login_by_email.graphql" "schema/mutation_update_contact.graphql" "schema/mutation_update_house.graphql" "schema/mutation_update_room.graphql" "schema/mutation_upload_file.graphql" "schema/mutation_upload_visualization.graphql" "schema/mutation_upload_visualizations.graphql" "schema/query.graphql" "schema/query_album.graphql" "schema/query_profile.graphql" "schema/query_project.graphql" "schema/query_workspace.graphql" "schema/root.graphql"
 var sourcesFS embed.FS
 
 func sourceData(filename string) string {
@@ -2228,7 +2206,6 @@ var sources = []*ast.Source{
 	{Name: "schema/mutation_upload_visualizations.graphql", Input: sourceData("schema/mutation_upload_visualizations.graphql"), BuiltIn: false},
 	{Name: "schema/query.graphql", Input: sourceData("schema/query.graphql"), BuiltIn: false},
 	{Name: "schema/query_album.graphql", Input: sourceData("schema/query_album.graphql"), BuiltIn: false},
-	{Name: "schema/query_enums.graphql", Input: sourceData("schema/query_enums.graphql"), BuiltIn: false},
 	{Name: "schema/query_profile.graphql", Input: sourceData("schema/query_profile.graphql"), BuiltIn: false},
 	{Name: "schema/query_project.graphql", Input: sourceData("schema/query_project.graphql"), BuiltIn: false},
 	{Name: "schema/query_workspace.graphql", Input: sourceData("schema/query_workspace.graphql"), BuiltIn: false},
@@ -4564,54 +4541,6 @@ func (ec *executionContext) fieldContext_ContactUpdated_contact(ctx context.Cont
 				return ec.fieldContext_Contact_modifiedAt(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Contact", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Enums_project(ctx context.Context, field graphql.CollectedField, obj *Enums) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Enums_project(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Project, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*ProjectEnums)
-	fc.Result = res
-	return ec.marshalNProjectEnums2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectEnums(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Enums_project(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Enums",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "status":
-				return ec.fieldContext_ProjectEnums_status(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type ProjectEnums", field.Name)
 		},
 	}
 	return fc, nil
@@ -8033,6 +7962,54 @@ func (ec *executionContext) fieldContext_Project_albums(ctx context.Context, fie
 	return fc, nil
 }
 
+func (ec *executionContext) _Project_statuses(ctx context.Context, field graphql.CollectedField, obj *Project) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Project_statuses(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Project().Statuses(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*ProjectStatusDictionary)
+	fc.Result = res
+	return ec.marshalNProjectStatusDictionary2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectStatusDictionary(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Project_statuses(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Project",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "items":
+				return ec.fieldContext_ProjectStatusDictionary_items(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProjectStatusDictionary", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _ProjectAlbums_list(ctx context.Context, field graphql.CollectedField, obj *ProjectAlbums) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_ProjectAlbums_list(ctx, field)
 	if err != nil {
@@ -8505,6 +8482,8 @@ func (ec *executionContext) fieldContext_ProjectCreated_project(ctx context.Cont
 				return ec.fieldContext_Project_files(ctx, field)
 			case "albums":
 				return ec.fieldContext_Project_albums(ctx, field)
+			case "statuses":
+				return ec.fieldContext_Project_statuses(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Project", field.Name)
 		},
@@ -8573,56 +8552,10 @@ func (ec *executionContext) fieldContext_ProjectDatesChanged_project(ctx context
 				return ec.fieldContext_Project_files(ctx, field)
 			case "albums":
 				return ec.fieldContext_Project_albums(ctx, field)
+			case "statuses":
+				return ec.fieldContext_Project_statuses(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Project", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _ProjectEnums_status(ctx context.Context, field graphql.CollectedField, obj *ProjectEnums) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ProjectEnums_status(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Status, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(*ProjectStatusEnum)
-	fc.Result = res
-	return ec.marshalNProjectStatusEnum2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectStatusEnum(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_ProjectEnums_status(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "ProjectEnums",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "items":
-				return ec.fieldContext_ProjectStatusEnum_items(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type ProjectStatusEnum", field.Name)
 		},
 	}
 	return fc, nil
@@ -9113,6 +9046,8 @@ func (ec *executionContext) fieldContext_ProjectStatusChanged_project(ctx contex
 				return ec.fieldContext_Project_files(ctx, field)
 			case "albums":
 				return ec.fieldContext_Project_albums(ctx, field)
+			case "statuses":
+				return ec.fieldContext_Project_statuses(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Project", field.Name)
 		},
@@ -9120,8 +9055,8 @@ func (ec *executionContext) fieldContext_ProjectStatusChanged_project(ctx contex
 	return fc, nil
 }
 
-func (ec *executionContext) _ProjectStatusEnum_items(ctx context.Context, field graphql.CollectedField, obj *ProjectStatusEnum) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ProjectStatusEnum_items(ctx, field)
+func (ec *executionContext) _ProjectStatusDictionary_items(ctx context.Context, field graphql.CollectedField, obj *ProjectStatusDictionary) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectStatusDictionary_items(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -9146,32 +9081,32 @@ func (ec *executionContext) _ProjectStatusEnum_items(ctx context.Context, field 
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*ProjectStatusEnumItem)
+	res := resTmp.([]*ProjectStatusDictionaryItem)
 	fc.Result = res
-	return ec.marshalNProjectStatusEnumItem2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectStatusEnumItemᚄ(ctx, field.Selections, res)
+	return ec.marshalNProjectStatusDictionaryItem2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectStatusDictionaryItemᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_ProjectStatusEnum_items(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_ProjectStatusDictionary_items(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "ProjectStatusEnum",
+		Object:     "ProjectStatusDictionary",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "key":
-				return ec.fieldContext_ProjectStatusEnumItem_key(ctx, field)
+				return ec.fieldContext_ProjectStatusDictionaryItem_key(ctx, field)
 			case "value":
-				return ec.fieldContext_ProjectStatusEnumItem_value(ctx, field)
+				return ec.fieldContext_ProjectStatusDictionaryItem_value(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type ProjectStatusEnumItem", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type ProjectStatusDictionaryItem", field.Name)
 		},
 	}
 	return fc, nil
 }
 
-func (ec *executionContext) _ProjectStatusEnumItem_key(ctx context.Context, field graphql.CollectedField, obj *ProjectStatusEnumItem) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ProjectStatusEnumItem_key(ctx, field)
+func (ec *executionContext) _ProjectStatusDictionaryItem_key(ctx context.Context, field graphql.CollectedField, obj *ProjectStatusDictionaryItem) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectStatusDictionaryItem_key(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -9201,9 +9136,9 @@ func (ec *executionContext) _ProjectStatusEnumItem_key(ctx context.Context, fiel
 	return ec.marshalNProjectStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectStatus(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_ProjectStatusEnumItem_key(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_ProjectStatusDictionaryItem_key(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "ProjectStatusEnumItem",
+		Object:     "ProjectStatusDictionaryItem",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -9214,8 +9149,8 @@ func (ec *executionContext) fieldContext_ProjectStatusEnumItem_key(ctx context.C
 	return fc, nil
 }
 
-func (ec *executionContext) _ProjectStatusEnumItem_value(ctx context.Context, field graphql.CollectedField, obj *ProjectStatusEnumItem) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ProjectStatusEnumItem_value(ctx, field)
+func (ec *executionContext) _ProjectStatusDictionaryItem_value(ctx context.Context, field graphql.CollectedField, obj *ProjectStatusDictionaryItem) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectStatusDictionaryItem_value(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -9245,9 +9180,9 @@ func (ec *executionContext) _ProjectStatusEnumItem_value(ctx context.Context, fi
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_ProjectStatusEnumItem_value(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_ProjectStatusDictionaryItem_value(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "ProjectStatusEnumItem",
+		Object:     "ProjectStatusDictionaryItem",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -9571,51 +9506,6 @@ func (ec *executionContext) fieldContext_Query_album(ctx context.Context, field 
 	if fc.Args, err = ec.field_Query_album_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Query_enums(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_enums(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Enums(rctx)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*Enums)
-	fc.Result = res
-	return ec.marshalOEnums2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐEnums(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Query_enums(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Query",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "project":
-				return ec.fieldContext_Enums_project(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Enums", field.Name)
-		},
 	}
 	return fc, nil
 }
@@ -11852,6 +11742,8 @@ func (ec *executionContext) fieldContext_WorkspaceProjectsList_items(ctx context
 				return ec.fieldContext_Project_files(ctx, field)
 			case "albums":
 				return ec.fieldContext_Project_albums(ctx, field)
+			case "statuses":
+				return ec.fieldContext_Project_statuses(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Project", field.Name)
 		},
@@ -17152,34 +17044,6 @@ func (ec *executionContext) _ContactUpdated(ctx context.Context, sel ast.Selecti
 	return out
 }
 
-var enumsImplementors = []string{"Enums"}
-
-func (ec *executionContext) _Enums(ctx context.Context, sel ast.SelectionSet, obj *Enums) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, enumsImplementors)
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("Enums")
-		case "project":
-
-			out.Values[i] = ec._Enums_project(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
 var expiredTokenImplementors = []string{"ExpiredToken", "AcceptInviteResult", "ConfirmLoginLinkResult", "Error", "ConfirmLoginPinResult"}
 
 func (ec *executionContext) _ExpiredToken(ctx context.Context, sel ast.SelectionSet, obj *ExpiredToken) graphql.Marshaler {
@@ -18270,6 +18134,26 @@ func (ec *executionContext) _Project(ctx context.Context, sel ast.SelectionSet, 
 				return innerFunc(ctx)
 
 			})
+		case "statuses":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Project_statuses(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -18571,34 +18455,6 @@ func (ec *executionContext) _ProjectDatesChanged(ctx context.Context, sel ast.Se
 	return out
 }
 
-var projectEnumsImplementors = []string{"ProjectEnums"}
-
-func (ec *executionContext) _ProjectEnums(ctx context.Context, sel ast.SelectionSet, obj *ProjectEnums) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, projectEnumsImplementors)
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("ProjectEnums")
-		case "status":
-
-			out.Values[i] = ec._ProjectEnums_status(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
 var projectFilesImplementors = []string{"ProjectFiles"}
 
 func (ec *executionContext) _ProjectFiles(ctx context.Context, sel ast.SelectionSet, obj *ProjectFiles) graphql.Marshaler {
@@ -18861,19 +18717,19 @@ func (ec *executionContext) _ProjectStatusChanged(ctx context.Context, sel ast.S
 	return out
 }
 
-var projectStatusEnumImplementors = []string{"ProjectStatusEnum"}
+var projectStatusDictionaryImplementors = []string{"ProjectStatusDictionary"}
 
-func (ec *executionContext) _ProjectStatusEnum(ctx context.Context, sel ast.SelectionSet, obj *ProjectStatusEnum) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, projectStatusEnumImplementors)
+func (ec *executionContext) _ProjectStatusDictionary(ctx context.Context, sel ast.SelectionSet, obj *ProjectStatusDictionary) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, projectStatusDictionaryImplementors)
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
-			out.Values[i] = graphql.MarshalString("ProjectStatusEnum")
+			out.Values[i] = graphql.MarshalString("ProjectStatusDictionary")
 		case "items":
 
-			out.Values[i] = ec._ProjectStatusEnum_items(ctx, field, obj)
+			out.Values[i] = ec._ProjectStatusDictionary_items(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
@@ -18889,26 +18745,26 @@ func (ec *executionContext) _ProjectStatusEnum(ctx context.Context, sel ast.Sele
 	return out
 }
 
-var projectStatusEnumItemImplementors = []string{"ProjectStatusEnumItem"}
+var projectStatusDictionaryItemImplementors = []string{"ProjectStatusDictionaryItem"}
 
-func (ec *executionContext) _ProjectStatusEnumItem(ctx context.Context, sel ast.SelectionSet, obj *ProjectStatusEnumItem) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, projectStatusEnumItemImplementors)
+func (ec *executionContext) _ProjectStatusDictionaryItem(ctx context.Context, sel ast.SelectionSet, obj *ProjectStatusDictionaryItem) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, projectStatusDictionaryItemImplementors)
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
-			out.Values[i] = graphql.MarshalString("ProjectStatusEnumItem")
+			out.Values[i] = graphql.MarshalString("ProjectStatusDictionaryItem")
 		case "key":
 
-			out.Values[i] = ec._ProjectStatusEnumItem_key(ctx, field, obj)
+			out.Values[i] = ec._ProjectStatusDictionaryItem_key(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "value":
 
-			out.Values[i] = ec._ProjectStatusEnumItem_value(ctx, field, obj)
+			out.Values[i] = ec._ProjectStatusDictionaryItem_value(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
@@ -19096,26 +18952,6 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
-				return res
-			}
-
-			rrm := func(ctx context.Context) graphql.Marshaler {
-				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
-			}
-
-			out.Concurrently(i, func() graphql.Marshaler {
-				return rrm(innerCtx)
-			})
-		case "enums":
-			field := field
-
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Query_enums(ctx, field)
 				return res
 			}
 
@@ -21412,16 +21248,6 @@ func (ec *executionContext) marshalNProjectContactsTotalResult2githubᚗcomᚋap
 	return ec._ProjectContactsTotalResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNProjectEnums2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectEnums(ctx context.Context, sel ast.SelectionSet, v *ProjectEnums) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._ProjectEnums(ctx, sel, v)
-}
-
 func (ec *executionContext) marshalNProjectFiles2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectFiles(ctx context.Context, sel ast.SelectionSet, v ProjectFiles) graphql.Marshaler {
 	return ec._ProjectFiles(ctx, sel, &v)
 }
@@ -21520,17 +21346,21 @@ func (ec *executionContext) marshalNProjectStatus2githubᚗcomᚋapartomatᚋapa
 	return v
 }
 
-func (ec *executionContext) marshalNProjectStatusEnum2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectStatusEnum(ctx context.Context, sel ast.SelectionSet, v *ProjectStatusEnum) graphql.Marshaler {
+func (ec *executionContext) marshalNProjectStatusDictionary2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectStatusDictionary(ctx context.Context, sel ast.SelectionSet, v ProjectStatusDictionary) graphql.Marshaler {
+	return ec._ProjectStatusDictionary(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNProjectStatusDictionary2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectStatusDictionary(ctx context.Context, sel ast.SelectionSet, v *ProjectStatusDictionary) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
 		}
 		return graphql.Null
 	}
-	return ec._ProjectStatusEnum(ctx, sel, v)
+	return ec._ProjectStatusDictionary(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNProjectStatusEnumItem2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectStatusEnumItemᚄ(ctx context.Context, sel ast.SelectionSet, v []*ProjectStatusEnumItem) graphql.Marshaler {
+func (ec *executionContext) marshalNProjectStatusDictionaryItem2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectStatusDictionaryItemᚄ(ctx context.Context, sel ast.SelectionSet, v []*ProjectStatusDictionaryItem) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -21554,7 +21384,7 @@ func (ec *executionContext) marshalNProjectStatusEnumItem2ᚕᚖgithubᚗcomᚋa
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNProjectStatusEnumItem2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectStatusEnumItem(ctx, sel, v[i])
+			ret[i] = ec.marshalNProjectStatusDictionaryItem2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectStatusDictionaryItem(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -21574,14 +21404,14 @@ func (ec *executionContext) marshalNProjectStatusEnumItem2ᚕᚖgithubᚗcomᚋa
 	return ret
 }
 
-func (ec *executionContext) marshalNProjectStatusEnumItem2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectStatusEnumItem(ctx context.Context, sel ast.SelectionSet, v *ProjectStatusEnumItem) graphql.Marshaler {
+func (ec *executionContext) marshalNProjectStatusDictionaryItem2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectStatusDictionaryItem(ctx context.Context, sel ast.SelectionSet, v *ProjectStatusDictionaryItem) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
 		}
 		return graphql.Null
 	}
-	return ec._ProjectStatusEnumItem(ctx, sel, v)
+	return ec._ProjectStatusDictionaryItem(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNProjectVisualizations2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectVisualizations(ctx context.Context, sel ast.SelectionSet, v ProjectVisualizations) graphql.Marshaler {
@@ -22568,13 +22398,6 @@ func (ec *executionContext) marshalOContactType2ᚕgithubᚗcomᚋapartomatᚋap
 	}
 
 	return ret
-}
-
-func (ec *executionContext) marshalOEnums2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐEnums(ctx context.Context, sel ast.SelectionSet, v *Enums) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._Enums(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOFileType2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐFileTypeᚄ(ctx context.Context, v interface{}) ([]FileType, error) {

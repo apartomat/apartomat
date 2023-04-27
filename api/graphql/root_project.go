@@ -37,6 +37,17 @@ func (r *projectResolver) Albums(ctx context.Context, obj *Project) (*ProjectAlb
 	return &ProjectAlbums{}, nil
 }
 
+func (r *projectResolver) Statuses(ctx context.Context, obj *Project) (*ProjectStatusDictionary, error) {
+	return &ProjectStatusDictionary{
+		Items: []*ProjectStatusDictionaryItem{
+			{ProjectStatusNew, "Новый"},
+			{ProjectStatusInProgress, "В работе"},
+			{ProjectStatusDone, "Завершен"},
+			{ProjectStatusCanceled, "Отменен"},
+		},
+	}, nil
+}
+
 func projectToGraphQL(p *projects.Project) *Project {
 	if p == nil {
 		return nil
