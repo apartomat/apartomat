@@ -24,18 +24,10 @@ const defaultAddr = ":80"
 
 type ServerOption func(server *http.Server)
 
-type addrOpt struct {
-	addr string
-}
-
 func WithAddr(addr string) ServerOption {
 	return func(s *http.Server) {
 		s.Addr = addr
 	}
-}
-
-func (opt addrOpt) Apply(s *http.Server) {
-	s.Addr = opt.addr
 }
 
 type server struct {
