@@ -4,8 +4,19 @@ import (
 	"context"
 	"crypto/ed25519"
 	"crypto/x509"
+	"database/sql"
 	"encoding/pem"
 	"fmt"
+	"io/ioutil"
+	"os"
+
+	"go.uber.org/zap"
+
+	"github.com/uptrace/bun"
+	"github.com/uptrace/bun/dialect/pgdialect"
+	"github.com/uptrace/bun/driver/pgdriver"
+	"github.com/uptrace/bun/extra/bundebug"
+
 	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/auth/paseto"
 	"github.com/apartomat/apartomat/internal/dataloader"
@@ -18,6 +29,7 @@ import (
 	files "github.com/apartomat/apartomat/internal/store/files/postgres"
 	houses "github.com/apartomat/apartomat/internal/store/houses/postgres"
 	projects "github.com/apartomat/apartomat/internal/store/projects/postgres"
+	sites "github.com/apartomat/apartomat/internal/store/public_sites/postgres"
 	rooms "github.com/apartomat/apartomat/internal/store/rooms/postgres"
 	users "github.com/apartomat/apartomat/internal/store/users/postgres"
 	visualizations "github.com/apartomat/apartomat/internal/store/visualizations/postgres"
@@ -25,15 +37,16 @@ import (
 	workspaces "github.com/apartomat/apartomat/internal/store/workspaces/postgres"
 	"github.com/go-pg/pg/v10"
 	"github.com/prometheus/client_golang/prometheus"
-	"io/ioutil"
-	"log"
-	"os"
 )
 
 func main() {
+	log, err := NewLogger("debug")
+	if err != nil {
+		panic(err)
+	}
+
 	if len(os.Args) < 2 {
-		log.Print("expect command (run or gen-key-pair)")
-		os.Exit(1)
+		log.Fatal("expect command (run or gen-key-pair)")
 	}
 
 	ctx := context.Background()
@@ -42,16 +55,17 @@ func main() {
 	case "gen-key-pair":
 		_, _, err := genPairToFile("shoppinglist.key")
 		if err != nil {
-			log.Fatalf("can't generate key pair: %s\n", err)
+			log.Fatal("can't generate key pair", zap.Error(err))
 		}
 
-		log.Print("done")
+		log.Info("done")
+
 		os.Exit(0)
 
 	case "run":
 		privateKey, err := readPrivateKeyFromFile("shoppinglist.key")
 		if err != nil {
-			log.Fatalf("cant read private key from file: %s", err)
+			log.Fatal("cant read private key from file", zap.Error(err))
 		}
 
 		confirmLoginIssuerVerifier := paseto.NewConfirmEmailTokenIssuerVerifier(privateKey)
@@ -67,21 +81,30 @@ func main() {
 
 		pgopts, err := pg.ParseURL(os.Getenv("POSTGRES_DSN"))
 		if err != nil {
-			log.Fatalf("can't parse POSTGRES_DSN %s", err)
+			log.Fatal("can't parse POSTGRES_DSN %s", zap.Error(err))
 		}
 
 		pgdb := pg.Connect(pgopts)
 
-		logger, err := NewLogger("debug")
-		if err != nil {
-			log.Fatalf("can't init zap: %s", err)
-		}
-
-		pgdb.AddQueryHook(postgres.NewLoggerHook(logger))
+		pgdb.AddQueryHook(postgres.NewLoggerHook(log))
 
 		reg := prometheus.NewRegistry()
 
 		pgdb.AddQueryHook(postgres.NewQueryLatencyHook(reg))
+
+		//
+
+		sqldb := sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(os.Getenv("POSTGRES_DSN"))))
+
+		bundb := bun.NewDB(sqldb, pgdialect.New())
+
+		// todo: write to logger
+		bundb.AddQueryHook(bundebug.NewQueryHook(
+			bundebug.WithVerbose(true),
+			bundebug.WithEnabled(true),
+		))
+
+		//
 
 		usersStore := users.NewStore(pgdb)
 		workspacesStore := workspaces.NewStore(pgdb)
@@ -93,6 +116,7 @@ func main() {
 		housesStore := houses.NewStore(pgdb)
 		roomsStore := rooms.NewStore(pgdb)
 		visualizationsStore := visualizations.NewStore(pgdb)
+		publicSitesStore := sites.NewStore(bundb)
 
 		usersLoader := dataloader.NewUserLoader(dataloader.NewUserLoaderConfig(ctx, usersStore))
 
@@ -128,6 +152,7 @@ func main() {
 			Contacts:       contactsStore,
 			Houses:         housesStore,
 			Projects:       projectsStore,
+			PublicSites:    publicSitesStore,
 			Files:          filesStore,
 			Rooms:          roomsStore,
 			Users:          usersStore,
@@ -150,11 +175,11 @@ func main() {
 				Users: usersLoader,
 			},
 			reg,
-			logger,
+			log,
 		).Run(addr)
 
 	default:
-		log.Print("expect command (run or gen-key-pair)")
+		log.Info("expect command (run or gen-key-pair)")
 		os.Exit(1)
 	}
 }

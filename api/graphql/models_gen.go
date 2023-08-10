@@ -116,6 +116,14 @@ type LoginByEmailResult interface {
 	IsLoginByEmailResult()
 }
 
+type MakeProjectNotPublicResult interface {
+	IsMakeProjectNotPublicResult()
+}
+
+type MakeProjectPublicResult interface {
+	IsMakeProjectPublicResult()
+}
+
 type ProjectAlbumsListResult interface {
 	IsProjectAlbumsListResult()
 }
@@ -146,6 +154,10 @@ type ProjectHousesListResult interface {
 
 type ProjectHousesTotalResult interface {
 	IsProjectHousesTotalResult()
+}
+
+type ProjectPublicSite interface {
+	IsProjectPublicSite()
 }
 
 type ProjectResult interface {
@@ -418,6 +430,10 @@ func (Forbidden) IsDeleteVisualizationsResult() {}
 
 func (Forbidden) IsInviteUserToWorkspaceResult() {}
 
+func (Forbidden) IsMakeProjectNotPublicResult() {}
+
+func (Forbidden) IsMakeProjectPublicResult() {}
+
 func (Forbidden) IsUpdateContactResult() {}
 
 func (Forbidden) IsUpdateHouseResult() {}
@@ -598,6 +614,10 @@ func (NotFound) IsDeleteVisualizationsResult() {}
 
 func (NotFound) IsInviteUserToWorkspaceResult() {}
 
+func (NotFound) IsMakeProjectNotPublicResult() {}
+
+func (NotFound) IsMakeProjectPublicResult() {}
+
 func (NotFound) IsUpdateContactResult() {}
 
 func (NotFound) IsUpdateHouseResult() {}
@@ -611,6 +631,8 @@ func (NotFound) IsAlbumProjectResult() {}
 func (NotFound) IsAlbumPageVisualizationResult() {}
 
 func (NotFound) IsProjectResult() {}
+
+func (NotFound) IsProjectPublicSite() {}
 
 func (NotFound) IsWorkspaceResult() {}
 
@@ -636,6 +658,7 @@ type Project struct {
 	Visualizations *ProjectVisualizations   `json:"visualizations"`
 	Files          *ProjectFiles            `json:"files"`
 	Albums         *ProjectAlbums           `json:"albums"`
+	PublicSite     ProjectPublicSite        `json:"publicSite"`
 	Statuses       *ProjectStatusDictionary `json:"statuses"`
 }
 
@@ -735,6 +758,18 @@ type ProjectHousesTotal struct {
 
 func (ProjectHousesTotal) IsProjectHousesTotalResult() {}
 
+type ProjectMadeNotPublic struct {
+	PublicSite *PublicSite `json:"publicSite"`
+}
+
+func (ProjectMadeNotPublic) IsMakeProjectNotPublicResult() {}
+
+type ProjectMadePublic struct {
+	PublicSite *PublicSite `json:"publicSite"`
+}
+
+func (ProjectMadePublic) IsMakeProjectPublicResult() {}
+
 type ProjectStatusChanged struct {
 	Project *Project `json:"project"`
 }
@@ -779,6 +814,20 @@ type ProjectVisualizationsTotal struct {
 }
 
 func (ProjectVisualizationsTotal) IsProjectVisualizationsTotalResult() {}
+
+type PublicSite struct {
+	ID       string              `json:"id"`
+	Status   PublicSiteStatus    `json:"status"`
+	URL      string              `json:"url"`
+	Settings *PublicSiteSettings `json:"settings"`
+}
+
+func (PublicSite) IsProjectPublicSite() {}
+
+type PublicSiteSettings struct {
+	Visualizations bool `json:"visualizations"`
+	Albums         bool `json:"albums"`
+}
 
 type Room struct {
 	ID         string    `json:"id"`
@@ -845,6 +894,10 @@ func (ServerError) IsInviteUserToWorkspaceResult() {}
 
 func (ServerError) IsLoginByEmailResult() {}
 
+func (ServerError) IsMakeProjectNotPublicResult() {}
+
+func (ServerError) IsMakeProjectPublicResult() {}
+
 func (ServerError) IsUpdateContactResult() {}
 
 func (ServerError) IsUpdateHouseResult() {}
@@ -888,6 +941,8 @@ func (ServerError) IsProjectFilesTotalResult() {}
 func (ServerError) IsProjectAlbumsListResult() {}
 
 func (ServerError) IsProjectAlbumsTotalResult() {}
+
+func (ServerError) IsProjectPublicSite() {}
 
 func (ServerError) IsWorkspaceResult() {}
 
@@ -1268,6 +1323,47 @@ func (e *ProjectStatus) UnmarshalGQL(v interface{}) error {
 }
 
 func (e ProjectStatus) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type PublicSiteStatus string
+
+const (
+	PublicSiteStatusPublic    PublicSiteStatus = "PUBLIC"
+	PublicSiteStatusNotPublic PublicSiteStatus = "NOT_PUBLIC"
+)
+
+var AllPublicSiteStatus = []PublicSiteStatus{
+	PublicSiteStatusPublic,
+	PublicSiteStatusNotPublic,
+}
+
+func (e PublicSiteStatus) IsValid() bool {
+	switch e {
+	case PublicSiteStatusPublic, PublicSiteStatusNotPublic:
+		return true
+	}
+	return false
+}
+
+func (e PublicSiteStatus) String() string {
+	return string(e)
+}
+
+func (e *PublicSiteStatus) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = PublicSiteStatus(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid PublicSiteStatus", str)
+	}
+	return nil
+}
+
+func (e PublicSiteStatus) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }
 

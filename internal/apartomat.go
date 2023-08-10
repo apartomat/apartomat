@@ -10,6 +10,7 @@ import (
 	"github.com/apartomat/apartomat/internal/store/files"
 	"github.com/apartomat/apartomat/internal/store/houses"
 	"github.com/apartomat/apartomat/internal/store/projects"
+	sites "github.com/apartomat/apartomat/internal/store/public_sites"
 	"github.com/apartomat/apartomat/internal/store/rooms"
 	"github.com/apartomat/apartomat/internal/store/users"
 	"github.com/apartomat/apartomat/internal/store/visualizations"
@@ -40,6 +41,7 @@ type Apartomat struct {
 	Contacts       contacts.Store
 	Houses         houses.Store
 	Projects       projects.Store
+	PublicSites    sites.Store
 	Files          files.Store
 	Rooms          rooms.Store
 	Users          users.Store

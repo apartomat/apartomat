@@ -25,6 +25,19 @@ var (
 	_ Store = (*store)(nil)
 )
 
+func (s *store) Get(ctx context.Context, spec Spec) (*Project, error) {
+	res, err := s.List(ctx, spec, 1, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(res) == 0 {
+		return nil, ErrProjectNotFound
+	}
+
+	return res[0], nil
+}
+
 func (s *store) List(ctx context.Context, spec Spec, limit, offset int) ([]*Project, error) {
 	qs, err := toSpecQuery(spec)
 	if err != nil {

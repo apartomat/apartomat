@@ -1,0 +1,9 @@
+extend type Mutation {
+    makeProjectNotPublic(projectId: String!): MakeProjectNotPublicResult!
+}
+
+union MakeProjectNotPublicResult = ProjectMadeNotPublic | NotFound | Forbidden | ServerError
+
+type ProjectMadeNotPublic {
+    publicSite: PublicSite!
+}

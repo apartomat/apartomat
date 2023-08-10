@@ -2,9 +2,11 @@ package apartomat
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/apartomat/apartomat/internal/auth"
 	. "github.com/apartomat/apartomat/internal/store/projects"
+	sites "github.com/apartomat/apartomat/internal/store/public_sites"
 	"github.com/apartomat/apartomat/internal/store/workspace_users"
 	"github.com/apartomat/apartomat/internal/store/workspaces"
 	"time"
@@ -35,14 +37,26 @@ func (u *Apartomat) CreateProject(
 		return nil, fmt.Errorf("can't create project in workspace (id=%s): %w", workspace.ID, ErrForbidden)
 	}
 
-	id, err := NewNanoID()
-	if err != nil {
+	project := NewProject(MustGenerateNanoID(), name, startAt, endAt, workspaceID)
+
+	if err := u.Projects.Save(ctx, project); err != nil {
 		return nil, err
 	}
 
-	project := NewProject(id, name, startAt, endAt, workspaceID)
+	siteID := MustGenerateNanoID()
 
-	if err := u.Projects.Save(ctx, project); err != nil {
+	site := sites.NewPublicSite(
+		siteID,
+		fmt.Sprintf("https://p.apartomat.ru/%s", siteID),
+		sites.StatusNotPublic,
+		sites.PublicSiteSettings{
+			AllowVisualizations: false,
+			AllowAlbums:         false,
+		},
+		project.ID,
+	)
+
+	if err := u.PublicSites.Save(ctx, site); err != nil {
 		return nil, err
 	}
 
@@ -182,4 +196,138 @@ func (u *Apartomat) GetProject(ctx context.Context, id string) (*Project, error)
 
 func (u *Apartomat) CanGetProject(ctx context.Context, subj *auth.UserCtx, obj *Project) (bool, error) {
 	return u.isProjectUser(ctx, subj, obj)
+}
+
+func (u *Apartomat) PublishProject(ctx context.Context, id string) (*Project, error) {
+	prjs, err := u.Projects.List(ctx, IDIn(id), 1, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(prjs) == 0 {
+		return nil, fmt.Errorf("project (id=%s): %w", id, ErrNotFound)
+	}
+
+	var (
+		project = prjs[0]
+	)
+
+	if ok, err := u.CanGetProject(ctx, auth.UserFromCtx(ctx), project); err != nil {
+		return nil, err
+	} else if !ok {
+		return nil, fmt.Errorf("can't get project (id=%s): %w", project.ID, ErrForbidden)
+	}
+
+	return project, nil
+}
+
+func (u *Apartomat) GetProjectPublicSite(ctx context.Context, projectId string) (*sites.PublicSite, error) {
+	prjs, err := u.Projects.List(ctx, IDIn(projectId), 1, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(prjs) == 0 {
+		return nil, fmt.Errorf("project (id=%s): %w", projectId, ErrNotFound)
+	}
+
+	var (
+		project = prjs[0]
+	)
+
+	if ok, err := u.CanGetProject(ctx, auth.UserFromCtx(ctx), project); err != nil {
+		return nil, err
+	} else if !ok {
+		return nil, fmt.Errorf("can't get project (id=%s) public site: %w", project.ID, ErrForbidden)
+	}
+
+	return u.PublicSites.Get(ctx, sites.ProjectIDIn(project.ID))
+}
+
+func (u *Apartomat) MakeProjectPublic(ctx context.Context, projectId string) (*sites.PublicSite, error) {
+	proj, err := u.Projects.Get(ctx, IDIn(projectId))
+	if err != nil {
+		return nil, err
+	}
+
+	if ok, err := u.CanUpdateProject(ctx, auth.UserFromCtx(ctx), proj); err != nil {
+		return nil, err
+	} else if !ok {
+		return nil, fmt.Errorf("can't make project (id=%s) public: %w", proj.ID, ErrForbidden)
+	}
+
+	site, err := u.PublicSites.Get(ctx, sites.ProjectIDIn(proj.ID))
+	if errors.Is(err, sites.ErrPublicSiteNotFound) {
+		siteID := MustGenerateNanoID()
+
+		s := sites.NewPublicSite(
+			siteID,
+			fmt.Sprintf("https://p.apartomat.ru/%s", siteID),
+			sites.StatusNotPublic,
+			sites.PublicSiteSettings{
+				AllowVisualizations: true,
+				AllowAlbums:         true,
+			},
+			proj.ID,
+		)
+
+		site = &s
+
+	} else if err != nil {
+		return nil, err
+	}
+
+	if err := site.ToPublic(); err != nil {
+		return nil, fmt.Errorf("can't make project public: %w", err)
+	}
+
+	if err := u.PublicSites.Save(ctx, *site); err != nil {
+		return nil, err
+	}
+
+	return site, nil
+}
+
+func (u *Apartomat) MakeProjectNotPublic(ctx context.Context, projectId string) (*sites.PublicSite, error) {
+	proj, err := u.Projects.Get(ctx, IDIn(projectId))
+	if err != nil {
+		return nil, err
+	}
+
+	if ok, err := u.CanUpdateProject(ctx, auth.UserFromCtx(ctx), proj); err != nil {
+		return nil, err
+	} else if !ok {
+		return nil, fmt.Errorf("can't make project (id=%s) not public: %w", proj.ID, ErrForbidden)
+	}
+
+	site, err := u.PublicSites.Get(ctx, sites.ProjectIDIn(proj.ID))
+	if errors.Is(err, sites.ErrPublicSiteNotFound) {
+		siteID := MustGenerateNanoID()
+
+		s := sites.NewPublicSite(
+			siteID,
+			fmt.Sprintf("https://p.apartomat.ru/%s", siteID),
+			sites.StatusPublic,
+			sites.PublicSiteSettings{
+				AllowVisualizations: true,
+				AllowAlbums:         true,
+			},
+			proj.ID,
+		)
+
+		site = &s
+
+	} else if err != nil {
+		return nil, err
+	}
+
+	if err := site.ToNotPublic(); err != nil {
+		return nil, fmt.Errorf("can't make project not public: %w", err)
+	}
+
+	if err := u.PublicSites.Save(ctx, *site); err != nil {
+		return nil, err
+	}
+
+	return site, nil
 }

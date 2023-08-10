@@ -2,8 +2,12 @@ package graphql
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"github.com/apartomat/apartomat/internal/store"
 	"github.com/apartomat/apartomat/internal/store/projects"
+	sites "github.com/apartomat/apartomat/internal/store/public_sites"
+	"go.uber.org/zap"
 	"time"
 )
 
@@ -21,10 +25,6 @@ func (r *projectResolver) Contacts(ctx context.Context, obj *Project) (*ProjectC
 	return &ProjectContacts{}, nil
 }
 
-func (r *projectResolver) Files(ctx context.Context, obj *Project) (*ProjectFiles, error) {
-	return &ProjectFiles{}, nil
-}
-
 func (r *projectResolver) Houses(ctx context.Context, obj *Project) (*ProjectHouses, error) {
 	return &ProjectHouses{}, nil
 }
@@ -33,8 +33,31 @@ func (r *projectResolver) Visualizations(ctx context.Context, obj *Project) (*Pr
 	return &ProjectVisualizations{}, nil
 }
 
+func (r *projectResolver) Files(ctx context.Context, obj *Project) (*ProjectFiles, error) {
+	return &ProjectFiles{}, nil
+}
+
 func (r *projectResolver) Albums(ctx context.Context, obj *Project) (*ProjectAlbums, error) {
 	return &ProjectAlbums{}, nil
+}
+
+func (r *projectResolver) PublicSite(ctx context.Context, obj *Project) (ProjectPublicSite, error) {
+	site, err := r.useCases.GetProjectPublicSite(ctx, obj.ID)
+	if err != nil {
+		if errors.Is(err, store.ErrNotFound) {
+			return notFound()
+		}
+
+		r.logger.Error(
+			"can't resolve project public site: %s",
+			zap.String("projectId", obj.ID),
+			zap.Error(err),
+		)
+
+		return serverError()
+	}
+
+	return publicSiteToGraphQL(site), nil
 }
 
 func (r *projectResolver) Statuses(ctx context.Context, obj *Project) (*ProjectStatusDictionary, error) {
@@ -161,4 +184,31 @@ func period(startAt, endAt *time.Time, timezone *string) (*string, error) {
 
 func newof[T any](val T) *T {
 	return &val
+}
+
+func publicSiteToGraphQL(s *sites.PublicSite) *PublicSite {
+	if s == nil {
+		return nil
+	}
+
+	return &PublicSite{
+		ID:     s.ID,
+		Status: publicSiteStatusToGraphQL(s.Status),
+		URL:    s.URL,
+		Settings: &PublicSiteSettings{
+			Visualizations: s.Settings.AllowVisualizations,
+			Albums:         s.Settings.AllowAlbums,
+		},
+	}
+}
+
+func publicSiteStatusToGraphQL(st sites.Status) PublicSiteStatus {
+	switch st {
+	case sites.StatusPublic:
+		return PublicSiteStatusPublic
+	case sites.StatusNotPublic:
+		return PublicSiteStatusNotPublic
+	}
+
+	return ""
 }

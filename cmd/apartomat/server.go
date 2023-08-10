@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/apartomat/apartomat/api/graphql"
 	apartomat "github.com/apartomat/apartomat/internal"
@@ -10,7 +11,6 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.uber.org/zap"
-	"log"
 	"net"
 	"net/http"
 	"os"
@@ -52,6 +52,10 @@ func NewServer(
 }
 
 func (server *server) Run(opts ...ServerOption) {
+	var (
+		log = server.logger
+	)
+
 	bgCtx := context.Background()
 
 	mux := chi.NewRouter()
@@ -61,7 +65,7 @@ func (server *server) Run(opts ...ServerOption) {
 	mux.Handle("/graphql", graphql.Handler(
 		server.useCases.CheckAuthToken,
 		server.loaders,
-		graphql.NewRootResolver(server.useCases, server.logger),
+		graphql.NewRootResolver(server.useCases, log),
 		10000,
 	))
 
@@ -87,31 +91,31 @@ func (server *server) Run(opts ...ServerOption) {
 	go func() {
 		<-quit
 
-		log.Print("Stopping server...")
+		log.Info("Stopping server...")
 
 		ctx, cancel := context.WithTimeout(bgCtx, 5*time.Second)
 		defer cancel()
 
 		if err := s.Shutdown(ctx); err != nil {
-			log.Fatalf("can't stop server: %s", err)
+			log.Fatal("can't stop server", zap.Error(err))
 		}
 
 		close(done)
 	}()
 
-	log.Printf("Starting server at %s...", s.Addr)
+	log.Info(fmt.Sprintf("Starting server at %s...", s.Addr))
 
 	go func() {
 		if err := s.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("can't start server: %s", err)
+			log.Fatal("can't start server: %s", zap.Error(err))
 		}
 	}()
 
-	log.Printf("Visit http://%s/pg for playground", serverHttpAddr(s.Addr))
+	log.Info(fmt.Sprintf("Visit http://%s/pg for playground", serverHttpAddr(s.Addr)))
 
 	<-done
 
-	log.Print("Buy")
+	log.Info("Buy")
 }
 
 func serverHttpAddr(addr string) string {

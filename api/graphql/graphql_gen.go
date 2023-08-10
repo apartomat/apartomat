@@ -240,6 +240,8 @@ type ComplexityRoot struct {
 		DeleteVisualizations       func(childComplexity int, id []string) int
 		InviteUser                 func(childComplexity int, workspaceID string, email string, role WorkspaceUserRole) int
 		LoginByEmail               func(childComplexity int, email string, workspaceName string) int
+		MakeProjectNotPublic       func(childComplexity int, projectID string) int
+		MakeProjectPublic          func(childComplexity int, projectID string) int
 		Ping                       func(childComplexity int) int
 		UpdateContact              func(childComplexity int, contactID string, data UpdateContactInput) int
 		UpdateHouse                func(childComplexity int, houseID string, data UpdateHouseInput) int
@@ -267,6 +269,7 @@ type ComplexityRoot struct {
 		ID             func(childComplexity int) int
 		Name           func(childComplexity int) int
 		Period         func(childComplexity int, timezone *string) int
+		PublicSite     func(childComplexity int) int
 		StartAt        func(childComplexity int) int
 		Status         func(childComplexity int) int
 		Statuses       func(childComplexity int) int
@@ -333,6 +336,14 @@ type ComplexityRoot struct {
 		Total func(childComplexity int) int
 	}
 
+	ProjectMadeNotPublic struct {
+		PublicSite func(childComplexity int) int
+	}
+
+	ProjectMadePublic struct {
+		PublicSite func(childComplexity int) int
+	}
+
 	ProjectStatusChanged struct {
 		Project func(childComplexity int) int
 	}
@@ -357,6 +368,18 @@ type ComplexityRoot struct {
 
 	ProjectVisualizationsTotal struct {
 		Total func(childComplexity int) int
+	}
+
+	PublicSite struct {
+		ID       func(childComplexity int) int
+		Settings func(childComplexity int) int
+		Status   func(childComplexity int) int
+		URL      func(childComplexity int) int
+	}
+
+	PublicSiteSettings struct {
+		Albums         func(childComplexity int) int
+		Visualizations func(childComplexity int) int
 	}
 
 	Query struct {
@@ -523,6 +546,8 @@ type MutationResolver interface {
 	DeleteVisualizations(ctx context.Context, id []string) (DeleteVisualizationsResult, error)
 	InviteUser(ctx context.Context, workspaceID string, email string, role WorkspaceUserRole) (InviteUserToWorkspaceResult, error)
 	LoginByEmail(ctx context.Context, email string, workspaceName string) (LoginByEmailResult, error)
+	MakeProjectNotPublic(ctx context.Context, projectID string) (MakeProjectNotPublicResult, error)
+	MakeProjectPublic(ctx context.Context, projectID string) (MakeProjectPublicResult, error)
 	UpdateContact(ctx context.Context, contactID string, data UpdateContactInput) (UpdateContactResult, error)
 	UpdateHouse(ctx context.Context, houseID string, data UpdateHouseInput) (UpdateHouseResult, error)
 	UpdateRoom(ctx context.Context, roomID string, data UpdateRoomInput) (UpdateRoomResult, error)
@@ -537,6 +562,7 @@ type ProjectResolver interface {
 	Visualizations(ctx context.Context, obj *Project) (*ProjectVisualizations, error)
 	Files(ctx context.Context, obj *Project) (*ProjectFiles, error)
 	Albums(ctx context.Context, obj *Project) (*ProjectAlbums, error)
+	PublicSite(ctx context.Context, obj *Project) (ProjectPublicSite, error)
 	Statuses(ctx context.Context, obj *Project) (*ProjectStatusDictionary, error)
 }
 type ProjectAlbumsResolver interface {
@@ -1237,6 +1263,30 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.LoginByEmail(childComplexity, args["email"].(string), args["workspaceName"].(string)), true
 
+	case "Mutation.makeProjectNotPublic":
+		if e.complexity.Mutation.MakeProjectNotPublic == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_makeProjectNotPublic_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.MakeProjectNotPublic(childComplexity, args["projectId"].(string)), true
+
+	case "Mutation.makeProjectPublic":
+		if e.complexity.Mutation.MakeProjectPublic == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_makeProjectPublic_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.MakeProjectPublic(childComplexity, args["projectId"].(string)), true
+
 	case "Mutation.ping":
 		if e.complexity.Mutation.Ping == nil {
 			break
@@ -1397,6 +1447,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Project.Period(childComplexity, args["timezone"].(*string)), true
+
+	case "Project.publicSite":
+		if e.complexity.Project.PublicSite == nil {
+			break
+		}
+
+		return e.complexity.Project.PublicSite(childComplexity), true
 
 	case "Project.startAt":
 		if e.complexity.Project.StartAt == nil {
@@ -1587,6 +1644,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ProjectHousesTotal.Total(childComplexity), true
 
+	case "ProjectMadeNotPublic.publicSite":
+		if e.complexity.ProjectMadeNotPublic.PublicSite == nil {
+			break
+		}
+
+		return e.complexity.ProjectMadeNotPublic.PublicSite(childComplexity), true
+
+	case "ProjectMadePublic.publicSite":
+		if e.complexity.ProjectMadePublic.PublicSite == nil {
+			break
+		}
+
+		return e.complexity.ProjectMadePublic.PublicSite(childComplexity), true
+
 	case "ProjectStatusChanged.project":
 		if e.complexity.ProjectStatusChanged.Project == nil {
 			break
@@ -1652,6 +1723,48 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ProjectVisualizationsTotal.Total(childComplexity), true
+
+	case "PublicSite.id":
+		if e.complexity.PublicSite.ID == nil {
+			break
+		}
+
+		return e.complexity.PublicSite.ID(childComplexity), true
+
+	case "PublicSite.settings":
+		if e.complexity.PublicSite.Settings == nil {
+			break
+		}
+
+		return e.complexity.PublicSite.Settings(childComplexity), true
+
+	case "PublicSite.status":
+		if e.complexity.PublicSite.Status == nil {
+			break
+		}
+
+		return e.complexity.PublicSite.Status(childComplexity), true
+
+	case "PublicSite.url":
+		if e.complexity.PublicSite.URL == nil {
+			break
+		}
+
+		return e.complexity.PublicSite.URL(childComplexity), true
+
+	case "PublicSiteSettings.albums":
+		if e.complexity.PublicSiteSettings.Albums == nil {
+			break
+		}
+
+		return e.complexity.PublicSiteSettings.Albums(childComplexity), true
+
+	case "PublicSiteSettings.visualizations":
+		if e.complexity.PublicSiteSettings.Visualizations == nil {
+			break
+		}
+
+		return e.complexity.PublicSiteSettings.Visualizations(childComplexity), true
 
 	case "Query.album":
 		if e.complexity.Query.Album == nil {
@@ -2166,7 +2279,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 	return introspection.WrapTypeFromDef(parsedSchema, parsedSchema.Types[name]), nil
 }
 
-//go:embed "schema/mutation.graphql" "schema/mutation_accept_invite.graphql" "schema/mutation_add_contact.graphql" "schema/mutation_add_house.graphql" "schema/mutation_add_room.graphql" "schema/mutation_add_visualizations_to_album.graphql" "schema/mutation_change_album_page_orientation.graphql" "schema/mutation_change_album_page_size.graphql" "schema/mutation_change_project_dates.graphql" "schema/mutation_change_project_status.graphql" "schema/mutation_confirm_login_link.graphql" "schema/mutation_confirm_login_pin.graphql" "schema/mutation_create_album.graphql" "schema/mutation_create_project.graphql" "schema/mutation_delete_album.graphql" "schema/mutation_delete_contact.graphql" "schema/mutation_delete_room.graphql" "schema/mutation_delete_visualizations.graphql" "schema/mutation_invite_user.graphql" "schema/mutation_login_by_email.graphql" "schema/mutation_update_contact.graphql" "schema/mutation_update_house.graphql" "schema/mutation_update_room.graphql" "schema/mutation_upload_file.graphql" "schema/mutation_upload_visualization.graphql" "schema/mutation_upload_visualizations.graphql" "schema/query.graphql" "schema/query_album.graphql" "schema/query_profile.graphql" "schema/query_project.graphql" "schema/query_workspace.graphql" "schema/root.graphql"
+//go:embed "schema/mutation.graphql" "schema/mutation_accept_invite.graphql" "schema/mutation_add_contact.graphql" "schema/mutation_add_house.graphql" "schema/mutation_add_room.graphql" "schema/mutation_add_visualizations_to_album.graphql" "schema/mutation_change_album_page_orientation.graphql" "schema/mutation_change_album_page_size.graphql" "schema/mutation_change_project_dates.graphql" "schema/mutation_change_project_status.graphql" "schema/mutation_confirm_login_link.graphql" "schema/mutation_confirm_login_pin.graphql" "schema/mutation_create_album.graphql" "schema/mutation_create_project.graphql" "schema/mutation_delete_album.graphql" "schema/mutation_delete_contact.graphql" "schema/mutation_delete_room.graphql" "schema/mutation_delete_visualizations.graphql" "schema/mutation_invite_user.graphql" "schema/mutation_login_by_email.graphql" "schema/mutation_make_project_not_public.graphql" "schema/mutation_make_project_public.graphql" "schema/mutation_update_contact.graphql" "schema/mutation_update_house.graphql" "schema/mutation_update_room.graphql" "schema/mutation_upload_file.graphql" "schema/mutation_upload_visualization.graphql" "schema/mutation_upload_visualizations.graphql" "schema/query.graphql" "schema/query_album.graphql" "schema/query_profile.graphql" "schema/query_project.graphql" "schema/query_workspace.graphql" "schema/root.graphql"
 var sourcesFS embed.FS
 
 func sourceData(filename string) string {
@@ -2198,6 +2311,8 @@ var sources = []*ast.Source{
 	{Name: "schema/mutation_delete_visualizations.graphql", Input: sourceData("schema/mutation_delete_visualizations.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_invite_user.graphql", Input: sourceData("schema/mutation_invite_user.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_login_by_email.graphql", Input: sourceData("schema/mutation_login_by_email.graphql"), BuiltIn: false},
+	{Name: "schema/mutation_make_project_not_public.graphql", Input: sourceData("schema/mutation_make_project_not_public.graphql"), BuiltIn: false},
+	{Name: "schema/mutation_make_project_public.graphql", Input: sourceData("schema/mutation_make_project_public.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_update_contact.graphql", Input: sourceData("schema/mutation_update_contact.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_update_house.graphql", Input: sourceData("schema/mutation_update_house.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_update_room.graphql", Input: sourceData("schema/mutation_update_room.graphql"), BuiltIn: false},
@@ -2649,6 +2764,36 @@ func (ec *executionContext) field_Mutation_loginByEmail_args(ctx context.Context
 		}
 	}
 	args["workspaceName"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_makeProjectNotPublic_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["projectId"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("projectId"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["projectId"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_makeProjectPublic_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["projectId"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("projectId"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["projectId"] = arg0
 	return args, nil
 }
 
@@ -6984,6 +7129,116 @@ func (ec *executionContext) fieldContext_Mutation_loginByEmail(ctx context.Conte
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_makeProjectNotPublic(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_makeProjectNotPublic(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().MakeProjectNotPublic(rctx, fc.Args["projectId"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(MakeProjectNotPublicResult)
+	fc.Result = res
+	return ec.marshalNMakeProjectNotPublicResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐMakeProjectNotPublicResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_makeProjectNotPublic(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type MakeProjectNotPublicResult does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_makeProjectNotPublic_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_makeProjectPublic(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_makeProjectPublic(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().MakeProjectPublic(rctx, fc.Args["projectId"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(MakeProjectPublicResult)
+	fc.Result = res
+	return ec.marshalNMakeProjectPublicResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐMakeProjectPublicResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_makeProjectPublic(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type MakeProjectPublicResult does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_makeProjectPublic_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_updateContact(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_updateContact(ctx, field)
 	if err != nil {
@@ -7962,6 +8217,50 @@ func (ec *executionContext) fieldContext_Project_albums(ctx context.Context, fie
 	return fc, nil
 }
 
+func (ec *executionContext) _Project_publicSite(ctx context.Context, field graphql.CollectedField, obj *Project) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Project_publicSite(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Project().PublicSite(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(ProjectPublicSite)
+	fc.Result = res
+	return ec.marshalNProjectPublicSite2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectPublicSite(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Project_publicSite(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Project",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ProjectPublicSite does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Project_statuses(ctx context.Context, field graphql.CollectedField, obj *Project) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Project_statuses(ctx, field)
 	if err != nil {
@@ -8482,6 +8781,8 @@ func (ec *executionContext) fieldContext_ProjectCreated_project(ctx context.Cont
 				return ec.fieldContext_Project_files(ctx, field)
 			case "albums":
 				return ec.fieldContext_Project_albums(ctx, field)
+			case "publicSite":
+				return ec.fieldContext_Project_publicSite(ctx, field)
 			case "statuses":
 				return ec.fieldContext_Project_statuses(ctx, field)
 			}
@@ -8552,6 +8853,8 @@ func (ec *executionContext) fieldContext_ProjectDatesChanged_project(ctx context
 				return ec.fieldContext_Project_files(ctx, field)
 			case "albums":
 				return ec.fieldContext_Project_albums(ctx, field)
+			case "publicSite":
+				return ec.fieldContext_Project_publicSite(ctx, field)
 			case "statuses":
 				return ec.fieldContext_Project_statuses(ctx, field)
 			}
@@ -8985,6 +9288,114 @@ func (ec *executionContext) fieldContext_ProjectHousesTotal_total(ctx context.Co
 	return fc, nil
 }
 
+func (ec *executionContext) _ProjectMadeNotPublic_publicSite(ctx context.Context, field graphql.CollectedField, obj *ProjectMadeNotPublic) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectMadeNotPublic_publicSite(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PublicSite, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*PublicSite)
+	fc.Result = res
+	return ec.marshalNPublicSite2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐPublicSite(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectMadeNotPublic_publicSite(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectMadeNotPublic",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_PublicSite_id(ctx, field)
+			case "status":
+				return ec.fieldContext_PublicSite_status(ctx, field)
+			case "url":
+				return ec.fieldContext_PublicSite_url(ctx, field)
+			case "settings":
+				return ec.fieldContext_PublicSite_settings(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PublicSite", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProjectMadePublic_publicSite(ctx context.Context, field graphql.CollectedField, obj *ProjectMadePublic) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectMadePublic_publicSite(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PublicSite, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*PublicSite)
+	fc.Result = res
+	return ec.marshalNPublicSite2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐPublicSite(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectMadePublic_publicSite(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectMadePublic",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_PublicSite_id(ctx, field)
+			case "status":
+				return ec.fieldContext_PublicSite_status(ctx, field)
+			case "url":
+				return ec.fieldContext_PublicSite_url(ctx, field)
+			case "settings":
+				return ec.fieldContext_PublicSite_settings(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PublicSite", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _ProjectStatusChanged_project(ctx context.Context, field graphql.CollectedField, obj *ProjectStatusChanged) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_ProjectStatusChanged_project(ctx, field)
 	if err != nil {
@@ -9046,6 +9457,8 @@ func (ec *executionContext) fieldContext_ProjectStatusChanged_project(ctx contex
 				return ec.fieldContext_Project_files(ctx, field)
 			case "albums":
 				return ec.fieldContext_Project_albums(ctx, field)
+			case "publicSite":
+				return ec.fieldContext_Project_publicSite(ctx, field)
 			case "statuses":
 				return ec.fieldContext_Project_statuses(ctx, field)
 			}
@@ -9406,6 +9819,276 @@ func (ec *executionContext) fieldContext_ProjectVisualizationsTotal_total(ctx co
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PublicSite_id(ctx context.Context, field graphql.CollectedField, obj *PublicSite) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PublicSite_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PublicSite_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PublicSite",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PublicSite_status(ctx context.Context, field graphql.CollectedField, obj *PublicSite) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PublicSite_status(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(PublicSiteStatus)
+	fc.Result = res
+	return ec.marshalNPublicSiteStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐPublicSiteStatus(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PublicSite_status(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PublicSite",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type PublicSiteStatus does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PublicSite_url(ctx context.Context, field graphql.CollectedField, obj *PublicSite) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PublicSite_url(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.URL, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PublicSite_url(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PublicSite",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PublicSite_settings(ctx context.Context, field graphql.CollectedField, obj *PublicSite) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PublicSite_settings(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Settings, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*PublicSiteSettings)
+	fc.Result = res
+	return ec.marshalNPublicSiteSettings2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐPublicSiteSettings(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PublicSite_settings(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PublicSite",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "visualizations":
+				return ec.fieldContext_PublicSiteSettings_visualizations(ctx, field)
+			case "albums":
+				return ec.fieldContext_PublicSiteSettings_albums(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PublicSiteSettings", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PublicSiteSettings_visualizations(ctx context.Context, field graphql.CollectedField, obj *PublicSiteSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PublicSiteSettings_visualizations(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Visualizations, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PublicSiteSettings_visualizations(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PublicSiteSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _PublicSiteSettings_albums(ctx context.Context, field graphql.CollectedField, obj *PublicSiteSettings) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_PublicSiteSettings_albums(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Albums, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_PublicSiteSettings_albums(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "PublicSiteSettings",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
 		},
 	}
 	return fc, nil
@@ -11742,6 +12425,8 @@ func (ec *executionContext) fieldContext_WorkspaceProjectsList_items(ctx context
 				return ec.fieldContext_Project_files(ctx, field)
 			case "albums":
 				return ec.fieldContext_Project_albums(ctx, field)
+			case "publicSite":
+				return ec.fieldContext_Project_publicSite(ctx, field)
 			case "statuses":
 				return ec.fieldContext_Project_statuses(ctx, field)
 			}
@@ -15737,6 +16422,80 @@ func (ec *executionContext) _LoginByEmailResult(ctx context.Context, sel ast.Sel
 	}
 }
 
+func (ec *executionContext) _MakeProjectNotPublicResult(ctx context.Context, sel ast.SelectionSet, obj MakeProjectNotPublicResult) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case ProjectMadeNotPublic:
+		return ec._ProjectMadeNotPublic(ctx, sel, &obj)
+	case *ProjectMadeNotPublic:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ProjectMadeNotPublic(ctx, sel, obj)
+	case NotFound:
+		return ec._NotFound(ctx, sel, &obj)
+	case *NotFound:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._NotFound(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
+func (ec *executionContext) _MakeProjectPublicResult(ctx context.Context, sel ast.SelectionSet, obj MakeProjectPublicResult) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case ProjectMadePublic:
+		return ec._ProjectMadePublic(ctx, sel, &obj)
+	case *ProjectMadePublic:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ProjectMadePublic(ctx, sel, obj)
+	case NotFound:
+		return ec._NotFound(ctx, sel, &obj)
+	case *NotFound:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._NotFound(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
 func (ec *executionContext) _ProjectAlbumsListResult(ctx context.Context, sel ast.SelectionSet, obj ProjectAlbumsListResult) graphql.Marshaler {
 	switch obj := (obj).(type) {
 	case nil:
@@ -15965,6 +16724,36 @@ func (ec *executionContext) _ProjectHousesTotalResult(ctx context.Context, sel a
 			return graphql.Null
 		}
 		return ec._Forbidden(ctx, sel, obj)
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
+func (ec *executionContext) _ProjectPublicSite(ctx context.Context, sel ast.SelectionSet, obj ProjectPublicSite) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case PublicSite:
+		return ec._PublicSite(ctx, sel, &obj)
+	case *PublicSite:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._PublicSite(ctx, sel, obj)
+	case NotFound:
+		return ec._NotFound(ctx, sel, &obj)
+	case *NotFound:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._NotFound(ctx, sel, obj)
 	case ServerError:
 		return ec._ServerError(ctx, sel, &obj)
 	case *ServerError:
@@ -17156,7 +17945,7 @@ func (ec *executionContext) _FileUploaded(ctx context.Context, sel ast.Selection
 	return out
 }
 
-var forbiddenImplementors = []string{"Forbidden", "AddContactResult", "AddHouseResult", "AddRoomResult", "AddVisualizationsToAlbumResult", "ChangeAlbumPageOrientationResult", "ChangeAlbumPageSizeResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "CreateAlbumResult", "CreateProjectResult", "DeleteAlbumResult", "DeleteContactResult", "DeleteRoomResult", "DeleteVisualizationsResult", "InviteUserToWorkspaceResult", "UpdateContactResult", "UpdateHouseResult", "UpdateRoomResult", "UploadFileResult", "UploadVisualizationResult", "UploadVisualizationsResult", "AlbumResult", "AlbumProjectResult", "UserProfileResult", "ProjectResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "ProjectVisualizationsListResult", "ProjectVisualizationsTotalResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectAlbumsListResult", "ProjectAlbumsTotalResult", "WorkspaceResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "WorkspaceUsersListResult", "WorkspaceUsersTotalResult", "Error"}
+var forbiddenImplementors = []string{"Forbidden", "AddContactResult", "AddHouseResult", "AddRoomResult", "AddVisualizationsToAlbumResult", "ChangeAlbumPageOrientationResult", "ChangeAlbumPageSizeResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "CreateAlbumResult", "CreateProjectResult", "DeleteAlbumResult", "DeleteContactResult", "DeleteRoomResult", "DeleteVisualizationsResult", "InviteUserToWorkspaceResult", "MakeProjectNotPublicResult", "MakeProjectPublicResult", "UpdateContactResult", "UpdateHouseResult", "UpdateRoomResult", "UploadFileResult", "UploadVisualizationResult", "UploadVisualizationsResult", "AlbumResult", "AlbumProjectResult", "UserProfileResult", "ProjectResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "ProjectVisualizationsListResult", "ProjectVisualizationsTotalResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectAlbumsListResult", "ProjectAlbumsTotalResult", "WorkspaceResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "WorkspaceUsersListResult", "WorkspaceUsersTotalResult", "Error"}
 
 func (ec *executionContext) _Forbidden(ctx context.Context, sel ast.SelectionSet, obj *Forbidden) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, forbiddenImplementors)
@@ -17850,6 +18639,24 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "makeProjectNotPublic":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_makeProjectNotPublic(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "makeProjectPublic":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_makeProjectPublic(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "updateContact":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
@@ -17915,7 +18722,7 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 	return out
 }
 
-var notFoundImplementors = []string{"NotFound", "AddHouseResult", "AddRoomResult", "ChangeAlbumPageOrientationResult", "ChangeAlbumPageSizeResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "DeleteAlbumResult", "DeleteContactResult", "DeleteRoomResult", "DeleteVisualizationsResult", "InviteUserToWorkspaceResult", "UpdateContactResult", "UpdateHouseResult", "UpdateRoomResult", "AlbumResult", "AlbumProjectResult", "AlbumPageVisualizationResult", "ProjectResult", "WorkspaceResult", "Error"}
+var notFoundImplementors = []string{"NotFound", "AddHouseResult", "AddRoomResult", "ChangeAlbumPageOrientationResult", "ChangeAlbumPageSizeResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "DeleteAlbumResult", "DeleteContactResult", "DeleteRoomResult", "DeleteVisualizationsResult", "InviteUserToWorkspaceResult", "MakeProjectNotPublicResult", "MakeProjectPublicResult", "UpdateContactResult", "UpdateHouseResult", "UpdateRoomResult", "AlbumResult", "AlbumProjectResult", "AlbumPageVisualizationResult", "ProjectResult", "ProjectPublicSite", "WorkspaceResult", "Error"}
 
 func (ec *executionContext) _NotFound(ctx context.Context, sel ast.SelectionSet, obj *NotFound) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, notFoundImplementors)
@@ -18124,6 +18931,26 @@ func (ec *executionContext) _Project(ctx context.Context, sel ast.SelectionSet, 
 					}
 				}()
 				res = ec._Project_albums(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		case "publicSite":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Project_publicSite(ctx, field, obj)
 				if res == graphql.Null {
 					atomic.AddUint32(&invalids, 1)
 				}
@@ -18689,6 +19516,62 @@ func (ec *executionContext) _ProjectHousesTotal(ctx context.Context, sel ast.Sel
 	return out
 }
 
+var projectMadeNotPublicImplementors = []string{"ProjectMadeNotPublic", "MakeProjectNotPublicResult"}
+
+func (ec *executionContext) _ProjectMadeNotPublic(ctx context.Context, sel ast.SelectionSet, obj *ProjectMadeNotPublic) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, projectMadeNotPublicImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ProjectMadeNotPublic")
+		case "publicSite":
+
+			out.Values[i] = ec._ProjectMadeNotPublic_publicSite(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var projectMadePublicImplementors = []string{"ProjectMadePublic", "MakeProjectPublicResult"}
+
+func (ec *executionContext) _ProjectMadePublic(ctx context.Context, sel ast.SelectionSet, obj *ProjectMadePublic) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, projectMadePublicImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ProjectMadePublic")
+		case "publicSite":
+
+			out.Values[i] = ec._ProjectMadePublic_publicSite(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var projectStatusChangedImplementors = []string{"ProjectStatusChanged", "ChangeProjectStatusResult"}
 
 func (ec *executionContext) _ProjectStatusChanged(ctx context.Context, sel ast.SelectionSet, obj *ProjectStatusChanged) graphql.Marshaler {
@@ -18882,6 +19765,90 @@ func (ec *executionContext) _ProjectVisualizationsTotal(ctx context.Context, sel
 		case "total":
 
 			out.Values[i] = ec._ProjectVisualizationsTotal_total(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var publicSiteImplementors = []string{"PublicSite", "ProjectPublicSite"}
+
+func (ec *executionContext) _PublicSite(ctx context.Context, sel ast.SelectionSet, obj *PublicSite) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, publicSiteImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("PublicSite")
+		case "id":
+
+			out.Values[i] = ec._PublicSite_id(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "status":
+
+			out.Values[i] = ec._PublicSite_status(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "url":
+
+			out.Values[i] = ec._PublicSite_url(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "settings":
+
+			out.Values[i] = ec._PublicSite_settings(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var publicSiteSettingsImplementors = []string{"PublicSiteSettings"}
+
+func (ec *executionContext) _PublicSiteSettings(ctx context.Context, sel ast.SelectionSet, obj *PublicSiteSettings) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, publicSiteSettingsImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("PublicSiteSettings")
+		case "visualizations":
+
+			out.Values[i] = ec._PublicSiteSettings_visualizations(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "albums":
+
+			out.Values[i] = ec._PublicSiteSettings_albums(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
@@ -19195,7 +20162,7 @@ func (ec *executionContext) _RoomUpdated(ctx context.Context, sel ast.SelectionS
 	return out
 }
 
-var serverErrorImplementors = []string{"ServerError", "AcceptInviteResult", "AddContactResult", "AddHouseResult", "AddVisualizationsToAlbumResult", "ChangeAlbumPageOrientationResult", "ChangeAlbumPageSizeResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "ConfirmLoginLinkResult", "ConfirmLoginPinResult", "CreateAlbumResult", "CreateProjectResult", "DeleteAlbumResult", "DeleteContactResult", "DeleteVisualizationsResult", "InviteUserToWorkspaceResult", "LoginByEmailResult", "UpdateContactResult", "UpdateHouseResult", "UploadFileResult", "UploadVisualizationResult", "UploadVisualizationsResult", "AlbumResult", "AlbumProjectResult", "AlbumPagesResult", "AlbumPageVisualizationResult", "UserProfileResult", "ProjectResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "ProjectVisualizationsListResult", "ProjectVisualizationsTotalResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectAlbumsListResult", "ProjectAlbumsTotalResult", "WorkspaceResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "WorkspaceUsersListResult", "WorkspaceUsersTotalResult", "Error"}
+var serverErrorImplementors = []string{"ServerError", "AcceptInviteResult", "AddContactResult", "AddHouseResult", "AddVisualizationsToAlbumResult", "ChangeAlbumPageOrientationResult", "ChangeAlbumPageSizeResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "ConfirmLoginLinkResult", "ConfirmLoginPinResult", "CreateAlbumResult", "CreateProjectResult", "DeleteAlbumResult", "DeleteContactResult", "DeleteVisualizationsResult", "InviteUserToWorkspaceResult", "LoginByEmailResult", "MakeProjectNotPublicResult", "MakeProjectPublicResult", "UpdateContactResult", "UpdateHouseResult", "UploadFileResult", "UploadVisualizationResult", "UploadVisualizationsResult", "AlbumResult", "AlbumProjectResult", "AlbumPagesResult", "AlbumPageVisualizationResult", "UserProfileResult", "ProjectResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "ProjectVisualizationsListResult", "ProjectVisualizationsTotalResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectAlbumsListResult", "ProjectAlbumsTotalResult", "ProjectPublicSite", "WorkspaceResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "WorkspaceUsersListResult", "WorkspaceUsersTotalResult", "Error"}
 
 func (ec *executionContext) _ServerError(ctx context.Context, sel ast.SelectionSet, obj *ServerError) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, serverErrorImplementors)
@@ -21101,6 +22068,26 @@ func (ec *executionContext) marshalNLoginByEmailResult2githubᚗcomᚋapartomat�
 	return ec._LoginByEmailResult(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNMakeProjectNotPublicResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐMakeProjectNotPublicResult(ctx context.Context, sel ast.SelectionSet, v MakeProjectNotPublicResult) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._MakeProjectNotPublicResult(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNMakeProjectPublicResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐMakeProjectPublicResult(ctx context.Context, sel ast.SelectionSet, v MakeProjectPublicResult) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._MakeProjectPublicResult(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNPageOrientation2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐPageOrientation(ctx context.Context, v interface{}) (PageOrientation, error) {
 	var res PageOrientation
 	err := res.UnmarshalGQL(v)
@@ -21326,6 +22313,16 @@ func (ec *executionContext) marshalNProjectHousesTotalResult2githubᚗcomᚋapar
 	return ec._ProjectHousesTotalResult(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNProjectPublicSite2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectPublicSite(ctx context.Context, sel ast.SelectionSet, v ProjectPublicSite) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._ProjectPublicSite(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNProjectResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectResult(ctx context.Context, sel ast.SelectionSet, v ProjectResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -21451,6 +22448,36 @@ func (ec *executionContext) marshalNProjectVisualizationsTotalResult2githubᚗco
 		return graphql.Null
 	}
 	return ec._ProjectVisualizationsTotalResult(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNPublicSite2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐPublicSite(ctx context.Context, sel ast.SelectionSet, v *PublicSite) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._PublicSite(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNPublicSiteSettings2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐPublicSiteSettings(ctx context.Context, sel ast.SelectionSet, v *PublicSiteSettings) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._PublicSiteSettings(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNPublicSiteStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐPublicSiteStatus(ctx context.Context, v interface{}) (PublicSiteStatus, error) {
+	var res PublicSiteStatus
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNPublicSiteStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐPublicSiteStatus(ctx context.Context, sel ast.SelectionSet, v PublicSiteStatus) graphql.Marshaler {
+	return v
 }
 
 func (ec *executionContext) marshalNRoom2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐRoomᚄ(ctx context.Context, sel ast.SelectionSet, v []*Room) graphql.Marshaler {
