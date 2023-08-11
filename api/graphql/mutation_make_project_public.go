@@ -23,6 +23,10 @@ func (r *mutationResolver) MakeProjectPublic(
 			return notFound()
 		}
 
+		if errors.Is(err, public_sites.ErrPublicSiteIsPublic) {
+			return ProjectIsAlreadyPublic{}, nil
+		}
+
 		r.logger.Error("can't make project public", zap.Error(err))
 
 		return serverError()

@@ -2,8 +2,12 @@ extend type Mutation {
     makeProjectNotPublic(projectId: String!): MakeProjectNotPublicResult!
 }
 
-union MakeProjectNotPublicResult = ProjectMadeNotPublic | NotFound | Forbidden | ServerError
+union MakeProjectNotPublicResult = ProjectMadeNotPublic | ProjectIsAlreadyNotPublic | NotFound | Forbidden | ServerError
 
 type ProjectMadeNotPublic {
     publicSite: PublicSite!
+}
+
+type ProjectIsAlreadyNotPublic implements Error {
+    message: String!
 }

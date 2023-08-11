@@ -758,6 +758,24 @@ type ProjectHousesTotal struct {
 
 func (ProjectHousesTotal) IsProjectHousesTotalResult() {}
 
+type ProjectIsAlreadyNotPublic struct {
+	Message string `json:"message"`
+}
+
+func (ProjectIsAlreadyNotPublic) IsMakeProjectNotPublicResult() {}
+
+func (ProjectIsAlreadyNotPublic) IsError()                {}
+func (this ProjectIsAlreadyNotPublic) GetMessage() string { return this.Message }
+
+type ProjectIsAlreadyPublic struct {
+	Message string `json:"message"`
+}
+
+func (ProjectIsAlreadyPublic) IsMakeProjectPublicResult() {}
+
+func (ProjectIsAlreadyPublic) IsError()                {}
+func (this ProjectIsAlreadyPublic) GetMessage() string { return this.Message }
+
 type ProjectMadeNotPublic struct {
 	PublicSite *PublicSite `json:"publicSite"`
 }

@@ -336,6 +336,14 @@ type ComplexityRoot struct {
 		Total func(childComplexity int) int
 	}
 
+	ProjectIsAlreadyNotPublic struct {
+		Message func(childComplexity int) int
+	}
+
+	ProjectIsAlreadyPublic struct {
+		Message func(childComplexity int) int
+	}
+
 	ProjectMadeNotPublic struct {
 		PublicSite func(childComplexity int) int
 	}
@@ -1643,6 +1651,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ProjectHousesTotal.Total(childComplexity), true
+
+	case "ProjectIsAlreadyNotPublic.message":
+		if e.complexity.ProjectIsAlreadyNotPublic.Message == nil {
+			break
+		}
+
+		return e.complexity.ProjectIsAlreadyNotPublic.Message(childComplexity), true
+
+	case "ProjectIsAlreadyPublic.message":
+		if e.complexity.ProjectIsAlreadyPublic.Message == nil {
+			break
+		}
+
+		return e.complexity.ProjectIsAlreadyPublic.Message(childComplexity), true
 
 	case "ProjectMadeNotPublic.publicSite":
 		if e.complexity.ProjectMadeNotPublic.PublicSite == nil {
@@ -9288,6 +9310,94 @@ func (ec *executionContext) fieldContext_ProjectHousesTotal_total(ctx context.Co
 	return fc, nil
 }
 
+func (ec *executionContext) _ProjectIsAlreadyNotPublic_message(ctx context.Context, field graphql.CollectedField, obj *ProjectIsAlreadyNotPublic) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectIsAlreadyNotPublic_message(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Message, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectIsAlreadyNotPublic_message(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectIsAlreadyNotPublic",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ProjectIsAlreadyPublic_message(ctx context.Context, field graphql.CollectedField, obj *ProjectIsAlreadyPublic) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProjectIsAlreadyPublic_message(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Message, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProjectIsAlreadyPublic_message(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProjectIsAlreadyPublic",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _ProjectMadeNotPublic_publicSite(ctx context.Context, field graphql.CollectedField, obj *ProjectMadeNotPublic) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_ProjectMadeNotPublic_publicSite(ctx, field)
 	if err != nil {
@@ -16278,6 +16388,20 @@ func (ec *executionContext) _Error(ctx context.Context, sel ast.SelectionSet, ob
 			return graphql.Null
 		}
 		return ec._InvalidEmail(ctx, sel, obj)
+	case ProjectIsAlreadyNotPublic:
+		return ec._ProjectIsAlreadyNotPublic(ctx, sel, &obj)
+	case *ProjectIsAlreadyNotPublic:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ProjectIsAlreadyNotPublic(ctx, sel, obj)
+	case ProjectIsAlreadyPublic:
+		return ec._ProjectIsAlreadyPublic(ctx, sel, &obj)
+	case *ProjectIsAlreadyPublic:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ProjectIsAlreadyPublic(ctx, sel, obj)
 	case ServerError:
 		return ec._ServerError(ctx, sel, &obj)
 	case *ServerError:
@@ -16433,6 +16557,13 @@ func (ec *executionContext) _MakeProjectNotPublicResult(ctx context.Context, sel
 			return graphql.Null
 		}
 		return ec._ProjectMadeNotPublic(ctx, sel, obj)
+	case ProjectIsAlreadyNotPublic:
+		return ec._ProjectIsAlreadyNotPublic(ctx, sel, &obj)
+	case *ProjectIsAlreadyNotPublic:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ProjectIsAlreadyNotPublic(ctx, sel, obj)
 	case NotFound:
 		return ec._NotFound(ctx, sel, &obj)
 	case *NotFound:
@@ -16470,6 +16601,13 @@ func (ec *executionContext) _MakeProjectPublicResult(ctx context.Context, sel as
 			return graphql.Null
 		}
 		return ec._ProjectMadePublic(ctx, sel, obj)
+	case ProjectIsAlreadyPublic:
+		return ec._ProjectIsAlreadyPublic(ctx, sel, &obj)
+	case *ProjectIsAlreadyPublic:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ProjectIsAlreadyPublic(ctx, sel, obj)
 	case NotFound:
 		return ec._NotFound(ctx, sel, &obj)
 	case *NotFound:
@@ -19501,6 +19639,62 @@ func (ec *executionContext) _ProjectHousesTotal(ctx context.Context, sel ast.Sel
 		case "total":
 
 			out.Values[i] = ec._ProjectHousesTotal_total(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var projectIsAlreadyNotPublicImplementors = []string{"ProjectIsAlreadyNotPublic", "MakeProjectNotPublicResult", "Error"}
+
+func (ec *executionContext) _ProjectIsAlreadyNotPublic(ctx context.Context, sel ast.SelectionSet, obj *ProjectIsAlreadyNotPublic) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, projectIsAlreadyNotPublicImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ProjectIsAlreadyNotPublic")
+		case "message":
+
+			out.Values[i] = ec._ProjectIsAlreadyNotPublic_message(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var projectIsAlreadyPublicImplementors = []string{"ProjectIsAlreadyPublic", "MakeProjectPublicResult", "Error"}
+
+func (ec *executionContext) _ProjectIsAlreadyPublic(ctx context.Context, sel ast.SelectionSet, obj *ProjectIsAlreadyPublic) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, projectIsAlreadyPublicImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ProjectIsAlreadyPublic")
+		case "message":
+
+			out.Values[i] = ec._ProjectIsAlreadyPublic_message(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
