@@ -1,0 +1,39 @@
+mutation makeProjectPublic($projectId: String!) {
+    makeProjectPublic(projectId: $projectId) {
+        __typename
+        ...on ProjectMadePublic {
+            publicSite {
+                status
+            }
+        }
+        ...on NotFound {
+            message
+        }
+        ...on Forbidden {
+            message
+        }
+        ...on ServerError {
+            message
+        }
+    }
+}
+
+mutation makeProjectNotPublic($projectId: String!) {
+    makeProjectNotPublic(projectId: $projectId) {
+        __typename
+        ...on ProjectMadeNotPublic {
+            publicSite {
+                status
+            }
+        }
+        ...on NotFound {
+            message
+        }
+        ...on Forbidden {
+            message
+        }
+        ...on ServerError {
+            message
+        }
+    }
+}

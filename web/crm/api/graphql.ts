@@ -325,6 +325,10 @@ export type LoginConfirmed = {
   token: Scalars['String'];
 };
 
+export type MakeProjectNotPublicResult = Forbidden | NotFound | ProjectIsAlreadyNotPublic | ProjectMadeNotPublic | ServerError;
+
+export type MakeProjectPublicResult = Forbidden | NotFound | ProjectIsAlreadyPublic | ProjectMadePublic | ServerError;
+
 export type Mutation = {
   __typename?: 'Mutation';
   acceptInvite: AcceptInviteResult;
@@ -346,6 +350,8 @@ export type Mutation = {
   deleteVisualizations: DeleteVisualizationsResult;
   inviteUser: InviteUserToWorkspaceResult;
   loginByEmail: LoginByEmailResult;
+  makeProjectNotPublic: MakeProjectNotPublicResult;
+  makeProjectPublic: MakeProjectPublicResult;
   ping: Scalars['String'];
   updateContact: UpdateContactResult;
   updateHouse: UpdateHouseResult;
@@ -465,6 +471,16 @@ export type MutationLoginByEmailArgs = {
 };
 
 
+export type MutationMakeProjectNotPublicArgs = {
+  projectId: Scalars['String'];
+};
+
+
+export type MutationMakeProjectPublicArgs = {
+  projectId: Scalars['String'];
+};
+
+
 export type MutationUpdateContactArgs = {
   contactId: Scalars['String'];
   data: UpdateContactInput;
@@ -532,6 +548,7 @@ export type Project = {
   id: Scalars['String'];
   name: Scalars['String'];
   period?: Maybe<Scalars['String']>;
+  publicSite: ProjectPublicSite;
   startAt?: Maybe<Scalars['Time']>;
   status: ProjectStatus;
   statuses: ProjectStatusDictionary;
@@ -687,6 +704,28 @@ export type ProjectHousesTotal = {
 
 export type ProjectHousesTotalResult = Forbidden | ProjectHousesTotal | ServerError;
 
+export type ProjectIsAlreadyNotPublic = Error & {
+  __typename?: 'ProjectIsAlreadyNotPublic';
+  message: Scalars['String'];
+};
+
+export type ProjectIsAlreadyPublic = Error & {
+  __typename?: 'ProjectIsAlreadyPublic';
+  message: Scalars['String'];
+};
+
+export type ProjectMadeNotPublic = {
+  __typename?: 'ProjectMadeNotPublic';
+  publicSite: PublicSite;
+};
+
+export type ProjectMadePublic = {
+  __typename?: 'ProjectMadePublic';
+  publicSite: PublicSite;
+};
+
+export type ProjectPublicSite = NotFound | PublicSite | ServerError;
+
 export type ProjectResult = Forbidden | NotFound | Project | ServerError;
 
 export enum ProjectStatus {
@@ -756,6 +795,25 @@ export type ProjectVisualizationsTotal = {
 };
 
 export type ProjectVisualizationsTotalResult = Forbidden | ProjectVisualizationsTotal | ServerError;
+
+export type PublicSite = {
+  __typename?: 'PublicSite';
+  id: Scalars['String'];
+  settings: PublicSiteSettings;
+  status: PublicSiteStatus;
+  url: Scalars['String'];
+};
+
+export type PublicSiteSettings = {
+  __typename?: 'PublicSiteSettings';
+  albums: Scalars['Boolean'];
+  visualizations: Scalars['Boolean'];
+};
+
+export enum PublicSiteStatus {
+  NotPublic = 'NOT_PUBLIC',
+  Public = 'PUBLIC'
+}
 
 export type Query = {
   __typename?: 'Query';
@@ -1170,6 +1228,20 @@ export type UpdateHouseMutationVariables = Exact<{
 
 export type UpdateHouseMutation = { __typename?: 'Mutation', updateHouse: { __typename: 'Forbidden', message: string } | { __typename: 'HouseUpdated', house: { __typename?: 'House', id: string, city: string, address: string, housingComplex: string, createdAt: any, modifiedAt: any } } | { __typename: 'NotFound', message: string } | { __typename: 'ServerError', message: string } };
 
+export type MakeProjectPublicMutationVariables = Exact<{
+  projectId: Scalars['String'];
+}>;
+
+
+export type MakeProjectPublicMutation = { __typename?: 'Mutation', makeProjectPublic: { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'ProjectIsAlreadyPublic' } | { __typename: 'ProjectMadePublic', publicSite: { __typename?: 'PublicSite', status: PublicSiteStatus } } | { __typename: 'ServerError', message: string } };
+
+export type MakeProjectNotPublicMutationVariables = Exact<{
+  projectId: Scalars['String'];
+}>;
+
+
+export type MakeProjectNotPublicMutation = { __typename?: 'Mutation', makeProjectNotPublic: { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'ProjectIsAlreadyNotPublic' } | { __typename: 'ProjectMadeNotPublic', publicSite: { __typename?: 'PublicSite', status: PublicSiteStatus } } | { __typename: 'ServerError', message: string } };
+
 export type AddRoomMutationVariables = Exact<{
   houseId: Scalars['String'];
   room: AddRoomInput;
@@ -1207,9 +1279,9 @@ export type ProjectScreenQueryVariables = Exact<{
 }>;
 
 
-export type ProjectScreenQuery = { __typename?: 'Query', project: { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'Project', id: string, name: string, startAt?: any | null, endAt?: any | null, status: ProjectStatus, statuses: { __typename?: 'ProjectStatusDictionary', items: Array<{ __typename?: 'ProjectStatusDictionaryItem', key: ProjectStatus, value: string }> }, contacts: { __typename?: 'ProjectContacts', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectContactsList', items: Array<{ __typename?: 'Contact', id: string, fullName: string, photo: string, details: Array<{ __typename?: 'ContactDetails', type: ContactType, value: string }> }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectContactsTotal', total: number } | { __typename: 'ServerError' } }, houses: { __typename?: 'ProjectHouses', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectHousesList', items: Array<{ __typename?: 'House', id: string, city: string, address: string, housingComplex: string, createdAt: any, modifiedAt: any, rooms: { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null, level?: number | null }> } | { __typename?: 'ServerError', message: string } } }> } | { __typename: 'ServerError', message: string } }, visualizations: { __typename?: 'ProjectVisualizations', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectVisualizationsList', items: Array<{ __typename?: 'Visualization', id: string, name: string, description: string, version: number, file: { __typename?: 'File', id: string, name: string, url: any, type: FileType, mimeType: string }, room?: { __typename?: 'Room', id: string, name: string, square?: number | null, level?: number | null } | null }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectVisualizationsTotal', total: number } | { __typename: 'ServerError' } }, albums: { __typename?: 'ProjectAlbums', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectAlbumsList', items: Array<{ __typename: 'Album', id: string, name: string }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectAlbumsTotal', total: number } | { __typename: 'ServerError' } } } | { __typename: 'ServerError', message: string } };
+export type ProjectScreenQuery = { __typename?: 'Query', project: { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'Project', id: string, name: string, startAt?: any | null, endAt?: any | null, status: ProjectStatus, statuses: { __typename?: 'ProjectStatusDictionary', items: Array<{ __typename?: 'ProjectStatusDictionaryItem', key: ProjectStatus, value: string }> }, contacts: { __typename?: 'ProjectContacts', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectContactsList', items: Array<{ __typename?: 'Contact', id: string, fullName: string, photo: string, details: Array<{ __typename?: 'ContactDetails', type: ContactType, value: string }> }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectContactsTotal', total: number } | { __typename: 'ServerError' } }, houses: { __typename?: 'ProjectHouses', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectHousesList', items: Array<{ __typename?: 'House', id: string, city: string, address: string, housingComplex: string, createdAt: any, modifiedAt: any, rooms: { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null, level?: number | null }> } | { __typename?: 'ServerError', message: string } } }> } | { __typename: 'ServerError', message: string } }, visualizations: { __typename?: 'ProjectVisualizations', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectVisualizationsList', items: Array<{ __typename?: 'Visualization', id: string, name: string, description: string, version: number, file: { __typename?: 'File', id: string, name: string, url: any, type: FileType, mimeType: string }, room?: { __typename?: 'Room', id: string, name: string, square?: number | null, level?: number | null } | null }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectVisualizationsTotal', total: number } | { __typename: 'ServerError' } }, albums: { __typename?: 'ProjectAlbums', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectAlbumsList', items: Array<{ __typename: 'Album', id: string, name: string }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectAlbumsTotal', total: number } | { __typename: 'ServerError' } }, publicSite: { __typename: 'NotFound' } | { __typename: 'PublicSite', id: string, status: PublicSiteStatus, url: string, settings: { __typename?: 'PublicSiteSettings', visualizations: boolean, albums: boolean } } | { __typename: 'ServerError' } } | { __typename: 'ServerError', message: string } };
 
-export type ProjectScreenProjectFragment = { __typename?: 'Project', id: string, name: string, startAt?: any | null, endAt?: any | null, status: ProjectStatus, statuses: { __typename?: 'ProjectStatusDictionary', items: Array<{ __typename?: 'ProjectStatusDictionaryItem', key: ProjectStatus, value: string }> }, contacts: { __typename?: 'ProjectContacts', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectContactsList', items: Array<{ __typename?: 'Contact', id: string, fullName: string, photo: string, details: Array<{ __typename?: 'ContactDetails', type: ContactType, value: string }> }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectContactsTotal', total: number } | { __typename: 'ServerError' } }, houses: { __typename?: 'ProjectHouses', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectHousesList', items: Array<{ __typename?: 'House', id: string, city: string, address: string, housingComplex: string, createdAt: any, modifiedAt: any, rooms: { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null, level?: number | null }> } | { __typename?: 'ServerError', message: string } } }> } | { __typename: 'ServerError', message: string } }, visualizations: { __typename?: 'ProjectVisualizations', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectVisualizationsList', items: Array<{ __typename?: 'Visualization', id: string, name: string, description: string, version: number, file: { __typename?: 'File', id: string, name: string, url: any, type: FileType, mimeType: string }, room?: { __typename?: 'Room', id: string, name: string, square?: number | null, level?: number | null } | null }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectVisualizationsTotal', total: number } | { __typename: 'ServerError' } }, albums: { __typename?: 'ProjectAlbums', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectAlbumsList', items: Array<{ __typename: 'Album', id: string, name: string }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectAlbumsTotal', total: number } | { __typename: 'ServerError' } } };
+export type ProjectScreenProjectFragment = { __typename?: 'Project', id: string, name: string, startAt?: any | null, endAt?: any | null, status: ProjectStatus, statuses: { __typename?: 'ProjectStatusDictionary', items: Array<{ __typename?: 'ProjectStatusDictionaryItem', key: ProjectStatus, value: string }> }, contacts: { __typename?: 'ProjectContacts', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectContactsList', items: Array<{ __typename?: 'Contact', id: string, fullName: string, photo: string, details: Array<{ __typename?: 'ContactDetails', type: ContactType, value: string }> }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectContactsTotal', total: number } | { __typename: 'ServerError' } }, houses: { __typename?: 'ProjectHouses', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectHousesList', items: Array<{ __typename?: 'House', id: string, city: string, address: string, housingComplex: string, createdAt: any, modifiedAt: any, rooms: { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null, level?: number | null }> } | { __typename?: 'ServerError', message: string } } }> } | { __typename: 'ServerError', message: string } }, visualizations: { __typename?: 'ProjectVisualizations', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectVisualizationsList', items: Array<{ __typename?: 'Visualization', id: string, name: string, description: string, version: number, file: { __typename?: 'File', id: string, name: string, url: any, type: FileType, mimeType: string }, room?: { __typename?: 'Room', id: string, name: string, square?: number | null, level?: number | null } | null }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectVisualizationsTotal', total: number } | { __typename: 'ServerError' } }, albums: { __typename?: 'ProjectAlbums', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectAlbumsList', items: Array<{ __typename: 'Album', id: string, name: string }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectAlbumsTotal', total: number } | { __typename: 'ServerError' } }, publicSite: { __typename: 'NotFound' } | { __typename: 'PublicSite', id: string, status: PublicSiteStatus, url: string, settings: { __typename?: 'PublicSiteSettings', visualizations: boolean, albums: boolean } } | { __typename: 'ServerError' } };
 
 export type ProjectScreenVisualizationsFragment = { __typename?: 'ProjectVisualizations', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectVisualizationsList', items: Array<{ __typename?: 'Visualization', id: string, name: string, description: string, version: number, file: { __typename?: 'File', id: string, name: string, url: any, type: FileType, mimeType: string }, room?: { __typename?: 'Room', id: string, name: string, square?: number | null, level?: number | null } | null }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectVisualizationsTotal', total: number } | { __typename: 'ServerError' } };
 
@@ -1226,6 +1298,14 @@ export type ProjectScreenHouseRoomFragment = { __typename?: 'Room', id: string, 
 export type ProjectScreenAlbumsFragment = { __typename?: 'ProjectAlbums', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectAlbumsList', items: Array<{ __typename: 'Album', id: string, name: string }> } | { __typename: 'ServerError', message: string }, total: { __typename: 'Forbidden' } | { __typename: 'ProjectAlbumsTotal', total: number } | { __typename: 'ServerError' } };
 
 export type ProjectScreenAlbumFragment = { __typename?: 'Album', id: string, name: string };
+
+type ProjectScreenPublicSite_NotFound_Fragment = { __typename: 'NotFound' };
+
+type ProjectScreenPublicSite_PublicSite_Fragment = { __typename: 'PublicSite', id: string, status: PublicSiteStatus, url: string, settings: { __typename?: 'PublicSiteSettings', visualizations: boolean, albums: boolean } };
+
+type ProjectScreenPublicSite_ServerError_Fragment = { __typename: 'ServerError' };
+
+export type ProjectScreenPublicSiteFragment = ProjectScreenPublicSite_NotFound_Fragment | ProjectScreenPublicSite_PublicSite_Fragment | ProjectScreenPublicSite_ServerError_Fragment;
 
 export type DeleteVisualizationsMutationVariables = Exact<{
   id: Array<Scalars['String']> | Scalars['String'];
@@ -1567,6 +1647,20 @@ export const ProjectScreenAlbumsFragmentDoc = gql`
   }
 }
     ${ProjectScreenAlbumFragmentDoc}`;
+export const ProjectScreenPublicSiteFragmentDoc = gql`
+    fragment ProjectScreenPublicSite on ProjectPublicSite {
+  __typename
+  ... on PublicSite {
+    id
+    status
+    url
+    settings {
+      visualizations
+      albums
+    }
+  }
+}
+    `;
 export const ProjectScreenProjectFragmentDoc = gql`
     fragment ProjectScreenProject on Project {
   id
@@ -1614,10 +1708,14 @@ export const ProjectScreenProjectFragmentDoc = gql`
   albums {
     ...ProjectScreenAlbums
   }
+  publicSite {
+    ...ProjectScreenPublicSite
+  }
 }
     ${ProjectScreenHousesFragmentDoc}
 ${ProjectScreenVisualizationsFragmentDoc}
-${ProjectScreenAlbumsFragmentDoc}`;
+${ProjectScreenAlbumsFragmentDoc}
+${ProjectScreenPublicSiteFragmentDoc}`;
 export const VisualizationsScreenHouseRoomFragmentDoc = gql`
     fragment VisualizationsScreenHouseRoom on Room {
   id
@@ -2612,6 +2710,100 @@ export function useUpdateHouseMutation(baseOptions?: Apollo.MutationHookOptions<
 export type UpdateHouseMutationHookResult = ReturnType<typeof useUpdateHouseMutation>;
 export type UpdateHouseMutationResult = Apollo.MutationResult<UpdateHouseMutation>;
 export type UpdateHouseMutationOptions = Apollo.BaseMutationOptions<UpdateHouseMutation, UpdateHouseMutationVariables>;
+export const MakeProjectPublicDocument = gql`
+    mutation makeProjectPublic($projectId: String!) {
+  makeProjectPublic(projectId: $projectId) {
+    __typename
+    ... on ProjectMadePublic {
+      publicSite {
+        status
+      }
+    }
+    ... on NotFound {
+      message
+    }
+    ... on Forbidden {
+      message
+    }
+    ... on ServerError {
+      message
+    }
+  }
+}
+    `;
+export type MakeProjectPublicMutationFn = Apollo.MutationFunction<MakeProjectPublicMutation, MakeProjectPublicMutationVariables>;
+
+/**
+ * __useMakeProjectPublicMutation__
+ *
+ * To run a mutation, you first call `useMakeProjectPublicMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useMakeProjectPublicMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [makeProjectPublicMutation, { data, loading, error }] = useMakeProjectPublicMutation({
+ *   variables: {
+ *      projectId: // value for 'projectId'
+ *   },
+ * });
+ */
+export function useMakeProjectPublicMutation(baseOptions?: Apollo.MutationHookOptions<MakeProjectPublicMutation, MakeProjectPublicMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<MakeProjectPublicMutation, MakeProjectPublicMutationVariables>(MakeProjectPublicDocument, options);
+      }
+export type MakeProjectPublicMutationHookResult = ReturnType<typeof useMakeProjectPublicMutation>;
+export type MakeProjectPublicMutationResult = Apollo.MutationResult<MakeProjectPublicMutation>;
+export type MakeProjectPublicMutationOptions = Apollo.BaseMutationOptions<MakeProjectPublicMutation, MakeProjectPublicMutationVariables>;
+export const MakeProjectNotPublicDocument = gql`
+    mutation makeProjectNotPublic($projectId: String!) {
+  makeProjectNotPublic(projectId: $projectId) {
+    __typename
+    ... on ProjectMadeNotPublic {
+      publicSite {
+        status
+      }
+    }
+    ... on NotFound {
+      message
+    }
+    ... on Forbidden {
+      message
+    }
+    ... on ServerError {
+      message
+    }
+  }
+}
+    `;
+export type MakeProjectNotPublicMutationFn = Apollo.MutationFunction<MakeProjectNotPublicMutation, MakeProjectNotPublicMutationVariables>;
+
+/**
+ * __useMakeProjectNotPublicMutation__
+ *
+ * To run a mutation, you first call `useMakeProjectNotPublicMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useMakeProjectNotPublicMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [makeProjectNotPublicMutation, { data, loading, error }] = useMakeProjectNotPublicMutation({
+ *   variables: {
+ *      projectId: // value for 'projectId'
+ *   },
+ * });
+ */
+export function useMakeProjectNotPublicMutation(baseOptions?: Apollo.MutationHookOptions<MakeProjectNotPublicMutation, MakeProjectNotPublicMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<MakeProjectNotPublicMutation, MakeProjectNotPublicMutationVariables>(MakeProjectNotPublicDocument, options);
+      }
+export type MakeProjectNotPublicMutationHookResult = ReturnType<typeof useMakeProjectNotPublicMutation>;
+export type MakeProjectNotPublicMutationResult = Apollo.MutationResult<MakeProjectNotPublicMutation>;
+export type MakeProjectNotPublicMutationOptions = Apollo.BaseMutationOptions<MakeProjectNotPublicMutation, MakeProjectNotPublicMutationVariables>;
 export const AddRoomDocument = gql`
     mutation addRoom($houseId: String!, $room: AddRoomInput!) {
   addRoom(houseId: $houseId, room: $room) {

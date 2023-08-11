@@ -39,12 +39,18 @@ const authLink = setContext((_, { headers }) => {
         }
     }
 })
-  
+
 const httpLink = createUploadLink({ uri: import.meta.env.VITE_APARTOMAT_API_URL })
-  
+
 const link = authLink.concat(httpLink)
-  
-const apolloClient = new ApolloClient({ cache: new InMemoryCache(), link })
+
+const appoloCache = new InMemoryCache({
+    possibleTypes: {
+        ProjectPublicSite: ["PublicSite", "NotFound", "ServerError"],
+    }
+})
+
+const apolloClient = new ApolloClient({ cache: appoloCache, link })
 
 function App() {
   return (

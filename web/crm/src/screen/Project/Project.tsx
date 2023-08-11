@@ -23,6 +23,7 @@ import Visualizations from "./Visualizations/Visualizations"
 import UploadVisualizations from "./UploadVisualizations/UploadVisualizations"
 import CreateAlbumOnClick from "./CreateAlbum/CreateAlbum"
 import Albums from "./Albums/Albums"
+import PublicSite from "./PublicSite/PublicSite"
 
 export function Project () {
     const { id } = useParams<"id">() as { id: string }
@@ -123,194 +124,208 @@ export function Project () {
         )
     }
 
-    if (project) {
-        return (
-            <Main pad={{vertical: "medium", horizontal: "large"}}>
+    if (!project) {
+        return <></>
+    }
 
-                {refetching &&
-                    <Layer position="top" margin="medium" plain animate={false}>
-                        <Box direction="row" gap="small">
-                            <Loading message="Загрузка..."/>
-                            <Text>Загрузка...</Text>
-                        </Box>
-                    </Layer>
-                }
+    return (
+        <Main pad={{vertical: "medium", horizontal: "large"}}>
 
-                {showNotification ? <Layer
-                    position="top"
-                    modal={false}
-                    responsive={false}
-                    margin={{ vertical: "small", horizontal: "small"}}
+            {refetching &&
+                <Layer position="top" margin="medium" plain animate={false}>
+                    <Box direction="row" gap="small">
+                        <Loading message="Загрузка..."/>
+                        <Text>Загрузка...</Text>
+                    </Box>
+                </Layer>
+            }
+
+            {showNotification ? <Layer
+                position="top"
+                modal={false}
+                responsive={false}
+                margin={{ vertical: "small", horizontal: "small"}}
+            >
+                <Box
+                    align="center"
+                    direction="row"
+                    gap="xsmall"
+                    justify="between"
+                    elevation="small"
+                    background="status-ok"
+                    round="medium"
+                    pad={{ vertical: "xsmall", horizontal: "small"}}
                 >
-                    <Box
-                        align="center"
-                        direction="row"
-                        gap="xsmall"
-                        justify="between"
-                        elevation="small"
-                        background="status-ok"
-                        round="medium"
-                        pad={{ vertical: "xsmall", horizontal: "small"}}
-                    >
-                        <StatusGood/>
-                        <Text>{notification}</Text>
-                    </Box>
-                </Layer> : null}
+                    <StatusGood/>
+                    <Text>{notification}</Text>
+                </Box>
+            </Layer> : null}
 
-                <Header background="white" margin={{vertical: "medium"}}>
-                    <Box>
-                        <Text size="xlarge" weight="bold" color="brand">
-                            <AnchorLink to="/">apartomat</AnchorLink>
-                        </Text>
-                    </Box>
-                    <Box><UserAvatar user={user} className="header-user" /></Box>
-                </Header>
-
+            <Header background="white" margin={{vertical: "medium"}}>
                 <Box>
-                    <Box direction="row" justify="between" margin={{vertical: "medium"}}>
-                        <Box direction="row" justify="center">
-                            <Heading level={2} margin="none">{project.name}</Heading>
-                            <ChangeStatus
-                                margin={{ horizontal: "medium"}}
-                                projectId={project.id}
-                                status={project.status}
-                                values={projectStatusDictionary}
-                                onProjectStatusChanged={({ status }) => {
+                    <Text size="xlarge" weight="bold" color="brand">
+                        <AnchorLink to="/">apartomat</AnchorLink>
+                    </Text>
+                </Box>
+                <Box><UserAvatar user={user} className="header-user" /></Box>
+            </Header>
+
+            <Box>
+                <Box direction="row" justify="between" margin={{vertical: "medium"}}>
+                    <Box direction="row" justify="center">
+                        <Heading level={2} margin="none">{project.name}</Heading>
+                        <ChangeStatus
+                            margin={{ horizontal: "medium"}}
+                            projectId={project.id}
+                            status={project.status}
+                            values={projectStatusDictionary}
+                            onProjectStatusChanged={({ status }) => {
+                                if (project) {
                                     setProject({ ...project, status })
-                                }}
-                            />
-                        </Box>
+                                }
+                            }}
+                        />
+
+                    </Box>
+                    <Box direction="row" gap="small">
+                        <PublicSite
+                            projectId={id}
+                            site={project.publicSite}
+                            onClose={(changed: boolean) => {
+                                if (changed) {
+                                    refetch()
+                                }
+                            }}
+                        />
                         <AddSomething
                             onClickAddVisualizations={() => {
                                 setShowUploadVisualizations(true)
                             }}
                         />
                     </Box>
-
-                    <Grid
-                        columns={{count: respSize === "small" ? 1 : 2, size: "auto"}}
-                        gap="small"
-                        responsive
-                        margin={{ bottom: "large" }}
-                    >
-                        <Box>
-                            <Heading level={4}>Сроки проекта</Heading>
-                            <ProjectDates
-                                projectId={project.id}
-                                startAt={project.startAt}
-                                endAt={project.endAt}
-                                onChange={({ startAt, endAt }) => {
-                                    notify({ message: "Даты изменены" })
-                                    setProject({ ...project, startAt, endAt })
-                                }}
-                            />
-                        </Box>
-
-                        <Box>
-                            <Heading level={4}>Адрес</Heading>
-                            <House
-                                projectId={project.id}
-                                houses={project.houses}
-                                onAdd={() => refetch()}
-                                onUpdate={() => refetch()}
-                            />
-                        </Box>
-
-                        <Box>
-                            <Heading level={4}>Заказчик</Heading>
-                            <Contacts
-                                projectId={project.id}
-                                contacts={project.contacts}
-                                notify={notify}
-                                onAdd={() => notify({ message: "Контакт добавлен", callback: refetch })}
-                                onDelete={() => notify({ message: "Контакт удален" })}
-                                onUpdate={() => notify({ message: "Контакт сохранен" })}
-                            />
-                        </Box>
-
-                        <Box>
-                            <Heading level={4}>Комнаты</Heading>
-                            <Rooms
-                                houses={project.houses}
-                                onAddRoom={() => notify({ message: "Комната добавлена", callback: refetch })}
-                                onDeleteRoom={() => notify({ message: "Комната удалена", callback: refetch })}
-                                onUpdateRoom={() => notify({ message: "Комната сохранена", callback: refetch })}
-                            />
-                        </Box>
-                    </Grid>
-
-                    {project.visualizations.list.__typename === "ProjectVisualizationsList" && project.visualizations.list.items.length > 0 &&
-                        <Box margin={{ bottom: "large" }}>
-                            <Box direction="row" justify="between">
-                                <Heading level={3}><AnchorLink to={`/vis/${id}`}>Визуализации</AnchorLink></Heading>
-                                <Box justify="center">
-                                    <Button color="brand" label="Загрузить" onClick={() => setShowUploadVisualizations(true)} />
-                                </Box>
-                            </Box>
-                            <Visualizations visualizations={project.visualizations}/>
-                        </Box>
-                    }
-
-                    {project.albums.list.__typename === "ProjectAlbumsList" && project.albums.list.items.length > 0 &&
-                        <Box margin={{ bottom: "large" }}>
-                            <Box direction="row" justify="between">
-                                <Heading level={3}>Альбомы</Heading>
-                                <Box justify="center">
-                                    {/* <Button color="brand" label="Загрузить" onClick={() => setShowUploadVisualizations(true)} /> */}
-                                </Box>
-                            </Box>
-                            <Albums
-                                albums={project.albums}
-                                onDelete={(albums) => {
-                                    notify({ message: albums?.length === 1 ? "Альбом удален" : `Удалено альбомов ${albums.length}` })
-                                    refetch()
-                                }}
-                            />
-                        </Box>
-                    }
-
-                    {showUploadVisualizations &&
-                        <UploadVisualizations
-                            projectId={project.id}
-                            houses={project.houses}
-                            onUploadComplete={({ files }: { files: File[] }) => {
-                                setShowUploadVisualizations(false)
-                                notify({ message: files?.length === 1 ? "Файл загружен" : `Загружено файлов ${files?.length}` })
-                                refetch()
-                            }}
-                            onClickOutside={() => {
-                                setShowUploadVisualizations(false)
-                            }}
-                            onClickClose={() => {
-                                setShowUploadVisualizations(false)
-                            }}
-                        />
-                    }
                 </Box>
 
-                <AddSomething2
-                    projectId={id}
-                    style={{
-                        position: "fixed",
-                        bottom: 0,
-                        left: 0,
-                        right: 0
-                    }}
-                    direction="row"
-                    justify="center"
-                    pad="small"
-                    onClickAddVisualizations={() => {
-                        setShowUploadVisualizations(true)
-                    }}
-                    onAlbumCreated={(id: string) => {
-                        setRedirectTo(`/album/${id}`)
-                    }}
-                />    
-            </Main>
-        )
-    } else {
-        return <></>
-    }
+                <Grid
+                    columns={{count: respSize === "small" ? 1 : 2, size: "auto"}}
+                    gap="small"
+                    responsive
+                    margin={{ bottom: "large" }}
+                >
+                    <Box>
+                        <Heading level={4}>Сроки проекта</Heading>
+                        <ProjectDates
+                            projectId={project.id}
+                            startAt={project.startAt}
+                            endAt={project.endAt}
+                            onChange={({ startAt, endAt }) => {
+                                notify({ message: "Даты изменены" })
+                                setProject({ ...project, startAt, endAt })
+                            }}
+                        />
+                    </Box>
+
+                    <Box>
+                        <Heading level={4}>Адрес</Heading>
+                        <House
+                            projectId={project.id}
+                            houses={project.houses}
+                            onAdd={() => refetch()}
+                            onUpdate={() => refetch()}
+                        />
+                    </Box>
+
+                    <Box>
+                        <Heading level={4}>Заказчик</Heading>
+                        <Contacts
+                            projectId={project.id}
+                            contacts={project.contacts}
+                            notify={notify}
+                            onAdd={() => notify({ message: "Контакт добавлен", callback: refetch })}
+                            onDelete={() => notify({ message: "Контакт удален" })}
+                            onUpdate={() => notify({ message: "Контакт сохранен" })}
+                        />
+                    </Box>
+
+                    <Box>
+                        <Heading level={4}>Комнаты</Heading>
+                        <Rooms
+                            houses={project.houses}
+                            onAddRoom={() => notify({ message: "Комната добавлена", callback: refetch })}
+                            onDeleteRoom={() => notify({ message: "Комната удалена", callback: refetch })}
+                            onUpdateRoom={() => notify({ message: "Комната сохранена", callback: refetch })}
+                        />
+                    </Box>
+                </Grid>
+
+                {project.visualizations.list.__typename === "ProjectVisualizationsList" && project.visualizations.list.items.length > 0 &&
+                    <Box margin={{ bottom: "large" }}>
+                        <Box direction="row" justify="between">
+                            <Heading level={3}><AnchorLink to={`/vis/${id}`}>Визуализации</AnchorLink></Heading>
+                            <Box justify="center">
+                                <Button color="brand" label="Загрузить" onClick={() => setShowUploadVisualizations(true)} />
+                            </Box>
+                        </Box>
+                        <Visualizations visualizations={project.visualizations}/>
+                    </Box>
+                }
+
+                {project.albums.list.__typename === "ProjectAlbumsList" && project.albums.list.items.length > 0 &&
+                    <Box margin={{ bottom: "large" }}>
+                        <Box direction="row" justify="between">
+                            <Heading level={3}>Альбомы</Heading>
+                            <Box justify="center">
+                                {/* <Button color="brand" label="Загрузить" onClick={() => setShowUploadVisualizations(true)} /> */}
+                            </Box>
+                        </Box>
+                        <Albums
+                            albums={project.albums}
+                            onDelete={(albums) => {
+                                notify({ message: albums?.length === 1 ? "Альбом удален" : `Удалено альбомов ${albums.length}` })
+                                refetch()
+                            }}
+                        />
+                    </Box>
+                }
+
+                {showUploadVisualizations &&
+                    <UploadVisualizations
+                        projectId={project.id}
+                        houses={project.houses}
+                        onUploadComplete={({ files }: { files: File[] }) => {
+                            setShowUploadVisualizations(false)
+                            notify({ message: files?.length === 1 ? "Файл загружен" : `Загружено файлов ${files?.length}` })
+                            refetch()
+                        }}
+                        onClickOutside={() => {
+                            setShowUploadVisualizations(false)
+                        }}
+                        onClickClose={() => {
+                            setShowUploadVisualizations(false)
+                        }}
+                    />
+                }
+            </Box>
+
+            <AddSomething2
+                projectId={id}
+                style={{
+                    position: "fixed",
+                    bottom: 0,
+                    left: 0,
+                    right: 0
+                }}
+                direction="row"
+                justify="center"
+                pad="small"
+                onClickAddVisualizations={() => {
+                    setShowUploadVisualizations(true)
+                }}
+                onAlbumCreated={(id: string) => {
+                    setRedirectTo(`/album/${id}`)
+                }}
+            />
+        </Main>
+    )
 }
 
 export default Project
@@ -331,7 +346,7 @@ export function AddSomething2 ({
     const targetRef = useRef<HTMLDivElement>(null)
 
     return (
-        <Box { ...boxProps}>
+        <Box {...boxProps}>
             <Box ref={targetRef} border={{ color: "background-front", size: "medium"}} round="large">
                 <Button label="Добавить..." icon={<Add/>} primary onClick={() => setShow(true)}/>
             </Box>

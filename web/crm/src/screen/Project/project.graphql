@@ -56,6 +56,9 @@ fragment ProjectScreenProject on Project {
     albums {
         ...ProjectScreenAlbums
     }
+    publicSite {
+        ...ProjectScreenPublicSite
+    }
 }
 
 fragment ProjectScreenVisualizations on ProjectVisualizations {
@@ -167,4 +170,17 @@ fragment ProjectScreenAlbums on ProjectAlbums {
 fragment ProjectScreenAlbum on Album {
     id
     name
+}
+
+fragment ProjectScreenPublicSite on ProjectPublicSite {
+    __typename
+    ...on PublicSite {
+        id
+        status
+        url
+        settings {
+            visualizations
+            albums
+        }
+    }
 }
