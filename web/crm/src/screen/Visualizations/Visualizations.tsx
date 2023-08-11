@@ -12,8 +12,8 @@ import Loading from "./Loading/Loading"
 import AnchorLink from "common/AnchorLink"
 import UserAvatar from "./UserAvatar/UserAvatar"
 import ConfirmDelete from "./ConfirmDelete/ConfirmDelete"
-import { Trash } from "grommet-icons"
-import Notification from "./Notification/Notifications"
+import { LinkPrevious, Trash } from "grommet-icons"
+import Notification from "./Notification/Notification"
 import RoomsFilter from "./RoomsFilter/RoomsFilter"
 
 export default function Visualizations() {
@@ -83,13 +83,13 @@ export default function Visualizations() {
                     if (data?.project?.visualizations?.list?.__typename === "ProjectVisualizationsList") {
                         setVisualizations(data.project.visualizations.list.items)
                     }
-        
+
                     if (data &&
                         data.project.houses.list.__typename === "ProjectHousesList" &&
                         data.project.houses.list.items.length !== 0
                         ) {
                             const h = data.project.houses.list.items[0]
-            
+
                             if (h.rooms.list.__typename === "HouseRoomsList") {
                                 setRooms(h.rooms.list.items)
                             }
@@ -115,7 +115,6 @@ export default function Visualizations() {
         }})
     }, [ roomsFilter, refetch ])
 
-    
     const [ selected, setSelected ] = useState<string[]>([])
 
     const selectVis = (id: string, add: boolean) => {
@@ -215,7 +214,16 @@ export default function Visualizations() {
             </Header>
 
             <Box direction="row" justify="between" margin={{ vertical: "medium" }}>
-                <Heading level={2} margin="none"><AnchorLink to={`/p/${project?.id}`} color="black">{project?.name}</AnchorLink></Heading>
+                <Heading level={2} margin="none">
+                    <Box direction="row" gap="small">
+                        <AnchorLink
+                            to={`/p/${project?.id}`}
+                            color="black"
+                            style={{left: "-50px"}}
+                        ><LinkPrevious/></AnchorLink>
+                        <AnchorLink to={`/p/${project?.id}`} color="black">{project?.name}</AnchorLink>
+                    </Box>
+                </Heading>
                 <Box direction="row" gap="small" justify="center" align="center">
                     <Button
                         disabled={selected.length === 0}
