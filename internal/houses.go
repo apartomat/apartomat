@@ -81,7 +81,7 @@ func (u *Apartomat) AddHouse(
 		return nil, fmt.Errorf("can't add house to project (id=%s): %w", project.ID, ErrForbidden)
 	}
 
-	id, err := NewNanoID()
+	id, err := GenerateNanoID()
 	if err != nil {
 		return nil, err
 	}

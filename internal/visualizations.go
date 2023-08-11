@@ -21,7 +21,7 @@ func (u *Apartomat) UploadVisualization(
 		return nil, nil, err
 	}
 
-	id, err := NewNanoID()
+	id, err := GenerateNanoID()
 	if err != nil {
 		return nil, nil, err
 	}
@@ -70,7 +70,7 @@ func (u *Apartomat) UploadVisualizations(
 	}
 
 	for _, file := range uploads {
-		fileID, err := NewNanoID()
+		fileID, err := GenerateNanoID()
 		if err != nil {
 			return nil, err
 		}
@@ -88,7 +88,7 @@ func (u *Apartomat) UploadVisualizations(
 			return nil, err
 		}
 
-		id, err := NewNanoID()
+		id, err := GenerateNanoID()
 		if err != nil {
 			return nil, err
 		}

@@ -35,7 +35,7 @@ func (u *Apartomat) AddContact(ctx context.Context, projectID string, params Add
 		return nil, fmt.Errorf("can't add contact to project (id=%s): %w", project.ID, ErrForbidden)
 	}
 
-	id, err := NewNanoID()
+	id, err := GenerateNanoID()
 	if err != nil {
 		return nil, err
 	}

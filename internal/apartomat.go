@@ -58,6 +58,10 @@ var (
 
 const nanoidAlphabet = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-func NewNanoID() (string, error) {
+func GenerateNanoID() (string, error) {
 	return nanoid.Generate(nanoidAlphabet, 21)
+}
+
+func MustGenerateNanoID() string {
+	return nanoid.MustGenerate(nanoidAlphabet, 21)
 }

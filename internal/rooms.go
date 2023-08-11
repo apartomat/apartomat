@@ -98,7 +98,7 @@ func (u *Apartomat) AddRoom(
 		return nil, fmt.Errorf("can't add room to house (id=%s): %w", house.ID, ErrForbidden)
 	}
 
-	id, err := NewNanoID()
+	id, err := GenerateNanoID()
 	if err != nil {
 		return nil, err
 	}

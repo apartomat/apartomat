@@ -34,7 +34,7 @@ func (u *Apartomat) CreateAlbum(
 		return nil, fmt.Errorf("can't create album in project (id=%s): %w", project.ID, ErrForbidden)
 	}
 
-	id, err := NewNanoID()
+	id, err := GenerateNanoID()
 	if err != nil {
 		return nil, err
 	}

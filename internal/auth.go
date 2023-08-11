@@ -70,7 +70,7 @@ func (u *Apartomat) LoginByEmail(ctx context.Context, email string, workspaceNam
 	}
 
 	if len(users) == 0 {
-		id, err := NewNanoID()
+		id, err := GenerateNanoID()
 		if err != nil {
 			return "", err
 		}
@@ -90,7 +90,7 @@ func (u *Apartomat) LoginByEmail(ctx context.Context, email string, workspaceNam
 	}
 
 	if len(ws) == 0 {
-		id, err := NewNanoID()
+		id, err := GenerateNanoID()
 		if err != nil {
 			return "", err
 		}
@@ -101,7 +101,7 @@ func (u *Apartomat) LoginByEmail(ctx context.Context, email string, workspaceNam
 			return "", err
 		}
 
-		wid, err := NewNanoID()
+		wid, err := GenerateNanoID()
 		if err != nil {
 			return "", err
 		}
@@ -152,7 +152,7 @@ func (u *Apartomat) LoginEmailPIN(ctx context.Context, email string, workspaceNa
 	}
 
 	if len(users) == 0 {
-		id, err := NewNanoID()
+		id, err := GenerateNanoID()
 		if err != nil {
 			return "", "", err
 		}
@@ -172,7 +172,7 @@ func (u *Apartomat) LoginEmailPIN(ctx context.Context, email string, workspaceNa
 	}
 
 	if len(ws) == 0 {
-		id, err := NewNanoID()
+		id, err := GenerateNanoID()
 		if err != nil {
 			return "", "", err
 		}
@@ -183,7 +183,7 @@ func (u *Apartomat) LoginEmailPIN(ctx context.Context, email string, workspaceNa
 			return "", "", err
 		}
 
-		wid, err := NewNanoID()
+		wid, err := GenerateNanoID()
 		if err != nil {
 			return "", "", err
 		}
@@ -278,7 +278,7 @@ func (u *Apartomat) AcceptInviteToWorkspace(ctx context.Context, str string) (st
 		}
 
 	} else {
-		id, err := NewNanoID()
+		id, err := GenerateNanoID()
 		if err != nil {
 			return "", err
 		}
@@ -287,7 +287,7 @@ func (u *Apartomat) AcceptInviteToWorkspace(ctx context.Context, str string) (st
 	}
 
 	{
-		id, err := NewNanoID()
+		id, err := GenerateNanoID()
 		if err != nil {
 			return "", err
 		}
