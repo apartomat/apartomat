@@ -12,6 +12,8 @@ import (
 	"image/jpeg"
 	"image/png"
 	"io"
+	"net/url"
+	"strconv"
 	"strings"
 )
 
@@ -24,36 +26,91 @@ func (m *Uploader) Resize(ctx context.Context, path string, opts parent.ResizeOp
 		return nil, fmt.Errorf("can't connect to minio: %w", err)
 	}
 
-	obj, err := cl.GetObject(ctx, m.bucketName, strings.TrimLeft(path, "/"), minio.GetObjectOptions{})
-	if err != nil {
-		return nil, err
-	}
-
-	img, f, err := image.Decode(obj)
-	if err != nil {
-		return nil, err
-	}
-
-	res := resize.Resize(opts.Width, opts.Height, img, resize.Lanczos3)
-
 	var (
-		buf bytes.Buffer
+		origPath = strings.TrimLeft(path, "/")
+		resPath  = origPath
 	)
 
-	switch f {
-	case "jpeg":
-		err = jpeg.Encode(&buf, res, nil)
-		if err != nil {
-			return nil, err
-		}
-	case "png":
-		err = png.Encode(&buf, res)
-		if err != nil {
-			return nil, err
-		}
-	default:
-		return nil, fmt.Errorf("unknown format %s", f)
+	q := &url.Values{}
+
+	if opts.Width != 0 {
+		q.Add("w", strconv.Itoa(int(opts.Width)))
 	}
 
-	return &buf, nil
+	if opts.Height != 0 {
+		q.Add("h", strconv.Itoa(int(opts.Height)))
+	}
+
+	if sq := q.Encode(); sq != "" {
+		resPath += "?" + sq
+	}
+
+	robj, err := cl.GetObject(
+		ctx,
+		m.bucketName,
+		resPath,
+		minio.GetObjectOptions{},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	stat, err := robj.Stat()
+	if err != nil {
+		if er := minio.ToErrorResponse(err); er.Code != "NoSuchKey" {
+			return nil, err
+		}
+
+		if sq := q.Encode(); sq != "" {
+			oobj, err := cl.GetObject(
+				ctx,
+				m.bucketName,
+				origPath,
+				minio.GetObjectOptions{},
+			)
+			if err != nil {
+				return nil, err
+			}
+
+			img, f, err := image.Decode(oobj)
+			if err != nil {
+				return nil, err
+			}
+
+			res := resize.Resize(opts.Width, opts.Height, img, resize.Lanczos3)
+
+			var (
+				buf bytes.Buffer
+			)
+
+			switch f {
+			case "jpeg":
+				err = jpeg.Encode(&buf, res, nil)
+				if err != nil {
+					return nil, err
+				}
+			case "png":
+				err = png.Encode(&buf, res)
+				if err != nil {
+					return nil, err
+				}
+			default:
+				return nil, fmt.Errorf("unknown format %s", f)
+			}
+
+			var (
+				resbuf bytes.Buffer
+			)
+
+			resbuf.Write(buf.Bytes())
+
+			if _, err = m.Upload(ctx, &buf, int64(buf.Len()), resPath, stat.ContentType); err != nil {
+				return nil, err
+			}
+
+			return &resbuf, nil
+		}
+	}
+
+	return robj, nil
 }
