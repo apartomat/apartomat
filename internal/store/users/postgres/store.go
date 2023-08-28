@@ -68,8 +68,8 @@ type record struct {
 	Email              string    `pg:"email"`
 	FullName           string    `pg:"full_name,use_zero"`
 	IsActive           bool      `pg:"is_active"`
-	UserGravatar       bool      `pg:"use_gravatar,use_zero"`
-	DefaultWorkspaceID *string   `pg:"default_workspace_id,"`
+	UseGravatar        bool      `pg:"use_gravatar,use_zero"`
+	DefaultWorkspaceID *string   `pg:"default_workspace_id"`
 	CreatedAt          time.Time `pg:"created_at"`
 	ModifiedAt         time.Time `pg:"modified_at"`
 }
@@ -80,7 +80,7 @@ func toRecord(user *User) *record {
 		Email:              user.Email,
 		FullName:           user.FullName,
 		IsActive:           user.IsActive,
-		UserGravatar:       user.UseGravatar,
+		UseGravatar:        user.UseGravatar,
 		DefaultWorkspaceID: user.DefaultWorkspaceID,
 		CreatedAt:          user.CreatedAt,
 		ModifiedAt:         user.ModifiedAt,
@@ -108,7 +108,7 @@ func fromRecords(records []*record) []*User {
 			Email:              r.Email,
 			FullName:           r.FullName,
 			IsActive:           r.IsActive,
-			UseGravatar:        r.UserGravatar,
+			UseGravatar:        r.UseGravatar,
 			DefaultWorkspaceID: r.DefaultWorkspaceID,
 			CreatedAt:          r.CreatedAt,
 			ModifiedAt:         r.ModifiedAt,
