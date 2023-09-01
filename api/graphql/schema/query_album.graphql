@@ -10,6 +10,7 @@ type Album {
     project: AlbumProjectResult! @goField(forceResolver: true)
     settings: AlbumSettings!
     pages: AlbumPagesResult! @goField(forceResolver: true)
+    file: AlbumRecentFileResult @goField(forceResolver: true)
 }
 
 union AlbumProjectResult = Project | NotFound | Forbidden | ServerError
@@ -47,3 +48,20 @@ type AlbumPageVisualization {
 }
 
 union AlbumPageVisualizationResult = Visualization | NotFound | ServerError
+
+union AlbumRecentFileResult = AlbumFile | NotFound | Forbidden | ServerError
+
+type AlbumFile {
+    id: String!
+    status: AlbumFileStatus!
+    version: Int!
+    file: File
+    generatingStartedAt: Time
+    generatingDoneAt: Time
+}
+
+enum AlbumFileStatus {
+    NEW
+    GENERATING_IN_PROGRESS
+    GENERATING_DONE
+}

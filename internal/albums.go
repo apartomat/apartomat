@@ -4,7 +4,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/apartomat/apartomat/internal/auth"
+	albumFiles "github.com/apartomat/apartomat/internal/store/album_files"
 	. "github.com/apartomat/apartomat/internal/store/albums"
+	"github.com/apartomat/apartomat/internal/store/files"
 	"github.com/apartomat/apartomat/internal/store/projects"
 	"github.com/apartomat/apartomat/internal/store/visualizations"
 	"github.com/apartomat/apartomat/internal/store/workspace_users"
@@ -393,6 +395,44 @@ func (u *Apartomat) CanChangeAlbumSettings(ctx context.Context, subj *auth.UserC
 	var (
 		project = prjs[0]
 	)
+
+	return u.isProjectUser(ctx, subj, project)
+}
+
+func (u *Apartomat) GetAlbumRecentFile(ctx context.Context, albumID string) (*albumFiles.AlbumFile, *files.File, error) {
+	album, err := u.Albums.Get(ctx, IDIn(albumID))
+	if err != nil {
+		return nil, nil, err
+	}
+
+	if ok, err := u.CanChangeAlbumSettings(ctx, auth.UserFromCtx(ctx), album); err != nil {
+		return nil, nil, err
+	} else if !ok {
+		return nil, nil, fmt.Errorf("can't get album (id=%s) recent file: %w", album.ID, ErrForbidden)
+	}
+
+	albumFile, err := u.AlbumFiles.GetMaxVersion(ctx, albumFiles.And(albumFiles.AlbumIDIn(albumID)))
+	if err != nil {
+		return nil, nil, err
+	}
+
+	if albumFile != nil && albumFile.FileID != nil {
+		file, err := u.Files.Get(ctx, files.IDIn(*albumFile.FileID))
+		if err != nil {
+			return nil, nil, err
+		}
+
+		return albumFile, file, err
+	}
+
+	return albumFile, nil, err
+}
+
+func (u *Apartomat) CanGetAlbumFile(ctx context.Context, subj *auth.UserCtx, obj *Album) (bool, error) {
+	project, err := u.Projects.Get(ctx, projects.IDIn(obj.ProjectID))
+	if err != nil {
+		return false, err
+	}
 
 	return u.isProjectUser(ctx, subj, project)
 }

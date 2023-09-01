@@ -132,3 +132,17 @@ create table apartomat.public_sites (
     project_id char(21) not null,
     constraint public_sites_project_id_fkey foreign key (project_id) references apartomat.projects on delete cascade
 );
+
+create table apartomat.album_files (
+    id char(21) primary key,
+    status text not null,
+    version integer not null default 0,
+    generating_started_at timestamp with time zone,
+    generating_done_at timestamp with time zone,
+    created_at timestamp with time zone not null default now(),
+    modified_at timestamp with time zone not null default now(),
+    album_id char(21) not null,
+    file_id char(21),
+    constraint album_files_album_id_fkey foreign key (album_id) references apartomat.albums on delete cascade,
+    constraint album_files_file_fkey foreign key (file_id) references apartomat.files on delete set null
+);

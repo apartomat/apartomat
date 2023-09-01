@@ -24,6 +24,7 @@ import (
 	"github.com/apartomat/apartomat/internal/mail"
 	"github.com/apartomat/apartomat/internal/mail/smtp"
 	"github.com/apartomat/apartomat/internal/postgres"
+	albumFiles "github.com/apartomat/apartomat/internal/store/album_files/postgres"
 	albums "github.com/apartomat/apartomat/internal/store/albums/postgres"
 	contacts "github.com/apartomat/apartomat/internal/store/contacts/postgres"
 	files "github.com/apartomat/apartomat/internal/store/files/postgres"
@@ -112,6 +113,7 @@ func main() {
 		projectsStore := projects.NewStore(pgdb)
 		filesStore := files.NewStore(pgdb)
 		albumsStore := albums.NewStore(pgdb)
+		albumFilesStore := albumFiles.NewStore(bundb)
 		contactsStore := contacts.NewStore(pgdb)
 		housesStore := houses.NewStore(pgdb)
 		roomsStore := rooms.NewStore(pgdb)
@@ -149,6 +151,7 @@ func main() {
 			),
 			Uploader:       uploader,
 			Albums:         albumsStore,
+			AlbumFiles:     albumFilesStore,
 			Contacts:       contactsStore,
 			Houses:         housesStore,
 			Projects:       projectsStore,

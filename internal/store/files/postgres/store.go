@@ -51,6 +51,19 @@ func (s *store) List(ctx context.Context, spec Spec, limit, offset int) ([]*File
 	return fromRecords(rows), nil
 }
 
+func (s *store) Get(ctx context.Context, spec Spec) (*File, error) {
+	res, err := s.List(ctx, spec, 1, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(res) == 0 {
+		return nil, ErrFileNotFound
+	}
+
+	return res[0], nil
+}
+
 func (s *store) Save(ctx context.Context, files ...*File) error {
 	recs := toRecords(files)
 

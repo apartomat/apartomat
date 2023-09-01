@@ -11,7 +11,7 @@ var (
 )
 
 type Store interface {
-	Get(ctx context.Context, spec Spec) (*Project, error)
 	List(ctx context.Context, spec Spec, limit, offset int) ([]*Project, error)
+	Get(ctx context.Context, spec Spec) (*Project, error)
 	Save(context.Context, ...*Project) error
 }

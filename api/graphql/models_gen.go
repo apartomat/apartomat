@@ -47,6 +47,10 @@ type AlbumProjectResult interface {
 	IsAlbumProjectResult()
 }
 
+type AlbumRecentFileResult interface {
+	IsAlbumRecentFileResult()
+}
+
 type AlbumResult interface {
 	IsAlbumResult()
 }
@@ -238,11 +242,12 @@ type AddRoomInput struct {
 }
 
 type Album struct {
-	ID       string             `json:"id"`
-	Name     string             `json:"name"`
-	Project  AlbumProjectResult `json:"project"`
-	Settings *AlbumSettings     `json:"settings"`
-	Pages    AlbumPagesResult   `json:"pages"`
+	ID       string                `json:"id"`
+	Name     string                `json:"name"`
+	Project  AlbumProjectResult    `json:"project"`
+	Settings *AlbumSettings        `json:"settings"`
+	Pages    AlbumPagesResult      `json:"pages"`
+	File     AlbumRecentFileResult `json:"file,omitempty"`
 }
 
 func (Album) IsAlbumResult() {}
@@ -258,6 +263,17 @@ type AlbumDeleted struct {
 }
 
 func (AlbumDeleted) IsDeleteAlbumResult() {}
+
+type AlbumFile struct {
+	ID                  string          `json:"id"`
+	Status              AlbumFileStatus `json:"status"`
+	Version             int             `json:"version"`
+	File                *File           `json:"file,omitempty"`
+	GeneratingStartedAt *time.Time      `json:"generatingStartedAt,omitempty"`
+	GeneratingDoneAt    *time.Time      `json:"generatingDoneAt,omitempty"`
+}
+
+func (AlbumFile) IsAlbumRecentFileResult() {}
 
 type AlbumPageCover struct {
 	Position int `json:"position"`
@@ -450,6 +466,8 @@ func (Forbidden) IsAlbumResult() {}
 
 func (Forbidden) IsAlbumProjectResult() {}
 
+func (Forbidden) IsAlbumRecentFileResult() {}
+
 func (Forbidden) IsUserProfileResult() {}
 
 func (Forbidden) IsProjectResult() {}
@@ -629,6 +647,8 @@ func (NotFound) IsAlbumResult() {}
 func (NotFound) IsAlbumProjectResult() {}
 
 func (NotFound) IsAlbumPageVisualizationResult() {}
+
+func (NotFound) IsAlbumRecentFileResult() {}
 
 func (NotFound) IsProjectResult() {}
 
@@ -934,6 +954,8 @@ func (ServerError) IsAlbumPagesResult() {}
 
 func (ServerError) IsAlbumPageVisualizationResult() {}
 
+func (ServerError) IsAlbumRecentFileResult() {}
+
 func (ServerError) IsUserProfileResult() {}
 
 func (ServerError) IsProjectResult() {}
@@ -1126,6 +1148,49 @@ type WorkspaceUsersTotal struct {
 }
 
 func (WorkspaceUsersTotal) IsWorkspaceUsersTotalResult() {}
+
+type AlbumFileStatus string
+
+const (
+	AlbumFileStatusNew                  AlbumFileStatus = "NEW"
+	AlbumFileStatusGeneratingInProgress AlbumFileStatus = "GENERATING_IN_PROGRESS"
+	AlbumFileStatusGeneratingDone       AlbumFileStatus = "GENERATING_DONE"
+)
+
+var AllAlbumFileStatus = []AlbumFileStatus{
+	AlbumFileStatusNew,
+	AlbumFileStatusGeneratingInProgress,
+	AlbumFileStatusGeneratingDone,
+}
+
+func (e AlbumFileStatus) IsValid() bool {
+	switch e {
+	case AlbumFileStatusNew, AlbumFileStatusGeneratingInProgress, AlbumFileStatusGeneratingDone:
+		return true
+	}
+	return false
+}
+
+func (e AlbumFileStatus) String() string {
+	return string(e)
+}
+
+func (e *AlbumFileStatus) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = AlbumFileStatus(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid AlbumFileStatus", str)
+	}
+	return nil
+}
+
+func (e AlbumFileStatus) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
 
 type ContactType string
 

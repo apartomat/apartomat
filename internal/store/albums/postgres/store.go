@@ -55,30 +55,17 @@ func (s *store) List(ctx context.Context, spec Spec, limit, offset int) ([]*Albu
 	return fromRecords(recs), nil
 }
 
-func (s *store) Save(ctx context.Context, albums ...*Album) error {
-	recs := toRecords(albums)
-
-	_, err := s.db.ModelContext(postgres.WithQueryContext(ctx, "albums.Save"), &recs).
-		Returning("NULL").
-		OnConflict("(id) DO UPDATE").Insert()
-
-	return err
-}
-
-func (s *store) Delete(ctx context.Context, albums ...*Album) error {
-	var (
-		ids = make([]string, len(albums))
-	)
-
-	for i, album := range albums {
-		ids[i] = album.ID
+func (s *store) Get(ctx context.Context, spec Spec) (*Album, error) {
+	res, err := s.List(ctx, spec, 1, 0)
+	if err != nil {
+		return nil, err
 	}
 
-	_, err := s.db.ModelContext(postgres.WithQueryContext(ctx, "albums.Delete"), (*record)(nil)).
-		Where(`id IN (?)`, pg.In(ids)).
-		Delete()
+	if len(res) == 0 {
+		return nil, ErrAlbumNotFound
+	}
 
-	return err
+	return res[0], nil
 }
 
 func (s *store) Count(ctx context.Context, spec Spec) (int, error) {
@@ -104,6 +91,32 @@ func (s *store) Count(ctx context.Context, spec Spec) (int, error) {
 	_, err = s.db.QueryOneContext(postgres.WithQueryContext(ctx, "albums.Count"), pg.Scan(&c), sql, args...)
 
 	return c, err
+}
+
+func (s *store) Save(ctx context.Context, albums ...*Album) error {
+	recs := toRecords(albums)
+
+	_, err := s.db.ModelContext(postgres.WithQueryContext(ctx, "albums.Save"), &recs).
+		Returning("NULL").
+		OnConflict("(id) DO UPDATE").Insert()
+
+	return err
+}
+
+func (s *store) Delete(ctx context.Context, albums ...*Album) error {
+	var (
+		ids = make([]string, len(albums))
+	)
+
+	for i, album := range albums {
+		ids[i] = album.ID
+	}
+
+	_, err := s.db.ModelContext(postgres.WithQueryContext(ctx, "albums.Delete"), (*record)(nil)).
+		Where(`id IN (?)`, pg.In(ids)).
+		Delete()
+
+	return err
 }
 
 type record struct {

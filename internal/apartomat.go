@@ -2,9 +2,11 @@ package apartomat
 
 import (
 	"errors"
+
 	"github.com/apartomat/apartomat/internal/auth"
 	"github.com/apartomat/apartomat/internal/image"
 	"github.com/apartomat/apartomat/internal/mail"
+	albumFiles "github.com/apartomat/apartomat/internal/store/album_files"
 	"github.com/apartomat/apartomat/internal/store/albums"
 	"github.com/apartomat/apartomat/internal/store/contacts"
 	"github.com/apartomat/apartomat/internal/store/files"
@@ -38,6 +40,7 @@ type Apartomat struct {
 	Uploader image.Uploader
 
 	Albums         albums.Store
+	AlbumFiles     albumFiles.Store
 	Contacts       contacts.Store
 	Houses         houses.Store
 	Projects       projects.Store
