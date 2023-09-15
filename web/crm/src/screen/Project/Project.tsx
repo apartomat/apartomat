@@ -161,7 +161,7 @@ export function Project () {
                 </Box>
             </Layer> : null}
 
-            <Header background="white" margin={{vertical: "medium"}}>
+            <Header margin={{ vertical: "medium" }}>
                 <Box>
                     <Text size="xlarge" weight="bold" color="brand">
                         <AnchorLink to="/">apartomat</AnchorLink>
