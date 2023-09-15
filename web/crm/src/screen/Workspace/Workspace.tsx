@@ -71,7 +71,7 @@ export default function Workspace () {
     }, [ data ])
 
     const [ showCreateProjectLayer, setShowCreateProjectLayer ] = useState(false)
-    
+
     if (loading) {
         return (
             <Main pad="large">
@@ -102,7 +102,7 @@ export default function Workspace () {
         <Main>
             {notification && <Notification message={notification}/>}
 
-            <Header background="white" margin={{ top:"large", horizontal:"large", bottom:"medium" }}>
+            <Header margin={{ top:"large", horizontal:"large", bottom:"medium" }}>
                 <Box>
                     <Text size="xlarge" weight="bold" color="brand">apartomat</Text>
                 </Box>
