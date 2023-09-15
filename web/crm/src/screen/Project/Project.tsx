@@ -56,7 +56,7 @@ export function Project () {
         setNotification(message)
 
         callback && callback()
-        
+
         setTimeout(() => {
             setShowNotification(true)
 
@@ -198,6 +198,10 @@ export function Project () {
                             }}
                         />
                         <AddSomething
+                            projectId={id}
+                            onAlbumCreated={(id) => {
+                                setRedirectTo(`/album/${id}`)
+                            }}
                             onClickAddVisualizations={() => {
                                 setShowUploadVisualizations(true)
                             }}
