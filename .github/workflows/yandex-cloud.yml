@@ -1,0 +1,55 @@
+name: Apartomat
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+env:
+  CR_REGISTRY: ${{ secrets.YC_CR_REGISTRY }}
+  CR_REPOSITORY: apartomat
+  APARTOMAT_PRIV_KEY: ${{ secrets.APARTOMAT_PRIV_KEY }}
+  APARTOMAT_PUB_KEY: ${{ secrets.APARTOMAT_PUB_KEY }}
+  TEST_MD5: ${{ secrets.TEST_MD5 }}
+
+jobs:
+  build-apartomat:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Test
+      run: |
+        echo $TEST_MD5 > test.key
+        md5sum test.key
+
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: "1.20"
+
+#    - name: Vet
+#      run: go vet ./...
+
+    - name: Test
+      run: go test -v ./... -tags="test unit"
+
+    - name: Build
+      env:
+        APARTOMAT_VERSION: ${{ github.run_number }}
+      run: GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o bin/apartomat-lunux-amd64 -ldflags "-X api.graphql.version=$APARTOMAT_VERSION" ./cmd/apartomat
+
+    - name: Login to Yandex Cloud Container Registry
+      uses: yc-actions/yc-cr-login@v1
+      with:
+        yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
+
+    - name: Push image to Yandex Cloud Container Registry
+      env:
+        IMAGE_TAG: ${{ github.run_number }}
+      run: |
+        echo $APARTOMAT_PRIV_KEY | base64 --decode > apartomat.key
+        docker build -f ./deploy/yandex/apartomat/Dockerfile -t cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG .
+        docker push cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG

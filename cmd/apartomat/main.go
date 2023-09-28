@@ -54,7 +54,7 @@ func main() {
 
 	switch os.Args[1] {
 	case "gen-key-pair":
-		_, _, err := genPairToFile("shoppinglist.key")
+		_, _, err := genPairToFile("apartomat.key")
 		if err != nil {
 			log.Fatal("can't generate key pair", zap.Error(err))
 		}
@@ -64,7 +64,7 @@ func main() {
 		os.Exit(0)
 
 	case "run":
-		privateKey, err := readPrivateKeyFromFile("shoppinglist.key")
+		privateKey, err := readPrivateKeyFromFile("apartomat.key")
 		if err != nil {
 			log.Fatal("cant read private key from file", zap.Error(err))
 		}
