@@ -9,9 +9,6 @@ on:
 env:
   CR_REGISTRY: ${{ secrets.YC_CR_REGISTRY }}
   CR_REPOSITORY: apartomat
-  APARTOMAT_PRIV_KEY: ${{ secrets.APARTOMAT_PRIV_KEY }}
-  APARTOMAT_PUB_KEY: ${{ secrets.APARTOMAT_PUB_KEY }}
-  TEST_MD5: ${{ secrets.TEST_MD5 }}
 
 jobs:
   build-apartomat:
@@ -19,11 +16,6 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v3
-
-    - name: Test
-      run: |
-        echo $TEST_MD5 > test.key
-        md5sum test.key
 
     - name: Set up Go
       uses: actions/setup-go@v3
@@ -39,7 +31,7 @@ jobs:
     - name: Build
       env:
         APARTOMAT_VERSION: ${{ github.run_number }}
-      run: GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o bin/apartomat-lunux-amd64 -ldflags "-X api.graphql.version=$APARTOMAT_VERSION" ./cmd/apartomat
+      run: GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o bin/apartomat-lunux-amd64 -ldflags "-X github.com/apartomat/apartomat/api/graphql.Version=$APARTOMAT_VERSION" ./cmd/apartomat
 
     - name: Login to Yandex Cloud Container Registry
       uses: yc-actions/yc-cr-login@v1
@@ -48,8 +40,28 @@ jobs:
 
     - name: Push image to Yandex Cloud Container Registry
       env:
+        APARTOMAT_PRIV_KEY: ${{ secrets.APARTOMAT_PRIV_KEY }}
         IMAGE_TAG: ${{ github.run_number }}
       run: |
         echo $APARTOMAT_PRIV_KEY | base64 --decode > apartomat.key
         docker build -f ./deploy/yandex/apartomat/Dockerfile -t cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG .
         docker push cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG
+
+    - name: Deploy Serverless Container
+      id: deploy-sls-container
+      uses: yc-actions/yc-sls-container-deploy@v2
+      env:
+        FOLDER_ID: ${{ secrets.APARTOMAT_SLS_FOLDER_ID }}
+        SERVICE_ACCOUNT_ID: ${{ secrets.APARTOMAT_SERVICE_ACCOUNT_ID }}
+        IMAGE_TAG: ${{ github.run_number }}
+      with:
+        yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
+        container-name: crm
+        folder-id: $FOLDER_ID
+        revision-service-account-id: $SERVICE_ACCOUNT_ID
+        revision-cores: 1
+        revision-memory: 182Mb
+        revision-core-fraction: 100
+        revision-concurrency: 8
+        revision-image-url: cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG
+        revision-execution-timeout: 10

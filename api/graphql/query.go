@@ -3,7 +3,7 @@ package graphql
 import "context"
 
 var (
-	version = "0"
+	Version = ""
 )
 
 type queryResolver struct {
@@ -11,7 +11,7 @@ type queryResolver struct {
 }
 
 func (r *queryResolver) Version(ctx context.Context) (string, error) {
-	return version, nil
+	return Version, nil
 }
 
 func (r *rootResolver) Query() QueryResolver { return &queryResolver{r} }
