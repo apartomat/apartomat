@@ -11,57 +11,84 @@ env:
   CR_REPOSITORY: apartomat
 
 jobs:
-  build-apartomat:
+#  build-crm-api:
+#    runs-on: ubuntu-latest
+#    steps:
+#    - name: Checkout
+#      uses: actions/checkout@v3
+#
+#    - name: Set up Go
+#      uses: actions/setup-go@v3
+#      with:
+#        go-version: "1.20"
+#
+##    - name: Vet
+##      run: go vet ./...
+#
+#    - name: Test
+#      run: go test -v ./... -tags="test unit"
+#
+#    - name: Build
+#      env:
+#        APARTOMAT_VERSION: ${{ github.run_number }}
+#      run: GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o bin/apartomat-lunux-amd64 -ldflags "-X github.com/apartomat/apartomat/api/graphql.Version=$APARTOMAT_VERSION" ./cmd/apartomat
+#
+#    - name: Login to Yandex Cloud Container Registry
+#      uses: yc-actions/yc-cr-login@v1
+#      with:
+#        yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
+#
+#    - name: Push image to Yandex Cloud Container Registry
+#      env:
+#        APARTOMAT_PRIV_KEY: ${{ secrets.APARTOMAT_PRIV_KEY }}
+#        IMAGE_TAG: ${{ github.run_number }}
+#      run: |
+#        echo $APARTOMAT_PRIV_KEY | base64 --decode > apartomat.key
+#        docker build -f ./deploy/yandex/apartomat/Dockerfile -t cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG .
+#        docker push cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG
+#
+#    - name: Deploy Serverless Container
+#      id: deploy-sls-container
+#      uses: yc-actions/yc-sls-container-deploy@v2
+#      env:
+#        FOLDER_ID: ${{ secrets.APARTOMAT_SLS_FOLDER_ID }}
+#        SERVICE_ACCOUNT_ID: ${{ secrets.APARTOMAT_SERVICE_ACCOUNT_ID }}
+#        IMAGE_TAG: ${{ github.run_number }}
+#      with:
+#        yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
+#        container-name: crm
+#        folder-id: $FOLDER_ID
+#        revision-service-account-id: $SERVICE_ACCOUNT_ID
+#        revision-cores: 1
+#        revision-memory: 182Mb
+#        revision-core-fraction: 100
+#        revision-concurrency: 8
+#        revision-image-url: cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG
+#        revision-execution-timeout: 10
+
+  build-crm-web:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
-
-    - name: Set up Go
-      uses: actions/setup-go@v3
-      with:
-        go-version: "1.20"
-
-#    - name: Vet
-#      run: go vet ./...
-
-    - name: Test
-      run: go test -v ./... -tags="test unit"
-
-    - name: Build
-      env:
-        APARTOMAT_VERSION: ${{ github.run_number }}
-      run: GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o bin/apartomat-lunux-amd64 -ldflags "-X github.com/apartomat/apartomat/api/graphql.Version=$APARTOMAT_VERSION" ./cmd/apartomat
-
-    - name: Login to Yandex Cloud Container Registry
-      uses: yc-actions/yc-cr-login@v1
-      with:
-        yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
-
-    - name: Push image to Yandex Cloud Container Registry
-      env:
-        APARTOMAT_PRIV_KEY: ${{ secrets.APARTOMAT_PRIV_KEY }}
-        IMAGE_TAG: ${{ github.run_number }}
-      run: |
-        echo $APARTOMAT_PRIV_KEY | base64 --decode > apartomat.key
-        docker build -f ./deploy/yandex/apartomat/Dockerfile -t cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG .
-        docker push cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG
-
-    - name: Deploy Serverless Container
-      id: deploy-sls-container
-      uses: yc-actions/yc-sls-container-deploy@v2
-      env:
-        FOLDER_ID: ${{ secrets.APARTOMAT_SLS_FOLDER_ID }}
-        SERVICE_ACCOUNT_ID: ${{ secrets.APARTOMAT_SERVICE_ACCOUNT_ID }}
-        IMAGE_TAG: ${{ github.run_number }}
-      with:
-        yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
-        container-name: crm
-        folder-id: $FOLDER_ID
-        revision-service-account-id: $SERVICE_ACCOUNT_ID
-        revision-cores: 1
-        revision-memory: 182Mb
-        revision-core-fraction: 100
-        revision-concurrency: 8
-        revision-image-url: cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG
-        revision-execution-timeout: 10
+      - uses: actions/checkout@v3
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - run: npm ci
+        working-directory: ./web/crm/
+      - run: npm run build
+        working-directory: ./web/crm/
+      - run: ls ./web/crm
+      - name: Upload files to Object Storage
+        uses: yc-actions/yc-obj-storage-upload@v1
+        with:
+          yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
+          bucket: crm.apartomat.ru
+          root: ./web/crm/dist/
+          include: |
+            *.svg
+            *.js
+            assets
+            index.html
+          exclude: |
+            **/*.ts
