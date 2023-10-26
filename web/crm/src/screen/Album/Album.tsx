@@ -1,12 +1,14 @@
-import React, { useEffect, useRef, useState } from "react"
+import { MouseEventHandler, useEffect, useState } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 
-import { Box, BoxExtendedProps, Button, Carousel, Drop, Grid, Heading, Image, Main } from "grommet"
-import { Close, Previous, Next, Add, Sort } from "grommet-icons"
-import useAlbum, { AlbumScreenVisualizationFragment, AlbumScreenProjectFragment, AlbumScreenAlbumPageCoverFragment, AlbumScreenAlbumPageVisualizationFragment, AlbumScreenSettingsFragment } from "./useAlbum"
-import { useAddVisualizationsToAlbum } from "./useAddVisualizationsToAlbum"
+import { Box, BoxExtendedProps, Button, Grid, Heading, Header, Image, Text } from "grommet"
+import { Close, Add, Sort } from "grommet-icons"
+
+import useAlbum, { AlbumScreenVisualizationFragment, AlbumScreenProjectFragment, AlbumScreenAlbumPageCoverFragment, AlbumScreenAlbumPageVisualizationFragment, AlbumScreenSettingsFragment, PageOrientation as PageOrientationEnum, AlbumScreenHouseRoomFragment } from "./useAlbum"
 
 import { PageSize, PageOrientation } from "./Settings/"
+import AddVisualizations from "screen/Album/AddVisualizations/AddVisualizations"
+import Paper from "./Paper/Paper"
 
 export function Album() {
     const { id } = useParams<"id">() as { id: string }
@@ -15,13 +17,15 @@ export function Album() {
 
     const [ visualizations, setVisualizations ] = useState<AlbumScreenVisualizationFragment[]>([])
 
+    const [ rooms, setRooms ] = useState<AlbumScreenHouseRoomFragment[]>([])
+
     const [ pages, setPages ] = useState<(AlbumScreenAlbumPageCoverFragment | AlbumScreenAlbumPageVisualizationFragment)[]>([])
 
-    const [ addVisualizations, { loading: addVisualizationsLoading } ] = useAddVisualizationsToAlbum(id)
-
-    const { data } = useAlbum({ id })
-
     const [ settings, setSettings ] = useState<AlbumScreenSettingsFragment | undefined>()
+
+    const { data, loading } = useAlbum({ id })
+
+    const [ showAddVisualizations, setShowAddVisualizations ] = useState(false)
 
     useEffect(() => {
         if (data?.album?.__typename === "Album") {
@@ -31,15 +35,25 @@ export function Album() {
                 if (data.album.project.visualizations.list.__typename === "ProjectVisualizationsList") {
                     setVisualizations(data.album.project.visualizations.list.items)
                 }
-            }    
-            
+
+                if (data.album.project.houses.__typename === "ProjectHouses" &&
+                    data.album.project.houses.list.__typename === "ProjectHousesList"
+                ) {
+                    const list = data.album.project.houses.list.items[0].rooms.list
+
+                    if (list.__typename === "HouseRoomsList") {
+                        setRooms(list.items)
+                    }
+                }
+            }
+
             if (data.album.pages.__typename === "AlbumPages") {
                 setPages(data.album.pages.items)
             }
 
             setSettings(data.album.settings)
         }
-        
+
     }, [ data ])
 
     const [ currentPage, setCurrentPage ] = useState<number>(0)
@@ -53,16 +67,39 @@ export function Album() {
     }
 
     return (
-        <Main pad={{vertical: "medium", horizontal: "large"}} direction="row" justify="center">
-            <Box style={{ position: "fixed", right: 0 }} gap="small" margin={{ horizontal: "large" }}>
-                <Box align="end">
+        <Grid
+            fill
+            columns={["small", "flex", "small"]}
+            rows={["auto", "flex", "auto"]}
+            areas={[
+                {name: "header", start: [0, 0], end: [2,0]},
+                {name: "left", start: [0, 1], end: [0,1]},
+                {name: "main", start: [1, 1], end: [1,1]},
+                {name: "right", start: [2, 1], end: [2,1]},
+                {name: "footer", start: [0, 2], end: [2,2]},
+            ]}
+            width={{ width: "100vw" }}
+            height={{ height: "100vh" }}
+            pad="medium"
+            responsive
+        >
+            <Header gridArea="header">
+                <Box>
+                    <Text size="xlarge" weight="bold">
+                        {data?.album.__typename === "Album" && <>{data?.album.name}</>}
+                    </Text>
+                </Box>
+                <Box>
                     <Button
                         icon={<Close/>}
                         onClick={() => {
                             project && setRedirectTo(`/p/${project.id}`)
-                        } }
+                        }}
                     />
                 </Box>
+            </Header>
+
+            <Box gridArea="right">
                 {settings &&
                     <Box gap="small" align="end" margin={{ top: "large" }}>
                         <Heading level={5}>Настройки для печати</Heading>
@@ -70,201 +107,137 @@ export function Album() {
                         <PageOrientation albumId={id} orientation={settings.pageOrientation} />
                     </Box>
                 }
-
             </Box>
 
-            <Box style={{ position: "fixed", left: 0 }} gap="small" margin={{ horizontal: "large" }}>
-                {data?.album.__typename === "Album" && <Heading level={3} margin={{top: ""}}>{data?.album.name}</Heading>}
-            </Box>
+            <Box gridArea="left"></Box>
 
-            <Box direction="column" justify="center" height="large">
-                    <Carousel
-                        controls={false}
-                        activeChild={currentPage}
-                        onChild={(n) => {
-                            setCurrentPage(n)
-                        }}
-                        fill
-                    >
-                        {pages.map((p, key) => {
-                            return (
-                                <Paper
-                                    key={key}
-                                        size="A4"
-                                        scale={0.6}
-                                        pad="medium"
-                                        background="background-contrast"
-                                        round="xsmall"
-                                        justify="center"
-                                        margin="xsmall"
-                                    >
-                                    {(() => {
-                                            switch (p.__typename) {
-                                                case "AlbumPageVisualization":
-                                                    switch (p.visualization.__typename) {
-                                                        case "Visualization":
-                                                            return (
-                                                                <Image
-                                                                    fit="cover"
-                                                                    src={p.visualization.file.url}
-                                                                />
-                                                            )
-                                                        default:
-                                                            return <></>
-                                                    }
-                                                    default:
-                                                        return <></>
-                                            }
-                                        })()}
-                                </Paper>
-                            )
-                        })}
-                    </Carousel>
-                {/* <Paper size="A4" scale={0.6} pad="medium" background="background-contrast">
-                    {currentPage &&
-                        <Image src={currentPage} fit="contain"/>
-                    }
-                </Paper> */}
-            </Box>
-
-            <Box
-                direction="row"
-                style={{ position: "absolute", bottom: 0 }}
-                align="center"
-            >
-                <Box align="center" margin={{right: "large"}}>
-                    <Box round="full" overflow="hidden" background="light-2">
-                        <Button icon={<Sort/>} hoverIndicator/>
+            {pages.length === 0 && !loading &&
+                <Box
+                    gridArea="main"
+                    align="center"
+                    justify="center"
+                >
+                    <Box margin={{ bottom: "medium" }}>
+                        <Text size="small" color="text-xweak" textAlign="center">В альбом можно добавить обложку, визуализации и другие материалы</Text>
                     </Box>
+                    <Button
+                        icon={<Add/>}
+                        label="Добавить..."
+                        primary
+                        onClick={() => {
+                            setShowAddVisualizations(true)
+                        }}
+                    />
                 </Box>
+            }
 
-                {/* {pages.length > 0 && <Box align="end"><Previous color="light-3"/></Box>} */}
-                
-                {pages.length > 0 && <Pages
-                    pages={pages}
-                    current={currentPage}
-                    onClickPage={(n) => setCurrentPage(n)}
-                    width={{max: "large"}}
-                />}
+            {pages.length > 0 &&
+                <Box
+                    gridArea="main"
+                    align="center"
+                    justify="center"
+                >
+                    {pages.filter((_, i) => i === currentPage).map((p, key) => {
+                        return (
+                            <Box
+                                key={key}
+                                style={{ aspectRatio: orientationToAspectRation(settings?.pageOrientation) }}
+                                pad="medium"
+                                background="background-contrast"
+                                round="xsmall"
+                            >
+                                {(() => {
+                                    switch (p.__typename) {
+                                        case "AlbumPageVisualization":
+                                            switch (p.visualization.__typename) {
+                                                case "Visualization":
+                                                    return (
+                                                        <Image
+                                                            key={key}
+                                                            fit="contain"
+                                                            src={p.visualization.file.url}
+                                                        />
+                                                    )
+                                                default:
+                                                    return <></>
+                                            }
+                                        default:
+                                            return <></>
+                                    }
+                                })()}
+                            </Box>
+                        )
+                    })}
+                </Box>
+            }
 
-                {/* {pages.length > 0 && <Box><Next color="light-3"/></Box>} */}
+            <Box gridArea="footer">
+                {pages.length > 0 &&
+                    <Box
+                        direction="row"
+                        align="center"
+                        justify="center"
+                    >
+                        <Box align="center" margin={{right: "medium"}}>
+                            <Box round="full" overflow="hidden" background="light-2">
+                                <Button icon={<Sort/>} hoverIndicator/>
+                            </Box>
+                        </Box>
 
-                <AddVisualizations
-                    margin={{ left: "large" }}
-                    visualizations={visualizations}
-                    onClickAdd={(ids: string[]) => {
-                        addVisualizations(ids)
-                    }}
-                />
+                        {pages.length > 0 && <Pages
+                            pages={pages}
+                            current={currentPage}
+                            onClickPage={(n) => setCurrentPage(n)}
+                            width={{max: "large"}}
+                        />}
+
+                        <AddVisualizationsCircleButton
+                            margin={{left: "medium"}}
+                            onClick={() => {
+                                setShowAddVisualizations(true)
+                            }}
+                        />
+                    </Box>
+                }
             </Box>
-        </Main>
+
+            {showAddVisualizations &&
+                <AddVisualizations
+                    albumId={id}
+                    visualizations={visualizations}
+                    rooms={rooms}
+                    inAlbum={ids(pages)}
+                    onVisualizationsAdded={() => setShowAddVisualizations(false)}
+                    onEsc={() => setShowAddVisualizations(false)}
+                    onClickOutside={() => setShowAddVisualizations(false)}
+                    onClickClose={() => setShowAddVisualizations(false)}
+                />
+            }
+        </Grid>
     )
 }
 
 export default Album
 
-function Paper({
-    children,
-    size = "A4",
-    scale = 1.0,
-    ...boxProps
-}: {
-    children: JSX.Element | never[] | undefined | string,
-    size?: "A4" | "A5",
-    scale?: 0.05 | 0.1 | 0.25 | 0.3 | 0.4 | 0.5 | 0.6 | 0.7 | 0.75 | 1
-} & BoxExtendedProps) {
-    return (
-        <Box {...boxProps} width={`calc(${scale} * 210mm)`} height={`calc(${scale} * 297mm)`}>
-            {children}
-        </Box>
-    )
-}
 
-function AddVisualizations({
+
+function AddVisualizationsCircleButton({
     visualizations,
     onClickAdd,
+    onClick,
     ...boxProps
 }: {
-    visualizations: AlbumScreenVisualizationFragment[],
-    onClickAdd?: (id: string[]) => void 
+    onClick?: MouseEventHandler<T> | undefined
 } & BoxExtendedProps) {
 
-    const [show, setShow] = useState(false)
-
-    const targetRef = useRef<HTMLDivElement>(null)
-
-    const [ selected, setSelected ] = useState<string[]>([])
-
-    const select = (id: string) => {
-        if (selected.includes(id)) {
-            setSelected(selected.filter(s => s !== id))
-        } else {
-            setSelected([...selected, id])
-        }
-    }
 
     return (
-        <Box {...boxProps} ref={targetRef}>
-            <Box round="full" overflow="hidden" background="brand">
-                <Button
-                    icon={<Add />}
-                    hoverIndicator
-                    onClick={() => {
-                        setShow(!show)
-                        setSelected([])
-                    }}/>
-            </Box>
-            {show && targetRef.current &&
-                <Drop
-                    target={targetRef.current}
-                    align={{left: "right", top: "top"}}
-                    elevation="small"
-                    onClickOutside={() => {
-                        setShow(false)
-                        setSelected([])
-                    }}
-                    round="xsmall"
-                >
-                    {visualizations &&
-                        <Box width="large" pad="small">
-                            <Grid
-                                columns="xxsmall"
-                                rows="xxsmall"
-                                gap="xsmall"
-                            >
-                                {visualizations.map((vis, key) => {
-                                    return (
-                                        <Box
-                                            key={key}
-                                            focusIndicator={false}
-                                            round="xsmall"
-                                            pad="xxsmall"
-                                            style={{boxShadow: selected.includes(vis.id) ? "0 0 0px 2px #7D4CDB": "none" }}
-                                            onClick={() => select(vis.id)}
-                                        >
-                                            <Image
-                                                src={`${vis.file.url}?w=48`}
-                                                fit="contain"
-                                            ></Image>
-                                        </Box>
-                                    )
-                                })}
-                            </Grid>
-                        </Box>
-                    }
-                    <Box direction="row" justify="between">
-                        <Button
-                            label="Добавить"
-                            disabled={selected.length === 0}
-                            onClick={() => {
-                                onClickAdd && onClickAdd(selected)
-                                setShow(false)
-                                setSelected([])
-                            }
-                        }/>
-                    </Box>
-                </Drop>
-            }
+        <Box {...boxProps} round="full" overflow="hidden" background="brand">
+            <Button
+                icon={<Add />}
+                hoverIndicator
+                onClick={onClick}
+            />
         </Box>
     )
 }
@@ -280,7 +253,11 @@ function Pages({
     onClickPage: (n: number) => void
 } & BoxExtendedProps) {
     return (
-        <Box overflow="auto"     pad="xsmall" {...props}>
+        <Box
+            overflow="auto"
+            pad="xsmall"
+            {...props}
+        >
             <Grid
                 columns="xsmall"
                 style={{gridAutoFlow: "column", overflowX: "scroll"}}
@@ -326,4 +303,23 @@ function Pages({
             </Grid>
         </Box>
     )
+}
+
+function orientationToAspectRation(orientation?: PageOrientationEnum): string {
+    const
+        land = "1.41/1",
+        port = "1/1.41";
+
+    switch (orientation) {
+        case PageOrientationEnum.Landscape:
+            return land
+        case PageOrientationEnum.Portrait:
+            return port
+    }
+
+    return port
+}
+
+function ids(pages: (AlbumScreenAlbumPageCoverFragment | AlbumScreenAlbumPageVisualizationFragment)[]): string[] {
+    return pages.filter(p => p.__typename === "AlbumPageVisualization" && p.visualization.__typename === "Visualization").map(v => v.visualization.id)
 }

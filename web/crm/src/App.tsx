@@ -47,6 +47,7 @@ const link = authLink.concat(httpLink)
 const appoloCache = new InMemoryCache({
     possibleTypes: {
         ProjectPublicSite: ["PublicSite", "NotFound", "ServerError"],
+        Project: ["ProjectVisualizations"],
     }
 })
 

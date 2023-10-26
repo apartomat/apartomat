@@ -6,8 +6,11 @@ export type {
     AlbumScreenVisualizationFragment,
     AlbumScreenAlbumPageCoverFragment,
     AlbumScreenAlbumPageVisualizationFragment,
-    AlbumScreenSettingsFragment
+    AlbumScreenSettingsFragment,
+    AlbumScreenHouseRoomFragment
 } from "api/graphql"
+
+export { PageOrientation } from "api/graphql"
 
 export function useAlbum({
     id
