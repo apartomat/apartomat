@@ -1,0 +1,16 @@
+{
+  "short_name": "apartomat",
+  "name": "apartomat",
+  "icons": [
+    {
+      "src": "apartomat.svg",
+      "type": "image/svg+xml",
+      "purpose": "maskable any",
+      "sizes": "48x48 72x72 96x96 128x128 256x256 512x512"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#7D4CDB",
+  "background_color": "#FFFFFF"
+}
