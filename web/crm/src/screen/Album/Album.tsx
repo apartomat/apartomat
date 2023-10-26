@@ -8,7 +8,7 @@ import useAlbum, { AlbumScreenVisualizationFragment, AlbumScreenProjectFragment,
 
 import { PageSize, PageOrientation } from "./Settings/"
 import AddVisualizations from "screen/Album/AddVisualizations/AddVisualizations"
-import Paper from "./Paper/Paper"
+import { Pages } from "./Pages"
 
 export function Album() {
     const { id } = useParams<"id">() as { id: string }
@@ -222,15 +222,11 @@ export default Album
 
 
 function AddVisualizationsCircleButton({
-    visualizations,
-    onClickAdd,
     onClick,
     ...boxProps
 }: {
-    onClick?: MouseEventHandler<T> | undefined
+    onClick?: MouseEventHandler | undefined
 } & BoxExtendedProps) {
-
-
     return (
         <Box {...boxProps} round="full" overflow="hidden" background="brand">
             <Button
@@ -238,69 +234,6 @@ function AddVisualizationsCircleButton({
                 hoverIndicator
                 onClick={onClick}
             />
-        </Box>
-    )
-}
-
-function Pages({
-    pages,
-    current,
-    onClickPage,
-    ...props
-}: {
-    pages: (AlbumScreenAlbumPageCoverFragment | AlbumScreenAlbumPageVisualizationFragment)[],
-    current: number,
-    onClickPage: (n: number) => void
-} & BoxExtendedProps) {
-    return (
-        <Box
-            overflow="auto"
-            pad="xsmall"
-            {...props}
-        >
-            <Grid
-                columns="xsmall"
-                style={{gridAutoFlow: "column", overflowX: "scroll"}}
-                gap="xsmall"
-                pad="xsmall"
-            >
-                {pages.map((p, key) => {
-                    return (
-                        <Box
-                            key={key}
-                            height="xsmall"
-                            width="xsmall"
-                            flex={{"shrink":0}}
-                            style={{boxShadow: current === key ? "0 0 0px 2px #7D4CDB": "none" }}
-                            align="center"
-                        >
-                            <Paper size="A4" scale={0.1}>
-                                {(() => {
-                                    switch (p.__typename) {
-                                        case "AlbumPageVisualization":
-                                            switch (p.visualization.__typename) {
-                                                case "Visualization":
-                                                    return (
-                                                        <Image
-                                                            fit="cover"
-                                                            src={p.visualization.file.url}
-                                                            onClick={() => {
-                                                                onClickPage && onClickPage(key)
-                                                            }}
-                                                        />
-                                                    )
-                                                default:
-                                                    return <></>
-                                            }
-                                            default:
-                                                return <></>
-                                    }
-                                })()}
-                            </Paper>
-                        </Box>
-                    )
-                })}
-            </Grid>
         </Box>
     )
 }
@@ -320,6 +253,9 @@ function orientationToAspectRation(orientation?: PageOrientationEnum): string {
     return port
 }
 
+
 function ids(pages: (AlbumScreenAlbumPageCoverFragment | AlbumScreenAlbumPageVisualizationFragment)[]): string[] {
-    return pages.filter(p => p.__typename === "AlbumPageVisualization" && p.visualization.__typename === "Visualization").map(v => v.visualization.id)
+    const vis =  pages.filter((p => p.__typename === "AlbumPageVisualization" && p.visualization.__typename === "Visualization")) as ({ visualization: { __typename?: 'Visualization', id: string, file: { __typename?: 'File', url: any } }})[]
+
+    return vis.map((v) => v.visualization.id)
 }
