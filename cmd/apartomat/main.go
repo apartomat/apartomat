@@ -173,6 +173,7 @@ func main() {
 		}
 
 		NewServer(
+			bundb,
 			usecases,
 			&dataloader.DataLoaders{
 				Users: usersLoader,

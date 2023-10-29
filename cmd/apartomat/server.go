@@ -10,6 +10,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/uptrace/bun"
 	"go.uber.org/zap"
 	"net"
 	"net/http"
@@ -31,6 +32,7 @@ func WithAddr(addr string) ServerOption {
 }
 
 type server struct {
+	db         *bun.DB
 	useCases   *apartomat.Apartomat
 	loaders    *dataloader.DataLoaders
 	prometheus *prometheus.Registry
@@ -38,12 +40,14 @@ type server struct {
 }
 
 func NewServer(
+	db *bun.DB,
 	useCases *apartomat.Apartomat,
 	loaders *dataloader.DataLoaders,
 	reg *prometheus.Registry,
 	logger *zap.Logger,
 ) *server {
 	return &server{
+		db:         db,
 		useCases:   useCases,
 		loaders:    loaders,
 		prometheus: reg,
@@ -65,7 +69,7 @@ func (server *server) Run(opts ...ServerOption) {
 	mux.Handle("/graphql", graphql.Handler(
 		server.useCases.CheckAuthToken,
 		server.loaders,
-		graphql.NewRootResolver(server.useCases, log),
+		graphql.NewRootResolver(server.db, server.useCases, log),
 		10000,
 	))
 
