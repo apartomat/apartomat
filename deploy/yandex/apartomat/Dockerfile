@@ -1,5 +1,7 @@
 FROM alpine:3.15
 
+RUN apk add --no-cache tzdata
+
 WORKDIR /apartomat
 
 COPY ../../../bin/apartomat-lunux-amd64 .
