@@ -124,7 +124,7 @@ create table apartomat.albums (
 
 create table apartomat.public_sites (
     id char(21) primary key,
-    status string not null,
+    status text not null,
     url text not null,
     settings jsonb not null default '{}',
     created_at timestamp with time zone not null default now(),
