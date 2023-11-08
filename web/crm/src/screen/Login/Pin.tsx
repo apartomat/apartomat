@@ -47,6 +47,10 @@ function Pin({ email, token, redirectTo = "/" }: { email: string, token: string,
                                 name="pin"
                                 mask={[{ length: 6, placeholder: "• • • • • •", regexp: /^\d+$/ }]}
                                 onChange={handleInputPin}
+                                value={pin}
+                                type="number"
+                                pattern="[0-9]*"
+                                inputMode="numeric"
                             />
                         </FormField>
                         <ConfirmPinError data={data} />
