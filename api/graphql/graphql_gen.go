@@ -8,6 +8,7 @@ import (
 	"embed"
 	"errors"
 	"fmt"
+	"io"
 	"strconv"
 	"sync"
 	"sync/atomic"
@@ -49,6 +50,7 @@ type ResolverRoot interface {
 	ProjectHouses() ProjectHousesResolver
 	ProjectVisualizations() ProjectVisualizationsResolver
 	Query() QueryResolver
+	Subscription() SubscriptionResolver
 	UserProfile() UserProfileResolver
 	Visualization() VisualizationResolver
 	Workspace() WorkspaceResolver
@@ -252,7 +254,7 @@ type ComplexityRoot struct {
 		LoginByEmail               func(childComplexity int, email string, workspaceName string) int
 		MakeProjectNotPublic       func(childComplexity int, projectID string) int
 		MakeProjectPublic          func(childComplexity int, projectID string) int
-		Ping                       func(childComplexity int) int
+		Pass                       func(childComplexity int) int
 		UpdateContact              func(childComplexity int, contactID string, data UpdateContactInput) int
 		UpdateHouse                func(childComplexity int, houseID string, data UpdateHouseInput) int
 		UpdateRoom                 func(childComplexity int, roomID string, data UpdateRoomInput) int
@@ -442,6 +444,10 @@ type ComplexityRoot struct {
 		Visualizations func(childComplexity int) int
 	}
 
+	Subscription struct {
+		Ping func(childComplexity int) int
+	}
+
 	UserProfile struct {
 		Abbr             func(childComplexity int) int
 		DefaultWorkspace func(childComplexity int) int
@@ -546,7 +552,7 @@ type HouseRoomsResolver interface {
 	List(ctx context.Context, obj *HouseRooms, limit int, offset int) (HouseRoomsListResult, error)
 }
 type MutationResolver interface {
-	Ping(ctx context.Context) (string, error)
+	Pass(ctx context.Context) (bool, error)
 	AcceptInvite(ctx context.Context, token string) (AcceptInviteResult, error)
 	AddContact(ctx context.Context, projectID string, contact AddContactInput) (AddContactResult, error)
 	AddHouse(ctx context.Context, projectID string, house AddHouseInput) (AddHouseResult, error)
@@ -612,6 +618,9 @@ type QueryResolver interface {
 	Profile(ctx context.Context) (UserProfileResult, error)
 	Project(ctx context.Context, id string) (ProjectResult, error)
 	Workspace(ctx context.Context, id string) (WorkspaceResult, error)
+}
+type SubscriptionResolver interface {
+	Ping(ctx context.Context) (<-chan string, error)
 }
 type UserProfileResolver interface {
 	DefaultWorkspace(ctx context.Context, obj *UserProfile) (*Workspace, error)
@@ -1357,12 +1366,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.MakeProjectPublic(childComplexity, args["projectId"].(string)), true
 
-	case "Mutation.ping":
-		if e.complexity.Mutation.Ping == nil {
+	case "Mutation.pass":
+		if e.complexity.Mutation.Pass == nil {
 			break
 		}
 
-		return e.complexity.Mutation.Ping(childComplexity), true
+		return e.complexity.Mutation.Pass(childComplexity), true
 
 	case "Mutation.updateContact":
 		if e.complexity.Mutation.UpdateContact == nil {
@@ -1991,6 +2000,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.SomeVisualizationsUploaded.Visualizations(childComplexity), true
 
+	case "Subscription.ping":
+		if e.complexity.Subscription.Ping == nil {
+			break
+		}
+
+		return e.complexity.Subscription.Ping(childComplexity), true
+
 	case "UserProfile.abbr":
 		if e.complexity.UserProfile.Abbr == nil {
 			break
@@ -2345,6 +2361,23 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 				Data: buf.Bytes(),
 			}
 		}
+	case ast.Subscription:
+		next := ec._Subscription(ctx, rc.Operation.SelectionSet)
+
+		var buf bytes.Buffer
+		return func(ctx context.Context) *graphql.Response {
+			buf.Reset()
+			data := next(ctx)
+
+			if data == nil {
+				return nil
+			}
+			data.MarshalGQL(&buf)
+
+			return &graphql.Response{
+				Data: buf.Bytes(),
+			}
+		}
 
 	default:
 		return graphql.OneShot(graphql.ErrorResponse(ctx, "unsupported GraphQL operation"))
@@ -2370,7 +2403,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 	return introspection.WrapTypeFromDef(parsedSchema, parsedSchema.Types[name]), nil
 }
 
-//go:embed "schema/mutation.graphql" "schema/mutation_accept_invite.graphql" "schema/mutation_add_contact.graphql" "schema/mutation_add_house.graphql" "schema/mutation_add_room.graphql" "schema/mutation_add_visualizations_to_album.graphql" "schema/mutation_change_album_page_orientation.graphql" "schema/mutation_change_album_page_size.graphql" "schema/mutation_change_project_dates.graphql" "schema/mutation_change_project_status.graphql" "schema/mutation_confirm_login_link.graphql" "schema/mutation_confirm_login_pin.graphql" "schema/mutation_create_album.graphql" "schema/mutation_create_project.graphql" "schema/mutation_delete_album.graphql" "schema/mutation_delete_contact.graphql" "schema/mutation_delete_room.graphql" "schema/mutation_delete_visualizations.graphql" "schema/mutation_invite_user.graphql" "schema/mutation_login_by_email.graphql" "schema/mutation_make_project_not_public.graphql" "schema/mutation_make_project_public.graphql" "schema/mutation_update_contact.graphql" "schema/mutation_update_house.graphql" "schema/mutation_update_room.graphql" "schema/mutation_upload_file.graphql" "schema/mutation_upload_visualization.graphql" "schema/mutation_upload_visualizations.graphql" "schema/query.graphql" "schema/query_album.graphql" "schema/query_profile.graphql" "schema/query_project.graphql" "schema/query_workspace.graphql" "schema/root.graphql"
+//go:embed "schema/mutation.graphql" "schema/mutation_accept_invite.graphql" "schema/mutation_add_contact.graphql" "schema/mutation_add_house.graphql" "schema/mutation_add_room.graphql" "schema/mutation_add_visualizations_to_album.graphql" "schema/mutation_change_album_page_orientation.graphql" "schema/mutation_change_album_page_size.graphql" "schema/mutation_change_project_dates.graphql" "schema/mutation_change_project_status.graphql" "schema/mutation_confirm_login_link.graphql" "schema/mutation_confirm_login_pin.graphql" "schema/mutation_create_album.graphql" "schema/mutation_create_project.graphql" "schema/mutation_delete_album.graphql" "schema/mutation_delete_contact.graphql" "schema/mutation_delete_room.graphql" "schema/mutation_delete_visualizations.graphql" "schema/mutation_invite_user.graphql" "schema/mutation_login_by_email.graphql" "schema/mutation_make_project_not_public.graphql" "schema/mutation_make_project_public.graphql" "schema/mutation_update_contact.graphql" "schema/mutation_update_house.graphql" "schema/mutation_update_room.graphql" "schema/mutation_upload_file.graphql" "schema/mutation_upload_visualization.graphql" "schema/mutation_upload_visualizations.graphql" "schema/query.graphql" "schema/query_album.graphql" "schema/query_profile.graphql" "schema/query_project.graphql" "schema/query_workspace.graphql" "schema/root.graphql" "schema/subscription.graphql"
 var sourcesFS embed.FS
 
 func sourceData(filename string) string {
@@ -2416,6 +2449,7 @@ var sources = []*ast.Source{
 	{Name: "schema/query_project.graphql", Input: sourceData("schema/query_project.graphql"), BuiltIn: false},
 	{Name: "schema/query_workspace.graphql", Input: sourceData("schema/query_workspace.graphql"), BuiltIn: false},
 	{Name: "schema/root.graphql", Input: sourceData("schema/root.graphql"), BuiltIn: false},
+	{Name: "schema/subscription.graphql", Input: sourceData("schema/subscription.graphql"), BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
@@ -6447,8 +6481,8 @@ func (ec *executionContext) fieldContext_LoginConfirmed_token(ctx context.Contex
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_ping(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Mutation_ping(ctx, field)
+func (ec *executionContext) _Mutation_pass(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_pass(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -6461,7 +6495,7 @@ func (ec *executionContext) _Mutation_ping(ctx context.Context, field graphql.Co
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().Ping(rctx)
+		return ec.resolvers.Mutation().Pass(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -6473,19 +6507,19 @@ func (ec *executionContext) _Mutation_ping(ctx context.Context, field graphql.Co
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(bool)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Mutation_ping(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Mutation_pass(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Mutation",
 		Field:      field,
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
+			return nil, errors.New("field of type Boolean does not have child fields")
 		},
 	}
 	return fc, nil
@@ -11616,6 +11650,64 @@ func (ec *executionContext) fieldContext_SomeVisualizationsUploaded_visualizatio
 				return ec.fieldContext_Visualization_room(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Visualization", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Subscription_ping(ctx context.Context, field graphql.CollectedField) (ret func(ctx context.Context) graphql.Marshaler) {
+	fc, err := ec.fieldContext_Subscription_ping(ctx, field)
+	if err != nil {
+		return nil
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = nil
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Subscription().Ping(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return nil
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return nil
+	}
+	return func(ctx context.Context) graphql.Marshaler {
+		select {
+		case res, ok := <-resTmp.(<-chan string):
+			if !ok {
+				return nil
+			}
+			return graphql.WriterFunc(func(w io.Writer) {
+				w.Write([]byte{'{'})
+				graphql.MarshalString(field.Alias).MarshalGQL(w)
+				w.Write([]byte{':'})
+				ec.marshalNString2string(ctx, field.Selections, res).MarshalGQL(w)
+				w.Write([]byte{'}'})
+			})
+		case <-ctx.Done():
+			return nil
+		}
+	}
+}
+
+func (ec *executionContext) fieldContext_Subscription_ping(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Subscription",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -19136,10 +19228,10 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Mutation")
-		case "ping":
+		case "pass":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_ping(ctx, field)
+				return ec._Mutation_pass(ctx, field)
 			})
 
 			if out.Values[i] == graphql.Null {
@@ -21000,6 +21092,26 @@ func (ec *executionContext) _SomeVisualizationsUploaded(ctx context.Context, sel
 		return graphql.Null
 	}
 	return out
+}
+
+var subscriptionImplementors = []string{"Subscription"}
+
+func (ec *executionContext) _Subscription(ctx context.Context, sel ast.SelectionSet) func(ctx context.Context) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, subscriptionImplementors)
+	ctx = graphql.WithFieldContext(ctx, &graphql.FieldContext{
+		Object: "Subscription",
+	})
+	if len(fields) != 1 {
+		ec.Errorf(ctx, "must subscribe to exactly one stream")
+		return nil
+	}
+
+	switch fields[0].Name {
+	case "ping":
+		return ec._Subscription_ping(ctx, fields[0])
+	default:
+		panic("unknown field " + strconv.Quote(fields[0].Name))
+	}
 }
 
 var userProfileImplementors = []string{"UserProfile", "UserProfileResult"}
