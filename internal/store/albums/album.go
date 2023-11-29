@@ -72,3 +72,7 @@ func (album *Album) ChangePageSize(size PageSize) {
 func (album *Album) ChangePageOrientation(orientation PageOrientation) {
 	album.Settings.PageOrientation = orientation
 }
+
+func (album *Album) UpVersion() {
+	album.Version++
+}

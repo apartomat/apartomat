@@ -10,6 +10,7 @@ import (
 	"github.com/apartomat/apartomat/internal/store/projects"
 	"github.com/apartomat/apartomat/internal/store/visualizations"
 	"github.com/apartomat/apartomat/internal/store/workspace_users"
+	"time"
 )
 
 func (u *Apartomat) CreateAlbum(
@@ -292,6 +293,8 @@ visLoop:
 		}
 	}
 
+	album.UpVersion()
+
 	if err := u.Albums.Save(ctx, album); err != nil {
 		return nil, err
 	}
@@ -342,6 +345,8 @@ func (u *Apartomat) ChangeAlbumPageSize(
 
 	album.ChangePageSize(size)
 
+	album.UpVersion()
+
 	if err := u.Albums.Save(ctx, album); err != nil {
 		return nil, err
 	}
@@ -375,6 +380,8 @@ func (u *Apartomat) ChangeAlbumPageOrientation(
 
 	album.ChangePageOrientation(orientation)
 
+	album.UpVersion()
+
 	if err := u.Albums.Save(ctx, album); err != nil {
 		return nil, err
 	}
@@ -405,7 +412,7 @@ func (u *Apartomat) GetAlbumRecentFile(ctx context.Context, albumID string) (*al
 		return nil, nil, err
 	}
 
-	if ok, err := u.CanChangeAlbumSettings(ctx, auth.UserFromCtx(ctx), album); err != nil {
+	if ok, err := u.CanGetAlbumFile(ctx, auth.UserFromCtx(ctx), album); err != nil {
 		return nil, nil, err
 	} else if !ok {
 		return nil, nil, fmt.Errorf("can't get album (id=%s) recent file: %w", album.ID, ErrForbidden)
@@ -435,4 +442,57 @@ func (u *Apartomat) CanGetAlbumFile(ctx context.Context, subj *auth.UserCtx, obj
 	}
 
 	return u.isProjectUser(ctx, subj, project)
+}
+
+func (u *Apartomat) StartGenerateAlbumFile(ctx context.Context, albumID string) (*albumFiles.AlbumFile, *files.File, error) {
+	album, err := u.Albums.Get(ctx, IDIn(albumID))
+	if err != nil {
+		return nil, nil, err
+	}
+
+	if ok, err := u.CanGetAlbumFile(ctx, auth.UserFromCtx(ctx), album); err != nil {
+		return nil, nil, err
+	} else if !ok {
+		return nil, nil, fmt.Errorf("can't get album (id=%s) recent file: %w", album.ID, ErrForbidden)
+	}
+
+	var (
+		lastFileVersion = -1
+	)
+
+	existedFile, err := u.AlbumFiles.GetMaxVersion(ctx, albumFiles.And(albumFiles.AlbumIDIn(albumID)))
+	if err == nil {
+		lastFileVersion = existedFile.Version
+	}
+
+	// нет файла -> начать генерацию
+	// генерация в процессе -> ошибка
+	// генерация не начата -> ошибка
+	// есть файл и генерация закончена -> начать новую генерацию
+
+	id, err := GenerateNanoID()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	af := albumFiles.NewAlbumFile(id, albumFiles.StatusNew, album.ID, lastFileVersion+1)
+
+	if err := u.AlbumFiles.Save(ctx, af); err != nil {
+		return nil, nil, err
+	}
+
+	go func() {
+		time.Sleep(30 * time.Second)
+
+		af.Status = albumFiles.StatusDone
+
+		if err := u.AlbumFiles.Save(ctx, af); err != nil {
+			println("======== can't save album file")
+			return
+		}
+
+		println("======== album file has been saved")
+	}()
+
+	return af, nil, err
 }

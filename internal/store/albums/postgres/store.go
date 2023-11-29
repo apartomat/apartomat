@@ -175,6 +175,7 @@ func fromRecords(recs []*record) []*Album {
 		res[i] = &Album{
 			ID:         rec.ID,
 			Name:       rec.Name,
+			Version:    rec.Version,
 			Settings:   fromSettingsRecord(rec.Settings),
 			Pages:      fromPageRecords(rec.Pages),
 			CreatedAt:  rec.CreatedAt,
