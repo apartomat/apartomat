@@ -15,7 +15,6 @@ import (
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/pgdialect"
 	"github.com/uptrace/bun/driver/pgdriver"
-	"github.com/uptrace/bun/extra/bundebug"
 
 	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/auth/paseto"
@@ -23,6 +22,7 @@ import (
 	"github.com/apartomat/apartomat/internal/image/minio"
 	"github.com/apartomat/apartomat/internal/mail"
 	"github.com/apartomat/apartomat/internal/mail/smtp"
+	zapbun "github.com/apartomat/apartomat/internal/pkg/bun"
 	"github.com/apartomat/apartomat/internal/postgres"
 	albumFiles "github.com/apartomat/apartomat/internal/store/album_files/postgres"
 	albums "github.com/apartomat/apartomat/internal/store/albums/postgres"
@@ -41,7 +41,7 @@ import (
 )
 
 func main() {
-	log, err := NewLogger("debug")
+	log, err := NewLogger(os.Getenv("LOG_LEVEL"))
 	if err != nil {
 		panic(err)
 	}
@@ -100,10 +100,7 @@ func main() {
 		bundb := bun.NewDB(sqldb, pgdialect.New())
 
 		// todo: write to logger
-		bundb.AddQueryHook(bundebug.NewQueryHook(
-			bundebug.WithVerbose(true),
-			bundebug.WithEnabled(true),
-		))
+		bundb.AddQueryHook(zapbun.NewZapLoggerQueryHook(log))
 
 		//
 
