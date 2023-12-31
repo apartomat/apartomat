@@ -1,0 +1,11 @@
+subscription onAlbumFileGenerated($albumId: String!) {
+    albumFileGenerated(id: $albumId) {
+        __typename
+        ...on AlbumFile {
+            ...AlbumScreenFile
+        }
+        ...on Error {
+            message
+        }
+    }
+}

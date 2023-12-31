@@ -19,12 +19,12 @@ const roundBox = (options: string[], option: string): RoundType | undefined => {
 export function PageSize({
     albumId,
     size,
-    onChange,
+    onAlbumPageSizeChanged,
     ...boxProps
 }: {
     albumId: string,
-    size: PageSizeEnum
-    onChange?: (size: PageSizeEnum) => void
+    size: PageSizeEnum,
+    onAlbumPageSizeChanged?: () => void
 } & BoxExtendedProps) {
     const options = [PageSizeEnum.A3, PageSizeEnum.A4]
 
@@ -41,6 +41,7 @@ export function PageSize({
             case "AlbumPageSizeChanged":
                 const { album } = data.changeAlbumPageSize
                 setPageSize(album.settings.pageSize)
+                onAlbumPageSizeChanged && onAlbumPageSizeChanged()
                 break
             default:
                 setPageSize(size)

@@ -1,0 +1,13 @@
+mutation generateAlbumFile($albumId: String!) {
+    generateAlbumFile(albumId: $albumId) {
+        __typename
+        ... on AlbumFileGenerationStarted {
+            file {
+                ...AlbumScreenFile
+            }
+        }
+        ... on Error {
+            message
+        }
+    }
+}

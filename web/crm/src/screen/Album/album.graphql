@@ -13,6 +13,7 @@ query albumScreen($id: String! $filter: ProjectVisualizationsListFilter!) {
 fragment AlbumScreenAlbum on Album {
     id
     name
+    version
     project {
         ... on Project {
             ...AlbumScreenProject
@@ -38,6 +39,14 @@ fragment AlbumScreenAlbum on Album {
     }
     settings {
         ...AlbumScreenSettings
+    }
+    file {
+        ... on AlbumFile {
+            ...AlbumScreenFile
+        }
+        ... on Error {
+            message
+        }
     }
 }
 
@@ -139,4 +148,17 @@ fragment AlbumScreenAlbumPageVisualization on AlbumPageVisualization {
             message
         }
     }
+}
+
+fragment AlbumScreenFile on AlbumFile {
+    id
+    status
+    version
+    file {
+        url
+        type
+        mimeType
+    }
+    generatingStartedAt
+    generatingDoneAt
 }

@@ -1,13 +1,14 @@
 import { MouseEventHandler, useEffect, useState } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 
-import { Box, BoxExtendedProps, Button, Grid, Heading, Header, Image, Text } from "grommet"
-import { Close, Add, Sort } from "grommet-icons"
+import {Box, BoxExtendedProps, Button, Grid, Heading, Header, Image, Text, Anchor, ButtonExtendedProps} from "grommet"
+import { Add, Close, DocumentPdf, Sort } from "grommet-icons"
 
 import useAlbum, { AlbumScreenVisualizationFragment, AlbumScreenProjectFragment, AlbumScreenAlbumPageCoverFragment, AlbumScreenAlbumPageVisualizationFragment, AlbumScreenSettingsFragment, PageOrientation as PageOrientationEnum, AlbumScreenHouseRoomFragment } from "./useAlbum"
 
 import { PageSize, PageOrientation } from "./Settings/"
 import AddVisualizations from "screen/Album/AddVisualizations/AddVisualizations"
+import GenerateAlbumFile from "screen/Album/GenerateFile/GenerateFile"
 import { Pages } from "./Pages"
 
 export function Album() {
@@ -23,7 +24,7 @@ export function Album() {
 
     const [ settings, setSettings ] = useState<AlbumScreenSettingsFragment | undefined>()
 
-    const { data, loading } = useAlbum({ id })
+    const { data, loading, refetch } = useAlbum({ id })
 
     const [ showAddVisualizations, setShowAddVisualizations ] = useState(false)
 
@@ -103,10 +104,24 @@ export function Album() {
                 {settings &&
                     <Box gap="small" align="end" margin={{ top: "large" }}>
                         <Heading level={5}>Настройки для печати</Heading>
-                        <PageSize albumId={id} size={settings.pageSize} />
-                        <PageOrientation albumId={id} orientation={settings.pageOrientation} />
+                        <PageSize
+                            albumId={id}
+                            size={settings.pageSize}
+                            onAlbumPageSizeChanged={() => refetch()}
+                        />
+                        <PageOrientation
+                            albumId={id}
+                            orientation={settings.pageOrientation}
+                            onAlbumPageOrientationChanged={() => refetch()}
+                        />
                     </Box>
                 }
+                {data?.album.__typename === "Album" && <Box gap="small" align="end" margin={{ top: "large" }}>
+                    <GenerateAlbumFile
+                        album={data.album}
+                        onAlbumFileGenerated={() => refetch()}
+                    />
+                </Box>}
             </Box>
 
             <Box gridArea="left"></Box>
@@ -207,7 +222,10 @@ export function Album() {
                     visualizations={visualizations}
                     rooms={rooms}
                     inAlbum={ids(pages)}
-                    onVisualizationsAdded={() => setShowAddVisualizations(false)}
+                    onVisualizationsAdded={() => {
+                        setShowAddVisualizations(false)
+                        refetch()
+                    }}
                     onEsc={() => setShowAddVisualizations(false)}
                     onClickOutside={() => setShowAddVisualizations(false)}
                     onClickClose={() => setShowAddVisualizations(false)}

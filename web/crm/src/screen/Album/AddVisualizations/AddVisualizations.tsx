@@ -1,4 +1,4 @@
-import {useRef, useState} from "react"
+import {useEffect, useRef, useState} from "react"
 
 import {Box, Button, Drop, Grid, Heading, Image, Layer, LayerExtendedProps, Text} from "grommet"
 import { FormClose}  from "grommet-icons"
@@ -39,7 +39,13 @@ export default function AddVisualizations({
 
     const [ selectedRooms, setSelectedRooms ] = useState<string[]>([])
 
-    const [ addVisualizations ] = useAddVisualizationsToAlbum(albumId)
+    const [ addVisualizations, { data, loading} ] = useAddVisualizationsToAlbum(albumId)
+
+    useEffect(() => {
+        if (data?.addVisualizationsToAlbum.__typename === "VisualizationsAddedToAlbum") {
+            onVisualizationsAdded && onVisualizationsAdded()
+        }
+    }, [ data ]);
 
     return (
         <Layer {...layerProps}>
@@ -136,7 +142,6 @@ export default function AddVisualizations({
                         onClick={() => {
                             addVisualizations(selected)
                             setSelected([])
-                            onVisualizationsAdded && onVisualizationsAdded()
                         }}
                     />
                 </Box>

@@ -12,11 +12,7 @@ export type {
 
 export { PageOrientation } from "api/graphql"
 
-export function useAlbum({
-    id
-}: {
-    id: string
-}) {
+export function useAlbum({ id }: { id: string }) {
     return useAlbumScreenQuery({
         client: useApolloClient(),
         errorPolicy: "all",

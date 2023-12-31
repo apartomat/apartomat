@@ -9,12 +9,12 @@ import { useChangeAlbumPageOrientation, PageOrientation as PageOrientationEnum }
 export function PageOrientation({
     albumId,
     orientation,
-    onChange,
+    onAlbumPageOrientationChanged,
     ...boxProps
 }: {
     albumId: string,
     orientation: PageOrientationEnum,
-    onChange?: (orientation: PageOrientationEnum) => void
+    onAlbumPageOrientationChanged?: () => void
 } & BoxExtendedProps) {
     const options = [
         {value: PageOrientationEnum.Portrait, title: "portrait", icon: <Document/> },
@@ -34,6 +34,7 @@ export function PageOrientation({
             case "AlbumPageOrientationChanged":
                 const { album } = data.changeAlbumPageOrientation
                 setPageOrientation(album.settings.pageOrientation)
+                onAlbumPageOrientationChanged && onAlbumPageOrientationChanged()
                 break
             default:
                 setPageOrientation(orientation)

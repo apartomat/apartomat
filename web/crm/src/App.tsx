@@ -1,8 +1,9 @@
 import { Grommet } from "grommet"
 
-import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client"
+import {ApolloClient, InMemoryCache, ApolloProvider, split, DefaultOptions} from "@apollo/client"
 import { setContext } from "@apollo/client/link/context"
 import { createUploadLink } from "apollo-upload-client"
+import {getMainDefinition} from "@apollo/client/utilities";
 
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 
@@ -18,6 +19,8 @@ import Workspace from "screen/Workspace/Workspace"
 import Project from "screen/Project/Project"
 import Visualizations from "screen/Visualizations/Visualizations"
 import Album from "screen/Album/Album"
+import {GraphQLWsLink} from "@apollo/client/link/subscriptions";
+import {createClient} from "graphql-ws";
 
 const theme = {
   global: {
@@ -29,7 +32,7 @@ const theme = {
   },
 }
 
-const authLink = setContext((_, { headers }) => {
+const authLink = setContext((req, { headers }) => {
     const token = JSON.parse(localStorage.getItem("token") || `""`)
 
     return {
@@ -42,42 +45,67 @@ const authLink = setContext((_, { headers }) => {
 
 const httpLink = createUploadLink({ uri: import.meta.env.VITE_APARTOMAT_API_URL })
 
-const link = authLink.concat(httpLink)
-
-const appoloCache = new InMemoryCache({
-    possibleTypes: {
-        ProjectPublicSite: ["PublicSite", "NotFound", "ServerError"],
-        Project: ["ProjectVisualizations"],
+const wsLink = new GraphQLWsLink(createClient({
+    url: import.meta.env.VITE_APARTOMAT_API_URL_WS,
+    connectionParams: () => {
+        return {
+            Authorization: JSON.parse(localStorage.getItem("token") || `""`),
+        }
     }
-})
+}))
 
-const apolloClient = new ApolloClient({ cache: appoloCache, link })
+const link = split(
+    ({ query }) => {
+        const definition = getMainDefinition(query);
+        return (
+            definition.kind === 'OperationDefinition' &&
+            definition.operation === 'subscription'
+        );
+    },
+    wsLink,
+    authLink.concat(httpLink)
+)
+
+const cache = new InMemoryCache()
+
+const defaultOptions: DefaultOptions = {
+    watchQuery: {
+        fetchPolicy: "no-cache",
+        errorPolicy: "all",
+    },
+    query: {
+        fetchPolicy: "no-cache",
+        errorPolicy: "all",
+    },
+}
+
+const apolloClient = new ApolloClient({ cache, link, defaultOptions })
 
 function App() {
-  return (
-    <Grommet theme={theme}>
-        <ApolloProvider client={apolloClient}>
-            <AuthProvider>
-                <BrowserRouter>
-                    <Routes>
-                        <Route path="/login" element={<Login />} />
-                        <Route path="/logout" element={<Logout />} />
-                        <Route path="/confirm" element={<Confirm />} />
-                        <Route path="/accept-invite" element={<AcceptInvite />} />
-                        <Route element={<AuthRequired />}>
-                            <Route path="/" element={<RedirectToDefaultWorkspace />} />
-                            <Route path="/:id" element={<Workspace />}/>
-                            <Route path="/p/:id" element={<Project />} />
-                            <Route path="/vis/:id" element={<Visualizations />}/>
-                            <Route path="/album/:id"  element={<Album />} />
-                            <Route path="/p/:id/album" element={<Album />} />
-                        </Route>
-                    </Routes>
-                </BrowserRouter>
-            </AuthProvider>
-        </ApolloProvider>
-    </Grommet>
-  )
+    return (
+        <Grommet theme={theme}>
+            <ApolloProvider client={apolloClient}>
+                <AuthProvider>
+                    <BrowserRouter>
+                        <Routes>
+                            <Route path="/login" element={<Login />} />
+                            <Route path="/logout" element={<Logout />} />
+                            <Route path="/confirm" element={<Confirm />} />
+                            <Route path="/accept-invite" element={<AcceptInvite />} />
+                            <Route element={<AuthRequired />}>
+                                <Route path="/" element={<RedirectToDefaultWorkspace />} />
+                                <Route path="/:id" element={<Workspace />}/>
+                                <Route path="/p/:id" element={<Project />} />
+                                <Route path="/vis/:id" element={<Visualizations />}/>
+                                <Route path="/album/:id"  element={<Album />} />
+                                <Route path="/p/:id/album" element={<Album />} />
+                            </Route>
+                        </Routes>
+                    </BrowserRouter>
+                </AuthProvider>
+            </ApolloProvider>
+        </Grommet>
+    )
 }
 
 export default App
