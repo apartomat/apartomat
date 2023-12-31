@@ -5,5 +5,6 @@ extend type Mutation {
 union AddVisualizationsToAlbumResult = VisualizationsAddedToAlbum | Forbidden | ServerError
 
 type VisualizationsAddedToAlbum {
+    album: Album!
     pages: [AlbumPageVisualization!]!
 }

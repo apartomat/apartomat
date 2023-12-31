@@ -1,12 +1,17 @@
 package graphql
 
 import (
+	"context"
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
+	"github.com/99designs/gqlgen/graphql/handler/lru"
+	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/apartomat/apartomat/internal/auth"
 	"github.com/apartomat/apartomat/internal/dataloader"
+	"github.com/gorilla/websocket"
 	"net/http"
 	"strings"
+	"time"
 )
 
 type CheckAuthTokenFn func(str string) (auth.AuthToken, error)
@@ -17,7 +22,39 @@ func Handler(
 	resolver ResolverRoot,
 	complexityLimit int,
 ) http.Handler {
-	gh := handler.NewDefaultServer(NewExecutableSchema(Config{Resolvers: resolver}))
+	var (
+		gh = handler.New(NewExecutableSchema(Config{Resolvers: resolver}))
+	)
+
+	gh.AddTransport(transport.Websocket{
+		KeepAlivePingInterval: 10 * time.Second,
+		Upgrader: websocket.Upgrader{
+			CheckOrigin: func(r *http.Request) bool {
+				return true
+			},
+		},
+		InitFunc: func(ctx context.Context, payload transport.InitPayload) (context.Context, error) {
+			if t, _ := ch(payload.Authorization()); t != nil {
+				return auth.WithUserCtx(ctx, &auth.UserCtx{ID: t.UserID()}), nil
+			}
+
+			return ctx, nil
+		},
+	})
+
+	gh.AddTransport(transport.Options{})
+	gh.AddTransport(transport.GET{})
+	gh.AddTransport(transport.POST{})
+	gh.AddTransport(transport.MultipartForm{})
+
+	gh.SetQueryCache(lru.New(1000))
+
+	gh.Use(extension.Introspection{})
+
+	gh.Use(extension.AutomaticPersistedQuery{
+		Cache: lru.New(100),
+	})
+
 	gh.Use(extension.FixedComplexityLimit(complexityLimit))
 
 	return CorsHandler(

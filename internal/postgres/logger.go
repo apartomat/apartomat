@@ -4,28 +4,33 @@ import (
 	"context"
 	"github.com/go-pg/pg/v10"
 	"go.uber.org/zap"
+	"time"
 )
 
-// loggerHook is a pg.QueryHook that logs queries. Writes log
+// ZapLogQueryHook is a pg.QueryHook that logs queries. Writes log
 // to zap.Logger with a zap.DebugLevel
-type loggerHook struct {
+type ZapLogQueryHook struct {
 	logger *zap.Logger
 }
 
-func NewLoggerHook(logger *zap.Logger) pg.QueryHook {
-	return &loggerHook{logger}
+func NewZapLogQueryHook(logger *zap.Logger) pg.QueryHook {
+	return &ZapLogQueryHook{logger}
 }
 
-func (h *loggerHook) BeforeQuery(c context.Context, q *pg.QueryEvent) (context.Context, error) {
+func (h *ZapLogQueryHook) BeforeQuery(ctx context.Context, q *pg.QueryEvent) (context.Context, error) {
+	return ctx, nil
+}
+
+func (h *ZapLogQueryHook) AfterQuery(c context.Context, q *pg.QueryEvent) error {
+	var (
+		dur = time.Now().Sub(q.StartTime)
+	)
+
 	query, err := q.FormattedQuery()
 
 	if err == nil {
-		h.logger.Debug(string(query))
+		h.logger.Debug(string(query), zap.Duration("dur", dur))
 	}
 
-	return c, nil
-}
-
-func (h *loggerHook) AfterQuery(c context.Context, q *pg.QueryEvent) error {
 	return nil
 }

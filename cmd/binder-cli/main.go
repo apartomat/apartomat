@@ -16,12 +16,12 @@ import (
 	"path/filepath"
 )
 
-const usage = `binder
+const usage = `binder-cli
 
 Book binder.
 
 Usage:
-	binder <format> <orientation> <path> [--debug]
+	binder-cli <format> <orientation> <path> [--debug]
 `
 
 type Orientation string
@@ -207,6 +207,7 @@ func main() {
 		name := fmt.Sprintf("%x", md5.Sum([]byte(path)))
 
 		pdf.RegisterImageOptionsReader(name, opt, img)
+
 		pdf.ImageOptions(name, x, y, w, h, false, opt, 0, "")
 
 		//

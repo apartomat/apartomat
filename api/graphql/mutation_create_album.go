@@ -34,8 +34,9 @@ func (r *mutationResolver) CreateAlbum(
 
 func albumToGraphQL(album *albums.Album) *Album {
 	return &Album{
-		ID:   album.ID,
-		Name: album.Name,
+		ID:      album.ID,
+		Name:    album.Name,
+		Version: album.Version,
 		Project: Project{
 			ID: album.ProjectID,
 		},

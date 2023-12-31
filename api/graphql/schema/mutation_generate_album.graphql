@@ -1,0 +1,9 @@
+extend type Mutation {
+    generateAlbumFile(albumId: String!): GenerateAlbumFileResult!
+}
+
+union GenerateAlbumFileResult = AlbumFileGenerationStarted | Forbidden | NotFound | ServerError
+
+type AlbumFileGenerationStarted {
+    file: AlbumFile!
+}

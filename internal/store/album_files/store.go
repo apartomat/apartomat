@@ -22,7 +22,7 @@ const (
 type Store interface {
 	List(ctx context.Context, spec Spec, sort Sort, limit, offset int) ([]*AlbumFile, error)
 	Get(ctx context.Context, spec Spec) (*AlbumFile, error)
-	GetMaxVersion(ctx context.Context, spec Spec) (*AlbumFile, error)
+	GetLastVersion(ctx context.Context, spec Spec) (*AlbumFile, error)
 	Count(context.Context, Spec) (int, error)
 	Save(context.Context, ...*AlbumFile) error
 	Delete(context.Context, ...*AlbumFile) error

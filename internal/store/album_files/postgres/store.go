@@ -54,7 +54,7 @@ func (s *store) Get(ctx context.Context, spec Spec) (*AlbumFile, error) {
 	return res[0], nil
 }
 
-func (s *store) GetMaxVersion(ctx context.Context, spec Spec) (*AlbumFile, error) {
+func (s *store) GetLastVersion(ctx context.Context, spec Spec) (*AlbumFile, error) {
 	res, err := s.List(ctx, spec, SortVersionDesc, 1, 0)
 	if err != nil {
 		return nil, err

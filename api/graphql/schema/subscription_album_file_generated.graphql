@@ -1,0 +1,5 @@
+extend type Subscription {
+    albumFileGenerated(id: String!): AlbumFileGenerated!
+}
+
+union AlbumFileGenerated = AlbumFile | Forbidden | NotFound | Unknown | ServerError

@@ -87,7 +87,7 @@ func main() {
 
 		pgdb := pg.Connect(pgopts)
 
-		pgdb.AddQueryHook(postgres.NewLoggerHook(log))
+		pgdb.AddQueryHook(postgres.NewZapLogQueryHook(log))
 
 		reg := prometheus.NewRegistry()
 
@@ -159,6 +159,7 @@ func main() {
 			Visualizations: visualizationsStore,
 			Workspaces:     workspacesStore,
 			WorkspaceUsers: workspaceUsersStore,
+			Logger:         log,
 		}
 
 		var (

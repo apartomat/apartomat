@@ -7,19 +7,19 @@ import (
 	"time"
 )
 
-type ZapLoggerQueryHook struct {
+type ZapLogQueryHook struct {
 	logger *zap.Logger
 }
 
-func NewZapLoggerQueryHook(logger *zap.Logger) *ZapLoggerQueryHook {
-	return &ZapLoggerQueryHook{logger: logger}
+func NewZapLoggerQueryHook(logger *zap.Logger) *ZapLogQueryHook {
+	return &ZapLogQueryHook{logger: logger}
 }
 
-func (h *ZapLoggerQueryHook) BeforeQuery(ctx context.Context, event *bun.QueryEvent) context.Context {
+func (h *ZapLogQueryHook) BeforeQuery(ctx context.Context, event *bun.QueryEvent) context.Context {
 	return ctx
 }
 
-func (h *ZapLoggerQueryHook) AfterQuery(ctx context.Context, event *bun.QueryEvent) {
+func (h *ZapLogQueryHook) AfterQuery(ctx context.Context, event *bun.QueryEvent) {
 	var (
 		dur = time.Now().Sub(event.StartTime)
 	)

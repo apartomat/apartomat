@@ -16,13 +16,14 @@ type Album struct {
 	ProjectID  string
 }
 
-func NewAlbum(id, name, projectID string) *Album {
+func NewAlbum(id, name string, settings Settings, projectID string) *Album {
 	now := time.Now()
 
 	return &Album{
 		ID:         id,
 		Name:       name,
 		Version:    0,
+		Settings:   settings,
 		CreatedAt:  now,
 		ModifiedAt: now,
 		ProjectID:  projectID,

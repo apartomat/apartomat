@@ -31,6 +31,10 @@ type AddVisualizationsToAlbumResult interface {
 	IsAddVisualizationsToAlbumResult()
 }
 
+type AlbumFileGenerated interface {
+	IsAlbumFileGenerated()
+}
+
 type AlbumPage interface {
 	IsAlbumPage()
 }
@@ -106,6 +110,10 @@ type DeleteVisualizationsResult interface {
 type Error interface {
 	IsError()
 	GetMessage() string
+}
+
+type GenerateAlbumFileResult interface {
+	IsGenerateAlbumFileResult()
 }
 
 type HouseRoomsListResult interface {
@@ -244,6 +252,7 @@ type AddRoomInput struct {
 type Album struct {
 	ID       string                `json:"id"`
 	Name     string                `json:"name"`
+	Version  int                   `json:"version"`
 	Project  AlbumProjectResult    `json:"project"`
 	Settings *AlbumSettings        `json:"settings"`
 	Pages    AlbumPagesResult      `json:"pages"`
@@ -274,6 +283,14 @@ type AlbumFile struct {
 }
 
 func (AlbumFile) IsAlbumRecentFileResult() {}
+
+func (AlbumFile) IsAlbumFileGenerated() {}
+
+type AlbumFileGenerationStarted struct {
+	File *AlbumFile `json:"file"`
+}
+
+func (AlbumFileGenerationStarted) IsGenerateAlbumFileResult() {}
 
 type AlbumPageCover struct {
 	Position int `json:"position"`
@@ -444,6 +461,8 @@ func (Forbidden) IsDeleteRoomResult() {}
 
 func (Forbidden) IsDeleteVisualizationsResult() {}
 
+func (Forbidden) IsGenerateAlbumFileResult() {}
+
 func (Forbidden) IsInviteUserToWorkspaceResult() {}
 
 func (Forbidden) IsMakeProjectNotPublicResult() {}
@@ -506,6 +525,8 @@ func (Forbidden) IsWorkspaceUsersTotalResult() {}
 
 func (Forbidden) IsError()                {}
 func (this Forbidden) GetMessage() string { return this.Message }
+
+func (Forbidden) IsAlbumFileGenerated() {}
 
 type Gravatar struct {
 	URL string `json:"url"`
@@ -630,6 +651,8 @@ func (NotFound) IsDeleteRoomResult() {}
 
 func (NotFound) IsDeleteVisualizationsResult() {}
 
+func (NotFound) IsGenerateAlbumFileResult() {}
+
 func (NotFound) IsInviteUserToWorkspaceResult() {}
 
 func (NotFound) IsMakeProjectNotPublicResult() {}
@@ -658,6 +681,8 @@ func (NotFound) IsWorkspaceResult() {}
 
 func (NotFound) IsError()                {}
 func (this NotFound) GetMessage() string { return this.Message }
+
+func (NotFound) IsAlbumFileGenerated() {}
 
 type PinSentByEmail struct {
 	Email string `json:"email"`
@@ -928,6 +953,8 @@ func (ServerError) IsDeleteContactResult() {}
 
 func (ServerError) IsDeleteVisualizationsResult() {}
 
+func (ServerError) IsGenerateAlbumFileResult() {}
+
 func (ServerError) IsInviteUserToWorkspaceResult() {}
 
 func (ServerError) IsLoginByEmailResult() {}
@@ -997,6 +1024,8 @@ func (ServerError) IsWorkspaceUsersTotalResult() {}
 func (ServerError) IsError()                {}
 func (this ServerError) GetMessage() string { return this.Message }
 
+func (ServerError) IsAlbumFileGenerated() {}
+
 type SomeVisualizationsDeleted struct {
 	Visualizations []*Visualization `json:"visualizations"`
 }
@@ -1008,6 +1037,15 @@ type SomeVisualizationsUploaded struct {
 }
 
 func (SomeVisualizationsUploaded) IsUploadVisualizationsResult() {}
+
+type Unknown struct {
+	Message string `json:"message"`
+}
+
+func (Unknown) IsError()                {}
+func (this Unknown) GetMessage() string { return this.Message }
+
+func (Unknown) IsAlbumFileGenerated() {}
 
 type UpdateContactInput struct {
 	FullName string                 `json:"fullName"`
@@ -1064,6 +1102,7 @@ type VisualizationUploaded struct {
 func (VisualizationUploaded) IsUploadVisualizationResult() {}
 
 type VisualizationsAddedToAlbum struct {
+	Album *Album                    `json:"album"`
 	Pages []*AlbumPageVisualization `json:"pages"`
 }
 

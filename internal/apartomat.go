@@ -2,6 +2,7 @@ package apartomat
 
 import (
 	"errors"
+	"go.uber.org/zap"
 
 	"github.com/apartomat/apartomat/internal/auth"
 	"github.com/apartomat/apartomat/internal/image"
@@ -51,6 +52,8 @@ type Apartomat struct {
 	Visualizations visualizations.Store
 	Workspaces     workspaces.Store
 	WorkspaceUsers workspace_users.Store
+
+	Logger *zap.Logger
 }
 
 var (

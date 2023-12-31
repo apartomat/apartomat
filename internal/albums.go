@@ -2,6 +2,7 @@ package apartomat
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/apartomat/apartomat/internal/auth"
 	albumFiles "github.com/apartomat/apartomat/internal/store/album_files"
@@ -10,7 +11,6 @@ import (
 	"github.com/apartomat/apartomat/internal/store/projects"
 	"github.com/apartomat/apartomat/internal/store/visualizations"
 	"github.com/apartomat/apartomat/internal/store/workspace_users"
-	"time"
 )
 
 func (u *Apartomat) CreateAlbum(
@@ -42,7 +42,7 @@ func (u *Apartomat) CreateAlbum(
 		return nil, err
 	}
 
-	album := NewAlbum(id, name, project.ID)
+	album := NewAlbum(id, name, Settings{PageOrientation: Portrait, PageSize: A4}, project.ID)
 
 	if err := u.Albums.Save(ctx, album); err != nil {
 		return nil, err
@@ -418,7 +418,7 @@ func (u *Apartomat) GetAlbumRecentFile(ctx context.Context, albumID string) (*al
 		return nil, nil, fmt.Errorf("can't get album (id=%s) recent file: %w", album.ID, ErrForbidden)
 	}
 
-	albumFile, err := u.AlbumFiles.GetMaxVersion(ctx, albumFiles.And(albumFiles.AlbumIDIn(albumID)))
+	albumFile, err := u.AlbumFiles.GetLastVersion(ctx, albumFiles.And(albumFiles.AlbumIDIn(albumID)))
 	if err != nil {
 		return nil, nil, err
 	}
@@ -444,6 +444,10 @@ func (u *Apartomat) CanGetAlbumFile(ctx context.Context, subj *auth.UserCtx, obj
 	return u.isProjectUser(ctx, subj, project)
 }
 
+var (
+	ErrAlbumFileVersionExisted = errors.New("album file version existed")
+)
+
 func (u *Apartomat) StartGenerateAlbumFile(ctx context.Context, albumID string) (*albumFiles.AlbumFile, *files.File, error) {
 	album, err := u.Albums.Get(ctx, IDIn(albumID))
 	if err != nil {
@@ -453,46 +457,28 @@ func (u *Apartomat) StartGenerateAlbumFile(ctx context.Context, albumID string) 
 	if ok, err := u.CanGetAlbumFile(ctx, auth.UserFromCtx(ctx), album); err != nil {
 		return nil, nil, err
 	} else if !ok {
-		return nil, nil, fmt.Errorf("can't get album (id=%s) recent file: %w", album.ID, ErrForbidden)
+		return nil, nil, fmt.Errorf("can't generate album (id=%s) file: %w", album.ID, ErrForbidden)
 	}
 
-	var (
-		lastFileVersion = -1
-	)
-
-	existedFile, err := u.AlbumFiles.GetMaxVersion(ctx, albumFiles.And(albumFiles.AlbumIDIn(albumID)))
-	if err == nil {
-		lastFileVersion = existedFile.Version
+	existedFile, err := u.AlbumFiles.GetLastVersion(ctx, albumFiles.And(albumFiles.AlbumIDIn(albumID)))
+	if err != nil && !errors.Is(err, albumFiles.ErrAlbumFileNotFound) {
+		return nil, nil, err
 	}
 
-	// нет файла -> начать генерацию
-	// генерация в процессе -> ошибка
-	// генерация не начата -> ошибка
-	// есть файл и генерация закончена -> начать новую генерацию
+	if existedFile != nil && existedFile.Version >= album.Version {
+		return nil, nil, ErrAlbumFileVersionExisted
+	}
 
 	id, err := GenerateNanoID()
 	if err != nil {
 		return nil, nil, err
 	}
 
-	af := albumFiles.NewAlbumFile(id, albumFiles.StatusNew, album.ID, lastFileVersion+1)
+	af := albumFiles.NewAlbumFile(id, albumFiles.StatusNew, album.ID, album.Version)
 
 	if err := u.AlbumFiles.Save(ctx, af); err != nil {
 		return nil, nil, err
 	}
-
-	go func() {
-		time.Sleep(30 * time.Second)
-
-		af.Status = albumFiles.StatusDone
-
-		if err := u.AlbumFiles.Save(ctx, af); err != nil {
-			println("======== can't save album file")
-			return
-		}
-
-		println("======== album file has been saved")
-	}()
 
 	return af, nil, err
 }

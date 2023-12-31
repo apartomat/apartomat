@@ -18,6 +18,7 @@ type FileType string
 const (
 	FileTypeNone          FileType = "NONE"
 	FileTypeVisualization FileType = "VISUALIZATION"
+	FileTypeAlbum         FileType = "ALBUM"
 )
 
 func NewFile(id, name, url string, fileType FileType, mimeType, projectID string) *File {

@@ -80,6 +80,26 @@ func VersionGte(val int) Spec {
 
 //
 
+type StatusInSpec struct {
+	Status []Status
+}
+
+func (s StatusInSpec) Is(c *AlbumFile) bool {
+	for _, val := range s.Status {
+		if c.Status == val {
+			return true
+		}
+	}
+
+	return false
+}
+
+func StatusIn(vals ...Status) Spec {
+	return StatusInSpec{Status: vals}
+}
+
+//
+
 type AndSpec struct {
 	Specs []Spec
 }

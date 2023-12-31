@@ -25,6 +25,10 @@ type AlreadyExists implements Error {
     message: String!
 }
 
+type Unknown implements Error {
+    message: String!
+}
+
 
 type Gravatar {
     url: String!

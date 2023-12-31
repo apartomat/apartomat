@@ -25,6 +25,8 @@ func toSpecQuery(spec Spec) (specQuery, error) {
 		return versionInSpecQuery{s}, nil
 	case VersionGteSpec:
 		return versionGteSpecQuery{s}, nil
+	case StatusInSpec:
+		return statusInSpecQuery{s}, nil
 	case AndSpec:
 		return andSpecQuery{spec: s}, nil
 	case OrSpec:
@@ -118,6 +120,16 @@ type versionGteSpecQuery struct {
 
 func (s versionGteSpecQuery) Expression() (goqu.Expression, error) {
 	return goqu.Ex{"version": s.spec.Version}, nil
+}
+
+//
+
+type statusInSpecQuery struct {
+	spec StatusInSpec
+}
+
+func (s statusInSpecQuery) Expression() (goqu.Expression, error) {
+	return goqu.Ex{"status": s.spec.Status}, nil
 }
 
 //
