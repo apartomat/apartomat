@@ -102,6 +102,8 @@ func main() {
 		// todo: write to logger
 		bundb.AddQueryHook(zapbun.NewZapLoggerQueryHook(log))
 
+		bundb.AddQueryHook(zapbun.NewQueryLatencyHook(reg))
+
 		//
 
 		usersStore := users.NewStore(pgdb)
@@ -114,7 +116,7 @@ func main() {
 		contactsStore := contacts.NewStore(pgdb)
 		housesStore := houses.NewStore(pgdb)
 		roomsStore := rooms.NewStore(pgdb)
-		visualizationsStore := visualizations.NewStore(pgdb)
+		visualizationsStore := visualizations.NewStore(bundb)
 		publicSitesStore := sites.NewStore(bundb)
 
 		usersLoader := dataloader.NewUserLoader(dataloader.NewUserLoaderConfig(ctx, usersStore))

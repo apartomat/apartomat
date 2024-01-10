@@ -6,28 +6,28 @@ import (
 	"github.com/doug-martin/goqu/v9"
 )
 
-type visualizationSpecQuery interface {
+type specQuery interface {
 	Expression() (goqu.Expression, error)
 }
 
-func toVisualizationSpecQuery(spec Spec) (visualizationSpecQuery, error) {
+func toSpecQuery(spec Spec) (specQuery, error) {
 	if spec == nil {
 		return nil, nil
 	}
 
-	if s, ok := spec.(visualizationSpecQuery); ok {
+	if s, ok := spec.(specQuery); ok {
 		return s, nil
 	}
 
 	switch s := spec.(type) {
 	case IDInSpec:
-		return visualizationIDInSpecQuery{s}, nil
+		return idInSpecQuery{s}, nil
 	case ProjectIDInSpec:
-		return visualizationProjectIDInSpecQuery{s}, nil
+		return projectIDInSpecQuery{s}, nil
 	case RoomIDInSpec:
-		return visualizationRoomIDInSpecQuery{s}, nil
+		return roomIDInSpecQuery{s}, nil
 	case StatusInSpec:
-		return visualizationStatusInSpecQuery{s}, nil
+		return statusInSpecQuery{s}, nil
 	case AndSpec:
 		return andSpecQuery{spec: s}, nil
 	case OrSpec:
@@ -37,35 +37,35 @@ func toVisualizationSpecQuery(spec Spec) (visualizationSpecQuery, error) {
 	return nil, errors.New("unknown spec")
 }
 
-type visualizationIDInSpecQuery struct {
+type idInSpecQuery struct {
 	spec IDInSpec
 }
 
-func (s visualizationIDInSpecQuery) Expression() (goqu.Expression, error) {
+func (s idInSpecQuery) Expression() (goqu.Expression, error) {
 	return goqu.Ex{"id": s.spec.ID}, nil
 }
 
-type visualizationProjectIDInSpecQuery struct {
+type projectIDInSpecQuery struct {
 	spec ProjectIDInSpec
 }
 
-func (s visualizationProjectIDInSpecQuery) Expression() (goqu.Expression, error) {
+func (s projectIDInSpecQuery) Expression() (goqu.Expression, error) {
 	return goqu.Ex{"project_id": s.spec.ProjectID}, nil
 }
 
-type visualizationRoomIDInSpecQuery struct {
+type roomIDInSpecQuery struct {
 	spec RoomIDInSpec
 }
 
-func (s visualizationRoomIDInSpecQuery) Expression() (goqu.Expression, error) {
+func (s roomIDInSpecQuery) Expression() (goqu.Expression, error) {
 	return goqu.Ex{"room_id": s.spec.RoomID}, nil
 }
 
-type visualizationStatusInSpecQuery struct {
+type statusInSpecQuery struct {
 	spec StatusInSpec
 }
 
-func (s visualizationStatusInSpecQuery) Expression() (goqu.Expression, error) {
+func (s statusInSpecQuery) Expression() (goqu.Expression, error) {
 	return goqu.Ex{"status": s.spec.Status}, nil
 }
 
@@ -77,7 +77,7 @@ func (s andSpecQuery) Expression() (goqu.Expression, error) {
 	exs := make([]goqu.Expression, 0, len(s.spec.Specs))
 
 	for _, spec := range s.spec.Specs {
-		if ps, err := toVisualizationSpecQuery(spec); err != nil {
+		if ps, err := toSpecQuery(spec); err != nil {
 			return nil, err
 		} else if ps != nil {
 			expr, err := ps.Expression()
@@ -100,7 +100,7 @@ func (s orSpecQuery) Expression() (goqu.Expression, error) {
 	exs := make([]goqu.Expression, 0, len(s.spec.Specs))
 
 	for _, spec := range s.spec.Specs {
-		if ps, err := toVisualizationSpecQuery(spec); err != nil {
+		if ps, err := toSpecQuery(spec); err != nil {
 			return nil, err
 		} else if ps != nil {
 			expr, err := ps.Expression()
@@ -113,4 +113,18 @@ func (s orSpecQuery) Expression() (goqu.Expression, error) {
 	}
 
 	return goqu.Or(exs...), nil
+}
+
+func selectBySpec(tablename string, spec Spec, limit, offset int) (string, []interface{}, error) {
+	qs, err := toSpecQuery(spec)
+	if err != nil {
+		return "", nil, err
+	}
+
+	expr, err := qs.Expression()
+	if err != nil {
+		return "", nil, err
+	}
+
+	return goqu.From(tablename).Where(expr).Limit(uint(limit)).Offset(uint(offset)).ToSQL()
 }

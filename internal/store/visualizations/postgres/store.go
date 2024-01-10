@@ -2,10 +2,9 @@ package postgres
 
 import (
 	"context"
-	"github.com/apartomat/apartomat/internal/postgres"
+	bunhook "github.com/apartomat/apartomat/internal/pkg/bun"
 	. "github.com/apartomat/apartomat/internal/store/visualizations"
-	"github.com/doug-martin/goqu/v9"
-	"github.com/go-pg/pg/v10"
+	"github.com/uptrace/bun"
 	"time"
 )
 
@@ -14,10 +13,10 @@ const (
 )
 
 type store struct {
-	db *pg.DB
+	db *bun.DB
 }
 
-func NewStore(db *pg.DB) *store {
+func NewStore(db *bun.DB) *store {
 	return &store{db}
 }
 
@@ -26,64 +25,48 @@ var (
 )
 
 func (s *store) List(ctx context.Context, spec Spec, limit, offset int) ([]*Visualization, error) {
-	qs, err := toVisualizationSpecQuery(spec)
+	sql, args, err := selectBySpec(visualizationsTableName, spec, limit, offset)
 	if err != nil {
 		return nil, err
 	}
 
-	expr, err := qs.Expression()
-	if err != nil {
+	recs := make([]record, 0)
+
+	if err := s.db.NewRaw(sql, args...).Scan(bunhook.WithQueryContext(ctx, "Visualizations.List"), &recs); err != nil {
 		return nil, err
 	}
 
-	sql, args, err := goqu.From(visualizationsTableName).Where(expr).Limit(uint(limit)).Offset(uint(offset)).ToSQL()
-	if err != nil {
-		return nil, err
-	}
-
-	rows := make([]*record, 0)
-
-	_, err = s.db.QueryContext(postgres.WithQueryContext(ctx, "visualizations.List"), &rows, sql, args...)
-	if err != nil {
-		return nil, err
-	}
-
-	return fromRecords(rows), nil
+	return fromRecords(recs), nil
 }
 
 func (s *store) Save(ctx context.Context, visualizations ...*Visualization) error {
 	recs := toRecords(visualizations)
 
-	_, err := s.db.ModelContext(postgres.WithQueryContext(ctx, "visualizations.Save"), &recs).
+	_, err := s.db.NewInsert().Model(&recs).
 		Returning("NULL").
-		OnConflict("(id) DO UPDATE").
-		Insert()
+		On("CONFLICT (id) DO UPDATE").
+		Exec(bunhook.WithQueryContext(ctx, "Visualizations.Save"))
 
 	return err
 }
 
 func (s *store) Delete(ctx context.Context, visualizations ...*Visualization) error {
 	var (
-		ids = make([]string, len(visualizations))
+		recs = toRecords(visualizations)
 	)
 
-	for i, v := range visualizations {
-		ids[i] = v.ID
-	}
-
-	_, err := s.db.ModelContext(postgres.WithQueryContext(ctx, "visualizations.Delete"), (*record)(nil)).
-		Where(`id IN (?)`, pg.In(ids)).
-		Delete()
+	_, err := s.db.NewDelete().Model(&recs).WherePK().Exec(bunhook.WithQueryContext(ctx, "Visualizations.Delete"))
 
 	return err
 }
 
 type record struct {
-	tableName   struct{}   `pg:"apartomat.visualizations"`
+	bun.BaseModel `bun:"table:apartomat.visualizations,alias:v"`
+
 	ID          string     `pg:"id,pk"`
-	Name        string     `pg:"name,use_zero"`
-	Description string     `pg:"description,use_zero"`
-	Version     int        `pg:"version,use_zero"`
+	Name        string     `pg:"name"`
+	Description string     `pg:"description"`
+	Version     int        `pg:"version"`
 	Status      string     `pg:"status"`
 	CreatedAt   time.Time  `pg:"created_at"`
 	ModifiedAt  time.Time  `pg:"modified_at"`
@@ -93,39 +76,41 @@ type record struct {
 	RoomID      *string    `pg:"room_id"`
 }
 
-func toRecord(visualization *Visualization) *record {
-	return &record{
-		ID:          visualization.ID,
-		Name:        visualization.Name,
-		Description: visualization.Description,
-		Version:     visualization.Version,
-		Status:      string(visualization.Status),
-		CreatedAt:   visualization.CreatedAt,
-		ModifiedAt:  visualization.ModifiedAt,
-		DeletedAt:   visualization.DeletedAt,
-		ProjectID:   visualization.ProjectID,
-		FileID:      visualization.FileID,
-		RoomID:      visualization.RoomID,
+func toRecord(val *Visualization) record {
+	return record{
+		ID:          val.ID,
+		Name:        val.Name,
+		Description: val.Description,
+		Version:     val.Version,
+		Status:      string(val.Status),
+		CreatedAt:   val.CreatedAt,
+		ModifiedAt:  val.ModifiedAt,
+		DeletedAt:   val.DeletedAt,
+		ProjectID:   val.ProjectID,
+		FileID:      val.FileID,
+		RoomID:      val.RoomID,
 	}
 }
 
-func toRecords(visualizations []*Visualization) []*record {
+func toRecords(vals []*Visualization) []record {
 	var (
-		res = make([]*record, len(visualizations))
+		res = make([]record, len(vals))
 	)
 
-	for i, v := range visualizations {
+	for i, v := range vals {
 		res[i] = toRecord(v)
 	}
 
 	return res
 }
 
-func fromRecords(records []*record) []*Visualization {
-	visualizations := make([]*Visualization, len(records))
+func fromRecords(records []record) []*Visualization {
+	var (
+		res = make([]*Visualization, len(records))
+	)
 
 	for i, r := range records {
-		visualizations[i] = &Visualization{
+		res[i] = &Visualization{
 			ID:          r.ID,
 			Name:        r.Name,
 			Description: r.Description,
@@ -140,5 +125,5 @@ func fromRecords(records []*record) []*Visualization {
 		}
 	}
 
-	return visualizations
+	return res
 }

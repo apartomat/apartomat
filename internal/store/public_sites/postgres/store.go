@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	bunhooks "github.com/apartomat/apartomat/internal/pkg/bun"
 	"time"
 
 	. "github.com/apartomat/apartomat/internal/store/public_sites"
@@ -32,7 +33,7 @@ func (s *store) List(ctx context.Context, spec Spec, limit, offset int) ([]Publi
 
 	recs := make([]record, 0)
 
-	if err := s.db.NewRaw(sql, args...).Scan(ctx, &recs); err != nil {
+	if err := s.db.NewRaw(sql, args...).Scan(bunhooks.WithQueryContext(ctx, "PublicSites.List"), &recs); err != nil {
 		return nil, err
 	}
 
@@ -58,7 +59,7 @@ func (s *store) Save(ctx context.Context, sites ...PublicSite) error {
 	_, err := s.db.NewInsert().Model(&recs).
 		Returning("NULL").
 		On("CONFLICT (id) DO UPDATE").
-		Exec(ctx)
+		Exec(bunhooks.WithQueryContext(ctx, "PublicSites.Save"))
 
 	return err
 }
@@ -80,42 +81,44 @@ type settingsRecord struct {
 	AllowAlbums         bool `json:"allowAlbums"`
 }
 
-func toRecord(site PublicSite) record {
+func toRecord(val PublicSite) record {
 	return record{
-		ID:         site.ID,
-		Status:     string(site.Status),
-		URL:        site.URL,
-		Settings:   toSettingsRecord(site.Settings),
-		CreatedAt:  site.CreatedAt,
-		ModifiedAt: site.ModifiedAt,
-		ProjectID:  site.ProjectID,
+		ID:         val.ID,
+		Status:     string(val.Status),
+		URL:        val.URL,
+		Settings:   toSettingsRecord(val.Settings),
+		CreatedAt:  val.CreatedAt,
+		ModifiedAt: val.ModifiedAt,
+		ProjectID:  val.ProjectID,
 	}
 }
 
-func toRecords(sites []PublicSite) []record {
+func toRecords(vals []PublicSite) []record {
 	var (
-		res = make([]record, len(sites))
+		res = make([]record, len(vals))
 	)
 
-	for i, p := range sites {
+	for i, p := range vals {
 		res[i] = toRecord(p)
 	}
 
 	return res
 }
 
-func toSettingsRecord(settings PublicSiteSettings) settingsRecord {
+func toSettingsRecord(val PublicSiteSettings) settingsRecord {
 	return settingsRecord{
-		AllowVisualizations: settings.AllowVisualizations,
-		AllowAlbums:         settings.AllowAlbums,
+		AllowVisualizations: val.AllowVisualizations,
+		AllowAlbums:         val.AllowAlbums,
 	}
 }
 
 func fromRecords(records []record) []PublicSite {
-	sites := make([]PublicSite, len(records))
+	var (
+		res = make([]PublicSite, len(records))
+	)
 
 	for i, rec := range records {
-		sites[i] = PublicSite{
+		res[i] = PublicSite{
 			ID:         rec.ID,
 			Status:     Status(rec.Status),
 			URL:        rec.URL,
@@ -126,7 +129,7 @@ func fromRecords(records []record) []PublicSite {
 		}
 	}
 
-	return sites
+	return res
 }
 
 func fromSettingsRecord(rec settingsRecord) PublicSiteSettings {

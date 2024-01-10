@@ -27,14 +27,16 @@ const (
 )
 
 func NewVisualization(id, projectID, projectFileID string, roomID *string) *Visualization {
-	now := time.Now()
+	var (
+		now = time.Now()
+	)
 
 	return &Visualization{
 		ID:          id,
 		Name:        "",
 		Description: "",
 		Version:     0,
-		Status:      "",
+		Status:      VisualizationStatusUnknown,
 		CreatedAt:   now,
 		ModifiedAt:  now,
 		DeletedAt:   nil,
@@ -45,7 +47,9 @@ func NewVisualization(id, projectID, projectFileID string, roomID *string) *Visu
 }
 
 func (v *Visualization) Delete() {
-	now := time.Now()
+	var (
+		now = time.Now()
+	)
 
 	v.DeletedAt = &now
 	v.Status = VisualizationStatusDeleted
