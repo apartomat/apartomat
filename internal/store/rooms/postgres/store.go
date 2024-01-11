@@ -2,22 +2,17 @@ package postgres
 
 import (
 	"context"
-	"github.com/apartomat/apartomat/internal/postgres"
+	bunhook "github.com/apartomat/apartomat/internal/pkg/bun"
 	. "github.com/apartomat/apartomat/internal/store/rooms"
-	"github.com/doug-martin/goqu/v9"
-	"github.com/go-pg/pg/v10"
+	"github.com/uptrace/bun"
 	"time"
 )
 
-const (
-	roomsTableName = `apartomat.rooms`
-)
-
 type store struct {
-	db *pg.DB
+	db *bun.DB
 }
 
-func NewStore(db *pg.DB) *store {
+func NewStore(db *bun.DB) *store {
 	return &store{db}
 }
 
@@ -26,67 +21,48 @@ var (
 )
 
 func (s *store) List(ctx context.Context, spec Spec, limit, offset int) ([]*Room, error) {
-	qs, err := toRoomSpecQuery(spec)
+	sql, args, err := selectBySpec(`apartomat.rooms`, spec, limit, offset)
 	if err != nil {
 		return nil, err
 	}
 
-	expr, err := qs.Expression()
-	if err != nil {
+	var (
+		recs = make([]record, 0)
+	)
+
+	if err := s.db.NewRaw(sql, args...).Scan(bunhook.WithQueryContext(ctx, "Rooms.List"), &recs); err != nil {
 		return nil, err
 	}
 
-	orderExpr := goqu.I("created_at").Asc()
-
-	sql, args, err := goqu.From(roomsTableName).
-		Where(expr).
-		Order(orderExpr).
-		Limit(uint(limit)).
-		Offset(uint(offset)).
-		ToSQL()
-	if err != nil {
-		return nil, err
-	}
-
-	recs := make([]*record, 0)
-
-	_, err = s.db.QueryContext(postgres.WithQueryContext(ctx, "rooms.List"), &recs, sql, args...)
-	if err != nil {
-		return nil, err
-	}
-
-	return fromRecord(recs), nil
+	return fromRecords(recs), nil
 }
 
 func (s *store) Save(ctx context.Context, rooms ...*Room) error {
-	recs := toRecords(rooms)
+	var (
+		recs = toRecords(rooms)
+	)
 
-	_, err := s.db.ModelContext(postgres.WithQueryContext(ctx, "rooms.Save"), &recs).
+	_, err := s.db.NewInsert().Model(&recs).
 		Returning("NULL").
-		OnConflict("(id) DO UPDATE").
-		Insert()
+		On("CONFLICT (id) DO UPDATE").
+		Exec(bunhook.WithQueryContext(ctx, "Rooms.Save"))
 
 	return err
 }
 
 func (s *store) Delete(ctx context.Context, rooms ...*Room) error {
 	var (
-		ids = make([]string, len(rooms))
+		recs = toRecords(rooms)
 	)
 
-	for i, r := range rooms {
-		ids[i] = r.ID
-	}
-
-	_, err := s.db.ModelContext(postgres.WithQueryContext(ctx, "rooms.Delete"), (*record)(nil)).
-		Where(`id IN (?)`, pg.In(ids)).
-		Delete()
+	_, err := s.db.NewDelete().Model(&recs).WherePK().Exec(bunhook.WithQueryContext(ctx, "Rooms.Delete"))
 
 	return err
 }
 
 type record struct {
-	tableName  struct{}  `pg:"apartomat.rooms"`
+	bun.BaseModel `bun:"table:apartomat.rooms,alias:r"`
+
 	ID         string    `pg:"id,pk"`
 	Name       string    `pg:"name"`
 	Square     *float64  `pg:"square"`
@@ -96,31 +72,31 @@ type record struct {
 	HouseID    string    `pg:"house_id"`
 }
 
-func toRecord(room *Room) *record {
-	return &record{
-		ID:         room.ID,
-		Name:       room.Name,
-		Square:     room.Square,
-		Level:      room.Level,
-		CreatedAt:  room.CreatedAt,
-		ModifiedAt: room.ModifiedAt,
-		HouseID:    room.HouseID,
+func toRecord(val *Room) record {
+	return record{
+		ID:         val.ID,
+		Name:       val.Name,
+		Square:     val.Square,
+		Level:      val.Level,
+		CreatedAt:  val.CreatedAt,
+		ModifiedAt: val.ModifiedAt,
+		HouseID:    val.HouseID,
 	}
 }
 
-func toRecords(rooms []*Room) []*record {
+func toRecords(vals []*Room) []record {
 	var (
-		res = make([]*record, len(rooms))
+		res = make([]record, len(vals))
 	)
 
-	for i, p := range rooms {
+	for i, p := range vals {
 		res[i] = toRecord(p)
 	}
 
 	return res
 }
 
-func fromRecord(records []*record) []*Room {
+func fromRecords(records []record) []*Room {
 	var (
 		res = make([]*Room, len(records))
 	)

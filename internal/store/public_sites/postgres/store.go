@@ -9,10 +9,6 @@ import (
 	"github.com/uptrace/bun"
 )
 
-const (
-	publicSitesTableName = `apartomat.public_sites`
-)
-
 type store struct {
 	db *bun.DB
 }
@@ -26,7 +22,7 @@ var (
 )
 
 func (s *store) List(ctx context.Context, spec Spec, limit, offset int) ([]PublicSite, error) {
-	sql, args, err := selectBySpec(publicSitesTableName, spec, limit, offset)
+	sql, args, err := selectBySpec(`apartomat.public_sites`, spec, limit, offset)
 	if err != nil {
 		return nil, err
 	}

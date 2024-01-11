@@ -11,33 +11,51 @@ type specQuery interface {
 	Expression() (goqu.Expression, error)
 }
 
-func toRoomSpecQuery(spec Spec) (specQuery, error) {
+func toSpecQuery(spec Spec) (specQuery, error) {
+	if spec == nil {
+		return nil, nil
+	}
+
 	if s, ok := spec.(specQuery); ok {
 		return s, nil
 	}
 
 	switch s := spec.(type) {
 	case IDInSpec:
-		return roomIDInSpecQuery{s}, nil
+		return idInSpecQuery{s}, nil
 	case HouseIDInSpec:
-		return roomHouseIDInSpecQuery{s}, nil
+		return houseIDInSpecQuery{s}, nil
 	}
 
 	return nil, errors.New("unknown spec")
 }
 
-type roomIDInSpecQuery struct {
+type idInSpecQuery struct {
 	spec IDInSpec
 }
 
-func (s roomIDInSpecQuery) Expression() (goqu.Expression, error) {
+func (s idInSpecQuery) Expression() (goqu.Expression, error) {
 	return goqu.Ex{"id": s.spec.IDs}, nil
 }
 
-type roomHouseIDInSpecQuery struct {
+type houseIDInSpecQuery struct {
 	spec HouseIDInSpec
 }
 
-func (s roomHouseIDInSpecQuery) Expression() (goqu.Expression, error) {
+func (s houseIDInSpecQuery) Expression() (goqu.Expression, error) {
 	return goqu.Ex{"house_id": s.spec.IDs}, nil
+}
+
+func selectBySpec(tablename string, spec Spec, limit, offset int) (string, []interface{}, error) {
+	qs, err := toSpecQuery(spec)
+	if err != nil {
+		return "", nil, err
+	}
+
+	expr, err := qs.Expression()
+	if err != nil {
+		return "", nil, err
+	}
+
+	return goqu.From(tablename).Where(expr).Limit(uint(limit)).Offset(uint(offset)).ToSQL()
 }

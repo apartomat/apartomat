@@ -115,7 +115,7 @@ func main() {
 		albumFilesStore := albumFiles.NewStore(bundb)
 		contactsStore := contacts.NewStore(pgdb)
 		housesStore := houses.NewStore(pgdb)
-		roomsStore := rooms.NewStore(pgdb)
+		roomsStore := rooms.NewStore(bundb)
 		visualizationsStore := visualizations.NewStore(bundb)
 		publicSitesStore := sites.NewStore(bundb)
 

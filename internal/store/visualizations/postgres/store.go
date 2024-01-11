@@ -8,10 +8,6 @@ import (
 	"time"
 )
 
-const (
-	visualizationsTableName = `apartomat.visualizations`
-)
-
 type store struct {
 	db *bun.DB
 }
@@ -25,12 +21,14 @@ var (
 )
 
 func (s *store) List(ctx context.Context, spec Spec, limit, offset int) ([]*Visualization, error) {
-	sql, args, err := selectBySpec(visualizationsTableName, spec, limit, offset)
+	sql, args, err := selectBySpec(`apartomat.visualizations`, spec, limit, offset)
 	if err != nil {
 		return nil, err
 	}
 
-	recs := make([]record, 0)
+	var (
+		recs = make([]record, 0)
+	)
 
 	if err := s.db.NewRaw(sql, args...).Scan(bunhook.WithQueryContext(ctx, "Visualizations.List"), &recs); err != nil {
 		return nil, err
@@ -40,7 +38,9 @@ func (s *store) List(ctx context.Context, spec Spec, limit, offset int) ([]*Visu
 }
 
 func (s *store) Save(ctx context.Context, visualizations ...*Visualization) error {
-	recs := toRecords(visualizations)
+	var (
+		recs = toRecords(visualizations)
+	)
 
 	_, err := s.db.NewInsert().Model(&recs).
 		Returning("NULL").

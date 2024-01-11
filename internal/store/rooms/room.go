@@ -15,7 +15,9 @@ type Room struct {
 }
 
 func NewRoom(id, name string, square *float64, level *int, houseID string) *Room {
-	now := time.Now()
+	var (
+		now = time.Now()
+	)
 
 	return &Room{
 		ID:         id,
