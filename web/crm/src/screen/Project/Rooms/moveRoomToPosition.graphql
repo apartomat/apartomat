@@ -1,0 +1,13 @@
+mutation moveRoomToPosition($roomId: String! $position: Int!) {
+    moveRoomToPosition(roomId: $roomId position: $position) {
+        __typename
+        ...on RoomMovedToPosition {
+            room {
+                id
+            }
+        }
+        ...on Error {
+            message
+        }
+    }
+}

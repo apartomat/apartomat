@@ -31,7 +31,7 @@ func (u *Apartomat) GetRooms(ctx context.Context, houseID string, limit, offset 
 		return nil, fmt.Errorf("can't get rooms of house (id=%s): %w", houseID, ErrForbidden)
 	}
 
-	return u.Rooms.List(ctx, HouseIDIn(houseID), limit, offset)
+	return u.Rooms.List(ctx, HouseIDIn(houseID), SortPositionAsc, limit, offset)
 }
 
 func (u *Apartomat) CanGetRooms(ctx context.Context, subj *auth.UserCtx, obj *houses.House) (bool, error) {
@@ -125,18 +125,9 @@ func (u *Apartomat) UpdateRoom(
 	square *float64,
 	level *int,
 ) (*Room, error) {
-	var (
-		room *Room
-	)
-
-	if r, err := u.Rooms.List(ctx, IDIn(roomID), 1, 0); err != nil {
+	room, err := u.Rooms.Get(ctx, IDIn(roomID))
+	if err != nil {
 		return nil, err
-	} else {
-		if len(r) == 0 {
-			return nil, fmt.Errorf("room (id=%s): %w", roomID, ErrNotFound)
-		}
-
-		room = r[0]
 	}
 
 	if ok, err := u.CanUpdateRoom(ctx, auth.UserFromCtx(ctx), room); err != nil {
@@ -205,18 +196,10 @@ func (u *Apartomat) CanUpdateRoom(ctx context.Context, subj *auth.UserCtx, obj *
 }
 
 func (u *Apartomat) DeleteRoom(ctx context.Context, roomID string) (*Room, error) {
-	rooms, err := u.Rooms.List(ctx, IDIn(roomID), 1, 0)
+	room, err := u.Rooms.Get(ctx, IDIn(roomID))
 	if err != nil {
 		return nil, err
 	}
-
-	if len(rooms) == 0 {
-		return nil, fmt.Errorf("room (id=%s): %w", roomID, ErrNotFound)
-	}
-
-	var (
-		room = rooms[0]
-	)
 
 	if ok, err := u.CanDeleteRoom(ctx, auth.UserFromCtx(ctx), room); err != nil {
 		return nil, err
@@ -231,4 +214,33 @@ func (u *Apartomat) DeleteRoom(ctx context.Context, roomID string) (*Room, error
 
 func (u *Apartomat) CanDeleteRoom(ctx context.Context, subj *auth.UserCtx, obj *Room) (bool, error) {
 	return u.CanUpdateRoom(ctx, subj, obj)
+}
+
+func (u *Apartomat) MoveRoomToPosition(ctx context.Context, roomID string, position int) (*Room, error) {
+	room, err := u.Rooms.Get(ctx, IDIn(roomID))
+	if err != nil {
+		return nil, err
+	}
+
+	if ok, err := u.CanUpdateRoom(ctx, auth.UserFromCtx(ctx), room); err != nil {
+		return nil, err
+	} else if !ok {
+		return nil, fmt.Errorf("can't update room (id=%s): %w", room.ID, ErrForbidden)
+	}
+
+	var (
+		asc = room.SortingPosition < position
+	)
+
+	room.MoveToPosition(position)
+
+	if err := u.Rooms.Save(ctx, room); err != nil {
+		return nil, err
+	}
+
+	if err := u.Rooms.Reorder(ctx, room.HouseID, asc); err != nil {
+		return nil, err
+	}
+
+	return room, nil
 }

@@ -53,7 +53,7 @@ export default function Room({
                 color="light-2"
                 label={room.name}
                 onClick={() => setShowCard(!showCard) }
-                style={{whiteSpace: "nowrap"}}
+                style={{ whiteSpace: "nowrap" }}
             />
             {ref.current && showCard &&
                 <Drop

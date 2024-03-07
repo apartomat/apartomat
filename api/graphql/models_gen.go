@@ -136,6 +136,10 @@ type MakeProjectPublicResult interface {
 	IsMakeProjectPublicResult()
 }
 
+type MoveRoomToPositionResult interface {
+	IsMoveRoomToPositionResult()
+}
+
 type ProjectAlbumsListResult interface {
 	IsProjectAlbumsListResult()
 }
@@ -469,6 +473,8 @@ func (Forbidden) IsMakeProjectNotPublicResult() {}
 
 func (Forbidden) IsMakeProjectPublicResult() {}
 
+func (Forbidden) IsMoveRoomToPositionResult() {}
+
 func (Forbidden) IsUpdateContactResult() {}
 
 func (Forbidden) IsUpdateHouseResult() {}
@@ -658,6 +664,8 @@ func (NotFound) IsInviteUserToWorkspaceResult() {}
 func (NotFound) IsMakeProjectNotPublicResult() {}
 
 func (NotFound) IsMakeProjectPublicResult() {}
+
+func (NotFound) IsMoveRoomToPositionResult() {}
 
 func (NotFound) IsUpdateContactResult() {}
 
@@ -913,6 +921,12 @@ type RoomDeleted struct {
 
 func (RoomDeleted) IsDeleteRoomResult() {}
 
+type RoomMovedToPosition struct {
+	Room *Room `json:"room"`
+}
+
+func (RoomMovedToPosition) IsMoveRoomToPositionResult() {}
+
 type RoomUpdated struct {
 	Room *Room `json:"room"`
 }
@@ -962,6 +976,8 @@ func (ServerError) IsLoginByEmailResult() {}
 func (ServerError) IsMakeProjectNotPublicResult() {}
 
 func (ServerError) IsMakeProjectPublicResult() {}
+
+func (ServerError) IsMoveRoomToPositionResult() {}
 
 func (ServerError) IsUpdateContactResult() {}
 

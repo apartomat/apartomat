@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"errors"
+	"github.com/doug-martin/goqu/v9/exp"
 
 	. "github.com/apartomat/apartomat/internal/store/rooms"
 	"github.com/doug-martin/goqu/v9"
@@ -46,7 +47,7 @@ func (s houseIDInSpecQuery) Expression() (goqu.Expression, error) {
 	return goqu.Ex{"house_id": s.spec.IDs}, nil
 }
 
-func selectBySpec(tablename string, spec Spec, limit, offset int) (string, []interface{}, error) {
+func selectBySpec(tablename string, spec Spec, sort Sort, limit, offset int) (string, []interface{}, error) {
 	qs, err := toSpecQuery(spec)
 	if err != nil {
 		return "", nil, err
@@ -57,5 +58,20 @@ func selectBySpec(tablename string, spec Spec, limit, offset int) (string, []int
 		return "", nil, err
 	}
 
-	return goqu.From(tablename).Where(expr).Limit(uint(limit)).Offset(uint(offset)).ToSQL()
+	var (
+		order exp.OrderedExpression
+	)
+
+	switch sort {
+	case SortIDAsc:
+		order = goqu.I("id").Asc()
+	case SortIDDesc:
+		order = goqu.I("id").Desc()
+	case SortPositionAsc:
+		order = goqu.I("sorting_position").Asc()
+	case SortPositionDesc:
+		order = goqu.I("sorting_position").Desc()
+	}
+
+	return goqu.From(tablename).Where(expr).Limit(uint(limit)).Offset(uint(offset)).Order(order).ToSQL()
 }

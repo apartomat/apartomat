@@ -358,6 +358,8 @@ export type MakeProjectNotPublicResult = Forbidden | NotFound | ProjectIsAlready
 
 export type MakeProjectPublicResult = Forbidden | NotFound | ProjectIsAlreadyPublic | ProjectMadePublic | ServerError;
 
+export type MoveRoomToPositionResult = Forbidden | NotFound | RoomMovedToPosition | ServerError;
+
 export type Mutation = {
   __typename?: 'Mutation';
   acceptInvite: AcceptInviteResult;
@@ -382,6 +384,7 @@ export type Mutation = {
   loginByEmail: LoginByEmailResult;
   makeProjectNotPublic: MakeProjectNotPublicResult;
   makeProjectPublic: MakeProjectPublicResult;
+  moveRoomToPosition: MoveRoomToPositionResult;
   pass: Scalars['Boolean'];
   updateContact: UpdateContactResult;
   updateHouse: UpdateHouseResult;
@@ -513,6 +516,12 @@ export type MutationMakeProjectNotPublicArgs = {
 
 export type MutationMakeProjectPublicArgs = {
   projectId: Scalars['String'];
+};
+
+
+export type MutationMoveRoomToPositionArgs = {
+  position: Scalars['Int'];
+  roomId: Scalars['String'];
 };
 
 
@@ -892,6 +901,11 @@ export type RoomAdded = {
 
 export type RoomDeleted = {
   __typename?: 'RoomDeleted';
+  room: Room;
+};
+
+export type RoomMovedToPosition = {
+  __typename?: 'RoomMovedToPosition';
   room: Room;
 };
 
@@ -1333,6 +1347,14 @@ export type UpdateRoomMutationVariables = Exact<{
 
 
 export type UpdateRoomMutation = { __typename?: 'Mutation', updateRoom: { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'RoomUpdated', room: { __typename?: 'Room', id: string, name: string, square?: number | null, level?: number | null } } };
+
+export type MoveRoomToPositionMutationVariables = Exact<{
+  roomId: Scalars['String'];
+  position: Scalars['Int'];
+}>;
+
+
+export type MoveRoomToPositionMutation = { __typename?: 'Mutation', moveRoomToPosition: { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'RoomMovedToPosition', room: { __typename?: 'Room', id: string } } | { __typename: 'ServerError', message: string } };
 
 export type UploadVisualizationsMutationVariables = Exact<{
   projectId: Scalars['String'];
@@ -3105,6 +3127,48 @@ export function useUpdateRoomMutation(baseOptions?: Apollo.MutationHookOptions<U
 export type UpdateRoomMutationHookResult = ReturnType<typeof useUpdateRoomMutation>;
 export type UpdateRoomMutationResult = Apollo.MutationResult<UpdateRoomMutation>;
 export type UpdateRoomMutationOptions = Apollo.BaseMutationOptions<UpdateRoomMutation, UpdateRoomMutationVariables>;
+export const MoveRoomToPositionDocument = gql`
+    mutation moveRoomToPosition($roomId: String!, $position: Int!) {
+  moveRoomToPosition(roomId: $roomId, position: $position) {
+    __typename
+    ... on RoomMovedToPosition {
+      room {
+        id
+      }
+    }
+    ... on Error {
+      message
+    }
+  }
+}
+    `;
+export type MoveRoomToPositionMutationFn = Apollo.MutationFunction<MoveRoomToPositionMutation, MoveRoomToPositionMutationVariables>;
+
+/**
+ * __useMoveRoomToPositionMutation__
+ *
+ * To run a mutation, you first call `useMoveRoomToPositionMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useMoveRoomToPositionMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [moveRoomToPositionMutation, { data, loading, error }] = useMoveRoomToPositionMutation({
+ *   variables: {
+ *      roomId: // value for 'roomId'
+ *      position: // value for 'position'
+ *   },
+ * });
+ */
+export function useMoveRoomToPositionMutation(baseOptions?: Apollo.MutationHookOptions<MoveRoomToPositionMutation, MoveRoomToPositionMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<MoveRoomToPositionMutation, MoveRoomToPositionMutationVariables>(MoveRoomToPositionDocument, options);
+      }
+export type MoveRoomToPositionMutationHookResult = ReturnType<typeof useMoveRoomToPositionMutation>;
+export type MoveRoomToPositionMutationResult = Apollo.MutationResult<MoveRoomToPositionMutation>;
+export type MoveRoomToPositionMutationOptions = Apollo.BaseMutationOptions<MoveRoomToPositionMutation, MoveRoomToPositionMutationVariables>;
 export const UploadVisualizationsDocument = gql`
     mutation uploadVisualizations($projectId: String!, $files: [Upload!]!, $roomId: String) {
   uploadVisualizations(projectId: $projectId, files: $files, roomId: $roomId) {

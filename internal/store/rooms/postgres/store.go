@@ -20,8 +20,8 @@ var (
 	_ Store = (*store)(nil)
 )
 
-func (s *store) List(ctx context.Context, spec Spec, limit, offset int) ([]*Room, error) {
-	sql, args, err := selectBySpec(`apartomat.rooms`, spec, limit, offset)
+func (s *store) List(ctx context.Context, spec Spec, sort Sort, limit, offset int) ([]*Room, error) {
+	sql, args, err := selectBySpec(`apartomat.rooms`, spec, sort, limit, offset)
 	if err != nil {
 		return nil, err
 	}
@@ -35,6 +35,19 @@ func (s *store) List(ctx context.Context, spec Spec, limit, offset int) ([]*Room
 	}
 
 	return fromRecords(recs), nil
+}
+
+func (s *store) Get(ctx context.Context, spec Spec) (*Room, error) {
+	res, err := s.List(ctx, spec, SortIDAsc, 1, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(res) == 0 {
+		return nil, ErrRoomNotFound
+	}
+
+	return res[0], nil
 }
 
 func (s *store) Save(ctx context.Context, rooms ...*Room) error {
@@ -60,27 +73,53 @@ func (s *store) Delete(ctx context.Context, rooms ...*Room) error {
 	return err
 }
 
+func (s *store) Reorder(ctx context.Context, houseID string, asc bool) error {
+	var (
+		sort = "DESC"
+	)
+
+	if asc {
+		sort = "ASC"
+	}
+
+	_, err := s.db.NewRaw(`
+UPDATE apartomat.rooms r1
+	SET
+	sorting_position = r2.pos,
+	modified_at = now()
+FROM (
+	SELECT
+		r2.*,
+		row_number() OVER (ORDER BY sorting_position, modified_at ?) AS pos
+	FROM apartomat.rooms r2 WHERE r2.house_id = ?
+) r2 WHERE r1.id = r2.id`, bun.Safe(sort), houseID).Exec(ctx)
+
+	return err
+}
+
 type record struct {
 	bun.BaseModel `bun:"table:apartomat.rooms,alias:r"`
 
-	ID         string    `pg:"id,pk"`
-	Name       string    `pg:"name"`
-	Square     *float64  `pg:"square"`
-	Level      *int      `pg:"level"`
-	CreatedAt  time.Time `pg:"created_at"`
-	ModifiedAt time.Time `pg:"modified_at"`
-	HouseID    string    `pg:"house_id"`
+	ID              string    `pg:"id,pk"`
+	Name            string    `pg:"name"`
+	Square          *float64  `pg:"square"`
+	Level           *int      `pg:"level"`
+	SortingPosition int       `pg:"sorting_position"`
+	CreatedAt       time.Time `pg:"created_at"`
+	ModifiedAt      time.Time `pg:"modified_at"`
+	HouseID         string    `pg:"house_id"`
 }
 
 func toRecord(val *Room) record {
 	return record{
-		ID:         val.ID,
-		Name:       val.Name,
-		Square:     val.Square,
-		Level:      val.Level,
-		CreatedAt:  val.CreatedAt,
-		ModifiedAt: val.ModifiedAt,
-		HouseID:    val.HouseID,
+		ID:              val.ID,
+		Name:            val.Name,
+		Square:          val.Square,
+		Level:           val.Level,
+		SortingPosition: val.SortingPosition,
+		CreatedAt:       val.CreatedAt,
+		ModifiedAt:      val.ModifiedAt,
+		HouseID:         val.HouseID,
 	}
 }
 
@@ -103,13 +142,14 @@ func fromRecords(records []record) []*Room {
 
 	for i, r := range records {
 		res[i] = &Room{
-			ID:         r.ID,
-			Name:       r.Name,
-			Square:     r.Square,
-			Level:      r.Level,
-			CreatedAt:  r.CreatedAt,
-			ModifiedAt: r.ModifiedAt,
-			HouseID:    r.HouseID,
+			ID:              r.ID,
+			Name:            r.Name,
+			Square:          r.Square,
+			Level:           r.Level,
+			SortingPosition: r.SortingPosition,
+			CreatedAt:       r.CreatedAt,
+			ModifiedAt:      r.ModifiedAt,
+			HouseID:         r.HouseID,
 		}
 	}
 

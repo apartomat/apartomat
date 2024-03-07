@@ -83,14 +83,15 @@ create table apartomat.houses (
 );
 
 create table apartomat.rooms (
-     id char(21) primary key,
-     name text not null,
-     square real,
-     level integer,
-     created_at timestamp with time zone not null default now(),
-     modified_at timestamp with time zone not null default now(),
-     house_id char(21) not null,
-     constraint rooms_house_id_fkey foreign key (house_id) references apartomat.houses on delete cascade
+    id char(21) primary key,
+    name text not null,
+    square real,
+    level integer,
+    sorting_position integer not null default 0,
+    created_at timestamp with time zone not null default now(),
+    modified_at timestamp with time zone not null default now(),
+    house_id char(21) not null,
+    constraint rooms_house_id_fkey foreign key (house_id) references apartomat.houses on delete cascade
 );
 
 create table apartomat.visualizations (

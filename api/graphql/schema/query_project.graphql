@@ -103,7 +103,7 @@ type House {
 }
 
 type HouseRooms {
-    list(limit: Int! = 10 offset: Int! = 0): HouseRoomsListResult!
+    list(limit: Int! = 100 offset: Int! = 0): HouseRoomsListResult!
 }
 
 union HouseRoomsListResult = HouseRoomsList | Forbidden | ServerError

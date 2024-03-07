@@ -28,10 +28,10 @@ func (r *visualizationResolver) Room(ctx context.Context, obj *Visualization) (*
 		return nil, nil
 	}
 
-	res, err := r.useCases.Rooms.List(ctx, rooms.IDIn(obj.Room.ID), 1, 0)
+	room, err := r.useCases.Rooms.Get(ctx, rooms.IDIn(obj.Room.ID))
 	if err != nil {
 		return nil, err
 	}
 
-	return roomToGraphQL(res[0]), nil
+	return roomToGraphQL(room), nil
 }

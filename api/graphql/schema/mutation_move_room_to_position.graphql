@@ -1,0 +1,9 @@
+extend type Mutation {
+    moveRoomToPosition(roomId: String! position: Int!): MoveRoomToPositionResult!
+}
+
+union MoveRoomToPositionResult = RoomMovedToPosition | NotFound | Forbidden | ServerError
+
+type RoomMovedToPosition {
+    room: Room!
+}

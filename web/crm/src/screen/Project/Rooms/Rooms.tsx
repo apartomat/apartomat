@@ -1,4 +1,18 @@
 import React, { useEffect, useState } from "react"
+import {
+    DndContext,
+    closestCenter,
+    KeyboardSensor,
+    PointerSensor,
+    useSensor,
+    useSensors, closestCorners, pointerWithin,
+} from "@dnd-kit/core"
+import {
+    arrayMove,
+    SortableContext,
+    sortableKeyboardCoordinates,
+    rectSortingStrategy, useSortable,
+} from "@dnd-kit/sortable"
 
 import { Box, BoxExtendedProps, Button } from "grommet"
 import { Add } from "grommet-icons"
@@ -9,6 +23,9 @@ import Room from "./Room/Room"
 import { Add as AddRoom } from "./Add/Add"
 import { Update as UpdateRoom } from "./Update/Update"
 import { ProjectScreenHouseRoomFragment as ProjectScreenHouseRoom } from "api/graphql"
+
+import useMoveRoomToPosition from "screen/Project/Rooms/useMoveRoomToPosition"
+import {CSS} from "@dnd-kit/utilities";
 
 export default function Rooms({
     houses,
@@ -22,17 +39,12 @@ export default function Rooms({
     onUpdateRoom?: (room: ProjectScreenHouseRoom ) => void,
     onDeleteRoom?: (room: ProjectScreenHouseRoom ) => void,
 } & BoxExtendedProps) {
-    const [ house, setHouse ] = useState(firstHouse(houses))
-
-    const [ rooms, setRooms ] = useState<ProjectScreenHouseRoom[]>([])
-
-    const [ showAddRoom, setShowAddRoom ] = useState(false)
-
-    const [ updateRoom, setUpdateRoom ] = useState<ProjectScreenHouseRoom | undefined>(undefined)
-
     useEffect(() => {
         setHouse(firstHouse(houses))
     }, [ houses ])
+
+
+    const [ house, setHouse ] = useState(firstHouse(houses))
 
     useEffect(() => {
         if (house && house.rooms.list.__typename === "HouseRoomsList") {
@@ -40,6 +52,13 @@ export default function Rooms({
         }
     }, [ house ])
 
+    const [ rooms, setRooms ] = useState<ProjectScreenHouseRoom[]>([])
+
+    const [ showAddRoom, setShowAddRoom ] = useState(false)
+
+    const [ updateRoom, setUpdateRoom ] = useState<ProjectScreenHouseRoom | undefined>(undefined)
+
+    const [ moveRoomToPosition ] = useMoveRoomToPosition()
 
     const handleAddRoom = (room: ProjectScreenHouseRoom) => {
         setShowAddRoom(false)
@@ -51,26 +70,71 @@ export default function Rooms({
         onDeleteRoom && onDeleteRoom(room)
     }
 
+    const sensors = useSensors(
+        useSensor(PointerSensor, {
+            activationConstraint: {
+                distance: 8,
+            },
+        }),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates,
+        })
+    );
+
+    function handleDragEnd(event) {
+        const { active, over } = event;
+
+        if (!over) {
+            return
+        }
+
+        if (active.id !== over.id) {
+            setRooms((items) => {
+                const oldIndex = rooms.findIndex(({ id }) => id === active.id);
+                const newIndex = rooms.findIndex(({ id }) => id === over.id);
+
+                const activeRoom = rooms.find(({ id }) => id === active.id)
+
+                moveRoomToPosition(activeRoom.id, newIndex+ 1)
+
+                return arrayMove(rooms, oldIndex, newIndex);
+            })
+        }
+    }
+
     return (
         <Box {...boxProps}>
+            <Box>
+
+            </Box>
             <Box direction="row" wrap>
-                {rooms.map((room) => {
-                    return (
-                        <Room
-                            key={room.id}
-                            room={room}
-                            margin={{right: "xsmall", bottom: "small"}}
-                            onClickUpdate={(room) => setUpdateRoom(room)}
-                            onDelete={handleDeleteRoom}
-                        />
-                    )
-                })}
+                <DndContext
+                    sensors={sensors}
+                    collisionDetection={pointerWithin}
+                    onDragEnd={handleDragEnd}
+                >
+                    <SortableContext items={rooms} strategy={rectSortingStrategy}>
+                        {rooms.map((room, index) => {
+                            return (
+                                <SortableItem key={room.id} id={room.id}>
+                                    <Room
+                                        key={room.id}
+                                        room={room}
+                                        margin={{right: "xsmall", bottom: "small"}}
+                                        onClickUpdate={(room) => setUpdateRoom(room)}
+                                        onDelete={handleDeleteRoom}
+                                    />
+                                </SortableItem>
+                            )
+                        })}
+                    </SortableContext>
+                </DndContext>
                 <Button key="" icon={<Add/>} label="Добавить" onClick={() => setShowAddRoom(true) } margin={{bottom: "small"}}/>
             </Box>
 
-            {showAddRoom && house &&
+            {showAddRoom && house && house.__typename === "House" &&
                 <AddRoom
-                    houseId={house?.id}
+                    houseId={house.id}
                     onEsc={() => { setUpdateRoom(undefined) }}
                     onClickClose={() => setShowAddRoom(false) }
                     onAdd={handleAddRoom}
@@ -99,4 +163,25 @@ function firstHouse(houses: ProjectHouses) {
         default:
             return undefined
     }
+}
+
+function SortableItem(props) {
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+    } = useSortable({id: props.id});
+
+    const style = {
+        transform: CSS.Transform.toString(transform ? { x: transform.x, y: transform.y, scaleX: 1, scaleY: 1} : null),
+        transition,
+    };
+
+    return (
+        <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+            {props.children}
+        </div>
+    );
 }

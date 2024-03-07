@@ -5,13 +5,14 @@ import (
 )
 
 type Room struct {
-	ID         string
-	Name       string
-	Square     *float64
-	Level      *int
-	CreatedAt  time.Time
-	ModifiedAt time.Time
-	HouseID    string
+	ID              string
+	Name            string
+	Square          *float64
+	Level           *int
+	SortingPosition int
+	CreatedAt       time.Time
+	ModifiedAt      time.Time
+	HouseID         string
 }
 
 func NewRoom(id, name string, square *float64, level *int, houseID string) *Room {
@@ -28,4 +29,9 @@ func NewRoom(id, name string, square *float64, level *int, houseID string) *Room
 		ModifiedAt: now,
 		HouseID:    houseID,
 	}
+}
+
+func (r *Room) MoveToPosition(position int) {
+	r.SortingPosition = position
+	r.ModifiedAt = time.Now()
 }

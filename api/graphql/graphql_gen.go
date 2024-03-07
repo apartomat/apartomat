@@ -260,6 +260,7 @@ type ComplexityRoot struct {
 		LoginByEmail               func(childComplexity int, email string, workspaceName string) int
 		MakeProjectNotPublic       func(childComplexity int, projectID string) int
 		MakeProjectPublic          func(childComplexity int, projectID string) int
+		MoveRoomToPosition         func(childComplexity int, roomID string, position int) int
 		Pass                       func(childComplexity int) int
 		UpdateContact              func(childComplexity int, contactID string, data UpdateContactInput) int
 		UpdateHouse                func(childComplexity int, houseID string, data UpdateHouseInput) int
@@ -434,6 +435,10 @@ type ComplexityRoot struct {
 		Room func(childComplexity int) int
 	}
 
+	RoomMovedToPosition struct {
+		Room func(childComplexity int) int
+	}
+
 	RoomUpdated struct {
 		Room func(childComplexity int) int
 	}
@@ -587,6 +592,7 @@ type MutationResolver interface {
 	LoginByEmail(ctx context.Context, email string, workspaceName string) (LoginByEmailResult, error)
 	MakeProjectNotPublic(ctx context.Context, projectID string) (MakeProjectNotPublicResult, error)
 	MakeProjectPublic(ctx context.Context, projectID string) (MakeProjectPublicResult, error)
+	MoveRoomToPosition(ctx context.Context, roomID string, position int) (MoveRoomToPositionResult, error)
 	UpdateContact(ctx context.Context, contactID string, data UpdateContactInput) (UpdateContactResult, error)
 	UpdateHouse(ctx context.Context, houseID string, data UpdateHouseInput) (UpdateHouseResult, error)
 	UpdateRoom(ctx context.Context, roomID string, data UpdateRoomInput) (UpdateRoomResult, error)
@@ -1406,6 +1412,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.MakeProjectPublic(childComplexity, args["projectId"].(string)), true
 
+	case "Mutation.moveRoomToPosition":
+		if e.complexity.Mutation.MoveRoomToPosition == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_moveRoomToPosition_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.MoveRoomToPosition(childComplexity, args["roomId"].(string), args["position"].(int)), true
+
 	case "Mutation.pass":
 		if e.complexity.Mutation.Pass == nil {
 			break
@@ -2012,6 +2030,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.RoomDeleted.Room(childComplexity), true
 
+	case "RoomMovedToPosition.room":
+		if e.complexity.RoomMovedToPosition.Room == nil {
+			break
+		}
+
+		return e.complexity.RoomMovedToPosition.Room(childComplexity), true
+
 	case "RoomUpdated.room":
 		if e.complexity.RoomUpdated.Room == nil {
 			break
@@ -2469,7 +2494,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 	return introspection.WrapTypeFromDef(parsedSchema, parsedSchema.Types[name]), nil
 }
 
-//go:embed "schema/mutation.graphql" "schema/mutation_accept_invite.graphql" "schema/mutation_add_contact.graphql" "schema/mutation_add_house.graphql" "schema/mutation_add_room.graphql" "schema/mutation_add_visualizations_to_album.graphql" "schema/mutation_change_album_page_orientation.graphql" "schema/mutation_change_album_page_size.graphql" "schema/mutation_change_project_dates.graphql" "schema/mutation_change_project_status.graphql" "schema/mutation_confirm_login_link.graphql" "schema/mutation_confirm_login_pin.graphql" "schema/mutation_create_album.graphql" "schema/mutation_create_project.graphql" "schema/mutation_delete_album.graphql" "schema/mutation_delete_contact.graphql" "schema/mutation_delete_room.graphql" "schema/mutation_delete_visualizations.graphql" "schema/mutation_generate_album.graphql" "schema/mutation_invite_user.graphql" "schema/mutation_login_by_email.graphql" "schema/mutation_make_project_not_public.graphql" "schema/mutation_make_project_public.graphql" "schema/mutation_update_contact.graphql" "schema/mutation_update_house.graphql" "schema/mutation_update_room.graphql" "schema/mutation_upload_file.graphql" "schema/mutation_upload_visualization.graphql" "schema/mutation_upload_visualizations.graphql" "schema/query.graphql" "schema/query_album.graphql" "schema/query_profile.graphql" "schema/query_project.graphql" "schema/query_workspace.graphql" "schema/root.graphql" "schema/subscription.graphql" "schema/subscription_album_file_generated.graphql"
+//go:embed "schema/mutation.graphql" "schema/mutation_accept_invite.graphql" "schema/mutation_add_contact.graphql" "schema/mutation_add_house.graphql" "schema/mutation_add_room.graphql" "schema/mutation_add_visualizations_to_album.graphql" "schema/mutation_change_album_page_orientation.graphql" "schema/mutation_change_album_page_size.graphql" "schema/mutation_change_project_dates.graphql" "schema/mutation_change_project_status.graphql" "schema/mutation_confirm_login_link.graphql" "schema/mutation_confirm_login_pin.graphql" "schema/mutation_create_album.graphql" "schema/mutation_create_project.graphql" "schema/mutation_delete_album.graphql" "schema/mutation_delete_contact.graphql" "schema/mutation_delete_room.graphql" "schema/mutation_delete_visualizations.graphql" "schema/mutation_generate_album.graphql" "schema/mutation_invite_user.graphql" "schema/mutation_login_by_email.graphql" "schema/mutation_make_project_not_public.graphql" "schema/mutation_make_project_public.graphql" "schema/mutation_move_room_to_position.graphql" "schema/mutation_update_contact.graphql" "schema/mutation_update_house.graphql" "schema/mutation_update_room.graphql" "schema/mutation_upload_file.graphql" "schema/mutation_upload_visualization.graphql" "schema/mutation_upload_visualizations.graphql" "schema/query.graphql" "schema/query_album.graphql" "schema/query_profile.graphql" "schema/query_project.graphql" "schema/query_workspace.graphql" "schema/root.graphql" "schema/subscription.graphql" "schema/subscription_album_file_generated.graphql"
 var sourcesFS embed.FS
 
 func sourceData(filename string) string {
@@ -2504,6 +2529,7 @@ var sources = []*ast.Source{
 	{Name: "schema/mutation_login_by_email.graphql", Input: sourceData("schema/mutation_login_by_email.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_make_project_not_public.graphql", Input: sourceData("schema/mutation_make_project_not_public.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_make_project_public.graphql", Input: sourceData("schema/mutation_make_project_public.graphql"), BuiltIn: false},
+	{Name: "schema/mutation_move_room_to_position.graphql", Input: sourceData("schema/mutation_move_room_to_position.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_update_contact.graphql", Input: sourceData("schema/mutation_update_contact.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_update_house.graphql", Input: sourceData("schema/mutation_update_house.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_update_room.graphql", Input: sourceData("schema/mutation_update_room.graphql"), BuiltIn: false},
@@ -3002,6 +3028,30 @@ func (ec *executionContext) field_Mutation_makeProjectPublic_args(ctx context.Co
 		}
 	}
 	args["projectId"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_moveRoomToPosition_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["roomId"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("roomId"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["roomId"] = arg0
+	var arg1 int
+	if tmp, ok := rawArgs["position"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("position"))
+		arg1, err = ec.unmarshalNInt2int(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["position"] = arg1
 	return args, nil
 }
 
@@ -7943,6 +7993,61 @@ func (ec *executionContext) fieldContext_Mutation_makeProjectPublic(ctx context.
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_moveRoomToPosition(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_moveRoomToPosition(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().MoveRoomToPosition(rctx, fc.Args["roomId"].(string), fc.Args["position"].(int))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(MoveRoomToPositionResult)
+	fc.Result = res
+	return ec.marshalNMoveRoomToPositionResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐMoveRoomToPositionResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_moveRoomToPosition(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type MoveRoomToPositionResult does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_moveRoomToPosition_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_updateContact(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_updateContact(ctx, field)
 	if err != nil {
@@ -11666,6 +11771,64 @@ func (ec *executionContext) _RoomDeleted_room(ctx context.Context, field graphql
 func (ec *executionContext) fieldContext_RoomDeleted_room(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "RoomDeleted",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Room_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Room_name(ctx, field)
+			case "square":
+				return ec.fieldContext_Room_square(ctx, field)
+			case "level":
+				return ec.fieldContext_Room_level(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Room_createdAt(ctx, field)
+			case "modifiedAt":
+				return ec.fieldContext_Room_modifiedAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Room", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _RoomMovedToPosition_room(ctx context.Context, field graphql.CollectedField, obj *RoomMovedToPosition) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_RoomMovedToPosition_room(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Room, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*Room)
+	fc.Result = res
+	return ec.marshalNRoom2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐRoom(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_RoomMovedToPosition_room(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "RoomMovedToPosition",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -17720,6 +17883,43 @@ func (ec *executionContext) _MakeProjectPublicResult(ctx context.Context, sel as
 	}
 }
 
+func (ec *executionContext) _MoveRoomToPositionResult(ctx context.Context, sel ast.SelectionSet, obj MoveRoomToPositionResult) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case RoomMovedToPosition:
+		return ec._RoomMovedToPosition(ctx, sel, &obj)
+	case *RoomMovedToPosition:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._RoomMovedToPosition(ctx, sel, obj)
+	case NotFound:
+		return ec._NotFound(ctx, sel, &obj)
+	case *NotFound:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._NotFound(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
 func (ec *executionContext) _ProjectAlbumsListResult(ctx context.Context, sel ast.SelectionSet, obj ProjectAlbumsListResult) graphql.Marshaler {
 	switch obj := (obj).(type) {
 	case nil:
@@ -19275,7 +19475,7 @@ func (ec *executionContext) _FileUploaded(ctx context.Context, sel ast.Selection
 	return out
 }
 
-var forbiddenImplementors = []string{"Forbidden", "AddContactResult", "AddHouseResult", "AddRoomResult", "AddVisualizationsToAlbumResult", "ChangeAlbumPageOrientationResult", "ChangeAlbumPageSizeResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "CreateAlbumResult", "CreateProjectResult", "DeleteAlbumResult", "DeleteContactResult", "DeleteRoomResult", "DeleteVisualizationsResult", "GenerateAlbumFileResult", "InviteUserToWorkspaceResult", "MakeProjectNotPublicResult", "MakeProjectPublicResult", "UpdateContactResult", "UpdateHouseResult", "UpdateRoomResult", "UploadFileResult", "UploadVisualizationResult", "UploadVisualizationsResult", "AlbumResult", "AlbumProjectResult", "AlbumRecentFileResult", "UserProfileResult", "ProjectResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "ProjectVisualizationsListResult", "ProjectVisualizationsTotalResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectAlbumsListResult", "ProjectAlbumsTotalResult", "WorkspaceResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "WorkspaceUsersListResult", "WorkspaceUsersTotalResult", "Error", "AlbumFileGenerated"}
+var forbiddenImplementors = []string{"Forbidden", "AddContactResult", "AddHouseResult", "AddRoomResult", "AddVisualizationsToAlbumResult", "ChangeAlbumPageOrientationResult", "ChangeAlbumPageSizeResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "CreateAlbumResult", "CreateProjectResult", "DeleteAlbumResult", "DeleteContactResult", "DeleteRoomResult", "DeleteVisualizationsResult", "GenerateAlbumFileResult", "InviteUserToWorkspaceResult", "MakeProjectNotPublicResult", "MakeProjectPublicResult", "MoveRoomToPositionResult", "UpdateContactResult", "UpdateHouseResult", "UpdateRoomResult", "UploadFileResult", "UploadVisualizationResult", "UploadVisualizationsResult", "AlbumResult", "AlbumProjectResult", "AlbumRecentFileResult", "UserProfileResult", "ProjectResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "ProjectVisualizationsListResult", "ProjectVisualizationsTotalResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectAlbumsListResult", "ProjectAlbumsTotalResult", "WorkspaceResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "WorkspaceUsersListResult", "WorkspaceUsersTotalResult", "Error", "AlbumFileGenerated"}
 
 func (ec *executionContext) _Forbidden(ctx context.Context, sel ast.SelectionSet, obj *Forbidden) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, forbiddenImplementors)
@@ -19996,6 +20196,15 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "moveRoomToPosition":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_moveRoomToPosition(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "updateContact":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
@@ -20061,7 +20270,7 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 	return out
 }
 
-var notFoundImplementors = []string{"NotFound", "AddHouseResult", "AddRoomResult", "ChangeAlbumPageOrientationResult", "ChangeAlbumPageSizeResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "DeleteAlbumResult", "DeleteContactResult", "DeleteRoomResult", "DeleteVisualizationsResult", "GenerateAlbumFileResult", "InviteUserToWorkspaceResult", "MakeProjectNotPublicResult", "MakeProjectPublicResult", "UpdateContactResult", "UpdateHouseResult", "UpdateRoomResult", "AlbumResult", "AlbumProjectResult", "AlbumPageVisualizationResult", "AlbumRecentFileResult", "ProjectResult", "ProjectPublicSite", "WorkspaceResult", "Error", "AlbumFileGenerated"}
+var notFoundImplementors = []string{"NotFound", "AddHouseResult", "AddRoomResult", "ChangeAlbumPageOrientationResult", "ChangeAlbumPageSizeResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "DeleteAlbumResult", "DeleteContactResult", "DeleteRoomResult", "DeleteVisualizationsResult", "GenerateAlbumFileResult", "InviteUserToWorkspaceResult", "MakeProjectNotPublicResult", "MakeProjectPublicResult", "MoveRoomToPositionResult", "UpdateContactResult", "UpdateHouseResult", "UpdateRoomResult", "AlbumResult", "AlbumProjectResult", "AlbumPageVisualizationResult", "AlbumRecentFileResult", "ProjectResult", "ProjectPublicSite", "WorkspaceResult", "Error", "AlbumFileGenerated"}
 
 func (ec *executionContext) _NotFound(ctx context.Context, sel ast.SelectionSet, obj *NotFound) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, notFoundImplementors)
@@ -21552,6 +21761,34 @@ func (ec *executionContext) _RoomDeleted(ctx context.Context, sel ast.SelectionS
 	return out
 }
 
+var roomMovedToPositionImplementors = []string{"RoomMovedToPosition", "MoveRoomToPositionResult"}
+
+func (ec *executionContext) _RoomMovedToPosition(ctx context.Context, sel ast.SelectionSet, obj *RoomMovedToPosition) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, roomMovedToPositionImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("RoomMovedToPosition")
+		case "room":
+
+			out.Values[i] = ec._RoomMovedToPosition_room(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
 var roomUpdatedImplementors = []string{"RoomUpdated", "UpdateRoomResult"}
 
 func (ec *executionContext) _RoomUpdated(ctx context.Context, sel ast.SelectionSet, obj *RoomUpdated) graphql.Marshaler {
@@ -21580,7 +21817,7 @@ func (ec *executionContext) _RoomUpdated(ctx context.Context, sel ast.SelectionS
 	return out
 }
 
-var serverErrorImplementors = []string{"ServerError", "AcceptInviteResult", "AddContactResult", "AddHouseResult", "AddVisualizationsToAlbumResult", "ChangeAlbumPageOrientationResult", "ChangeAlbumPageSizeResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "ConfirmLoginLinkResult", "ConfirmLoginPinResult", "CreateAlbumResult", "CreateProjectResult", "DeleteAlbumResult", "DeleteContactResult", "DeleteVisualizationsResult", "GenerateAlbumFileResult", "InviteUserToWorkspaceResult", "LoginByEmailResult", "MakeProjectNotPublicResult", "MakeProjectPublicResult", "UpdateContactResult", "UpdateHouseResult", "UploadFileResult", "UploadVisualizationResult", "UploadVisualizationsResult", "AlbumResult", "AlbumProjectResult", "AlbumPagesResult", "AlbumPageVisualizationResult", "AlbumRecentFileResult", "UserProfileResult", "ProjectResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "ProjectVisualizationsListResult", "ProjectVisualizationsTotalResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectAlbumsListResult", "ProjectAlbumsTotalResult", "ProjectPublicSite", "WorkspaceResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "WorkspaceUsersListResult", "WorkspaceUsersTotalResult", "Error", "AlbumFileGenerated"}
+var serverErrorImplementors = []string{"ServerError", "AcceptInviteResult", "AddContactResult", "AddHouseResult", "AddVisualizationsToAlbumResult", "ChangeAlbumPageOrientationResult", "ChangeAlbumPageSizeResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "ConfirmLoginLinkResult", "ConfirmLoginPinResult", "CreateAlbumResult", "CreateProjectResult", "DeleteAlbumResult", "DeleteContactResult", "DeleteVisualizationsResult", "GenerateAlbumFileResult", "InviteUserToWorkspaceResult", "LoginByEmailResult", "MakeProjectNotPublicResult", "MakeProjectPublicResult", "MoveRoomToPositionResult", "UpdateContactResult", "UpdateHouseResult", "UploadFileResult", "UploadVisualizationResult", "UploadVisualizationsResult", "AlbumResult", "AlbumProjectResult", "AlbumPagesResult", "AlbumPageVisualizationResult", "AlbumRecentFileResult", "UserProfileResult", "ProjectResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "ProjectVisualizationsListResult", "ProjectVisualizationsTotalResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectAlbumsListResult", "ProjectAlbumsTotalResult", "ProjectPublicSite", "WorkspaceResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "WorkspaceUsersListResult", "WorkspaceUsersTotalResult", "Error", "AlbumFileGenerated"}
 
 func (ec *executionContext) _ServerError(ctx context.Context, sel ast.SelectionSet, obj *ServerError) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, serverErrorImplementors)
@@ -23601,6 +23838,16 @@ func (ec *executionContext) marshalNMakeProjectPublicResult2githubᚗcomᚋapart
 		return graphql.Null
 	}
 	return ec._MakeProjectPublicResult(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNMoveRoomToPositionResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐMoveRoomToPositionResult(ctx context.Context, sel ast.SelectionSet, v MoveRoomToPositionResult) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._MoveRoomToPositionResult(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNPageOrientation2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐPageOrientation(ctx context.Context, v interface{}) (PageOrientation, error) {
