@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"go.uber.org/zap"
 	"math/rand"
 
 	"github.com/apartomat/apartomat/internal/auth"
