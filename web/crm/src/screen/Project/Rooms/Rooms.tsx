@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react"
+import React, {PropsWithChildren, useEffect, useState} from "react"
 import {
     DndContext,
     closestCenter,
     KeyboardSensor,
     PointerSensor,
     useSensor,
-    useSensors, closestCorners, pointerWithin,
+    useSensors, closestCorners, pointerWithin, DragEndEvent,
 } from "@dnd-kit/core"
 import {
     arrayMove,
@@ -81,8 +81,8 @@ export default function Rooms({
         })
     );
 
-    function handleDragEnd(event) {
-        const { active, over } = event;
+    function handleDragEnd(event: DragEndEvent) {
+        const { active, over } = event
 
         if (!over) {
             return
@@ -90,14 +90,16 @@ export default function Rooms({
 
         if (active.id !== over.id) {
             setRooms((items) => {
-                const oldIndex = rooms.findIndex(({ id }) => id === active.id);
-                const newIndex = rooms.findIndex(({ id }) => id === over.id);
+                const oldIndex = rooms.findIndex(({ id }) => id === active.id)
+                const newIndex = rooms.findIndex(({ id }) => id === over.id)
 
-                const activeRoom = rooms.find(({ id }) => id === active.id)
+                const room = rooms.find(({ id }) => id === active.id)
 
-                moveRoomToPosition(activeRoom.id, newIndex+ 1)
+                if (room) {
+                    moveRoomToPosition(room.id, newIndex+ 1)
+                }
 
-                return arrayMove(rooms, oldIndex, newIndex);
+                return arrayMove(rooms, oldIndex, newIndex)
             })
         }
     }
@@ -165,14 +167,14 @@ function firstHouse(houses: ProjectHouses) {
     }
 }
 
-function SortableItem(props) {
+function SortableItem({ id, children }: PropsWithChildren<{ id: string }>) {
     const {
         attributes,
         listeners,
         setNodeRef,
         transform,
         transition,
-    } = useSortable({id: props.id});
+    } = useSortable({ id })
 
     const style = {
         transform: CSS.Transform.toString(transform ? { x: transform.x, y: transform.y, scaleX: 1, scaleY: 1} : null),
@@ -181,7 +183,7 @@ function SortableItem(props) {
 
     return (
         <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-            {props.children}
+            {children}
         </div>
     );
 }
