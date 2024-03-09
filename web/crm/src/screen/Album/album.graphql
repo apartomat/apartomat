@@ -1,10 +1,10 @@
-query albumScreen($id: String! $filter: ProjectVisualizationsListFilter!) {
+query albumScreen($id: String!, $filter: ProjectVisualizationsListFilter!) {
     album: album(id: $id) {
         __typename
-        ...on Album {
+        ... on Album {
             ...AlbumScreenAlbum
         }
-        ...on Error {
+        ... on Error {
             message
         }
     }
@@ -59,7 +59,7 @@ fragment AlbumScreenProject on Project {
     id
     name
     visualizations {
-        list(filter: $filter limit: 100 offset: 0) {
+        list(filter: $filter, limit: 100, offset: 0) {
             ... on ProjectVisualizationsList {
                 items {
                     ...AlbumScreenVisualization
@@ -69,7 +69,6 @@ fragment AlbumScreenProject on Project {
                 message
             }
         }
-
     }
     houses {
         ...AlbumScreenHouses
@@ -93,7 +92,6 @@ fragment AlbumScreenVisualization on Visualization {
     }
 }
 
-
 fragment AlbumScreenHouseRoom on Room {
     id
     name
@@ -101,18 +99,17 @@ fragment AlbumScreenHouseRoom on Room {
     level
 }
 
-
 fragment AlbumScreenHouses on ProjectHouses {
-    list(filter: {} limit: 1 offset: 0) {
+    list(filter: {}, limit: 1, offset: 0) {
         __typename
-        ...on ProjectHousesList {
+        ... on ProjectHousesList {
             items {
                 rooms {
                     ...AlbumScreenHouseRooms
                 }
             }
         }
-        ...on Error {
+        ... on Error {
             message
         }
     }
@@ -120,12 +117,12 @@ fragment AlbumScreenHouses on ProjectHouses {
 
 fragment AlbumScreenHouseRooms on HouseRooms {
     list {
-        ...on HouseRoomsList {
+        ... on HouseRoomsList {
             items {
                 ...AlbumScreenHouseRoom
             }
         }
-        ...on Error {
+        ... on Error {
             message
         }
     }

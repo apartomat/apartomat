@@ -8,9 +8,9 @@ import { useChangeAlbumPageSize, PageSize as PageSizeEnum } from "./useChangeAlb
 const roundBox = (options: string[], option: string): RoundType | undefined => {
     switch (options.indexOf(option)) {
         case 0:
-            return {corner: "left", size: "small"}
+            return { corner: "left", size: "small" }
         case options.length - 1:
-            return {corner: "right", size: "small"}
+            return { corner: "right", size: "small" }
         default:
             return undefined
     }
@@ -22,15 +22,15 @@ export function PageSize({
     onAlbumPageSizeChanged,
     ...boxProps
 }: {
-    albumId: string,
-    size: PageSizeEnum,
+    albumId: string
+    size: PageSizeEnum
     onAlbumPageSizeChanged?: () => void
 } & BoxExtendedProps) {
     const options = [PageSizeEnum.A3, PageSizeEnum.A4]
 
-    const [ pageSize, setPageSize ] = useState<string>(size)
+    const [pageSize, setPageSize] = useState<string>(size)
 
-    const [ change, { data, error } ] = useChangeAlbumPageSize(albumId)
+    const [change, { data, error }] = useChangeAlbumPageSize(albumId)
 
     useEffect(() => {
         if (!data) {
@@ -39,7 +39,9 @@ export function PageSize({
 
         switch (data?.changeAlbumPageSize.__typename) {
             case "AlbumPageSizeChanged": {
-                const { changeAlbumPageSize: { album  } } = data
+                const {
+                    changeAlbumPageSize: { album },
+                } = data
                 setPageSize(album.settings.pageSize)
                 onAlbumPageSizeChanged && onAlbumPageSizeChanged()
                 break
@@ -47,15 +49,15 @@ export function PageSize({
             default:
                 setPageSize(size)
         }
-    }, [ data ])
+    }, [data])
 
     useEffect(() => {
         if (error) {
             setPageSize(size)
         }
-    }, [ error ])
+    }, [error])
 
-    const handleOnChange = ({ target: { value }}: React.ChangeEvent<HTMLInputElement>) => {
+    const handleOnChange = ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
         setPageSize(value)
         change(value as PageSizeEnum)
     }
@@ -69,20 +71,22 @@ export function PageSize({
                 options={options}
                 value={pageSize}
                 onChange={handleOnChange}
-            >{(option: string, { checked }: { checked: boolean, focus: boolean, hover: boolean}) => {
-                return (
-                    <Box
-                        width="xxsmall"
-                        height="xxsmall"
-                        align="center"
-                        justify="center"
-                        background={checked ? "brand" : "background-contrast"}
-                        round={roundBox(options, option)}
-                    >
-                        {option}
-                    </Box>
-                )
-            }}</RadioButtonGroup>
+            >
+                {(option: string, { checked }: { checked: boolean; focus: boolean; hover: boolean }) => {
+                    return (
+                        <Box
+                            width="xxsmall"
+                            height="xxsmall"
+                            align="center"
+                            justify="center"
+                            background={checked ? "brand" : "background-contrast"}
+                            round={roundBox(options, option)}
+                        >
+                            {option}
+                        </Box>
+                    )
+                }}
+            </RadioButtonGroup>
         </Box>
     )
 }

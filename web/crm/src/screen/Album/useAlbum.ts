@@ -7,7 +7,7 @@ export type {
     AlbumScreenAlbumPageCoverFragment,
     AlbumScreenAlbumPageVisualizationFragment,
     AlbumScreenSettingsFragment,
-    AlbumScreenHouseRoomFragment
+    AlbumScreenHouseRoomFragment,
 } from "api/graphql"
 
 export { PageOrientation } from "api/graphql"
@@ -18,8 +18,8 @@ export function useAlbum({ id }: { id: string }) {
         errorPolicy: "all",
         variables: {
             id,
-            filter: { status: { eq: [ VisualizationStatus.Approved, VisualizationStatus.Unknown ] } }
-        }
+            filter: { status: { eq: [VisualizationStatus.Approved, VisualizationStatus.Unknown] } },
+        },
     })
 }
 

@@ -13,17 +13,17 @@ export function Update({
     onClickClose,
     ...layerProps
 }: {
-    room: ProjectScreenHouseRoom,
-    onUpdate?: (room: ProjectScreenHouseRoom) => void,
-    onClickClose?: () => void,
+    room: ProjectScreenHouseRoom
+    onUpdate?: (room: ProjectScreenHouseRoom) => void
+    onClickClose?: () => void
 } & LayerExtendedProps) {
-    const [ value, setValue ] = useState({
+    const [value, setValue] = useState({
         name: room.name,
         square: room.square?.toString().replace(".", ","),
         level: room.level?.toString(),
     } as FormValue)
 
-    const [ updateRoom, { data, loading, error } ] = useUpdateRoom()
+    const [updateRoom, { data, loading, error }] = useUpdateRoom()
 
     const handleSubmit = (event: React.FormEvent) => {
         const { name, square } = value
@@ -38,41 +38,53 @@ export function Update({
             case "RoomUpdated":
                 onUpdate && onUpdate(data.updateRoom.room)
         }
-    }, [ data, onUpdate ])
+    }, [data, onUpdate])
 
     return (
         <Layer {...layerProps}>
-                <Box pad="medium" gap="medium" width={{min: "500px"}}>
-                    <Box direction="row" justify="between" align="center">
-                        <Heading level={3} margin="none">Комната</Heading>
-                        <Button icon={ <FormClose/> } onClick={onClickClose}/>
-                    </Box>
-                    <Form
-                        value={value}
-                        onChange={setValue}
-                        onSubmit={handleSubmit}
-                        submit={
-                            <Box direction="row" justify="between" margin={{top: "large"}}>
-                                <Button
-                                    type="submit"
-                                    primary
-                                    label={loading ? 'Сохранение...' : 'Сохранить' }
-                                    disabled={loading}
-                                />
-                                {error && <Box><Text>{error.message}</Text></Box>}
-                                <Box><Text color="status-critical"><ErrorMessage res={data?.updateRoom}/></Text></Box>
-                            </Box>
-                        }
-                    />
+            <Box pad="medium" gap="medium" width={{ min: "500px" }}>
+                <Box direction="row" justify="between" align="center">
+                    <Heading level={3} margin="none">
+                        Комната
+                    </Heading>
+                    <Button icon={<FormClose />} onClick={onClickClose} />
                 </Box>
+                <Form
+                    value={value}
+                    onChange={setValue}
+                    onSubmit={handleSubmit}
+                    submit={
+                        <Box direction="row" justify="between" margin={{ top: "large" }}>
+                            <Button
+                                type="submit"
+                                primary
+                                label={loading ? "Сохранение..." : "Сохранить"}
+                                disabled={loading}
+                            />
+                            {error && (
+                                <Box>
+                                    <Text>{error.message}</Text>
+                                </Box>
+                            )}
+                            <Box>
+                                <Text color="status-critical">
+                                    <ErrorMessage res={data?.updateRoom} />
+                                </Text>
+                            </Box>
+                        </Box>
+                    }
+                />
+            </Box>
         </Layer>
     )
 }
 
 /* eslint-disable  @typescript-eslint/no-explicit-any */
-function ErrorMessage({res}: {
-        res: { __typename: "Forbidden", message: string } |
-            { __typename: "ServerError", message: string } | any}) {
+function ErrorMessage({
+    res,
+}: {
+    res: { __typename: "Forbidden"; message: string } | { __typename: "ServerError"; message: string } | any
+}) {
     switch (res?.__typename) {
         case "Forbidden":
             return <>Доступ запрещен</>

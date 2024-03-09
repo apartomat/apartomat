@@ -1,24 +1,23 @@
 fragment AddHouse on House {
-  id
-  city
-  address
-  housingComplex
-  createdAt
-  modifiedAt
+    id
+    city
+    address
+    housingComplex
+    createdAt
+    modifiedAt
 }
 
-
-mutation addHouse($projectId: String! $house: AddHouseInput!) {
-  addHouse(projectId: $projectId house: $house) {
-    __typename
-    ...on HouseAdded {
-      house {
-        ...AddHouse
-      }
-    }
-    ...on Error {
+mutation addHouse($projectId: String!, $house: AddHouseInput!) {
+    addHouse(projectId: $projectId, house: $house) {
         __typename
-        message
+        ... on HouseAdded {
+            house {
+                ...AddHouse
+            }
+        }
+        ... on Error {
+            __typename
+            message
+        }
     }
-  }
 }

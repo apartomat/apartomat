@@ -11,8 +11,8 @@ export default function Room({
     onDelete,
     ...boxProps
 }: {
-    room: HouseRoom,
-    onClickUpdate?: (room: HouseRoom) => void,
+    room: HouseRoom
+    onClickUpdate?: (room: HouseRoom) => void
     onDelete?: (room: HouseRoom) => void
 } & BoxExtendedProps) {
     const ref = useRef(null)
@@ -21,7 +21,7 @@ export default function Room({
 
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
-    const [deleteRoom, { data } ] = useDeleteRoom()
+    const [deleteRoom, { data }] = useDeleteRoom()
 
     const handleDelete = () => {
         setShowDeleteConfirm(true)
@@ -42,7 +42,7 @@ export default function Room({
                 setShowCard(false)
                 onDelete && onDelete(room)
         }
-    }, [ data, room, onDelete ])
+    }, [data, room, onDelete])
 
     return (
         <Box {...boxProps}>
@@ -52,45 +52,47 @@ export default function Room({
                 primary
                 color="light-2"
                 label={room.name}
-                onClick={() => setShowCard(!showCard) }
+                onClick={() => setShowCard(!showCard)}
                 style={{ whiteSpace: "nowrap" }}
             />
-            {ref.current && showCard &&
+            {ref.current && showCard && (
                 <Drop
                     target={ref.current}
-                    align={{left: "right"}}
+                    align={{ left: "right" }}
                     plain
-                    onEsc={() => setShowCard(false) }
-                    onClickOutside={() => setShowCard(false) }
+                    onEsc={() => setShowCard(false)}
+                    onClickOutside={() => setShowCard(false)}
                 >
                     <Card width="medium" background="white" margin="small">
-                        <CardHeader pad={{horizontal: "medium", top: "medium"}} style={{fontWeight: "bold"}}>{room.name}</CardHeader>
-                        <CardBody pad="medium">
-                            {room.square && <>{room.square}&nbsp;м²</>}
-                        </CardBody>
-                        <CardFooter pad={{horizontal: "small"}} background="light-1" height="xxsmall">
-                            {showDeleteConfirm
-                                ?
-                                    <Box direction="row" gap="small">
-                                        <Button primary label="Удалить" size="small" onClick={handleDeleteConfirm}/>
-                                        <Button label="Отмена" size="small" onClick={handleDeleteCancel}/>
-                                    </Box>
-                                : (
-                                    <Button icon={<Trash/>} onClick={handleDelete}/>
-                                )
-                            }
+                        <CardHeader pad={{ horizontal: "medium", top: "medium" }} style={{ fontWeight: "bold" }}>
+                            {room.name}
+                        </CardHeader>
+                        <CardBody pad="medium">{room.square && <>{room.square}&nbsp;м²</>}</CardBody>
+                        <CardFooter pad={{ horizontal: "small" }} background="light-1" height="xxsmall">
+                            {showDeleteConfirm ? (
+                                <Box direction="row" gap="small">
+                                    <Button primary label="Удалить" size="small" onClick={handleDeleteConfirm} />
+                                    <Button label="Отмена" size="small" onClick={handleDeleteCancel} />
+                                </Box>
+                            ) : (
+                                <Button icon={<Trash />} onClick={handleDelete} />
+                            )}
 
-                            {!showDeleteConfirm &&
-                                <Button label="Редактировать" size="small" primary onClick={() => {
-                                    setShowCard(false)
-                                    onClickUpdate && onClickUpdate(room)
-                                }}/>
-                            }
-
+                            {!showDeleteConfirm && (
+                                <Button
+                                    label="Редактировать"
+                                    size="small"
+                                    primary
+                                    onClick={() => {
+                                        setShowCard(false)
+                                        onClickUpdate && onClickUpdate(room)
+                                    }}
+                                />
+                            )}
                         </CardFooter>
                     </Card>
                 </Drop>
-            }
+            )}
         </Box>
     )
 }

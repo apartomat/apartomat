@@ -1,18 +1,18 @@
 mutation makeProjectPublic($projectId: String!) {
     makeProjectPublic(projectId: $projectId) {
         __typename
-        ...on ProjectMadePublic {
+        ... on ProjectMadePublic {
             publicSite {
                 status
             }
         }
-        ...on NotFound {
+        ... on NotFound {
             message
         }
-        ...on Forbidden {
+        ... on Forbidden {
             message
         }
-        ...on ServerError {
+        ... on ServerError {
             message
         }
     }
@@ -21,18 +21,18 @@ mutation makeProjectPublic($projectId: String!) {
 mutation makeProjectNotPublic($projectId: String!) {
     makeProjectNotPublic(projectId: $projectId) {
         __typename
-        ...on ProjectMadeNotPublic {
+        ... on ProjectMadeNotPublic {
             publicSite {
                 status
             }
         }
-        ...on NotFound {
+        ... on NotFound {
             message
         }
-        ...on Forbidden {
+        ... on Forbidden {
             message
         }
-        ...on ServerError {
+        ... on ServerError {
             message
         }
     }

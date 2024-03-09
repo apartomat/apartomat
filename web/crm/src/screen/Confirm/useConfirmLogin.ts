@@ -3,11 +3,11 @@ import { useConfirmLoginLinkMutation, ConfirmLoginLinkMutation, ConfirmLoginLink
 
 export function useConfirmLogin(): [
     (email: string) => Promise<FetchResult<ConfirmLoginLinkMutation>>,
-    ConfirmLoginLinkMutationResult
+    ConfirmLoginLinkMutationResult,
 ] {
     const client = useApolloClient()
 
-    const [ confirmLogin, result ] = useConfirmLoginLinkMutation({ client, errorPolicy: 'all' })
+    const [confirmLogin, result] = useConfirmLoginLinkMutation({ client, errorPolicy: "all" })
 
     return [(token: string) => confirmLogin({ variables: { token } }), result]
 }

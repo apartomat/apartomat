@@ -10,19 +10,19 @@ export default function ConfirmDelete({
     onClickDelete,
     ...layerProps
 }: {
-    count: number,
-    disableButton: boolean,
-    onClickClose?: () => void,
-    onClickDelete?: () => void,
+    count: number
+    disableButton: boolean
+    onClickClose?: () => void
+    onClickDelete?: () => void
 } & LayerExtendedProps) {
     return (
-        <Layer
-            {...layerProps}
-        >
-            <Box pad="medium" gap="medium" width={{min: "500px"}}>
+        <Layer {...layerProps}>
+            <Box pad="medium" gap="medium" width={{ min: "500px" }}>
                 <Box direction="row" justify="between" align="center">
-                    <Heading level={4} margin="none">Удалить {count} визуализации из проекта?</Heading>
-                    <Button plain icon={ <FormClose/> } size="small" onClick={onClickClose}/>
+                    <Heading level={4} margin="none">
+                        Удалить {count} визуализации из проекта?
+                    </Heading>
+                    <Button plain icon={<FormClose />} size="small" onClick={onClickClose} />
                 </Box>
                 <Box
                     pad="small"
@@ -30,16 +30,13 @@ export default function ConfirmDelete({
                     direction="row"
                     gap="small"
                     align="center"
-                    background={{ color: "status-warning", opacity: "weak"}}
+                    background={{ color: "status-warning", opacity: "weak" }}
                 >
-                    <Alert color="status-warning" size="medium"/>
+                    <Alert color="status-warning" size="medium" />
                     <Text>Удаленные визуализации не возможно будет восстановить.</Text>
                 </Box>
                 <Box direction="row" justify="end" gap="small" margin={{ top: "small" }}>
-                    <Button
-                        label="Отмена"
-                        onClick={onClickClose}
-                    />
+                    <Button label="Отмена" onClick={onClickClose} />
                     <Button
                         primary
                         label={disableButton ? "Удаление..." : "Удалить"}

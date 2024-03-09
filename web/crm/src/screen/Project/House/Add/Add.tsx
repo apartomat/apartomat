@@ -1,6 +1,6 @@
-import React, {useEffect, useState} from "react"
+import React, { useEffect, useState } from "react"
 
-import useAddHouse, {House as HouseType} from "./useAddHouse"
+import useAddHouse, { House as HouseType } from "./useAddHouse"
 
 import { Box, Button, Heading, Layer } from "grommet"
 import { FormClose } from "grommet-icons"
@@ -11,18 +11,18 @@ export function Add({
     projectId,
     onAdd,
     onEsc,
-    onClickClose
+    onClickClose,
 }: {
-    projectId: string,
+    projectId: string
     onAdd?: (house: HouseType) => void
-    onEsc?: () => void,
+    onEsc?: () => void
     onClickClose?: () => void
 }) {
-    const [ errorMessage, setErrorMessage ] = useState<string | undefined>()
+    const [errorMessage, setErrorMessage] = useState<string | undefined>()
 
-    const [ value, setValue ] = useState({ city: "", address: "", housingComplex: ""} as FormValue)
+    const [value, setValue] = useState({ city: "", address: "", housingComplex: "" } as FormValue)
 
-    const [ addHouse, { data, error, loading } ] = useAddHouse()
+    const [addHouse, { data, error, loading }] = useAddHouse()
 
     const handleSubmit = (event: React.FormEvent) => {
         addHouse(projectId, { ...value })
@@ -49,21 +49,28 @@ export function Add({
         if (error) {
             setErrorMessage("Ошибка сервера")
         }
-
-    }, [ data, error, onAdd ])
+    }, [data, error, onAdd])
 
     return (
-        <Layer
-            onEsc={onEsc}
-        >
+        <Layer onEsc={onEsc}>
             <Box pad="medium" gap="medium" width="medium">
-
                 <Box direction="row" justify="between" align="center">
-                    <Heading level={2} margin="none">Адрес</Heading>
-                    <Button icon={ <FormClose/> } onClick={onClickClose}/>
+                    <Heading level={2} margin="none">
+                        Адрес
+                    </Heading>
+                    <Button icon={<FormClose />} onClick={onClickClose} />
                 </Box>
 
-                {errorMessage && <Box background={{color: "status-critical", opacity: "strong"}} round="medium" pad={{vertical: "small", horizontal: "medium"}} margin={{top: "small"}}>{errorMessage}</Box>}
+                {errorMessage && (
+                    <Box
+                        background={{ color: "status-critical", opacity: "strong" }}
+                        round="medium"
+                        pad={{ vertical: "small", horizontal: "medium" }}
+                        margin={{ top: "small" }}
+                    >
+                        {errorMessage}
+                    </Box>
+                )}
 
                 <Box>
                     <Form
@@ -72,11 +79,11 @@ export function Add({
                         onSubmit={handleSubmit}
                         submit={
                             <Box>
-                                <Box direction="row" justify="between" margin={{top: "large"}}>
+                                <Box direction="row" justify="between" margin={{ top: "large" }}>
                                     <Button
                                         type="submit"
                                         primary
-                                        label={loading ? 'Сохранение...' : 'Сохранить' }
+                                        label={loading ? "Сохранение..." : "Сохранить"}
                                         disabled={loading}
                                     />
                                 </Box>

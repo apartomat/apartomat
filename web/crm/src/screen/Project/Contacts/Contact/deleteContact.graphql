@@ -1,18 +1,18 @@
 mutation deleteContact($id: String!) {
     deleteContact(id: $id) {
         __typename
-        ...on ContactDeleted {
+        ... on ContactDeleted {
             contact {
                 id
             }
         }
-        ...on Forbidden {
+        ... on Forbidden {
             message
         }
-        ...on NotFound {
+        ... on NotFound {
             message
         }
-        ...on ServerError {
+        ... on ServerError {
             message
         }
     }

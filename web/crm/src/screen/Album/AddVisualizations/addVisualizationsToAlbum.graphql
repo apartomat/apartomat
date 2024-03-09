@@ -1,7 +1,7 @@
-mutation addVisualizationsToAlbum($albumId: String! $visualizations: [String!]!) {
-    addVisualizationsToAlbum(albumId: $albumId visualizations: $visualizations) {
+mutation addVisualizationsToAlbum($albumId: String!, $visualizations: [String!]!) {
+    addVisualizationsToAlbum(albumId: $albumId, visualizations: $visualizations) {
         __typename
-        ...on VisualizationsAddedToAlbum {
+        ... on VisualizationsAddedToAlbum {
             pages {
                 position
                 visualization {
@@ -14,10 +14,10 @@ mutation addVisualizationsToAlbum($albumId: String! $visualizations: [String!]!)
                 }
             }
         }
-        ...on Forbidden {
+        ... on Forbidden {
             message
         }
-        ...on ServerError {
+        ... on ServerError {
             message
         }
     }

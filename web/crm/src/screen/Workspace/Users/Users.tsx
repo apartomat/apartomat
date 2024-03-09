@@ -8,7 +8,6 @@ import { Add } from "grommet-icons"
 
 import Invite from "./Invite/Invite"
 
-
 export default function Users({
     workspaceId,
     users,
@@ -16,18 +15,18 @@ export default function Users({
     onUserInviteSent,
     ...boxProps
 }: {
-    workspaceId: string,
-    users: WorkspaceScreenUsersFragment,
-    roles: WorkspaceUserRoleDictionary,
-    onUserInviteSent?: (to: string) => void,
+    workspaceId: string
+    users: WorkspaceScreenUsersFragment
+    roles: WorkspaceUserRoleDictionary
+    onUserInviteSent?: (to: string) => void
 } & BoxExtendedProps) {
-    const [ showInviteUserLayer, setShowInviteUserLayer ] = useState(false)
+    const [showInviteUserLayer, setShowInviteUserLayer] = useState(false)
 
     return (
         <Box {...boxProps}>
-            {users.list.__typename === "WorkspaceUsersList" && 
+            {users.list.__typename === "WorkspaceUsersList" && (
                 <Box direction="row" gap="small">
-                    {users.list.items.map(user => {
+                    {users.list.items.map((user) => {
                         return (
                             <Tip content={user.profile.email} key={user.id}>
                                 <Button
@@ -40,7 +39,7 @@ export default function Users({
                                             background="light-1"
                                             border={{ color: "white", size: "small" }}
                                         >
-                                            { user.profile.abbr || "NA" }
+                                            {user.profile.abbr || "NA"}
                                         </Avatar>
                                     }
                                 />
@@ -52,14 +51,14 @@ export default function Users({
                         <Button
                             color="brand"
                             label="Пригласить"
-                            icon={<Add/>}
+                            icon={<Add />}
                             onClick={() => setShowInviteUserLayer(true)}
                         />
                     </Box>
                 </Box>
-            }
+            )}
 
-            {showInviteUserLayer &&
+            {showInviteUserLayer && (
                 <Invite
                     workspaceId={workspaceId}
                     roles={roles}
@@ -69,8 +68,7 @@ export default function Users({
                         onUserInviteSent && onUserInviteSent(...args)
                     }}
                 />
-            }
+            )}
         </Box>
-    )    
+    )
 }
-

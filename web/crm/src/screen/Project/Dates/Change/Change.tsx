@@ -1,4 +1,4 @@
-import React, { useState, useEffect} from "react"
+import React, { useState, useEffect } from "react"
 
 import { Layer, Box, Heading, Button, Calendar } from "grommet"
 import { FormClose } from "grommet-icons"
@@ -12,27 +12,27 @@ export default function Change({
     onChange,
     onEsc,
     onClickOutside,
-    onClickClose
+    onClickClose,
 }: {
-    projectId: string,
-    startAt?: string,
-    endAt?: string,
-    onChange?: (dates: { startAt?: string, endAt?: string }) => void,
-    onEsc?: () => void,
-    onClickOutside?: () => void,
+    projectId: string
+    startAt?: string
+    endAt?: string
+    onChange?: (dates: { startAt?: string; endAt?: string }) => void
+    onEsc?: () => void
+    onClickOutside?: () => void
     onClickClose?: () => void
 }) {
-    const [ dates, setDates ] = useState(startAt && endAt ? [[startAt, endAt]] : undefined)
+    const [dates, setDates] = useState(startAt && endAt ? [[startAt, endAt]] : undefined)
 
-    const [ change, { loading, data } ] = useChangeProjectDates()
+    const [change, { loading, data }] = useChangeProjectDates()
 
     useEffect(() => {
         switch (data?.changeProjectDates.__typename) {
             case "ProjectDatesChanged":
-                onChange && onChange({ startAt: dates && dates[0] && dates[0][0], endAt: dates && dates[0] && dates[0][1] })
+                onChange &&
+                    onChange({ startAt: dates && dates[0] && dates[0][0], endAt: dates && dates[0] && dates[0][1] })
         }
-    }, [ data, dates, onChange ])
-
+    }, [data, dates, onChange])
 
     /* eslint-disable  @typescript-eslint/no-explicit-any */
     const handleSelect = (value: any) => {
@@ -45,14 +45,13 @@ export default function Change({
     }
 
     return (
-        <Layer
-            onClickOutside={onClickOutside}
-            onEsc={onEsc}
-        >
+        <Layer onClickOutside={onClickOutside} onEsc={onEsc}>
             <Box pad="medium" gap="medium">
                 <Box direction="row" justify="between" align="center">
-                    <Heading level={2} margin="none">Сроки проекта</Heading>
-                    <Button icon={ <FormClose/> } onClick={onClickClose}/>
+                    <Heading level={2} margin="none">
+                        Сроки проекта
+                    </Heading>
+                    <Button icon={<FormClose />} onClick={onClickClose} />
                 </Box>
                 <Box>
                     <Calendar
@@ -64,11 +63,10 @@ export default function Change({
                         onSelect={handleSelect}
                     />
                 </Box>
-                <Box direction="row" margin={{top: "medium"}}>
-                    <Button type="submit" primary label="Сохранить" onClick={handleSubmit} disabled={loading}/>
+                <Box direction="row" margin={{ top: "medium" }}>
+                    <Button type="submit" primary label="Сохранить" onClick={handleSubmit} disabled={loading} />
                 </Box>
             </Box>
         </Layer>
     )
 }
-

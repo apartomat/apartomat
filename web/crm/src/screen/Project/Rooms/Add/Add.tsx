@@ -12,13 +12,13 @@ export function Add({
     onAdd,
     ...layerProps
 }: {
-    houseId: string,
-    onClickClose?: () => void,
-    onAdd?: (room: ProjectScreenHouseRoom) => void,
+    houseId: string
+    onClickClose?: () => void
+    onAdd?: (room: ProjectScreenHouseRoom) => void
 } & LayerExtendedProps) {
-    const [ value, setValue ] = useState({name: "", square: "", level: "" } as FormValue)
+    const [value, setValue] = useState({ name: "", square: "", level: "" } as FormValue)
 
-    const [ addRoom, { data, loading, error } ] = useAddRoom()
+    const [addRoom, { data, loading, error }] = useAddRoom()
 
     const handleSubmit = (event: React.FormEvent) => {
         const { name, square } = value
@@ -33,29 +33,34 @@ export function Add({
             case "RoomAdded":
                 onAdd && onAdd(data.addRoom.room)
         }
-    }, [ data, onAdd ])
+    }, [data, onAdd])
 
     return (
         <Layer {...layerProps}>
             <Box pad="medium" gap="medium" width="large">
                 <Box direction="row" justify="between" align="center">
-                    <Heading level={2} margin="none">Комната</Heading>
-                    <Button icon={ <FormClose/> } onClick={onClickClose}/>
+                    <Heading level={2} margin="none">
+                        Комната
+                    </Heading>
+                    <Button icon={<FormClose />} onClick={onClickClose} />
                 </Box>
                 <Form
                     value={value}
                     onChange={setValue}
                     onSubmit={handleSubmit}
                     submit={
-                        <Box direction="row" justify="between" margin={{top: "large"}}>
-                            <Button
-                                type="submit"
-                                primary
-                                label="Добавить"
-                                disabled={loading}
-                            />
-                            {error && <Box><Text color="status-critical">{error.message}</Text></Box>}
-                            <Box><Text color="status-critical"><ErrorMessage res={data?.addRoom}/></Text></Box>
+                        <Box direction="row" justify="between" margin={{ top: "large" }}>
+                            <Button type="submit" primary label="Добавить" disabled={loading} />
+                            {error && (
+                                <Box>
+                                    <Text color="status-critical">{error.message}</Text>
+                                </Box>
+                            )}
+                            <Box>
+                                <Text color="status-critical">
+                                    <ErrorMessage res={data?.addRoom} />
+                                </Text>
+                            </Box>
                         </Box>
                     }
                 />
@@ -65,7 +70,15 @@ export function Add({
 }
 
 /* eslint-disable  @typescript-eslint/no-explicit-any */
-function ErrorMessage({res}: {res: { __typename: "NotFound", message: string } |  { __typename: "Forbidden", message: string } | { __typename: "ServerError", message: string } | any }) {
+function ErrorMessage({
+    res,
+}: {
+    res:
+        | { __typename: "NotFound"; message: string }
+        | { __typename: "Forbidden"; message: string }
+        | { __typename: "ServerError"; message: string }
+        | any
+}) {
     switch (res?.__typename) {
         case "NotFound":
             return <>Не найдено</>
@@ -78,4 +91,4 @@ function ErrorMessage({res}: {res: { __typename: "NotFound", message: string } |
     return null
 }
 
-export default  Add
+export default Add

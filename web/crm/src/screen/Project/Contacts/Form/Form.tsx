@@ -2,26 +2,26 @@ import React from "react"
 
 import { Form as FormElement, FormField, MaskedInput } from "grommet"
 
-export type ContactFormData = { fullName: string, phone: string, email: string, instagram: string }
+export type ContactFormData = { fullName: string; phone: string; email: string; instagram: string }
 
 export function Form({
     contact,
     onSet,
     onSubmit,
-    submit
+    submit,
 }: {
-    contact: ContactFormData,
-    onSet: React.Dispatch<ContactFormData>,
-    onSubmit: (event: React.FormEvent) => void,
+    contact: ContactFormData
+    onSet: React.Dispatch<ContactFormData>
+    onSubmit: (event: React.FormEvent) => void
     submit: JSX.Element
 }) {
     return (
         <FormElement
             validate="submit"
             value={contact}
-            onChange={val => onSet(val)}
+            onChange={(val) => onSet(val)}
             onSubmit={onSubmit}
-            messages={{required: 'обязательное поле'}}
+            messages={{ required: "обязательное поле" }}
         >
             <FormField
                 label="Имя"
@@ -29,14 +29,14 @@ export function Form({
                 validate={{
                     regexp: /^.+$/,
                     message: "обязательно для заполнения",
-                    status: "error"
+                    status: "error",
                 }}
             >
                 <MaskedInput
                     name="fullName"
                     mask={[
                         { regexp: /^.*$/, placeholder: "Имя" },
-                        { fixed: ' ' },
+                        { fixed: " " },
                         { regexp: /^.*$/, placeholder: "Фамилия" },
                     ]}
                 />
@@ -45,30 +45,30 @@ export function Form({
                 <MaskedInput
                     name="phone"
                     mask={[
-                        { fixed: '+7 (' },
+                        { fixed: "+7 (" },
                         {
                             length: 3,
                             regexp: /^[0-9]{1,3}$/,
-                            placeholder: 'xxx',
+                            placeholder: "xxx",
                         },
-                        { fixed: ')' },
-                        { fixed: ' ' },
+                        { fixed: ")" },
+                        { fixed: " " },
                         {
                             length: 3,
                             regexp: /^[0-9]{1,3}$/,
-                            placeholder: 'xxx',
+                            placeholder: "xxx",
                         },
-                        { fixed: '-' },
+                        { fixed: "-" },
                         {
                             length: 2,
                             regexp: /^[0-9]{1,4}$/,
-                            placeholder: 'xx',
+                            placeholder: "xx",
                         },
-                        { fixed: '-' },
+                        { fixed: "-" },
                         {
                             length: 2,
                             regexp: /^[0-9]{1,4}$/,
-                            placeholder: 'xx',
+                            placeholder: "xx",
                         },
                     ]}
                 />
@@ -78,18 +78,15 @@ export function Form({
                     name="email"
                     mask={[
                         { regexp: /^[\w\-_.]+$/, placeholder: "example" },
-                        { fixed: '@' },
+                        { fixed: "@" },
                         { regexp: /^[\w\-_.]+$/, placeholder: "test" },
-                        { fixed: '.' },
-                        { regexp: /^[\w]+$/, placeholder: 'org' },
+                        { fixed: "." },
+                        { regexp: /^[\w]+$/, placeholder: "org" },
                     ]}
                 />
             </FormField>
             <FormField label="Instagram" name="instagram">
-                <MaskedInput
-                    name="instagram"
-                    mask={[{ fixed: 'https://www.instagram.com/' }, { regexp: /^.*$/ }]}
-                />
+                <MaskedInput name="instagram" mask={[{ fixed: "https://www.instagram.com/" }, { regexp: /^.*$/ }]} />
             </FormField>
             {submit}
         </FormElement>

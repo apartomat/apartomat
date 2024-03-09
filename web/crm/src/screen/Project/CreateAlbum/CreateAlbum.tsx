@@ -9,12 +9,11 @@ export default function CreateAlbumOnClick({
     children,
     onAlbumCreated,
 }: {
-    projectId: string,
-    children: React.ReactElement<ButtonExtendedProps>,
+    projectId: string
+    children: React.ReactElement<ButtonExtendedProps>
     onAlbumCreated?: (id: string) => void
 }): JSX.Element {
-
-    const [ create, { data } ] = useCreateAlbum()
+    const [create, { data }] = useCreateAlbum()
 
     const handleClick = () => {
         create(projectId, "Альбом")
@@ -25,7 +24,7 @@ export default function CreateAlbumOnClick({
             case "AlbumCreated":
                 onAlbumCreated && onAlbumCreated(data?.createAlbum.album.id)
         }
-    }, [ data ])
+    }, [data])
 
     return (
         <>
@@ -35,7 +34,6 @@ export default function CreateAlbumOnClick({
                 }
 
                 return child
-
             })}
         </>
     )

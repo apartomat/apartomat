@@ -1,10 +1,10 @@
 query projectScreen($id: String!) {
     project(id: $id) {
         __typename
-        ...on Project {
+        ... on Project {
             ...ProjectScreenProject
         }
-        ...on Error {
+        ... on Error {
             message
         }
     }
@@ -23,9 +23,9 @@ fragment ProjectScreenProject on Project {
         }
     }
     contacts {
-        list(filter: {} limit: 10 offset: 0) {
+        list(filter: {}, limit: 10, offset: 0) {
             __typename
-            ...on ProjectContactsList {
+            ... on ProjectContactsList {
                 items {
                     id
                     fullName
@@ -36,13 +36,13 @@ fragment ProjectScreenProject on Project {
                     }
                 }
             }
-            ...on Error {
+            ... on Error {
                 message
             }
         }
         total {
             __typename
-            ...on ProjectContactsTotal {
+            ... on ProjectContactsTotal {
                 total
             }
         }
@@ -62,20 +62,20 @@ fragment ProjectScreenProject on Project {
 }
 
 fragment ProjectScreenVisualizations on ProjectVisualizations {
-    list(filter: { status: { eq: [UNKNOWN, APPROVED] }} limit: 20 offset: 0) {
+    list(filter: { status: { eq: [UNKNOWN, APPROVED] } }, limit: 20, offset: 0) {
         __typename
-        ...on ProjectVisualizationsList {
+        ... on ProjectVisualizationsList {
             items {
                 ...ProjectScreenVisualization
             }
         }
-        ...on Error {
+        ... on Error {
             message
         }
     }
     total(filter: {}) {
         __typename
-        ...on ProjectVisualizationsTotal {
+        ... on ProjectVisualizationsTotal {
             total
         }
     }
@@ -99,9 +99,9 @@ fragment ProjectScreenVisualization on Visualization {
 }
 
 fragment ProjectScreenHouses on ProjectHouses {
-    list(filter: {} limit: 1 offset: 0) {
+    list(filter: {}, limit: 1, offset: 0) {
         __typename
-        ...on ProjectHousesList {
+        ... on ProjectHousesList {
             items {
                 ...ProjectScreenHouse
                 rooms {
@@ -109,7 +109,7 @@ fragment ProjectScreenHouses on ProjectHouses {
                 }
             }
         }
-        ...on Error {
+        ... on Error {
             message
         }
     }
@@ -126,12 +126,12 @@ fragment ProjectScreenHouse on House {
 
 fragment ProjectScreenHouseRooms on HouseRooms {
     list {
-        ...on HouseRoomsList {
+        ... on HouseRoomsList {
             items {
                 ...ProjectScreenHouseRoom
             }
         }
-        ...on Error {
+        ... on Error {
             message
         }
     }
@@ -145,23 +145,23 @@ fragment ProjectScreenHouseRoom on Room {
 }
 
 fragment ProjectScreenAlbums on ProjectAlbums {
-    list(limit: 20 offset: 0) {
+    list(limit: 20, offset: 0) {
         __typename
-        ...on ProjectAlbumsList {
+        ... on ProjectAlbumsList {
             items {
                 __typename
-                ...on Album {
+                ... on Album {
                     ...ProjectScreenAlbum
                 }
             }
         }
-        ...on Error {
+        ... on Error {
             message
         }
     }
     total {
         __typename
-        ...on ProjectAlbumsTotal {
+        ... on ProjectAlbumsTotal {
             total
         }
     }
@@ -174,7 +174,7 @@ fragment ProjectScreenAlbum on Album {
 
 fragment ProjectScreenPublicSite on ProjectPublicSite {
     __typename
-    ...on PublicSite {
+    ... on PublicSite {
         id
         status
         url

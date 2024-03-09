@@ -4,14 +4,11 @@ import { useDeleteAlbumMutation, DeleteAlbumMutation, DeleteAlbumMutationResult 
 
 export function useDeleteAlbum(): [
     (id: string) => Promise<FetchResult<DeleteAlbumMutation>>,
-    DeleteAlbumMutationResult
+    DeleteAlbumMutationResult,
 ] {
     const client = useApolloClient()
 
-    const [ change, result ] = useDeleteAlbumMutation({ client, errorPolicy: 'all' })
+    const [change, result] = useDeleteAlbumMutation({ client, errorPolicy: "all" })
 
-    return [
-        (id: string) => change({ variables: { id } }),
-        result,
-    ]
+    return [(id: string) => change({ variables: { id } }), result]
 }

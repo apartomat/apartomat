@@ -1,18 +1,18 @@
-mutation changeProjectStatus($projectId: String! $status: ProjectStatus!) {
-    changeProjectStatus(projectId: $projectId status: $status) {
+mutation changeProjectStatus($projectId: String!, $status: ProjectStatus!) {
+    changeProjectStatus(projectId: $projectId, status: $status) {
         __typename
-        ...on ProjectStatusChanged {
+        ... on ProjectStatusChanged {
             project {
                 status
             }
         }
-        ...on NotFound {
+        ... on NotFound {
             message
         }
-        ...on Forbidden {
+        ... on Forbidden {
             message
         }
-        ...on ServerError {
+        ... on ServerError {
             message
         }
     }

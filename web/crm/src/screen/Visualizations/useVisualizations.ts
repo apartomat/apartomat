@@ -2,11 +2,10 @@ import { useApolloClient } from "@apollo/client"
 import { ProjectVisualizationsListFilter, useVisualizationsScreenQuery } from "api/graphql"
 import { useState } from "react"
 
-export { VisualizationStatus } from  "api/graphql"
+export { VisualizationStatus } from "api/graphql"
 
 export function useVisualizations(id: string, filter: ProjectVisualizationsListFilter) {
-
-    const [ first, setFirst] = useState(true)
+    const [first, setFirst] = useState(true)
 
     const client = useApolloClient()
 
@@ -14,7 +13,7 @@ export function useVisualizations(id: string, filter: ProjectVisualizationsListF
         client,
         errorPolicy: "all",
         variables: { id, filter },
-        notifyOnNetworkStatusChange: true
+        notifyOnNetworkStatusChange: true,
     })
 
     const { called, loading } = result

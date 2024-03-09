@@ -1,12 +1,12 @@
 mutation deleteAlbum($id: String!) {
     deleteAlbum(id: $id) {
         __typename
-        ...on AlbumDeleted {
+        ... on AlbumDeleted {
             album {
                 id
             }
         }
-        ...on Error {
+        ... on Error {
             __typename
             message
         }

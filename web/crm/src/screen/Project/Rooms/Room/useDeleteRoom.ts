@@ -3,17 +3,11 @@ import { useDeleteRoomMutation, DeleteRoomMutation, DeleteRoomMutationResult } f
 
 export type DeleteRoom = (id: string) => Promise<FetchResult<DeleteRoomMutation>>
 
-export function useDeleteRoom(): [
-    DeleteRoom,
-    DeleteRoomMutationResult
-] {
+export function useDeleteRoom(): [DeleteRoom, DeleteRoomMutationResult] {
     const client = useApolloClient()
-    const [ deleteRoom, result ] = useDeleteRoomMutation({ client, errorPolicy: 'all' })
+    const [deleteRoom, result] = useDeleteRoomMutation({ client, errorPolicy: "all" })
 
-    return [
-        (id: string) => deleteRoom({ variables: { id } }),
-        result,
-    ]
+    return [(id: string) => deleteRoom({ variables: { id } }), result]
 }
 
 export default useDeleteRoom

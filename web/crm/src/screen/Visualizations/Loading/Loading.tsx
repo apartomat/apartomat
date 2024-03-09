@@ -7,9 +7,9 @@ export const Loading = ({
     color = "brand",
     weight = "medium",
     ...props
-} : {
+}: {
     color?: ColorType
-    weight?: 'xsmall' | 'small' | 'medium' | 'large' | 'xlarge' 
+    weight?: "xsmall" | "small" | "medium" | "large" | "xlarge"
 } & SpinnerExtendedProps) => {
     return (
         <Spinner

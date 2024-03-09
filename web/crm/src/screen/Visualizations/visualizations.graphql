@@ -1,11 +1,11 @@
-query visualizationsScreen($id: String! $filter: ProjectVisualizationsListFilter!) {
+query visualizationsScreen($id: String!, $filter: ProjectVisualizationsListFilter!) {
     project(id: $id) {
         __typename
-        ...on Project {
+        ... on Project {
             id
             name
             visualizations {
-                list(filter: $filter limit: 100 offset: 0) {
+                list(filter: $filter, limit: 100, offset: 0) {
                     ... on ProjectVisualizationsList {
                         items {
                             ...VisualizationsScreenVisualization
@@ -15,13 +15,12 @@ query visualizationsScreen($id: String! $filter: ProjectVisualizationsListFilter
                         message
                     }
                 }
-
             }
             houses {
                 ...VisualizationsScreenHouses
             }
         }
-        ...on Error {
+        ... on Error {
             message
         }
     }
@@ -44,7 +43,6 @@ fragment VisualizationsScreenVisualization on Visualization {
     }
 }
 
-
 fragment VisualizationsScreenHouseRoom on Room {
     id
     name
@@ -52,18 +50,17 @@ fragment VisualizationsScreenHouseRoom on Room {
     level
 }
 
-
 fragment VisualizationsScreenHouses on ProjectHouses {
-    list(filter: {} limit: 1 offset: 0) {
+    list(filter: {}, limit: 1, offset: 0) {
         __typename
-        ...on ProjectHousesList {
+        ... on ProjectHousesList {
             items {
                 rooms {
                     ...VisualizationsScreenHouseRooms
                 }
             }
         }
-        ...on Error {
+        ... on Error {
             message
         }
     }
@@ -71,12 +68,12 @@ fragment VisualizationsScreenHouses on ProjectHouses {
 
 fragment VisualizationsScreenHouseRooms on HouseRooms {
     list {
-        ...on HouseRoomsList {
+        ... on HouseRoomsList {
             items {
                 ...VisualizationsScreenHouseRoom
             }
         }
-        ...on Error {
+        ... on Error {
             message
         }
     }

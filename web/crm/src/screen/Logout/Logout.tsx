@@ -5,7 +5,7 @@ import useToken from "context/auth/useToken"
 import useAuthContext from "context/auth/useAuthContext"
 
 function Logout() {
-    const [,, removeToken] = useToken()
+    const [, , removeToken] = useToken()
 
     const { user, reset } = useAuthContext()
 
@@ -18,11 +18,9 @@ function Logout() {
 
     useEffect(() => {
         navigate("/")
-    }, [ user ])
+    }, [user])
 
-    return (
-        <></>
-    )
+    return <></>
 }
 
 export default Logout

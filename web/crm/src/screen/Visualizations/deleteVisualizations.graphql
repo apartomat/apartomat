@@ -1,23 +1,23 @@
 mutation deleteVisualizations($id: [String!]!) {
     deleteVisualizations(id: $id) {
         __typename
-        ...on VisualizationsDeleted {
+        ... on VisualizationsDeleted {
             visualizations {
                 id
             }
         }
-        ...on SomeVisualizationsDeleted {
+        ... on SomeVisualizationsDeleted {
             visualizations {
                 id
             }
         }
-        ...on NotFound {
+        ... on NotFound {
             message
         }
-        ...on Forbidden {
+        ... on Forbidden {
             message
         }
-        ...on ServerError {
+        ... on ServerError {
             message
         }
     }

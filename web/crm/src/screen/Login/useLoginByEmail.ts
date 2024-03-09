@@ -3,12 +3,9 @@ import { useLoginByEmailMutation, LoginByEmailMutation, LoginByEmailMutationResu
 
 export type LoginByEmailFn = (email: string) => Promise<FetchResult<LoginByEmailMutation>>
 
-export function useLoginByEmail(): [
-    LoginByEmailFn,
-    LoginByEmailMutationResult
-] {
+export function useLoginByEmail(): [LoginByEmailFn, LoginByEmailMutationResult] {
     const client = useApolloClient()
-    const [login, result] = useLoginByEmailMutation({ client, errorPolicy: 'all' })
+    const [login, result] = useLoginByEmailMutation({ client, errorPolicy: "all" })
 
     return [(email: string) => login({ variables: { email } }), result]
 }

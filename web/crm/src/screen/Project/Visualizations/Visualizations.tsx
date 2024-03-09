@@ -11,12 +11,11 @@ export default function Visualizations({
 }: {
     visualizations: ProjectScreenVisualizations
 } & BoxExtendedProps) {
-
     const gridRef = useRef<HTMLDivElement>(null)
 
-    const [ left, setLeft ] = useState<boolean>(true)
+    const [left, setLeft] = useState<boolean>(true)
 
-    const [ right, setRight ] = useState<boolean>(false)
+    const [right, setRight] = useState<boolean>(false)
 
     useEffect(() => {
         const grid = gridRef.current
@@ -43,16 +42,22 @@ export default function Visualizations({
 
             return (
                 <Box {...boxProps} direction="row">
-                    {!left &&
-                        <Box align="end" justify="center" height="small" width="xxsmall" style={{ position: "absolute", left: 0 }}>
-                            <Previous color="light-4"/>
+                    {!left && (
+                        <Box
+                            align="end"
+                            justify="center"
+                            height="small"
+                            width="xxsmall"
+                            style={{ position: "absolute", left: 0 }}
+                        >
+                            <Previous color="light-4" />
                         </Box>
-                    }
+                    )}
 
                     <Box overflow="auto">
                         <Grid
                             columns="small"
-                            style={{gridAutoFlow: "column", overflowX: "scroll"}}
+                            style={{ gridAutoFlow: "column", overflowX: "scroll" }}
                             gap="xsmall"
                             ref={gridRef}
                         >
@@ -61,7 +66,7 @@ export default function Visualizations({
                                     key={item.id}
                                     height="small"
                                     width="small"
-                                    flex={{"shrink":0}}
+                                    flex={{ shrink: 0 }}
                                     background="light-2"
                                 >
                                     <Image
@@ -73,18 +78,32 @@ export default function Visualizations({
                             ))}
                         </Grid>
 
-                        {visualizations.total.__typename === "ProjectVisualizationsTotal" && visualizations.total.total > visualizations.list.items.length
-                            ? <Box key={0} height="small" width="small" margin={{bottom: "small"}} flex={{"shrink":0}} align="center" justify="center">
+                        {visualizations.total.__typename === "ProjectVisualizationsTotal" &&
+                        visualizations.total.total > visualizations.list.items.length ? (
+                            <Box
+                                key={0}
+                                height="small"
+                                width="small"
+                                margin={{ bottom: "small" }}
+                                flex={{ shrink: 0 }}
+                                align="center"
+                                justify="center"
+                            >
                                 <Text>ещё {visualizations.total.total - visualizations.list.items.length}</Text>
                             </Box>
-                            : null
-                        }
+                        ) : null}
                     </Box>
-                    {!right &&
-                        <Box align="start" justify="center" height="small" width="xxsmall" style={{ position: "absolute", right: 0 }}>
-                            <Next color="light-3"/>
+                    {!right && (
+                        <Box
+                            align="start"
+                            justify="center"
+                            height="small"
+                            width="xxsmall"
+                            style={{ position: "absolute", right: 0 }}
+                        >
+                            <Next color="light-3" />
                         </Box>
-                    }
+                    )}
                 </Box>
             )
         default:

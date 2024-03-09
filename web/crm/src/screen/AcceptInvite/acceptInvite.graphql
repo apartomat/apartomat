@@ -1,10 +1,10 @@
 mutation acceptInvite($token: String!) {
     acceptInvite(token: $token) {
         __typename
-        ...on InviteAccepted {
+        ... on InviteAccepted {
             token
         }
-        ...on Error {
+        ... on Error {
             message
         }
     }

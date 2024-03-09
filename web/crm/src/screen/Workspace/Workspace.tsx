@@ -13,32 +13,36 @@ import Users from "./Users/Users"
 import Archive from "./Archive/Archive"
 import Notification from "./Notification/Notification"
 
-export default function Workspace () {
+export default function Workspace() {
     const { id } = useParams<"id">() as { id: string }
 
     const { user } = useAuthContext()
 
-    const [ error, setError ] = useState<string | undefined>(undefined)
+    const [error, setError] = useState<string | undefined>(undefined)
 
-    const [ screen, setScreen ] = useState<WorkspaceScreenFragment | undefined>(undefined)
+    const [screen, setScreen] = useState<WorkspaceScreenFragment | undefined>(undefined)
 
-    const { data, loading, error: fetchError } = useWorkspace({ id, timezone: Intl.DateTimeFormat().resolvedOptions().timeZone })
+    const {
+        data,
+        loading,
+        error: fetchError,
+    } = useWorkspace({ id, timezone: Intl.DateTimeFormat().resolvedOptions().timeZone })
 
     useEffect(() => {
         setError(fetchError ? "Ошибка сервера" : undefined)
-    }, [ fetchError ])
+    }, [fetchError])
 
-    const [ notification, setNotification ] = useState<string | undefined>(undefined)
+    const [notification, setNotification] = useState<string | undefined>(undefined)
 
     const notify = ({
         message,
         callback,
         timeout = 250,
-        duration = 1500
+        duration = 1500,
     }: {
-        message: string,
-        callback?: () => void,
-        timeout?: number,
+        message: string
+        callback?: () => void
+        timeout?: number
         duration?: number
     }) => {
         setTimeout(() => {
@@ -68,15 +72,15 @@ export default function Workspace () {
                     break
             }
         }
-    }, [ data ])
+    }, [data])
 
-    const [ showCreateProjectLayer, setShowCreateProjectLayer ] = useState(false)
+    const [showCreateProjectLayer, setShowCreateProjectLayer] = useState(false)
 
     if (loading) {
         return (
             <Main pad="large">
                 <Box direction="row" gap="small" align="center">
-                    <Loading message="Загрузка..."/>
+                    <Loading message="Загрузка..." />
                     <Text>Загрузка...</Text>
                 </Box>
             </Main>
@@ -100,28 +104,38 @@ export default function Workspace () {
 
     return (
         <Main>
-            {notification && <Notification message={notification}/>}
+            {notification && <Notification message={notification} />}
 
-            <Header margin={{ top:"large", horizontal:"large", bottom:"medium" }}>
+            <Header margin={{ top: "large", horizontal: "large", bottom: "medium" }}>
                 <Box>
-                    <Text size="xlarge" weight="bold" color="brand">apartomat</Text>
+                    <Text size="xlarge" weight="bold" color="brand">
+                        apartomat
+                    </Text>
                 </Box>
-                <Box><UserAvatar user={user}/></Box>
+                <Box>
+                    <UserAvatar user={user} />
+                </Box>
             </Header>
 
             <Box margin={{ horizontal: "large" }}>
-                <Box margin={{bottom: "medium"}}>
-                    <Box direction="row" margin={{vertical: "medium"}} justify="between">
-                        <Heading level={2} margin="none">{screen.name}</Heading>
+                <Box margin={{ bottom: "medium" }}>
+                    <Box direction="row" margin={{ vertical: "medium" }} justify="between">
+                        <Heading level={2} margin="none">
+                            {screen.name}
+                        </Heading>
                         <Box justify="center">
-                            <Button color="brand" label="Новый проект" onClick={() => setShowCreateProjectLayer(true)} />
+                            <Button
+                                color="brand"
+                                label="Новый проект"
+                                onClick={() => setShowCreateProjectLayer(true)}
+                            />
                         </Box>
                     </Box>
 
-                    <Projects projects={projects}/>
+                    <Projects projects={projects} />
                 </Box>
 
-                <Archive projects={projects}/>
+                <Archive projects={projects} />
 
                 <Users
                     workspaceId={screen.id}

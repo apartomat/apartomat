@@ -8,8 +8,7 @@ import LoginForm from "./LoginForm"
 import CheckEmail from "./CheckEmail"
 import Pin from "./Pin"
 
-export function Login () {
-    
+export function Login() {
     const { user } = useAuthContext()
 
     const navigate = useNavigate()
@@ -18,28 +17,20 @@ export function Login () {
         if (user.status === UserContextStatus.LOGGED || user.status === UserContextStatus.UNDEFINED) {
             navigate("/")
         }
-    }, [ user ])
+    }, [user])
 
-    const [ login, { data, loading, error } ] = useLoginByEmail()
+    const [login, { data, loading, error }] = useLoginByEmail()
 
     switch (data?.loginByEmail.__typename) {
         case "LinkSentByEmail":
-            return (
-                <CheckEmail email={data?.loginByEmail.email} />
-            )
+            return <CheckEmail email={data?.loginByEmail.email} />
         case "PinSentByEmail":
-            return (
-                <Pin email={data.loginByEmail.email} token={data.loginByEmail.token} />
-            )
+            return <Pin email={data.loginByEmail.email} token={data.loginByEmail.token} />
         case "ServerError":
-            return (
-                <LoginForm login={login} loading={loading} error={data?.loginByEmail} />
-            )
+            return <LoginForm login={login} loading={loading} error={data?.loginByEmail} />
     }
 
-    return (
-        <LoginForm login={login} loading={loading} error={error} />
-    )
+    return <LoginForm login={login} loading={loading} error={error} />
 }
 
 export default Login

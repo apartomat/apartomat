@@ -3,17 +3,11 @@ import { useCreateAlbumMutation, CreateAlbumMutation, CreateAlbumMutationResult 
 
 export type CreateAlbum = (projectId: string, name: string) => Promise<FetchResult<CreateAlbumMutation>>
 
-export function useCreatePrintAlbum(): [
-    CreateAlbum,
-    CreateAlbumMutationResult
-] {
+export function useCreatePrintAlbum(): [CreateAlbum, CreateAlbumMutationResult] {
     const client = useApolloClient()
-    const [ create, result ] = useCreateAlbumMutation({ client, errorPolicy: 'all' })
+    const [create, result] = useCreateAlbumMutation({ client, errorPolicy: "all" })
 
-    return [
-        (projectId: string, name: string) => create({ variables: { projectId, name } }),
-        result,
-    ]
+    return [(projectId: string, name: string) => create({ variables: { projectId, name } }), result]
 }
 
 export default useCreatePrintAlbum

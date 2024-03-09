@@ -5,10 +5,10 @@ export type { ConfirmLoginPinMutation } from "api/graphql"
 
 export function useConfirmLoginPin(): [
     (token: string, pin: string) => Promise<FetchResult<ConfirmLoginPinMutation>>,
-    ConfirmLoginPinMutationResult
+    ConfirmLoginPinMutationResult,
 ] {
     const client = useApolloClient()
-    const [ confirmLogin, result ] = useConfirmLoginPinMutation({ client, errorPolicy: "all" })
+    const [confirmLogin, result] = useConfirmLoginPinMutation({ client, errorPolicy: "all" })
 
     return [(token: string, pin: string) => confirmLogin({ variables: { token, pin } }), result]
 }

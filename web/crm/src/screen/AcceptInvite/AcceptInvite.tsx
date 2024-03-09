@@ -6,11 +6,11 @@ import useAcceptInvite from "./useAcceptInvite"
 import useAuthContext from "context/auth/useAuthContext"
 import useToken from "context/auth/useToken"
 
-export function AcceptInvite({ redirectTo = "/"}: { redirectTo?: string}) {
+export function AcceptInvite({ redirectTo = "/" }: { redirectTo?: string }) {
     const location = useLocation()
     const navigate = useNavigate()
     const { check } = useAuthContext()
-    const [, saveToken ] = useToken()
+    const [, saveToken] = useToken()
 
     const [confirmLogin, { data, loading }] = useAcceptInvite()
 
@@ -35,14 +35,16 @@ export function AcceptInvite({ redirectTo = "/"}: { redirectTo?: string}) {
                 navigate(redirectTo)
                 return
         }
-    }, [ data, history, redirectTo, check, saveToken, loading ])
+    }, [data, history, redirectTo, check, saveToken, loading])
 
     switch (data?.acceptInvite.__typename) {
         case "InvalidToken":
             return (
                 <div>
                     <h1>Invalid token</h1>
-                    <p>Please <a href="/login">login</a> again</p>
+                    <p>
+                        Please <a href="/login">login</a> again
+                    </p>
                 </div>
             )
         case "ServerError":

@@ -6,11 +6,11 @@ import useConfirmLogin from "./useConfirmLogin"
 import useAuthContext from "context/auth/useAuthContext"
 import useToken from "context/auth/useToken"
 
-export function Confirm({ redirectTo = "/"}: { redirectTo?: string }) {
+export function Confirm({ redirectTo = "/" }: { redirectTo?: string }) {
     const location = useLocation()
     const navigate = useNavigate()
     const { check } = useAuthContext()
-    const [, saveToken ] = useToken()
+    const [, saveToken] = useToken()
 
     const [confirmLogin, { data: confirmLoginResult, loading }] = useConfirmLogin()
     const [sent, setSent] = useState(false)
@@ -29,15 +29,16 @@ export function Confirm({ redirectTo = "/"}: { redirectTo?: string }) {
             check()
             navigate(redirectTo)
         }
-    }, [ confirmLoginResult, history, redirectTo, check, saveToken, loading ])
-
+    }, [confirmLoginResult, history, redirectTo, check, saveToken, loading])
 
     switch (confirmLoginResult?.confirmLoginLink.__typename) {
         case "InvalidToken":
             return (
                 <div>
                     <h1>Invalid token</h1>
-                    <p>Please <a href="/login">login</a> again</p>
+                    <p>
+                        Please <a href="/login">login</a> again
+                    </p>
                 </div>
             )
         case "ServerError":

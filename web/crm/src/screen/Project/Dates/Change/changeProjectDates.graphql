@@ -1,19 +1,19 @@
-mutation changeProjectDates($projectId: String! $dates: ChangeProjectDatesInput!) {
-    changeProjectDates(projectId: $projectId dates: $dates) {
+mutation changeProjectDates($projectId: String!, $dates: ChangeProjectDatesInput!) {
+    changeProjectDates(projectId: $projectId, dates: $dates) {
         __typename
-        ...on ProjectDatesChanged {
+        ... on ProjectDatesChanged {
             project {
                 startAt
                 endAt
             }
         }
-        ...on NotFound {
+        ... on NotFound {
             message
         }
-        ...on Forbidden {
+        ... on Forbidden {
             message
         }
-        ...on ServerError {
+        ... on ServerError {
             message
         }
     }

@@ -1,16 +1,20 @@
 import { FetchResult, useApolloClient } from "@apollo/client"
-import { ChangeAlbumPageOrientationMutation, useChangeAlbumPageOrientationMutation, ChangeAlbumPageOrientationMutationResult, PageOrientation } from "api/graphql"
+import {
+    ChangeAlbumPageOrientationMutation,
+    useChangeAlbumPageOrientationMutation,
+    ChangeAlbumPageOrientationMutationResult,
+    PageOrientation,
+} from "api/graphql"
 
 export { PageOrientation } from "api/graphql"
 
-export function useChangeAlbumPageOrientation(albumId: string): [
+export function useChangeAlbumPageOrientation(
+    albumId: string
+): [
     (pageSize: PageOrientation) => Promise<FetchResult<ChangeAlbumPageOrientationMutation>>,
-    ChangeAlbumPageOrientationMutationResult
+    ChangeAlbumPageOrientationMutationResult,
 ] {
-    const [ change, result ] = useChangeAlbumPageOrientationMutation({ client: useApolloClient(), errorPolicy: "all" })
+    const [change, result] = useChangeAlbumPageOrientationMutation({ client: useApolloClient(), errorPolicy: "all" })
 
-    return [
-        (orientation: PageOrientation) => change({ variables: { albumId, orientation } }),
-        result,
-    ]
+    return [(orientation: PageOrientation) => change({ variables: { albumId, orientation } }), result]
 }

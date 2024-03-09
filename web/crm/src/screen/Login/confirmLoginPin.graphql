@@ -1,19 +1,19 @@
-mutation confirmLoginPin($token: String! $pin: String!) {
-    confirmLoginPin(token: $token pin: $pin) {
+mutation confirmLoginPin($token: String!, $pin: String!) {
+    confirmLoginPin(token: $token, pin: $pin) {
         __typename
-        ...on LoginConfirmed {
+        ... on LoginConfirmed {
             token
         }
-        ...on InvalidPin {
+        ... on InvalidPin {
             message
         }
-        ...on InvalidToken {
+        ... on InvalidToken {
             message
         }
-        ...on ExpiredToken {
+        ... on ExpiredToken {
             message
         }
-        ...on ServerError {
+        ... on ServerError {
             message
         }
     }

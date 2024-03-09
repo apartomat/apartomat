@@ -1,20 +1,23 @@
 import {
-    Accordion, AccordionPanel,
+    Accordion,
+    AccordionPanel,
     Box,
     BoxExtendedProps,
     Button,
-    CheckBox, Form,
+    CheckBox,
+    Form,
     FormField,
     Heading,
     Layer,
-    LayerExtendedProps, Text,
-    TextInput
+    LayerExtendedProps,
+    Text,
+    TextInput,
 } from "grommet"
-import {FormClose, Link} from "grommet-icons"
+import { FormClose, Link } from "grommet-icons"
 
-import {ProjectScreenPublicSiteFragment, PublicSiteStatus} from "api/graphql"
-import React, {useEffect, useState} from "react";
-import {useMakeProjectNotPublic, useMakeProjectPublic} from "screen/Project/PublicSite/useMakeProjectPublic";
+import { ProjectScreenPublicSiteFragment, PublicSiteStatus } from "api/graphql"
+import React, { useEffect, useState } from "react"
+import { useMakeProjectNotPublic, useMakeProjectPublic } from "screen/Project/PublicSite/useMakeProjectPublic"
 
 export default function PublicSite({
     projectId,
@@ -23,25 +26,25 @@ export default function PublicSite({
     onClose,
     ...props
 }: {
-    projectId: string,
-    site: ProjectScreenPublicSiteFragment,
+    projectId: string
+    site: ProjectScreenPublicSiteFragment
     onChange?: () => void
     onClose?: (changed: boolean) => void
 } & BoxExtendedProps) {
-    const [ showForm, setShowForm ] = useState(false)
+    const [showForm, setShowForm] = useState(false)
 
     return (
         <Box {...props} justify="center">
             <Box>
                 <Button
                     label="Ссылка"
-                    icon={<Link color={siteIsPublic(site) ? "status-ok" : "status-unknown"}/>}
+                    icon={<Link color={siteIsPublic(site) ? "status-ok" : "status-unknown"} />}
                     onClick={() => setShowForm(!showForm)}
                     title="Ссылка"
                 />
             </Box>
 
-            {showForm &&
+            {showForm && (
                 <EditForm
                     projectId={projectId}
                     publicSite={site}
@@ -52,7 +55,7 @@ export default function PublicSite({
                     }}
                     onChange={onChange}
                 />
-            }
+            )}
         </Box>
     )
 }
@@ -66,7 +69,7 @@ function isVisualizationsAllowed(site: ProjectScreenPublicSiteFragment): boolean
         return site.settings.visualizations
     }
 
-    return true;
+    return true
 }
 
 function isAlbumsAllowed(site: ProjectScreenPublicSiteFragment): boolean {
@@ -74,7 +77,7 @@ function isAlbumsAllowed(site: ProjectScreenPublicSiteFragment): boolean {
         return site.settings.albums
     }
 
-    return true;
+    return true
 }
 
 function EditForm({
@@ -84,16 +87,16 @@ function EditForm({
     onClickClose,
     ...props
 }: {
-    projectId: string,
-    publicSite: ProjectScreenPublicSiteFragment,
-    onChange?: () => void,
+    projectId: string
+    publicSite: ProjectScreenPublicSiteFragment
+    onChange?: () => void
     onClickClose?: (changed: boolean) => void
 } & LayerExtendedProps) {
-    const [ changed, setChanged ] = useState(false)
+    const [changed, setChanged] = useState(false)
 
-    const [ isPublic, setIsPublic ] = useState(siteIsPublic(publicSite))
+    const [isPublic, setIsPublic] = useState(siteIsPublic(publicSite))
 
-    const [ makeProjectPublic, { data: makeProjectPublicResult} ] = useMakeProjectPublic(projectId)
+    const [makeProjectPublic, { data: makeProjectPublicResult }] = useMakeProjectPublic(projectId)
 
     useEffect(() => {
         switch (makeProjectPublicResult?.makeProjectPublic.__typename) {
@@ -109,9 +112,9 @@ function EditForm({
                 setErrorMessage("Доступ запрещен")
                 break
         }
-    }, [ makeProjectPublicResult ])
+    }, [makeProjectPublicResult])
 
-    const [ makeProjectNotPublic, { data: makeProjectNotPublicResult} ] = useMakeProjectNotPublic(projectId)
+    const [makeProjectNotPublic, { data: makeProjectNotPublicResult }] = useMakeProjectNotPublic(projectId)
 
     useEffect(() => {
         switch (makeProjectNotPublicResult?.makeProjectNotPublic.__typename) {
@@ -127,7 +130,7 @@ function EditForm({
                 setErrorMessage("Доступ запрещен")
                 break
         }
-    }, [ makeProjectNotPublicResult ])
+    }, [makeProjectNotPublicResult])
 
     const handleClickPublic = ({ target }: React.ChangeEvent<HTMLInputElement>) => {
         setErrorMessage(undefined)
@@ -136,33 +139,40 @@ function EditForm({
         target.checked ? makeProjectPublic() : makeProjectNotPublic()
     }
 
-    const [ errorMessage, setErrorMessage ] = useState<string | undefined>()
+    const [errorMessage, setErrorMessage] = useState<string | undefined>()
 
     return (
         <Layer {...props}>
             <Box pad="medium" gap="medium">
                 <Box direction="row" justify="between" align="center">
-                    <Heading level={2} margin="none">Ссылка на проект</Heading>
-                    <Button icon={ <FormClose/> } onClick={() => {
-                        onClickClose && onClickClose(changed)
-                    }}/>
+                    <Heading level={2} margin="none">
+                        Ссылка на проект
+                    </Heading>
+                    <Button
+                        icon={<FormClose />}
+                        onClick={() => {
+                            onClickClose && onClickClose(changed)
+                        }}
+                    />
                 </Box>
 
-                {errorMessage &&
+                {errorMessage && (
                     <Box
                         pad="small"
                         round="small"
                         direction="row"
                         gap="small"
                         align="center"
-                        background={{ color: "status-critical", opacity: "weak"}}
+                        background={{ color: "status-critical", opacity: "weak" }}
                     >
-                        <Box border={{ color: "status-critical", size: "small"}} round="large">
-                            <FormClose color="status-critical" size="medium"/>
+                        <Box border={{ color: "status-critical", size: "small" }} round="large">
+                            <FormClose color="status-critical" size="medium" />
                         </Box>
-                        <Text weight="bold" size="medium">{errorMessage}</Text>
+                        <Text weight="bold" size="medium">
+                            {errorMessage}
+                        </Text>
                     </Box>
-                }
+                )}
 
                 <Form>
                     <FormField>
@@ -177,24 +187,28 @@ function EditForm({
                         <AccordionPanel label="Настроить доступ">
                             <Box gap="small" pad={{ horizontal: "small", bottom: "small" }}>
                                 <Box direction="row" gap="medium">
-                                    <CheckBox label="Визуализации" checked={isVisualizationsAllowed(publicSite)} disabled/>
+                                    <CheckBox
+                                        label="Визуализации"
+                                        checked={isVisualizationsAllowed(publicSite)}
+                                        disabled
+                                    />
                                 </Box>
                                 <Box direction="row" gap="medium">
-                                    <CheckBox label="Альбом" checked={isAlbumsAllowed(publicSite)} disabled/>
+                                    <CheckBox label="Альбом" checked={isAlbumsAllowed(publicSite)} disabled />
                                 </Box>
                             </Box>
                         </AccordionPanel>
                     </Accordion>
 
-                    {publicSite.__typename === "PublicSite" &&
+                    {publicSite.__typename === "PublicSite" && (
                         <FormField label="Ссылка" margin={{ top: "small" }}>
-                            <TextInput value={publicSite.url} width="medium"/>
+                            <TextInput value={publicSite.url} width="medium" />
                         </FormField>
-                    }
+                    )}
                 </Form>
 
-                <Box direction="row" margin={{top: "medium"}}>
-                    <Button type="submit" label="Закрыть" onClick={()=> onClickClose && onClickClose(changed)}/>
+                <Box direction="row" margin={{ top: "medium" }}>
+                    <Button type="submit" label="Закрыть" onClick={() => onClickClose && onClickClose(changed)} />
                 </Box>
             </Box>
         </Layer>

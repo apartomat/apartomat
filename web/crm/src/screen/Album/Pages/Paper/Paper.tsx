@@ -1,11 +1,11 @@
-import {Box, BoxExtendedProps} from "grommet";
+import { Box, BoxExtendedProps } from "grommet"
 
 export default function Paper({
-   children,
-   scale = 1.0,
-   ...boxProps
+    children,
+    scale = 1.0,
+    ...boxProps
 }: {
-    children: JSX.Element | never[] | undefined | string,
+    children: JSX.Element | never[] | undefined | string
     scale?: 0.05 | 0.1 | 0.25 | 0.3 | 0.4 | 0.5 | 0.6 | 0.7 | 0.75 | 1
 } & BoxExtendedProps) {
     return (

@@ -1,12 +1,12 @@
-mutation addRoom($houseId: String! $room: AddRoomInput!) {
-    addRoom(houseId: $houseId room: $room) {
+mutation addRoom($houseId: String!, $room: AddRoomInput!) {
+    addRoom(houseId: $houseId, room: $room) {
         __typename
-        ...on RoomAdded {
+        ... on RoomAdded {
             room {
                 ...ProjectScreenHouseRoom
             }
         }
-        ...on Error {
+        ... on Error {
             message
         }
     }

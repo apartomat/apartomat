@@ -1,7 +1,7 @@
 mutation createProject($input: CreateProjectInput!) {
     createProject(input: $input) {
         __typename
-        ...on ProjectCreated {
+        ... on ProjectCreated {
             project {
                 id
                 name
@@ -9,10 +9,10 @@ mutation createProject($input: CreateProjectInput!) {
                 endAt
             }
         }
-        ...on ServerError {
+        ... on ServerError {
             message
         }
-        ...on Forbidden {
+        ... on Forbidden {
             message
         }
     }

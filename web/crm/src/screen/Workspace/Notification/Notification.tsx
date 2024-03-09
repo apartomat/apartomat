@@ -3,18 +3,13 @@ import React from "react"
 import { Box, Layer, Text } from "grommet"
 import { StatusGood } from "grommet-icons"
 
-export function Notification({
-    message,
-    ...layerProps
-}: {
-    message: string,
-}) {
+export function Notification({ message, ...layerProps }: { message: string }) {
     return (
         <Layer
             position="top"
             modal={false}
             responsive={false}
-            margin={{ vertical: "small", horizontal: "small"}}
+            margin={{ vertical: "small", horizontal: "small" }}
             {...layerProps}
         >
             <Box
@@ -25,9 +20,9 @@ export function Notification({
                 elevation="small"
                 background="status-ok"
                 round="medium"
-                pad={{ vertical: "xsmall", horizontal: "small"}}
+                pad={{ vertical: "xsmall", horizontal: "small" }}
             >
-                <StatusGood/>
+                <StatusGood />
                 <Text>{message}</Text>
             </Box>
         </Layer>

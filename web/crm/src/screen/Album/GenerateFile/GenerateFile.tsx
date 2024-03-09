@@ -1,8 +1,8 @@
-import {useEffect, useState} from "react"
-import {DocumentPdf} from "grommet-icons"
-import {Button, ButtonExtendedProps} from "grommet"
+import { useEffect, useState } from "react"
+import { DocumentPdf } from "grommet-icons"
+import { Button, ButtonExtendedProps } from "grommet"
 
-import {AlbumScreenAlbumFragment} from "api/graphql";
+import { AlbumScreenAlbumFragment } from "api/graphql"
 
 import { useOnAlbumFileGenerated } from "./useOnAlbumFileGenerated"
 import { useGenerateAlbumFile } from "./useGenerateAlbumFile"
@@ -11,29 +11,29 @@ export function GenerateFile({
     album,
     onAlbumFileGenerated,
 }: {
-    album: AlbumScreenAlbumFragment,
-    onAlbumFileGenerated?: (version: number) => void,
+    album: AlbumScreenAlbumFragment
+    onAlbumFileGenerated?: (version: number) => void
 }) {
-    const [ version, setVersion ] = useState<number>(album.version)
+    const [version, setVersion] = useState<number>(album.version)
 
-    const [ fileVersion, setFileVersion ] = useState<number | undefined>()
+    const [fileVersion, setFileVersion] = useState<number | undefined>()
 
-    const [ generateAlbumFile, { data: generateAlbumFileResultData }] = useGenerateAlbumFile(album.id)
+    const [generateAlbumFile, { data: generateAlbumFileResultData }] = useGenerateAlbumFile(album.id)
 
     useEffect(() => {
         if (album.file?.__typename === "AlbumFile") {
             setVersion(album.version)
             setFileVersion(album.file.version)
         }
-    }, [ album ])
+    }, [album])
 
     useEffect(() => {
         if (generateAlbumFileResultData?.generateAlbumFile.__typename === "AlbumFileGenerationStarted") {
             setWaitingFile(true)
         }
-    }, [ generateAlbumFileResultData ]);
+    }, [generateAlbumFileResultData])
 
-    const [ waitingFile, setWaitingFile ] = useState(false)
+    const [waitingFile, setWaitingFile] = useState(false)
 
     if (waitingFile) {
         return (
@@ -41,7 +41,7 @@ export function GenerateFile({
                 primary
                 color="brand"
                 label="Сгенерировать"
-                icon={<DocumentPdf/>}
+                icon={<DocumentPdf />}
                 albumId={album.id}
                 onAlbumFileGenerated={(version: number) => {
                     setVersion(version)
@@ -59,7 +59,7 @@ export function GenerateFile({
                 primary
                 color="brand"
                 label="Скачать"
-                icon={<DocumentPdf/>}
+                icon={<DocumentPdf />}
                 download={"test"}
                 target="_blank"
                 href={getFileUrl(album)}
@@ -73,7 +73,7 @@ export function GenerateFile({
             primary
             color="brand"
             label="Сгенерировать"
-            icon={<DocumentPdf/>}
+            icon={<DocumentPdf />}
             onClick={() => generateAlbumFile()}
         />
     )
@@ -86,12 +86,12 @@ function ButtonInProgress({
     onAlbumFileGenerated,
     ...buttonProps
 }: {
-    albumId: string,
+    albumId: string
     onAlbumFileGenerated?: (version: number) => void
-} & ButtonExtendedProps ) {
-    const { data, loading} = useOnAlbumFileGenerated({ albumId})
+} & ButtonExtendedProps) {
+    const { data, loading } = useOnAlbumFileGenerated({ albumId })
 
-    const [ success, setSuccess ] = useState(false)
+    const [success, setSuccess] = useState(false)
 
     useEffect(() => {
         if (data?.albumFileGenerated.__typename === "AlbumFile") {
@@ -102,13 +102,10 @@ function ButtonInProgress({
                 }
             }, 1000)
         }
-    }, [ data ])
+    }, [data])
 
-    return (
-        <Button {...buttonProps} busy={loading} success={success}/>
-    )
+    return <Button {...buttonProps} busy={loading} success={success} />
 }
-
 
 function getFileUrl(album: AlbumScreenAlbumFragment): string {
     console.log(album)

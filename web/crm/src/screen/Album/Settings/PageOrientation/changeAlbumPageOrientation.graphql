@@ -1,20 +1,20 @@
-mutation changeAlbumPageOrientation($albumId: String! $orientation: PageOrientation!) {
-    changeAlbumPageOrientation(albumId: $albumId orientation: $orientation) {
+mutation changeAlbumPageOrientation($albumId: String!, $orientation: PageOrientation!) {
+    changeAlbumPageOrientation(albumId: $albumId, orientation: $orientation) {
         __typename
-        ...on AlbumPageOrientationChanged {
+        ... on AlbumPageOrientationChanged {
             album {
                 settings {
                     pageOrientation
                 }
             }
         }
-        ...on NotFound {
+        ... on NotFound {
             message
         }
-        ...on Forbidden {
+        ... on Forbidden {
             message
         }
-        ...on ServerError {
+        ... on ServerError {
             message
         }
     }

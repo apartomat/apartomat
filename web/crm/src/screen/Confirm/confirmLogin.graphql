@@ -1,16 +1,16 @@
 mutation confirmLoginLink($token: String!) {
     confirmLoginLink(token: $token) {
         __typename
-        ...on LoginConfirmed {
+        ... on LoginConfirmed {
             token
         }
-        ...on InvalidToken {
+        ... on InvalidToken {
             message
         }
-        ...on ExpiredToken {
+        ... on ExpiredToken {
             message
         }
-        ...on ServerError {
+        ... on ServerError {
             message
         }
     }

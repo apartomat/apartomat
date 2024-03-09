@@ -21,21 +21,21 @@ export default function Visualizations() {
 
     const { user } = useAuthContext()
 
-    const [ error, setError ] = useState<string | undefined>(undefined)
+    const [error, setError] = useState<string | undefined>(undefined)
 
-    const [ loading, setLoading ] = useState(false)
+    const [loading, setLoading] = useState(false)
 
-    const [ notification, setNotification ] = useState<string | undefined>(undefined)
+    const [notification, setNotification] = useState<string | undefined>(undefined)
 
     const notify = ({
         message,
         callback,
         timeout = 250,
-        duration = 1500
+        duration = 1500,
     }: {
-        message: string,
-        callback?: () => void,
-        timeout?: number,
+        message: string
+        callback?: () => void
+        timeout?: number
         duration?: number
     }) => {
         setTimeout(() => {
@@ -49,11 +49,12 @@ export default function Visualizations() {
         }, timeout)
     }
 
-
-    const { data, loading: fetchLoading, refetch, first } = useVisualizations(
-        id,
-        { status: { eq: [VisualizationStatus.Approved, VisualizationStatus.Unknown] },
-    })
+    const {
+        data,
+        loading: fetchLoading,
+        refetch,
+        first,
+    } = useVisualizations(id, { status: { eq: [VisualizationStatus.Approved, VisualizationStatus.Unknown] } })
 
     useEffect(() => {
         if (loading && !fetchLoading) {
@@ -65,14 +66,13 @@ export default function Visualizations() {
         }
 
         setLoading(fetchLoading)
+    }, [fetchLoading])
 
-    }, [ fetchLoading ])
+    const [project, setProject] = useState<{ id: string; name: string }>()
 
-    const [ project, setProject ] = useState<{ id: string, name: string }>()
+    const [visualizations, setVisualizations] = useState<VisualizationsScreenVisualizationFragment[]>()
 
-    const [ visualizations, setVisualizations ] = useState<VisualizationsScreenVisualizationFragment[]>()
-
-    const [ rooms, setRooms ] = useState<VisualizationsScreenHouseRoomFragment[]>()
+    const [rooms, setRooms] = useState<VisualizationsScreenHouseRoomFragment[]>()
 
     useEffect(() => {
         if (data?.project) {
@@ -84,15 +84,16 @@ export default function Visualizations() {
                         setVisualizations(data.project.visualizations.list.items)
                     }
 
-                    if (data &&
+                    if (
+                        data &&
                         data.project.houses.list.__typename === "ProjectHousesList" &&
                         data.project.houses.list.items.length !== 0
-                        ) {
-                            const h = data.project.houses.list.items[0]
+                    ) {
+                        const h = data.project.houses.list.items[0]
 
-                            if (h.rooms.list.__typename === "HouseRoomsList") {
-                                setRooms(h.rooms.list.items)
-                            }
+                        if (h.rooms.list.__typename === "HouseRoomsList") {
+                            setRooms(h.rooms.list.items)
+                        }
                     }
                     break
                 case "NotFound":
@@ -103,23 +104,25 @@ export default function Visualizations() {
                     break
             }
         }
-    }, [ data ])
+    }, [data])
 
-    const [ roomsFilter, setRoomsfilter ] = useState<string[]>([])
+    const [roomsFilter, setRoomsfilter] = useState<string[]>([])
 
     useEffect(() => {
         setSelected([])
-        refetch({ filter: {
-            roomID: { eq: roomsFilter },
-            status: { eq: [ VisualizationStatus.Approved, VisualizationStatus.Unknown ] }
-        }})
-    }, [ roomsFilter, refetch ])
+        refetch({
+            filter: {
+                roomID: { eq: roomsFilter },
+                status: { eq: [VisualizationStatus.Approved, VisualizationStatus.Unknown] },
+            },
+        })
+    }, [roomsFilter, refetch])
 
-    const [ selected, setSelected ] = useState<string[]>([])
+    const [selected, setSelected] = useState<string[]>([])
 
     const selectVis = (id: string, add: boolean) => {
         if (add && selected.includes(id)) {
-            setSelected(selected.filter(s => s !== id))
+            setSelected(selected.filter((s) => s !== id))
         } else if (add) {
             setSelected([...selected, id])
         } else {
@@ -127,8 +130,7 @@ export default function Visualizations() {
         }
     }
 
-
-    const [ showConfirmDialog, setShowConfirmDialog ] = useState(false)
+    const [showConfirmDialog, setShowConfirmDialog] = useState(false)
 
     const handleClickDelete = () => {
         if (selected.length === 0) {
@@ -148,10 +150,9 @@ export default function Visualizations() {
         setShowConfirmDialog(false)
     }
 
+    const [deleteVisualizations, { data: deleteData, loading: deleteLoading }] = useDeleteVisualizations()
 
-    const [ deleteVisualizations, { data: deleteData, loading: deleteLoading } ] = useDeleteVisualizations()
-
-    const [ deleting, setDeleting ] = useState(false)
+    const [deleting, setDeleting] = useState(false)
 
     useEffect(() => {
         if (deleting && deleteData?.deleteVisualizations.__typename === "VisualizationsDeleted") {
@@ -163,14 +164,13 @@ export default function Visualizations() {
                 callback: refetch,
             })
         }
-    }, [ deleteData, deleting, refetch ])
-
+    }, [deleteData, deleting, refetch])
 
     if (loading && first) {
         return (
             <Main pad="large">
                 <Box direction="row" gap="small" align="center">
-                    <Loading message="Загрузка..."/>
+                    <Loading message="Загрузка..." />
                     <Text>Загрузка...</Text>
                 </Box>
             </Main>
@@ -189,67 +189,66 @@ export default function Visualizations() {
     }
 
     return (
-        <Main pad={{vertical: "medium", horizontal: "large"}}>
-
-            {loading && !first &&
+        <Main pad={{ vertical: "medium", horizontal: "large" }}>
+            {loading && !first && (
                 <Layer position="top" margin="medium" animate={false} modal={false}>
                     <Box direction="row" gap="small">
-                        <Loading message="Загрузка..."/>
+                        <Loading message="Загрузка..." />
                         <Text>Загрузка...</Text>
                     </Box>
                 </Layer>
-            }
+            )}
 
-            {notification &&
-                <Notification message={notification}/>
-            }
+            {notification && <Notification message={notification} />}
 
-            <Header background="white" margin={{vertical: "medium"}}>
+            <Header background="white" margin={{ vertical: "medium" }}>
                 <Box>
                     <Text size="xlarge" weight="bold" color="brand">
                         <AnchorLink to="/">apartomat</AnchorLink>
                     </Text>
                 </Box>
-                <Box><UserAvatar user={user} className="header-user" /></Box>
+                <Box>
+                    <UserAvatar user={user} className="header-user" />
+                </Box>
             </Header>
 
             <Box direction="row" justify="between" margin={{ vertical: "medium" }}>
                 <Heading level={2} margin="none">
                     <Box direction="row" gap="small">
-                        <AnchorLink
-                            to={`/p/${project?.id}`}
-                            color="black"
-                            style={{left: "-50px"}}
-                        ><LinkPrevious/></AnchorLink>
-                        <AnchorLink to={`/p/${project?.id}`} color="black">{project?.name}</AnchorLink>
+                        <AnchorLink to={`/p/${project?.id}`} color="black" style={{ left: "-50px" }}>
+                            <LinkPrevious />
+                        </AnchorLink>
+                        <AnchorLink to={`/p/${project?.id}`} color="black">
+                            {project?.name}
+                        </AnchorLink>
                     </Box>
                 </Heading>
                 <Box direction="row" gap="small" justify="center" align="center">
                     <Button
                         disabled={selected.length === 0}
-                        icon={<Trash color="brand"/>}
+                        icon={<Trash color="brand" />}
                         label="Удалить"
                         onClick={handleClickDelete}
                     />
                 </Box>
             </Box>
 
-            <Box margin={{bottom: "medium"}}>
+            <Box margin={{ bottom: "medium" }}>
                 <Box direction="row" justify="between">
-                {rooms &&
-                    <RoomsFilter
-                        rooms={rooms}
-                        margin={{ vertical: "medium" }}
-                        gap="small"
-                        onSelectRooms={(id: string[]) => setRoomsfilter(id)}
-                    />
-                }
-                    {selected.length > 1 &&
+                    {rooms && (
+                        <RoomsFilter
+                            rooms={rooms}
+                            margin={{ vertical: "medium" }}
+                            gap="small"
+                            onSelectRooms={(id: string[]) => setRoomsfilter(id)}
+                        />
+                    )}
+                    {selected.length > 1 && (
                         <Box direction="row" gap="small" align="center">
                             <Text size="small">Выбрано {selected.length}</Text>
-                            <Button label="Отменить" size="small" color="dark-5" onClick={() => setSelected([])}/>
+                            <Button label="Отменить" size="small" color="dark-5" onClick={() => setSelected([])} />
                         </Box>
-                    }
+                    )}
                 </Box>
 
                 <Grid
@@ -277,21 +276,17 @@ export default function Visualizations() {
                                         event.stopPropagation()
                                     }}
                                     focusIndicator={false}
-                                    style={{boxShadow: selected.includes(id) ? "0 0 0px 2px #7D4CDB": "none" }}
+                                    style={{ boxShadow: selected.includes(id) ? "0 0 0px 2px #7D4CDB" : "none" }}
                                 >
-                                    <Image
-                                        fit="contain"
-                                        src={`${file.url}?h=192`}
-                                    />
+                                    <Image fit="contain" src={`${file.url}?h=192`} />
                                 </Box>
                             </Box>
-
                         )
                     })}
                 </Grid>
             </Box>
 
-            {showConfirmDialog &&
+            {showConfirmDialog && (
                 <ConfirmDelete
                     count={selected.length}
                     disableButton={deleteLoading}
@@ -299,7 +294,7 @@ export default function Visualizations() {
                     onClickClose={handleClickCancelDelete}
                     onClickDelete={handleClickConfirmDelete}
                 />
-            }
+            )}
         </Main>
     )
 }

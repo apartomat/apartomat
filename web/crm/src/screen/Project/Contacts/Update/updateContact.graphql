@@ -1,7 +1,7 @@
-mutation updateContact($contactId: String! $data: UpdateContactInput!) {
-    updateContact(contactId: $contactId data: $data) {
+mutation updateContact($contactId: String!, $data: UpdateContactInput!) {
+    updateContact(contactId: $contactId, data: $data) {
         __typename
-        ...on ContactUpdated {
+        ... on ContactUpdated {
             contact {
                 id
                 fullName
@@ -12,13 +12,13 @@ mutation updateContact($contactId: String! $data: UpdateContactInput!) {
                 }
             }
         }
-        ...on NotFound {
+        ... on NotFound {
             message
         }
-        ...on Forbidden {
+        ... on Forbidden {
             message
         }
-        ...on ServerError {
+        ... on ServerError {
             message
         }
     }

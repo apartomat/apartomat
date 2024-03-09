@@ -8,14 +8,14 @@ import useToken from "context/auth/useToken"
 
 import { Main, Heading, Box, Form, FormField, Button, MaskedInput, Text } from "grommet"
 
-function Pin({ email, token, redirectTo = "/" }: { email: string, token: string, redirectTo?: string}) {
-    const [ confirmLogin, { data, loading } ] = useConfirmLoginPin()
+function Pin({ email, token, redirectTo = "/" }: { email: string; token: string; redirectTo?: string }) {
+    const [confirmLogin, { data, loading }] = useConfirmLoginPin()
     const { reset, check } = useAuthContext()
-    const [, saveToken ] = useToken()
+    const [, saveToken] = useToken()
 
     const navigate = useNavigate()
 
-    const [ pin, setPin ] = useState("")
+    const [pin, setPin] = useState("")
 
     useEffect(() => {
         if (data?.confirmLoginPin.__typename === "LoginConfirmed") {
@@ -24,9 +24,9 @@ function Pin({ email, token, redirectTo = "/" }: { email: string, token: string,
             check()
             navigate(redirectTo)
         }
-    }, [ data, saveToken, check, redirectTo, history ])
+    }, [data, saveToken, check, redirectTo, history])
 
-    function handleInputPin({ target: { value }}: React.ChangeEvent<HTMLInputElement>) {
+    function handleInputPin({ target: { value } }: React.ChangeEvent<HTMLInputElement>) {
         setPin(value)
     }
 
@@ -54,9 +54,9 @@ function Pin({ email, token, redirectTo = "/" }: { email: string, token: string,
                             />
                         </FormField>
                         <ConfirmPinError data={data} />
-                        <Box direction="row" justify="between" margin={{top: "medium"}}>
+                        <Box direction="row" justify="between" margin={{ top: "medium" }}>
                             <Box>
-                                <Button type="submit" primary label="Войти" disabled={loading} fill={false}/>
+                                <Button type="submit" primary label="Войти" disabled={loading} fill={false} />
                             </Box>
                         </Box>
                     </Form>
@@ -70,11 +70,15 @@ function ConfirmPinError({ data }: { data: ConfirmLoginPinMutation | null | unde
     switch (data?.confirmLoginPin.__typename) {
         case "ExpiredToken":
             return (
-                <Box pad={{horizontal: "small"}}><Text color="status-error">Время истекло</Text></Box>
+                <Box pad={{ horizontal: "small" }}>
+                    <Text color="status-error">Время истекло</Text>
+                </Box>
             )
         case "InvalidToken":
             return (
-                <Box pad={{horizontal: "small"}}><Text color="status-error">Неверный код</Text></Box>
+                <Box pad={{ horizontal: "small" }}>
+                    <Text color="status-error">Неверный код</Text>
+                </Box>
             )
         default:
             return null

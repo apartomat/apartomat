@@ -13,16 +13,16 @@ export default function ChangeStatus({
     onProjectStatusChanged,
     ...boxProps
 }: {
-    projectId: string,
-    status: ProjectStatus,
-    values?: ProjectStatusDictionary,
+    projectId: string
+    status: ProjectStatus
+    values?: ProjectStatusDictionary
     onProjectStatusChanged?: ({ status }: { status: ProjectStatus }) => void
 } & BoxExtendedProps) {
-    const [ show, setShow ] = useState<boolean>(false)
+    const [show, setShow] = useState<boolean>(false)
 
-    const [ state, setState ] = useState(status)
+    const [state, setState] = useState(status)
 
-    const [ changeStatus, { data, loading, error }] = useChangeStatus()
+    const [changeStatus, { data, loading, error }] = useChangeStatus()
 
     const handleItemClick = (projectId: string, status: ProjectStatus) => {
         changeStatus(projectId, status)
@@ -33,11 +33,15 @@ export default function ChangeStatus({
     useEffect(() => {
         switch (data?.changeProjectStatus.__typename) {
             case "ProjectStatusChanged": {
-                const { changeProjectStatus: { project: { status } } } = data
+                const {
+                    changeProjectStatus: {
+                        project: { status },
+                    },
+                } = data
                 onProjectStatusChanged && onProjectStatusChanged({ status })
             }
         }
-    }, [ data, onProjectStatusChanged ])
+    }, [data, onProjectStatusChanged])
 
     useEffect(() => {
         if (error) {
@@ -45,22 +49,16 @@ export default function ChangeStatus({
         }
     })
 
-    const label = useMemo(() => statusToLabel({ status: state, items: values?.items }), [ state, values ])
+    const label = useMemo(() => statusToLabel({ status: state, items: values?.items }), [state, values])
 
-    const color = useMemo(() => statusColor(state), [ state ])
+    const color = useMemo(() => statusColor(state), [state])
 
     const targetRef = useRef<HTMLDivElement>(null)
 
     return (
         <Box {...boxProps} justify="center">
             <Box ref={targetRef}>
-                <Button
-                    label={label}
-                    color={color}
-                    size="small"
-                    onClick={() => setShow(true)}
-                    disabled={loading}
-                />
+                <Button label={label} color={color} size="small" onClick={() => setShow(true)} disabled={loading} />
             </Box>
 
             {show && targetRef.current && (
@@ -73,10 +71,12 @@ export default function ChangeStatus({
                     onClickOutside={() => setShow(false)}
                     onEsc={() => setShow(false)}
                 >
-                    {values?.items.map(item => {
+                    {values?.items.map((item) => {
                         return (
-                            <Button key={item.key} plain hoverIndicator={{color: "light-2"}}>
-                                <Box pad="small" onClick={() => handleItemClick(projectId, item.key)}><Text>{item.value}</Text></Box>
+                            <Button key={item.key} plain hoverIndicator={{ color: "light-2" }}>
+                                <Box pad="small" onClick={() => handleItemClick(projectId, item.key)}>
+                                    <Text>{item.value}</Text>
+                                </Box>
                             </Button>
                         )
                     })}
@@ -86,7 +86,7 @@ export default function ChangeStatus({
     )
 }
 
-function statusToLabel({ status, items }: { status: ProjectStatus, items?: ProjectStatusDictionaryItem[] }): string {
+function statusToLabel({ status, items }: { status: ProjectStatus; items?: ProjectStatusDictionaryItem[] }): string {
     if (!items) {
         return ""
     }
@@ -101,7 +101,7 @@ function statusToLabel({ status, items }: { status: ProjectStatus, items?: Proje
 }
 
 function statusColor(status: ProjectStatus): string {
-    switch(status) {
+    switch (status) {
         case ProjectStatus.New:
             return "status-unknown"
         case ProjectStatus.InProgress:

@@ -10,11 +10,11 @@ export type UserContext =
     | UserServerErrorContext
 
 export enum UserContextStatus {
-    CHEKING = 'CHEKING',
-    LOGGED = 'LOGGED',
-    UNDEFINED = 'UNDEFINED',
-    UNAUTHORIZED = 'UNAUTHORIZED',
-    SERVER_ERROR = 'SERVER_ERROR'
+    CHEKING = "CHEKING",
+    LOGGED = "LOGGED",
+    UNDEFINED = "UNDEFINED",
+    UNAUTHORIZED = "UNAUTHORIZED",
+    SERVER_ERROR = "SERVER_ERROR",
 }
 
 type UserCheckingContext = {
@@ -44,28 +44,28 @@ type UserUndefinedContext = {
     status: UserContextStatus.UNDEFINED
 }
 
-const userContextUndefined: UserUndefinedContext = {status: UserContextStatus.UNDEFINED}
+const userContextUndefined: UserUndefinedContext = { status: UserContextStatus.UNDEFINED }
 
-const userEmpty: User = { id: "", email: "", avatar: "", defaultWorkspaceId: ""}
+const userEmpty: User = { id: "", email: "", avatar: "", defaultWorkspaceId: "" }
 
 export const authContext = createContext<{
-    user: UserContext,
-    concreteUser: User,
-    check: () => void,
-    reset: () => void,
+    user: UserContext
+    concreteUser: User
+    check: () => void
+    reset: () => void
     error: string | undefined
-}>({ user: userContextUndefined, concreteUser: userEmpty, check: () => {}, reset: () => {}, error: undefined})
+}>({ user: userContextUndefined, concreteUser: userEmpty, check: () => {}, reset: () => {}, error: undefined })
 
 export function useAuthContext() {
     return useContext(authContext)
 }
 
 export function useAuthProvider() {
-    const [ user, setUser ] = useState<UserContext>(userContextUndefined)
+    const [user, setUser] = useState<UserContext>(userContextUndefined)
 
-    const [ loadProfile, { data,  error, loading, refetch } ] = useProfileLazyQuery()
+    const [loadProfile, { data, error, loading, refetch }] = useProfileLazyQuery()
 
-    const [ concreteUser, setConcreteUser ] = useState<User>(userEmpty)
+    const [concreteUser, setConcreteUser] = useState<User>(userEmpty)
 
     function check() {
         if (user.status === UserContextStatus.UNDEFINED) {
@@ -80,7 +80,7 @@ export function useAuthProvider() {
     }
 
     function reset() {
-        setUser({status: UserContextStatus.UNDEFINED} as UserUndefinedContext)
+        setUser({ status: UserContextStatus.UNDEFINED } as UserUndefinedContext)
     }
 
     useEffect(() => {
@@ -91,25 +91,25 @@ export function useAuthProvider() {
                     id: data?.profile.id,
                     email: data?.profile.email,
                     avatar: data?.profile.gravatar?.url,
-                    defaultWorkspaceId: data?.profile.defaultWorkspace.id
+                    defaultWorkspaceId: data?.profile.defaultWorkspace.id,
                 } as UserLoggedContext)
 
                 setConcreteUser({
                     id: data?.profile.id,
                     email: data?.profile.email,
                     avatar: data?.profile.gravatar?.url,
-                    defaultWorkspaceId: data?.profile.defaultWorkspace.id
+                    defaultWorkspaceId: data?.profile.defaultWorkspace.id,
                 } as User)
 
                 break
             case "Forbidden":
-                setUser({status: UserContextStatus.UNAUTHORIZED} as UserUnauthorizedContext)
+                setUser({ status: UserContextStatus.UNAUTHORIZED } as UserUnauthorizedContext)
                 break
             case "ServerError":
-                setUser({status: UserContextStatus.SERVER_ERROR} as UserServerErrorContext)
+                setUser({ status: UserContextStatus.SERVER_ERROR } as UserServerErrorContext)
                 break
         }
-    }, [ data, error, loading ])
+    }, [data, error, loading])
 
     return { user, concreteUser, check, reset, error: error?.message }
 }

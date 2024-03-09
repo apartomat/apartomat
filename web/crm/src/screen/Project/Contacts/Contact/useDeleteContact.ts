@@ -1,19 +1,18 @@
 import { FetchResult, useApolloClient } from "@apollo/client"
-import { useDeleteContactMutation, DeleteContactMutation, DeleteContactMutationResult, Contact as ContactType } from "api/graphql"
+import {
+    useDeleteContactMutation,
+    DeleteContactMutation,
+    DeleteContactMutationResult,
+    Contact as ContactType,
+} from "api/graphql"
 
 export type DeleteContactFn = (id: string) => Promise<FetchResult<DeleteContactMutation>>
 
-export function useDeleteContact(): [
-    DeleteContactFn,
-    DeleteContactMutationResult
-] {
+export function useDeleteContact(): [DeleteContactFn, DeleteContactMutationResult] {
     const client = useApolloClient()
-    const [ deleteContact, result ] = useDeleteContactMutation({ client, errorPolicy: 'all' })
+    const [deleteContact, result] = useDeleteContactMutation({ client, errorPolicy: "all" })
 
-    return [
-        (id: string) => deleteContact({ variables: { id } }),
-        result,
-    ]
+    return [(id: string) => deleteContact({ variables: { id } }), result]
 }
 
 export default useDeleteContact

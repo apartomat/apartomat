@@ -2,13 +2,31 @@ import React, { useEffect, useState } from "react"
 
 import { useCreateProject, State as CreateProjectState } from "./useCreateProject"
 
-import { Accordion, AccordionPanel, Box, Button, DateInput, Form, FormField, Heading, Layer, Text, TextInput } from "grommet"
+import {
+    Accordion,
+    AccordionPanel,
+    Box,
+    Button,
+    DateInput,
+    Form,
+    FormField,
+    Heading,
+    Layer,
+    Text,
+    TextInput,
+} from "grommet"
 import { FormClose } from "grommet-icons"
 
-export default function CreateProject({ workspaceId, setShow }: { workspaceId: string, setShow: (show: boolean) => void }) {
-    const [ name, setName ] = useState("")
-    const [ create, , state ] = useCreateProject()
-    const [ dates, setDates ] = useState<string[]>([])
+export default function CreateProject({
+    workspaceId,
+    setShow,
+}: {
+    workspaceId: string
+    setShow: (show: boolean) => void
+}) {
+    const [name, setName] = useState("")
+    const [create, , state] = useCreateProject()
+    const [dates, setDates] = useState<string[]>([])
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault()
@@ -31,7 +49,7 @@ export default function CreateProject({ workspaceId, setShow }: { workspaceId: s
         if (state.state === CreateProjectState.DONE) {
             setShow(false)
         }
-    }, [ state.state, setShow ])
+    }, [state.state, setShow])
 
     const handleChangeDates = ({ value }: { value: string | string[] }) => {
         if (Array.isArray(value)) {
@@ -42,9 +60,11 @@ export default function CreateProject({ workspaceId, setShow }: { workspaceId: s
     return (
         <Layer>
             <Box pad="medium" gap="medium">
-                <Box direction="row" justify="between"align="center">
-                    <Heading level={2} margin="none">Новый проект</Heading>
-                    <Button icon={ <FormClose/> } onClick={() => setShow(false)}/>
+                <Box direction="row" justify="between" align="center">
+                    <Heading level={2} margin="none">
+                        Новый проект
+                    </Heading>
+                    <Button icon={<FormClose />} onClick={() => setShow(false)} />
                 </Box>
                 <Form onSubmit={handleSubmit} validate="submit">
                     {state.state === CreateProjectState.FAILED && <Text>{state.error.message}</Text>}
@@ -66,8 +86,13 @@ export default function CreateProject({ workspaceId, setShow }: { workspaceId: s
                             />
                         </AccordionPanel>
                     </Accordion>
-                    <Box direction="row" margin={{top: "medium"}}>
-                        <Button type="submit" primary label="Создать" disabled={state.state === CreateProjectState.CREATING}/>
+                    <Box direction="row" margin={{ top: "medium" }}>
+                        <Button
+                            type="submit"
+                            primary
+                            label="Создать"
+                            disabled={state.state === CreateProjectState.CREATING}
+                        />
                     </Box>
                 </Form>
             </Box>

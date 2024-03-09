@@ -4,22 +4,16 @@ import {
     AddHouseMutation,
     AddHouseInput,
     AddHouseMutationResult,
-    AddHouseFragment
+    AddHouseFragment,
 } from "api/graphql"
 
 export type AddHouse = (projectId: string, contact: AddHouseInput) => Promise<FetchResult<AddHouseMutation>>
 
-export function useAddHouse(): [
-    AddHouse,
-    AddHouseMutationResult
-] {
+export function useAddHouse(): [AddHouse, AddHouseMutationResult] {
     const client = useApolloClient()
-    const [add, result] = useAddHouseMutation({ client, errorPolicy: 'all' })
+    const [add, result] = useAddHouseMutation({ client, errorPolicy: "all" })
 
-    return [
-        (projectId: string, house: AddHouseInput) => add({ variables: { projectId, house } }),
-        result,
-    ]
+    return [(projectId: string, house: AddHouseInput) => add({ variables: { projectId, house } }), result]
 }
 
 export default useAddHouse

@@ -1,17 +1,17 @@
 mutation loginByEmail($email: String!) {
     loginByEmail(email: $email) {
         __typename
-        ...on LinkSentByEmail {
+        ... on LinkSentByEmail {
             email
         }
-        ...on PinSentByEmail {
+        ... on PinSentByEmail {
             email
             token
         }
-        ...on InvalidEmail {
+        ... on InvalidEmail {
             message
         }
-        ...on ServerError {
+        ... on ServerError {
             message
         }
     }

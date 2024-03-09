@@ -12,7 +12,7 @@ function AuthRequired() {
         if (user.status === UserContextStatus.UNDEFINED) {
             check()
         }
-    }, [ user, check ])
+    }, [user, check])
 
     if (error !== undefined) {
         return (
@@ -29,7 +29,7 @@ function AuthRequired() {
             return (
                 <Main pad="large">
                     <Box direction="row" gap="small" align="center">
-                        <Loading message="Авторизация..."/>
+                        <Loading message="Авторизация..." />
                         <Text>Авторизация...</Text>
                     </Box>
                 </Main>
@@ -42,13 +42,9 @@ function AuthRequired() {
                 </Main>
             )
         case UserContextStatus.LOGGED:
-            return (
-                <Outlet/>
-            )
+            return <Outlet />
         default:
-            return (
-                <Navigate to="/login"/>
-            )
+            return <Navigate to="/login" />
     }
 }
 

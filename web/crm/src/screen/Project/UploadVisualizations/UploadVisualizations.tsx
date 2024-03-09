@@ -1,6 +1,21 @@
 import React, { useState, DragEvent, ChangeEvent, useEffect, useCallback } from "react"
 
-import { Layer, Grid, Form, Box, Heading, Button, Image, Text, LayerExtendedProps, BoxExtendedProps, Stack, GridExtendedProps, FormField, Select  } from "grommet"
+import {
+    Layer,
+    Grid,
+    Form,
+    Box,
+    Heading,
+    Button,
+    Image,
+    Text,
+    LayerExtendedProps,
+    BoxExtendedProps,
+    Stack,
+    GridExtendedProps,
+    FormField,
+    Select,
+} from "grommet"
 import { Image as ImageIcon, FormClose } from "grommet-icons"
 
 import { Room, ProjectHouses } from "../useProject"
@@ -16,18 +31,18 @@ export default function UploadVisualizations({
     houses,
     ...layerProps
 }: {
-    projectId: string,
-    houses: ProjectHouses,
-    onClickClose?: () => void,
+    projectId: string
+    houses: ProjectHouses
+    onClickClose?: () => void
     onUploadComplete?: ({ files }: { files: File[] }) => void
 } & LayerExtendedProps) {
-    const [ files, setFiles ] = useState<File[]>([])
+    const [files, setFiles] = useState<File[]>([])
 
-    const [ room, setRoom ] = useState<{ key: string, value: string } | undefined>(undefined)
+    const [room, setRoom] = useState<{ key: string; value: string } | undefined>(undefined)
 
-    const [ errorMessage, setErrorMessage ] = useState<string | undefined>(undefined)
+    const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined)
 
-    const [ upload, { loading, error, data } ] = useUploadVisualizations()
+    const [upload, { loading, error, data }] = useUploadVisualizations()
 
     useEffect(() => {
         const complete = data?.uploadVisualizations.__typename === "VisualizationsUploaded"
@@ -35,7 +50,7 @@ export default function UploadVisualizations({
         if (complete) {
             onUploadComplete && onUploadComplete({ files })
         }
-    }, [ data, files, onUploadComplete ])
+    }, [data, files, onUploadComplete])
 
     useEffect(() => {
         const complete = data?.uploadVisualizations.__typename === "SomeVisualizationsUploaded"
@@ -43,7 +58,7 @@ export default function UploadVisualizations({
         if (complete) {
             onUploadComplete && onUploadComplete({ files })
         }
-    }, [ data, files, onUploadComplete ])
+    }, [data, files, onUploadComplete])
 
     useEffect(() => {
         const error = data?.uploadVisualizations.__typename === "Forbidden"
@@ -51,13 +66,13 @@ export default function UploadVisualizations({
         if (error) {
             setErrorMessage("Доступ запрещен")
         }
-    }, [ data ])
+    }, [data])
 
     useEffect(() => {
         setErrorMessage(error ? "Ошибка сервера" : undefined)
-    }, [ error ])
+    }, [error])
 
-    const [ dragCounter, setDragCounter ] = useState(0)
+    const [dragCounter, setDragCounter] = useState(0)
 
     const handleSubmit = (event: React.FormEvent) => {
         event.preventDefault()
@@ -97,22 +112,19 @@ export default function UploadVisualizations({
 
     const roomscb = useCallback(() => {
         return rooms(houses)
-    }, [ houses ])
+    }, [houses])
 
     return (
-        <Layer
-            {...layerProps}
-        >
+        <Layer {...layerProps}>
             <Box
                 width="large"
                 onDragEnter={() => {
-                    setDragCounter(dragCounter+1)
+                    setDragCounter(dragCounter + 1)
                 }}
                 onDragLeave={() => {
-                    setDragCounter(dragCounter-1)
+                    setDragCounter(dragCounter - 1)
                 }}
             >
-
                 <UploadFiles
                     ref={inputFile}
                     onAdd={(files) => {
@@ -121,66 +133,62 @@ export default function UploadVisualizations({
                     }}
                     pad="medium"
                     gap="medium"
-                    border={{color: dragCounter ? "focus" : "background", style: "dashed", size: "medium"}}
+                    border={{ color: dragCounter ? "focus" : "background", style: "dashed", size: "medium" }}
                     round="small"
                 >
                     <Box direction="row" justify="between" align="center">
-                        <Heading level={3} margin="none">Загрузить визуализации</Heading>
-                        <Button icon={ <FormClose/> } onClick={onClickClose}/>
+                        <Heading level={3} margin="none">
+                            Загрузить визуализации
+                        </Heading>
+                        <Button icon={<FormClose />} onClick={onClickClose} />
                     </Box>
 
-                    {errorMessage &&
+                    {errorMessage && (
                         <Box
                             pad="small"
                             round="small"
                             direction="row"
                             gap="small"
                             align="center"
-                            background={{ color: "status-critical", opacity: "weak"}}
+                            background={{ color: "status-critical", opacity: "weak" }}
                         >
-                            <Box border={{ color: "status-critical", size: "small"}} round="large">
-                                <FormClose color="status-critical" size="medium"/>
+                            <Box border={{ color: "status-critical", size: "small" }} round="large">
+                                <FormClose color="status-critical" size="medium" />
                             </Box>
-                            <Text weight="bold" size="medium">{errorMessage}</Text>
+                            <Text weight="bold" size="medium">
+                                {errorMessage}
+                            </Text>
                         </Box>
-                    }
+                    )}
 
                     <Form>
-                        <FormField
-                            contentProps={{ border: false }}
-                            label="Файлы">
-                                {files.length === 0 &&
-                                    <Box
-                                        align="center"
-                                        justify="center"
-                                        round="small"
-                                        background="light-1"
-                                        height="xsmall"
-                                        direction="column"
-                                        gap="small"
-                                    >
-                                            <ImageIcon size="medium"/>
-                                            <Box><Text size="medium">Для загрузки перетащите файлы сюда или выбирите файл</Text></Box>
+                        <FormField contentProps={{ border: false }} label="Файлы">
+                            {files.length === 0 && (
+                                <Box
+                                    align="center"
+                                    justify="center"
+                                    round="small"
+                                    background="light-1"
+                                    height="xsmall"
+                                    direction="column"
+                                    gap="small"
+                                >
+                                    <ImageIcon size="medium" />
+                                    <Box>
+                                        <Text size="medium">Для загрузки перетащите файлы сюда или выбирите файл</Text>
                                     </Box>
-                                }
-                                {files.length > 0 &&
-                                    <Files
-                                        files={files}
-                                        onClickRemove={removeFile}
-                                    />
-                                }
-                            </FormField>
+                                </Box>
+                            )}
+                            {files.length > 0 && <Files files={files} onClickRemove={removeFile} />}
+                        </FormField>
 
-                        {roomscb() &&
-                            <FormField
-                                label="Комната"
-                                width="medium"
-                            >
+                        {roomscb() && (
+                            <FormField label="Комната" width="medium">
                                 <Select
                                     labelKey="label"
                                     valueKey="value"
                                     value={room}
-                                    options={roomscb().map(room => {
+                                    options={roomscb().map((room) => {
                                         return { label: room.name, value: room.id }
                                     })}
                                     onChange={({ value }) => {
@@ -188,13 +196,13 @@ export default function UploadVisualizations({
                                     }}
                                 />
                             </FormField>
-                        }
+                        )}
 
                         <Box direction="row" justify="between" margin={{ top: "large" }}>
                             <Button
                                 onClick={handleSubmit}
                                 primary
-                                label={loading ? "Загрузка..." : "Загрузить" }
+                                label={loading ? "Загрузка..." : "Загрузить"}
                                 disabled={files.length === 0 || loading}
                             />
                             <Button
@@ -211,89 +219,85 @@ export default function UploadVisualizations({
     )
 }
 
-const UploadFiles = forwardRef(({
-    onAdd,
-    children,
-    ...boxProps
-}: {
-    onAdd?: (files: File[]) => void
-    children: React.ReactNode
-} & BoxExtendedProps, ref: React.Ref<unknown>) => {
-    const fileInput = useRef<HTMLInputElement>(null)
+const UploadFiles = forwardRef(
+    (
+        {
+            onAdd,
+            children,
+            ...boxProps
+        }: {
+            onAdd?: (files: File[]) => void
+            children: React.ReactNode
+        } & BoxExtendedProps,
+        ref: React.Ref<unknown>
+    ) => {
+        const fileInput = useRef<HTMLInputElement>(null)
 
-    useImperativeHandle(ref, () => ({
-        click: () => {
-            fileInput.current?.click()
+        useImperativeHandle(ref, () => ({
+            click: () => {
+                fileInput.current?.click()
+            },
+        }))
+
+        const handleDrop = (event: DragEvent<HTMLDivElement>) => {
+            event.preventDefault()
+
+            if (event.dataTransfer.files) {
+                const nextFiles: File[] = []
+
+                for (const h in event.dataTransfer.files) {
+                    const item = event.dataTransfer.files[h]
+
+                    if (item instanceof File) {
+                        nextFiles.push(item)
+                    }
+                }
+
+                if (nextFiles.length > 0) {
+                    onAdd && onAdd(nextFiles)
+                }
+            }
         }
-    }))
 
-    const handleDrop = (event: DragEvent<HTMLDivElement>) => {
-        event.preventDefault()
+        const handleSelect = (event: ChangeEvent<HTMLInputElement>) => {
+            event.preventDefault()
 
-        if (event.dataTransfer.files) {
             const nextFiles: File[] = []
 
-            for (const h in event.dataTransfer.files) {
-                const item = event.dataTransfer.files[h]
+            if (event.target.files) {
+                for (const h in event.target.files) {
+                    const item = event.target.files[h]
 
-                if (item instanceof File) {
-                    nextFiles.push(item)
+                    if (item instanceof File) {
+                        nextFiles.push(item)
+                    }
                 }
             }
 
-            if (nextFiles.length > 0 ) {
+            event.target.files = new DataTransfer().files
+
+            if (nextFiles.length > 0) {
                 onAdd && onAdd(nextFiles)
             }
         }
-    }
 
-    const handleSelect = (event: ChangeEvent<HTMLInputElement>) => {
-        event.preventDefault()
-
-        const nextFiles: File[] = []
-
-        if (event.target.files) {
-            for (const h in event.target.files) {
-                const item = event.target.files[h]
-
-                if (item instanceof File) {
-                    nextFiles.push(item)
-                }
-            }
+        const handleDragOver = (event: DragEvent<HTMLDivElement>) => {
+            event.preventDefault()
         }
 
-        event.target.files = (new DataTransfer()).files
+        return (
+            <Box onDrop={handleDrop} onDragOver={handleDragOver}>
+                <Box {...boxProps}>
+                    {React.Children.map(children, (child) => {
+                        return child
+                    })}
+                </Box>
 
-        if (nextFiles.length > 0) {
-            onAdd && onAdd(nextFiles)
-        }
-    }
-
-    const handleDragOver = (event: DragEvent<HTMLDivElement>) => {
-        event.preventDefault()
-    }
-
-    return (
-        <Box
-            onDrop={handleDrop}
-            onDragOver={handleDragOver}
-        >
-            <Box {...boxProps}>
-                {React.Children.map(children, ( child ) => {
-                    return child
-                })}
+                <input type="file" hidden multiple ref={fileInput} onChange={handleSelect} />
             </Box>
-
-            <input
-                type="file"
-                hidden
-                multiple
-                ref={fileInput}
-                onChange={handleSelect}
-            />
-        </Box>
-    )
-})
+        )
+    }
+)
 
 UploadFiles.displayName = "UploadFiles"
 
@@ -302,7 +306,7 @@ function Files({
     onClickRemove,
     ...gridProps
 }: {
-    files: File[],
+    files: File[]
     onClickRemove?: (i: number) => void
 } & GridExtendedProps) {
     return (
@@ -324,32 +328,36 @@ function FileForUpload({
     file,
     onClickRemove,
 }: {
-    file: File,
+    file: File
     onClickRemove?: () => void
 } & BoxExtendedProps) {
-    const [ hover, setHover ] = useState(false)
+    const [hover, setHover] = useState(false)
 
     return (
-        <Box width="xsmall" height="xsmall" flex={{"shrink":0}} onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}>
+        <Box
+            width="xsmall"
+            height="xsmall"
+            flex={{ shrink: 0 }}
+            onMouseEnter={() => setHover(true)}
+            onMouseLeave={() => setHover(false)}
+        >
             <Stack anchor="top-right">
-                <Box
-                    width="xsmall"
-                    height="xsmall"
-                    flex={{"shrink":0}}
-                    background="light-2"
-                >
-                    <Image
-                        fit="cover"
-                        src={ URL.createObjectURL(file) }
-                    />
+                <Box width="xsmall" height="xsmall" flex={{ shrink: 0 }} background="light-2">
+                    <Image fit="cover" src={URL.createObjectURL(file)} />
                 </Box>
-                {hover && <Button plain icon={<FormClose color="light-1"/>} onClick={() => onClickRemove && onClickRemove()}/>}
+                {hover && (
+                    <Button
+                        plain
+                        icon={<FormClose color="light-1" />}
+                        onClick={() => onClickRemove && onClickRemove()}
+                    />
+                )}
             </Stack>
         </Box>
     )
 }
 
-function rooms(houses: ProjectHouses ): Room[] {
+function rooms(houses: ProjectHouses): Room[] {
     const house = firstHouse(houses)
 
     if (house) {

@@ -1,15 +1,15 @@
 mutation deleteRoom($id: String!) {
     deleteRoom(id: $id) {
         __typename
-        ...on RoomDeleted {
+        ... on RoomDeleted {
             room {
                 id
             }
         }
-        ...on NotFound {
+        ... on NotFound {
             message
         }
-        ...on Forbidden {
+        ... on Forbidden {
             message
         }
     }

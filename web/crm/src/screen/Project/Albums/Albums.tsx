@@ -17,19 +17,17 @@ export default function Albums({
     albums: ProjectScreenAlbums
     onDelete?: (id: string[]) => void
 } & BoxExtendedProps) {
+    const [showConfirmDeleteDialog, setShowConfirmDeleteDialog] = useState<string | undefined>()
 
-    const [ showConfirmDeleteDialog, setShowConfirmDeleteDialog ] = useState<string | undefined>()
-
-    const [ deleteAlbum, { data, loading }] = useDeleteAlbum()
+    const [deleteAlbum, { data, loading }] = useDeleteAlbum()
 
     useEffect(() => {
         switch (data?.deleteAlbum.__typename) {
             case "AlbumDeleted":
                 setShowConfirmDeleteDialog(undefined)
                 onDelete && onDelete([data?.deleteAlbum.album.id])
-
         }
-    }, [ data ])
+    }, [data])
 
     const handleClickDelete = (id: string) => {
         setShowConfirmDeleteDialog(id)
@@ -53,33 +51,23 @@ export default function Albums({
 
             return (
                 <Box {...props}>
-                    {showConfirmDeleteDialog &&
+                    {showConfirmDeleteDialog && (
                         <ConfirmDelete
                             disableButton={loading}
                             onEsc={handleClickCancelDelete}
                             onClickClose={handleClickCancelDelete}
                             onClickDelete={handleClickConfirmDelete}
                         />
-                    }
+                    )}
 
                     <Box overflow="auto">
-                        <Grid
-                            columns="small"
-                            style={{gridAutoFlow: "column", overflowX: "scroll"}}
-                            gap="xsmall"
-                        >
+                        <Grid columns="small" style={{ gridAutoFlow: "column", overflowX: "scroll" }} gap="xsmall">
                             {albums.list.items.map((item) => {
                                 switch (item.__typename) {
                                     case "Album":
-                                        return (
-                                            <Album
-                                                id={item.id}
-                                                key={item.id}
-                                                onClickDelete={handleClickDelete}
-                                            />
-                                        )
-                                default:
-                                    return null
+                                        return <Album id={item.id} key={item.id} onClickDelete={handleClickDelete} />
+                                    default:
+                                        return null
                                 }
                             })}
                         </Grid>
@@ -90,4 +78,3 @@ export default function Albums({
             return null
     }
 }
-

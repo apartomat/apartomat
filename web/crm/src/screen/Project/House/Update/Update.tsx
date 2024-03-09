@@ -1,29 +1,33 @@
-import React, {useEffect, useState} from "react"
+import React, { useEffect, useState } from "react"
 
-import {ProjectScreenHouse} from "../../useProject"
-import useUpdateHouse, {House as HouseType} from "./useUpdateHouse"
+import { ProjectScreenHouse } from "../../useProject"
+import useUpdateHouse, { House as HouseType } from "./useUpdateHouse"
 
-import {Box, Button, Heading, Layer} from "grommet"
-import {FormClose} from "grommet-icons"
+import { Box, Button, Heading, Layer } from "grommet"
+import { FormClose } from "grommet-icons"
 
 import { Form } from "../Form/Form"
 
 export function Update({
-     house,
-     onUpdate,
-     onEsc,
-     onClickClose
+    house,
+    onUpdate,
+    onEsc,
+    onClickClose,
 }: {
-    house: ProjectScreenHouse,
-    onUpdate?: (house: HouseType) => void,
-    onEsc?: () => void,
+    house: ProjectScreenHouse
+    onUpdate?: (house: HouseType) => void
+    onEsc?: () => void
     onClickClose?: () => void
 }) {
-    const [ errorMessage, setErrorMessage ] = useState<string | undefined>()
+    const [errorMessage, setErrorMessage] = useState<string | undefined>()
 
-    const [ value, setValue ] = useState({ city: house.city, address: house.address, housingComplex: house.housingComplex})
+    const [value, setValue] = useState({
+        city: house.city,
+        address: house.address,
+        housingComplex: house.housingComplex,
+    })
 
-    const [ updateHouse, { data, error, loading } ] = useUpdateHouse()
+    const [updateHouse, { data, error, loading }] = useUpdateHouse()
 
     const handleSubmit = (event: React.FormEvent) => {
         updateHouse(house.id, { ...value })
@@ -46,21 +50,32 @@ export function Update({
                     setErrorMessage("Ошибка сервера")
             }
         }
-    }, [ data, onUpdate ])
+    }, [data, onUpdate])
 
     useEffect(() => {
         setErrorMessage(error ? "Ошибка сервера" : undefined)
-    }, [ error ])
+    }, [error])
 
     return (
         <Layer onEsc={onEsc}>
             <Box pad="medium" gap="medium" width="medium">
                 <Box direction="row" justify="between" align="center">
-                    <Heading level={2} margin="none">Адрес</Heading>
-                    <Button icon={ <FormClose/> } onClick={onClickClose}/>
+                    <Heading level={2} margin="none">
+                        Адрес
+                    </Heading>
+                    <Button icon={<FormClose />} onClick={onClickClose} />
                 </Box>
 
-                {errorMessage && <Box background={{color: "status-critical", opacity: "strong"}} round="medium" pad={{vertical: "small", horizontal: "medium"}} margin={{top: "small"}}>{errorMessage}</Box>}
+                {errorMessage && (
+                    <Box
+                        background={{ color: "status-critical", opacity: "strong" }}
+                        round="medium"
+                        pad={{ vertical: "small", horizontal: "medium" }}
+                        margin={{ top: "small" }}
+                    >
+                        {errorMessage}
+                    </Box>
+                )}
 
                 <Form
                     value={value}
@@ -68,11 +83,11 @@ export function Update({
                     onSubmit={handleSubmit}
                     submit={
                         <Box>
-                            <Box direction="row" justify="between" margin={{top: "small"}}>
+                            <Box direction="row" justify="between" margin={{ top: "small" }}>
                                 <Button
                                     type="submit"
                                     primary
-                                    label={loading ? 'Сохранение...' : 'Сохранить' }
+                                    label={loading ? "Сохранение..." : "Сохранить"}
                                     disabled={loading}
                                 />
                             </Box>

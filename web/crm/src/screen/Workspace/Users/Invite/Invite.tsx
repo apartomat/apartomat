@@ -6,7 +6,7 @@ import { FormClose } from "grommet-icons"
 import { WorkspaceUserRoleDictionary, WorkspaceUserRoleDictionaryItem, WorkspaceUserRole } from "api/graphql"
 import { useInviteUser } from "./useInviteUser"
 
-export type Value = { email: string, role?: WorkspaceUserRole }
+export type Value = { email: string; role?: WorkspaceUserRole }
 
 export default function Invite({
     workspaceId,
@@ -15,16 +15,16 @@ export default function Invite({
     onClickClose,
     ...layerProps
 }: {
-    workspaceId: string,
-    roles: WorkspaceUserRoleDictionary,
-    onInviteSent?: (to: string) => void,
+    workspaceId: string
+    roles: WorkspaceUserRoleDictionary
+    onInviteSent?: (to: string) => void
     onClickClose?: () => void
-} & LayerExtendedProps ) {
-    const [ value, setValue ] = useState<Value>({ email: "", role: undefined })
+} & LayerExtendedProps) {
+    const [value, setValue] = useState<Value>({ email: "", role: undefined })
 
-    const [ errorMessage, setErrorMessage ] = useState<string | undefined>()
+    const [errorMessage, setErrorMessage] = useState<string | undefined>()
 
-    const [ invite, { data, error } ] = useInviteUser(workspaceId)
+    const [invite, { data, error }] = useInviteUser(workspaceId)
 
     const handleSubmit = () => {
         const { email, role } = value
@@ -50,37 +50,41 @@ export default function Invite({
                 onInviteSent && onInviteSent(data?.inviteUser.to)
                 return
         }
-    }, [ data ])
+    }, [data])
 
     useEffect(() => {
         if (error) {
             setErrorMessage("Ошибка сервера")
         }
-    }, [ error ])
+    }, [error])
 
     return (
         <Layer {...layerProps}>
             <Box pad="medium" gap="medium" width="medium">
                 <Box direction="row" justify="between" align="center">
-                    <Heading level={2} margin="none">Пригласить</Heading>
-                    <Button icon={ <FormClose/> } onClick={onClickClose}/>
+                    <Heading level={2} margin="none">
+                        Пригласить
+                    </Heading>
+                    <Button icon={<FormClose />} onClick={onClickClose} />
                 </Box>
 
-                {errorMessage &&
+                {errorMessage && (
                     <Box
                         pad="small"
                         round="small"
                         direction="row"
                         gap="small"
                         align="center"
-                        background={{ color: "status-critical", opacity: "weak"}}
+                        background={{ color: "status-critical", opacity: "weak" }}
                     >
-                        <Box border={{ color: "status-critical", size: "small"}} round="large">
-                            <FormClose color="status-critical" size="medium"/>
+                        <Box border={{ color: "status-critical", size: "small" }} round="large">
+                            <FormClose color="status-critical" size="medium" />
                         </Box>
-                        <Text weight="bold" size="medium">{errorMessage}</Text>
+                        <Text weight="bold" size="medium">
+                            {errorMessage}
+                        </Text>
                     </Box>
-                }
+                )}
 
                 <Box>
                     <Form
@@ -104,9 +108,9 @@ export default function Invite({
                                 name="email"
                                 mask={[
                                     { regexp: /^[\w\-_.\\+]+$/, placeholder: "example" },
-                                    { fixed: '@' },
+                                    { fixed: "@" },
                                     { regexp: /^[\w\-_.]+$/, placeholder: "test" },
-                                    { fixed: '.' },
+                                    { fixed: "." },
                                     { regexp: /^[\w]+$/, placeholder: "org" },
                                 ]}
                             />
@@ -115,8 +119,8 @@ export default function Invite({
                             <Select
                                 name="role"
                                 options={roles.items.map(({ key, value }: WorkspaceUserRoleDictionaryItem) => {
-                                    return {key, value}
-                                } )}
+                                    return { key, value }
+                                })}
                                 valueKey={{ key: "key", reduce: true }}
                                 labelKey="value"
                             />

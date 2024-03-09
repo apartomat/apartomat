@@ -1,9 +1,9 @@
-query workspaceScreen($id: String! $timezone: String) {
+query workspaceScreen($id: String!, $timezone: String) {
     workspace(id: $id) {
-        ...on Workspace {
+        ... on Workspace {
             ...WorkspaceScreen
         }
-        ...on Error {
+        ... on Error {
             message
         }
     }
@@ -29,12 +29,12 @@ fragment WorkspaceScreen on Workspace {
 
 fragment WorkspaceScreenUsers on WorkspaceUsers {
     list {
-        ...on WorkspaceUsersList {
+        ... on WorkspaceUsersList {
             items {
                 ...WorkspaceScreenUser
             }
         }
-        ...on Error {
+        ... on Error {
             message
         }
     }
@@ -58,30 +58,30 @@ fragment WorkspaceScreenUser on WorkspaceUser {
 }
 
 fragment WorkspaceScreenCurrentProjects on WorkspaceProjects {
-    current: list(filter: {status: [NEW, IN_PROGRESS]} limit: 10) {
-        ...on WorkspaceProjectsList {
+    current: list(filter: { status: [NEW, IN_PROGRESS] }, limit: 10) {
+        ... on WorkspaceProjectsList {
             items {
                 ...WorkspaceScreenProject
             }
         }
-        ...on Error {
+        ... on Error {
             message
         }
     }
 }
 
 fragment WorkspaceScreenArchiveProjects on WorkspaceProjects {
-    done: list(filter: {status: [DONE, CANCELED]} limit: 10) {
-            __typename
-            ...on WorkspaceProjectsList {
-                items {
-                    ...WorkspaceScreenProject
-                }
-            }
-            ...on Error {
-                message
+    done: list(filter: { status: [DONE, CANCELED] }, limit: 10) {
+        __typename
+        ... on WorkspaceProjectsList {
+            items {
+                ...WorkspaceScreenProject
             }
         }
+        ... on Error {
+            message
+        }
+    }
 }
 
 fragment WorkspaceScreenProject on Project {

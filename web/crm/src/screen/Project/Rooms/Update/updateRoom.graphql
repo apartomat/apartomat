@@ -1,15 +1,15 @@
-mutation updateRoom($roomId: String! $data: UpdateRoomInput!) {
-    updateRoom(roomId: $roomId data: $data) {
+mutation updateRoom($roomId: String!, $data: UpdateRoomInput!) {
+    updateRoom(roomId: $roomId, data: $data) {
         __typename
-        ...on RoomUpdated {
+        ... on RoomUpdated {
             room {
                 ...ProjectScreenHouseRoom
             }
         }
-        ...on NotFound {
+        ... on NotFound {
             message
         }
-        ...on Forbidden {
+        ... on Forbidden {
             message
         }
     }

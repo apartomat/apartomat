@@ -9,15 +9,15 @@ export default function RoomsFilter({
     onSelectRooms,
     ...props
 }: {
-    onSelectRooms?: (id: string[]) => void,
+    onSelectRooms?: (id: string[]) => void
     rooms: VisualizationsScreenHouseRoomFragment[]
 } & BoxExtendedProps) {
-    const [ roomsChecked, setRoomsChecked ] = useState<string[]>([])
-    const [ metaKey, setMetaKey ] = useState<boolean>(false)
+    const [roomsChecked, setRoomsChecked] = useState<string[]>([])
+    const [metaKey, setMetaKey] = useState<boolean>(false)
 
     useEffect(() => {
         onSelectRooms && onSelectRooms(roomsChecked)
-    }, [ roomsChecked ])
+    }, [roomsChecked])
 
     const handleKeyDown = (event: KeyboardEvent) => {
         if (event.key === "Meta") {
@@ -47,12 +47,12 @@ export default function RoomsFilter({
                 return (
                     <CheckBox
                         key={room.id}
-                        onChange={({ target: { checked }}: React.ChangeEvent<HTMLInputElement>): void => {
+                        onChange={({ target: { checked } }: React.ChangeEvent<HTMLInputElement>): void => {
                             if (metaKey) {
                                 if (checked) {
                                     setRoomsChecked([...roomsChecked, room.id])
                                 } else {
-                                    setRoomsChecked(roomsChecked.filter(item => item !== room.id))
+                                    setRoomsChecked(roomsChecked.filter((item) => item !== room.id))
                                 }
                             } else {
                                 if (!checked && roomsChecked.length === 1) {
@@ -66,10 +66,12 @@ export default function RoomsFilter({
                     >
                         {({ checked }: { checked: boolean }) => (
                             <Box
-                                pad={{horizontal: "small", vertical: "xsmall"}}
+                                pad={{ horizontal: "small", vertical: "xsmall" }}
                                 background={checked ? "brand" : "light-1"}
                                 round="medium"
-                            >{room.name}</Box>
+                            >
+                                {room.name}
+                            </Box>
                         )}
                     </CheckBox>
                 )

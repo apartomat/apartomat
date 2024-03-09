@@ -1,7 +1,7 @@
-mutation uploadVisualizations($projectId: String! $files: [Upload!]! $roomId: String) {
-    uploadVisualizations(projectId: $projectId files: $files roomId: $roomId) {
+mutation uploadVisualizations($projectId: String!, $files: [Upload!]!, $roomId: String) {
+    uploadVisualizations(projectId: $projectId, files: $files, roomId: $roomId) {
         __typename
-        ...on VisualizationsUploaded {
+        ... on VisualizationsUploaded {
             visualizations {
                 id
                 file {
@@ -10,7 +10,7 @@ mutation uploadVisualizations($projectId: String! $files: [Upload!]! $roomId: St
                 }
             }
         }
-        ...on SomeVisualizationsUploaded {
+        ... on SomeVisualizationsUploaded {
             visualizations {
                 id
                 file {
@@ -19,7 +19,7 @@ mutation uploadVisualizations($projectId: String! $files: [Upload!]! $roomId: St
                 }
             }
         }
-        ...on Error {
+        ... on Error {
             message
         }
     }

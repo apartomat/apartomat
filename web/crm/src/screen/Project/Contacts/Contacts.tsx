@@ -16,9 +16,9 @@ export default function Contacts({
     notify,
     ...boxProps
 }: {
-    contacts: ProjectContacts,
-    projectId: string,
-    notify: (val: { message: string }) => void,
+    contacts: ProjectContacts
+    projectId: string
+    notify: (val: { message: string }) => void
 } & BoxExtendedProps) {
     const [showAddContact, setShowAddContact] = useState(false)
 
@@ -30,55 +30,68 @@ export default function Contacts({
 
     switch (contacts.list.__typename) {
         case "ProjectContactsList": {
-            const list = [...contacts.list.items, ...justAdded].filter(contact => !justDeleted.includes(contact.id))
+            const list = [...contacts.list.items, ...justAdded].filter((contact) => !justDeleted.includes(contact.id))
 
             return (
                 <Box {...boxProps}>
                     <Box direction="row" wrap>
-                        {[...list.map((contact) => {
-                            return (
-                                <Contact
-                                    key={contact.id}
-                                    contact={contact}
-                                    onDelete={(contact: ProjectContact) => {
-                                        setJustDeleted([...justDeleted, contact.id])
-                                        notify({ message: "Контакт удален"})
-                                    }}
-                                    onClickUpdate={(contact: ProjectContact) => {
-                                        setUpdateContact(contact)
-                                    }}
-                                    width={{min:"xsmall"}}
-                                    overflow="hidden"
-                                    margin={{right: "xsmall", bottom: "small"}}
-                                />
-                            )
-                        }), <Button key="" icon={<Add/>} label="Добавить" onClick={() => setShowAddContact(true) } margin={{bottom: "small"}}/>]}
+                        {[
+                            ...list.map((contact) => {
+                                return (
+                                    <Contact
+                                        key={contact.id}
+                                        contact={contact}
+                                        onDelete={(contact: ProjectContact) => {
+                                            setJustDeleted([...justDeleted, contact.id])
+                                            notify({ message: "Контакт удален" })
+                                        }}
+                                        onClickUpdate={(contact: ProjectContact) => {
+                                            setUpdateContact(contact)
+                                        }}
+                                        width={{ min: "xsmall" }}
+                                        overflow="hidden"
+                                        margin={{ right: "xsmall", bottom: "small" }}
+                                    />
+                                )
+                            }),
+                            <Button
+                                key=""
+                                icon={<Add />}
+                                label="Добавить"
+                                onClick={() => setShowAddContact(true)}
+                                margin={{ bottom: "small" }}
+                            />,
+                        ]}
                     </Box>
 
-                    {showAddContact ?
+                    {showAddContact ? (
                         <AddContact
                             projectId={projectId}
                             setShow={setShowAddContact}
                             onAdd={(contact: ProjectContact) => {
                                 setJustAdded([...justAdded, contact])
-                                notify({ message: "Контакт добавлен"})
+                                notify({ message: "Контакт добавлен" })
                             }}
-                        /> : null}
+                        />
+                    ) : null}
 
-                    {updateContact ?
+                    {updateContact ? (
                         <UpdateContact
                             contact={updateContact}
-                            hide={() => { setUpdateContact(undefined) }}
-                            onUpdate={() => {
-                                notify({ message: "Контакт сохранен"})
+                            hide={() => {
+                                setUpdateContact(undefined)
                             }}
-                        /> : null}
+                            onUpdate={() => {
+                                notify({ message: "Контакт сохранен" })
+                            }}
+                        />
+                    ) : null}
                 </Box>
             )
         }
         default:
             return (
-                <Box margin={{top: "small"}}>
+                <Box margin={{ top: "small" }}>
                     <Text>n/a</Text>
                 </Box>
             )

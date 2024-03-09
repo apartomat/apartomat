@@ -9,9 +9,9 @@ export type {
     WorkspaceScreenProjectFragment,
 } from "api/graphql"
 
-export function useWorkspace({ id, timezone }: { id: string, timezone: string }) {
+export function useWorkspace({ id, timezone }: { id: string; timezone: string }) {
     const client = useApolloClient()
-    return useWorkspaceScreenQuery({ client, errorPolicy: "all", variables: { id, timezone }})
+    return useWorkspaceScreenQuery({ client, errorPolicy: "all", variables: { id, timezone } })
 }
 
 export default useWorkspace

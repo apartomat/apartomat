@@ -3,11 +3,11 @@ import { useAcceptInviteMutation, AcceptInviteMutation, AcceptInviteMutationResu
 
 export function useAcceptInvite(): [
     (email: string) => Promise<FetchResult<AcceptInviteMutation>>,
-    AcceptInviteMutationResult
+    AcceptInviteMutationResult,
 ] {
     const client = useApolloClient()
 
-    const [ accept, result ] = useAcceptInviteMutation({ client, errorPolicy: "all" })
+    const [accept, result] = useAcceptInviteMutation({ client, errorPolicy: "all" })
 
     return [(token: string) => accept({ variables: { token } }), result]
 }

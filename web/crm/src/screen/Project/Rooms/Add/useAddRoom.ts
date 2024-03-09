@@ -3,17 +3,11 @@ import { useAddRoomMutation, AddRoomMutation, AddRoomInput, AddRoomMutationResul
 
 export type AddRoom = (houseId: string, room: AddRoomInput) => Promise<FetchResult<AddRoomMutation>>
 
-export function useAddRoom(): [
-    AddRoom,
-    AddRoomMutationResult
-] {
+export function useAddRoom(): [AddRoom, AddRoomMutationResult] {
     const client = useApolloClient()
-    const [add, result] = useAddRoomMutation({ client, errorPolicy: 'all' })
+    const [add, result] = useAddRoomMutation({ client, errorPolicy: "all" })
 
-    return [
-        (houseId: string, room: AddRoomInput) => add({ variables: { houseId, room } }),
-        result,
-    ]
+    return [(houseId: string, room: AddRoomInput) => add({ variables: { houseId, room } }), result]
 }
 
 export default useAddRoom

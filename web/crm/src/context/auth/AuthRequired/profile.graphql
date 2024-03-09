@@ -1,7 +1,7 @@
 query profile {
     profile {
         __typename
-        ...on UserProfile {
+        ... on UserProfile {
             id
             email
             gravatar {
@@ -12,10 +12,10 @@ query profile {
                 name
             }
         }
-        ...on Forbidden {
+        ... on Forbidden {
             message
         }
-        ...on ServerError {
+        ... on ServerError {
             message
         }
     }
