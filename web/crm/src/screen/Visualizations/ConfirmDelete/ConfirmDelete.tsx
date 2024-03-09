@@ -7,14 +7,12 @@ export default function ConfirmDelete({
     count,
     disableButton,
     onClickClose,
-    onClickCancel,
     onClickDelete,
     ...layerProps
 }: {
     count: number,
     disableButton: boolean,
     onClickClose?: () => void,
-    onClickCancel?: () => void,
     onClickDelete?: () => void,
 } & LayerExtendedProps) {
     return (

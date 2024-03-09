@@ -30,7 +30,7 @@ export function PageSize({
 
     const [ pageSize, setPageSize ] = useState<string>(size)
 
-    const [ change, { data, error, loading } ] = useChangeAlbumPageSize(albumId)
+    const [ change, { data, error } ] = useChangeAlbumPageSize(albumId)
 
     useEffect(() => {
         if (!data) {
@@ -38,11 +38,12 @@ export function PageSize({
         }
 
         switch (data?.changeAlbumPageSize.__typename) {
-            case "AlbumPageSizeChanged":
-                const { album } = data.changeAlbumPageSize
+            case "AlbumPageSizeChanged": {
+                const { changeAlbumPageSize: { album  } } = data
                 setPageSize(album.settings.pageSize)
                 onAlbumPageSizeChanged && onAlbumPageSizeChanged()
                 break
+            }
             default:
                 setPageSize(size)
         }
@@ -50,7 +51,7 @@ export function PageSize({
 
     useEffect(() => {
         if (error) {
-            setPageSize(size) 
+            setPageSize(size)
         }
     }, [ error ])
 

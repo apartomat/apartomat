@@ -1,6 +1,6 @@
 import React, { useCallback } from "react"
 
-import { WorkspaceScreenProjectFragment, WorkspaceScreenCurrentProjectsFragment } from "../useWorkspace"
+import { WorkspaceScreenCurrentProjectsFragment } from "../useWorkspace"
 
 import { Box, List, Text } from "grommet"
 import { FormClose } from "grommet-icons"
@@ -14,7 +14,7 @@ export default function Projects({ projects: { current: projects } }: { projects
                 case "ServerError":
                     return "Ошибка сервера"
             }
-    
+
             return ""
     }, [ projects ])
 

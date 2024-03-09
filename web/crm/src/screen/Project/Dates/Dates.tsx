@@ -29,7 +29,7 @@ export default function Dates({
         }
 
         if (startAt) {
-            return setLabel(<>new Date(startAt).toLocaleDateString("ru-RU")</>)
+            return setLabel(<>{new Date(startAt).toLocaleDateString("ru-RU")}</>)
         }
 
         return setLabel(<>не определены</>)

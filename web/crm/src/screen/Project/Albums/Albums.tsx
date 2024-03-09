@@ -20,7 +20,7 @@ export default function Albums({
 
     const [ showConfirmDeleteDialog, setShowConfirmDeleteDialog ] = useState<string | undefined>()
 
-    const [ deleteAlbum, { data, error, loading }] = useDeleteAlbum()
+    const [ deleteAlbum, { data, loading }] = useDeleteAlbum()
 
     useEffect(() => {
         switch (data?.deleteAlbum.__typename) {
@@ -58,11 +58,10 @@ export default function Albums({
                             disableButton={loading}
                             onEsc={handleClickCancelDelete}
                             onClickClose={handleClickCancelDelete}
-                            onClickCancel={handleClickCancelDelete}
                             onClickDelete={handleClickConfirmDelete}
                         />
                     }
-                    
+
                     <Box overflow="auto">
                         <Grid
                             columns="small"

@@ -13,18 +13,12 @@ import UpdateContact from "./Update/Update"
 export default function Contacts({
     contacts,
     projectId,
-    onAdd,
-    onUpdate,
-    onDelete,
     notify,
     ...boxProps
 }: {
     contacts: ProjectContacts,
     projectId: string,
     notify: (val: { message: string }) => void,
-    onAdd?: (house: ProjectContact) => void,
-    onUpdate?: (house: ProjectContact) => void,
-    onDelete?: (house: ProjectContact) => void
 } & BoxExtendedProps) {
     const [showAddContact, setShowAddContact] = useState(false)
 
@@ -35,7 +29,7 @@ export default function Contacts({
     const [justDeleted, setJustDeleted] = useState([] as string[])
 
     switch (contacts.list.__typename) {
-        case "ProjectContactsList":
+        case "ProjectContactsList": {
             const list = [...contacts.list.items, ...justAdded].filter(contact => !justDeleted.includes(contact.id))
 
             return (
@@ -75,12 +69,13 @@ export default function Contacts({
                         <UpdateContact
                             contact={updateContact}
                             hide={() => { setUpdateContact(undefined) }}
-                            onUpdate={(contact: ProjectContact) => {
+                            onUpdate={() => {
                                 notify({ message: "Контакт сохранен"})
                             }}
                         /> : null}
                 </Box>
             )
+        }
         default:
             return (
                 <Box margin={{top: "small"}}>

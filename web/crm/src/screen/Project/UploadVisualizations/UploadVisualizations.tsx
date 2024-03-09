@@ -123,7 +123,7 @@ export default function UploadVisualizations({
                     gap="medium"
                     border={{color: dragCounter ? "focus" : "background", style: "dashed", size: "medium"}}
                     round="small"
-                >                    
+                >
                     <Box direction="row" justify="between" align="center">
                         <Heading level={3} margin="none">Загрузить визуализации</Heading>
                         <Button icon={ <FormClose/> } onClick={onClickClose}/>
@@ -160,7 +160,7 @@ export default function UploadVisualizations({
                                         gap="small"
                                     >
                                             <ImageIcon size="medium"/>
-                                            <Box><Text size="medium">Для загрузки перетащите файлы сюда или выбирите файл</Text></Box>                                    
+                                            <Box><Text size="medium">Для загрузки перетащите файлы сюда или выбирите файл</Text></Box>
                                     </Box>
                                 }
                                 {files.length > 0 &&
@@ -202,7 +202,7 @@ export default function UploadVisualizations({
                                 onClick={() => {
                                     inputFile.current?.click()
                                 }}
-                            />                            
+                            />
                         </Box>
                     </Form>
                 </UploadFiles>
@@ -231,8 +231,8 @@ const UploadFiles = forwardRef(({
         event.preventDefault()
 
         if (event.dataTransfer.files) {
-            let nextFiles: File[] = []
-            
+            const nextFiles: File[] = []
+
             for (const h in event.dataTransfer.files) {
                 const item = event.dataTransfer.files[h]
 
@@ -250,12 +250,12 @@ const UploadFiles = forwardRef(({
     const handleSelect = (event: ChangeEvent<HTMLInputElement>) => {
         event.preventDefault()
 
-        let nextFiles: File[] = []
+        const nextFiles: File[] = []
 
         if (event.target.files) {
             for (const h in event.target.files) {
                 const item = event.target.files[h]
-    
+
                 if (item instanceof File) {
                     nextFiles.push(item)
                 }
@@ -295,6 +295,8 @@ const UploadFiles = forwardRef(({
     )
 })
 
+UploadFiles.displayName = "UploadFiles"
+
 function Files({
     files,
     onClickRemove,
@@ -321,7 +323,6 @@ function Files({
 function FileForUpload({
     file,
     onClickRemove,
-    ...boxProps
 }: {
     file: File,
     onClickRemove?: () => void

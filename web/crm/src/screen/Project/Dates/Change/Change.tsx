@@ -34,6 +34,7 @@ export default function Change({
     }, [ data, dates, onChange ])
 
 
+    /* eslint-disable  @typescript-eslint/no-explicit-any */
     const handleSelect = (value: any) => {
         setDates(value)
     }

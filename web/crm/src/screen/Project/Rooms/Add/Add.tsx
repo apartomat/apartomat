@@ -22,7 +22,7 @@ export function Add({
 
     const handleSubmit = (event: React.FormEvent) => {
         const { name, square } = value
-        
+
         addRoom(houseId, { name, square: parseFloat(square.replace(",", ".")) })
 
         event.preventDefault()
@@ -64,6 +64,7 @@ export function Add({
     )
 }
 
+/* eslint-disable  @typescript-eslint/no-explicit-any */
 function ErrorMessage({res}: {res: { __typename: "NotFound", message: string } |  { __typename: "Forbidden", message: string } | { __typename: "ServerError", message: string } | any }) {
     switch (res?.__typename) {
         case "NotFound":

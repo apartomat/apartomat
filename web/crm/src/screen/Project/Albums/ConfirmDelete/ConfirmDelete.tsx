@@ -6,13 +6,11 @@ import { Alert, FormClose } from "grommet-icons"
 export function ConfirmDelete({
     disableButton,
     onClickClose,
-    onClickCancel,
     onClickDelete,
     ...layerProps
 }: {
     disableButton: boolean,
     onClickClose?: () => void,
-    onClickCancel?: () => void,
     onClickDelete?: () => void,
 } & LayerExtendedProps) {
     return (

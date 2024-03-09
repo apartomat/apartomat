@@ -34,7 +34,7 @@ export function Pages({
                             style={{boxShadow: current === key ? "0 0 0px 2px #7D4CDB": "none" }}
                             align="center"
                         >
-                            <Paper size="A4" scale={0.1}>
+                            <Paper scale={0.1}>
                                 {(() => {
                                     switch (p.__typename) {
                                         case "AlbumPageVisualization":

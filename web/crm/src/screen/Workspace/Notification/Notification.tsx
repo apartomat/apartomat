@@ -5,11 +5,9 @@ import { StatusGood } from "grommet-icons"
 
 export function Notification({
     message,
-    status = "ok",
     ...layerProps
 }: {
     message: string,
-    status?: "ok" | "warning" | "error" 
 }) {
     return (
         <Layer

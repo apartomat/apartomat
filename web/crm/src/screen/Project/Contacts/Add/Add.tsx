@@ -43,10 +43,11 @@ export default function Add(
 
     useEffect(() => {
         switch (data?.addContact.__typename) {
-            case "ContactAdded":
+            case "ContactAdded": {
                 const { addContact: { contact }} = data
                 onAdd(contact)
                 setShow(false)
+            }
         }
     }, [ data, setShow, onAdd ]) // todo
 
@@ -82,6 +83,7 @@ export default function Add(
     )
 }
 
+/* eslint-disable  @typescript-eslint/no-explicit-any */
 function ErrorMessage({res}: { res: { __typename: "Forbidden", message: string } | { __typename: "ServerError", message: string } | any}) {
     switch (res?.__typename) {
         case "Forbidden":

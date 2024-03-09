@@ -1,6 +1,6 @@
 import { FetchResult, useApolloClient } from "@apollo/client"
 
-import { useDeleteAlbumMutation, DeleteAlbumMutation, ProjectStatus, DeleteAlbumMutationResult } from "api/graphql"
+import { useDeleteAlbumMutation, DeleteAlbumMutation, DeleteAlbumMutationResult } from "api/graphql"
 
 export function useDeleteAlbum(): [
     (id: string) => Promise<FetchResult<DeleteAlbumMutation>>,

@@ -1,6 +1,6 @@
-import {MouseEvent, useEffect, useRef, useState} from "react"
+import {MouseEvent, useEffect, useState} from "react"
 
-import {Box, Button, Drop, Grid, Heading, Image, Layer, LayerExtendedProps, Text} from "grommet"
+import {Box, Button, Grid, Heading, Image, Layer, LayerExtendedProps, Text} from "grommet"
 import { FormClose}  from "grommet-icons"
 
 import {AlbumScreenHouseRoomFragment, AlbumScreenVisualizationFragment} from "api/graphql";
@@ -12,7 +12,6 @@ export default function AddVisualizations({
     visualizations,
     rooms,
     inAlbum,
-    onClickAdd,
     onClickClose,
     onVisualizationsAdded,
     ...layerProps
@@ -21,11 +20,10 @@ export default function AddVisualizations({
     visualizations: AlbumScreenVisualizationFragment[],
     rooms: AlbumScreenHouseRoomFragment[],
     inAlbum: string[],
-    onClickAdd?: (id: string[]) => void,
     onVisualizationsAdded?: () => void,
     onClickClose?: () => void
 } & LayerExtendedProps) {
-    const [ errorMessage, setErrorMessage ] = useState<string | undefined>(undefined)
+    const [ errorMessage ] = useState<string | undefined>(undefined)
 
     const [ selected, setSelected ] = useState<string[]>([])
 
@@ -39,7 +37,7 @@ export default function AddVisualizations({
 
     const [ selectedRooms, setSelectedRooms ] = useState<string[]>([])
 
-    const [ addVisualizations, { data, loading} ] = useAddVisualizationsToAlbum(albumId)
+    const [ addVisualizations, { data} ] = useAddVisualizationsToAlbum(albumId)
 
     useEffect(() => {
         if (data?.addVisualizationsToAlbum.__typename === "VisualizationsAddedToAlbum") {

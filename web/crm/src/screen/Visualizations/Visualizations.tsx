@@ -256,7 +256,7 @@ export default function Visualizations() {
                     columns="small"
                     rows="small"
                     gap="medium"
-                    onClick={(event) => {
+                    onClick={() => {
                         setSelected([])
                     }}
                 >
@@ -297,7 +297,6 @@ export default function Visualizations() {
                     disableButton={deleteLoading}
                     onEsc={handleClickCancelDelete}
                     onClickClose={handleClickCancelDelete}
-                    onClickCancel={handleClickCancelDelete}
                     onClickDelete={handleClickConfirmDelete}
                 />
             }

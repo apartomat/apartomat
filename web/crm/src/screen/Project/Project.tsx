@@ -244,9 +244,6 @@ export function Project () {
                             projectId={project.id}
                             contacts={project.contacts}
                             notify={notify}
-                            onAdd={() => notify({ message: "Контакт добавлен", callback: refetch })}
-                            onDelete={() => notify({ message: "Контакт удален" })}
-                            onUpdate={() => notify({ message: "Контакт сохранен" })}
                         />
                     </Box>
 

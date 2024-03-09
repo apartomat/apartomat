@@ -9,7 +9,9 @@ export type AnchorLinkProps = LinkProps &
 const AnchorLink: React.FC<AnchorLinkProps> = (props) => {
     return (
         <Anchor
-            as={({ colorProp, hasIcon, hasLabel, focus, ...rest }) => <Link {...rest} />}
+            as={({...rest }) => {
+                return <Link {...rest} />
+            }}
             {...props}
         />
     )

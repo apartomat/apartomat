@@ -6,13 +6,13 @@ import useAcceptInvite from "./useAcceptInvite"
 import useAuthContext from "context/auth/useAuthContext"
 import useToken from "context/auth/useToken"
 
-export function AcceptInvite({ redrectTo = "/"}) {
+export function AcceptInvite({ redirectTo = "/"}: { redirectTo?: string}) {
     const location = useLocation()
     const navigate = useNavigate()
     const { check } = useAuthContext()
     const [, saveToken ] = useToken()
 
-    const [confirmLogin, { data, error, loading }] = useAcceptInvite()
+    const [confirmLogin, { data, loading }] = useAcceptInvite()
 
     const [sent, setSent] = useState(false)
 
@@ -29,13 +29,13 @@ export function AcceptInvite({ redrectTo = "/"}) {
             case "InviteAccepted":
                 saveToken(data?.acceptInvite.token)
                 check()
-                navigate(redrectTo)
+                navigate(redirectTo)
                 return
             case "AlreadyInWorkspace":
-                navigate(redrectTo)
+                navigate(redirectTo)
                 return
         }
-    }, [ data, history, redrectTo, check, saveToken, loading ])
+    }, [ data, history, redirectTo, check, saveToken, loading ])
 
     switch (data?.acceptInvite.__typename) {
         case "InvalidToken":

@@ -69,7 +69,10 @@ export function Update({
     )
 }
 
-function ErrorMessage({res}: { res: { __typename: "Forbidden", message: string } | { __typename: "ServerError", message: string } | any}) {
+/* eslint-disable  @typescript-eslint/no-explicit-any */
+function ErrorMessage({res}: {
+        res: { __typename: "Forbidden", message: string } |
+            { __typename: "ServerError", message: string } | any}) {
     switch (res?.__typename) {
         case "Forbidden":
             return <>Доступ запрещен</>

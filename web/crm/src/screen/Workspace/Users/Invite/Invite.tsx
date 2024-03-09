@@ -103,7 +103,7 @@ export default function Invite({
                             <MaskedInput
                                 name="email"
                                 mask={[
-                                    { regexp: /^[\w\-_.\+]+$/, placeholder: "example" },
+                                    { regexp: /^[\w\-_.\\+]+$/, placeholder: "example" },
                                     { fixed: '@' },
                                     { regexp: /^[\w\-_.]+$/, placeholder: "test" },
                                     { fixed: '.' },

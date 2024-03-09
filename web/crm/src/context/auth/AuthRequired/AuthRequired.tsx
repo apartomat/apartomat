@@ -1,5 +1,5 @@
 import React, { useEffect } from "react"
-import { useNavigate, Navigate, Outlet } from "react-router-dom"
+import { Navigate, Outlet } from "react-router-dom"
 
 import { Main, Box, Text, SpinnerExtendedProps, Spinner, Heading, Paragraph } from "grommet"
 

@@ -6,7 +6,7 @@ import useConfirmLogin from "./useConfirmLogin"
 import useAuthContext from "context/auth/useAuthContext"
 import useToken from "context/auth/useToken"
 
-export function Confirm({ redrectTo = "/"}) {
+export function Confirm({ redirectTo = "/"}: { redirectTo?: string }) {
     const location = useLocation()
     const navigate = useNavigate()
     const { check } = useAuthContext()
@@ -27,9 +27,9 @@ export function Confirm({ redrectTo = "/"}) {
         if (confirmLoginResult?.confirmLoginLink.__typename === "LoginConfirmed") {
             saveToken(confirmLoginResult?.confirmLoginLink.token)
             check()
-            navigate(redrectTo)
+            navigate(redirectTo)
         }
-    }, [ confirmLoginResult, history, redrectTo, check, saveToken, loading ])
+    }, [ confirmLoginResult, history, redirectTo, check, saveToken, loading ])
 
 
     switch (confirmLoginResult?.confirmLoginLink.__typename) {

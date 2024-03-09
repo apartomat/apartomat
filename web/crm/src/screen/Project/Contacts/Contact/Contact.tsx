@@ -66,8 +66,8 @@ export default function Contact({
                     <Card width="medium" background="white" margin="small">
                         <CardHeader pad={{horizontal: "medium", top: "medium"}} style={{fontWeight: "bold"}}>{contact.fullName}</CardHeader>
                         <CardBody pad="medium">
-                            {contact.details.filter(c => ![ContactType.Instagram].includes(c.type)).map(c => {
-                                return <Box pad={{vertical: "small"}}>{c.value}</Box>
+                            {contact.details.filter(c => ![ContactType.Instagram].includes(c.type)).map((c, index) => {
+                                return <Box key={index} pad={{vertical: "small"}}>{c.value}</Box>
                             })}
                             {contact.details.filter(c => [ContactType.Instagram].includes(c.type)).length > 0
                                 ? <Box pad={{vertical: "small"}} direction="row">

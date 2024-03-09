@@ -1,5 +1,5 @@
 import { FetchResult, useApolloClient } from "@apollo/client"
-import { ChangeAlbumPageOrientationMutation, useChangeAlbumPageOrientationMutation, PageSize, ChangeAlbumPageOrientationMutationResult, PageOrientation } from "api/graphql"
+import { ChangeAlbumPageOrientationMutation, useChangeAlbumPageOrientationMutation, ChangeAlbumPageOrientationMutationResult, PageOrientation } from "api/graphql"
 
 export { PageOrientation } from "api/graphql"
 

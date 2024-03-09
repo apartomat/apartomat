@@ -18,8 +18,8 @@ export default function ChangeStatus({
     values?: ProjectStatusDictionary,
     onProjectStatusChanged?: ({ status }: { status: ProjectStatus }) => void
 } & BoxExtendedProps) {
-    const [ show, setShow ] = useState<Boolean>(false)
-    
+    const [ show, setShow ] = useState<boolean>(false)
+
     const [ state, setState ] = useState(status)
 
     const [ changeStatus, { data, loading, error }] = useChangeStatus()
@@ -32,9 +32,10 @@ export default function ChangeStatus({
 
     useEffect(() => {
         switch (data?.changeProjectStatus.__typename) {
-            case "ProjectStatusChanged":
-                const { status } = data?.changeProjectStatus.project
+            case "ProjectStatusChanged": {
+                const { changeProjectStatus: { project: { status } } } = data
                 onProjectStatusChanged && onProjectStatusChanged({ status })
+            }
         }
     }, [ data, onProjectStatusChanged ])
 
@@ -90,7 +91,7 @@ function statusToLabel({ status, items }: { status: ProjectStatus, items?: Proje
         return ""
     }
 
-    for (let item of items) {
+    for (const item of items) {
         if (item.key === status) {
             return item.value
         }

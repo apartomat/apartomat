@@ -1,5 +1,5 @@
 import { FetchResult, useApolloClient } from "@apollo/client"
-import { useInviteUserMutation, InviteUserMutation, InviteUserMutationResult, Contact as ContactType, WorkspaceUserRole } from "api/graphql"
+import { useInviteUserMutation, InviteUserMutation, InviteUserMutationResult, WorkspaceUserRole } from "api/graphql"
 
 export function useInviteUser(workspaceId: string): [
     (email: string, role: WorkspaceUserRole) => Promise<FetchResult<InviteUserMutation>>,

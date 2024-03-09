@@ -18,7 +18,7 @@ export function GenerateFile({
 
     const [ fileVersion, setFileVersion ] = useState<number | undefined>()
 
-    const [ generateAlbumFile, { data: generateAlbumFileResultData, loading }] = useGenerateAlbumFile(album.id)
+    const [ generateAlbumFile, { data: generateAlbumFileResultData }] = useGenerateAlbumFile(album.id)
 
     useEffect(() => {
         if (album.file?.__typename === "AlbumFile") {

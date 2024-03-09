@@ -36,27 +36,25 @@ export default function AddSomething({
                 >
                     <Button
                         plain
-                        children={({ hover }: {hover: boolean}) => {
-                            return <Box pad="small" background={hover ? 'light-1': ''}><Text>Визуализации</Text></Box>
-                        }}
+                        hoverIndicator
                         onClick={() => {
                             setShow(false)
                             onClickAddVisualizations()
                         }}
-                    />
+                    >
+                        <Box pad="small"><Text>Визуализации</Text></Box>
+                    </Button>
                     <Button
                         plain
-                        children={({ hover }: {hover: boolean}) => {
-                            return (
-                                <CreateAlbumOnClick
-                                    projectId={projectId}
-                                    onAlbumCreated={onAlbumCreated}
-                                >
-                                    <Box pad="small" background={hover ? 'light-1': ''}><Text>Альбом</Text></Box>
-                                </CreateAlbumOnClick>
-                            )
-                        }}
-                    />
+                        hoverIndicator
+                    >
+                        <CreateAlbumOnClick
+                            projectId={projectId}
+                            onAlbumCreated={onAlbumCreated}
+                        >
+                            <Box pad="small"><Text>Альбом</Text></Box>
+                        </CreateAlbumOnClick>
+                    </Button>
                 </Drop>
             )}
         </Box>

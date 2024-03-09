@@ -1,8 +1,8 @@
 import { MouseEventHandler, useEffect, useState } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 
-import {Box, BoxExtendedProps, Button, Grid, Heading, Header, Image, Text, Anchor, ButtonExtendedProps} from "grommet"
-import { Add, Close, DocumentPdf, Sort } from "grommet-icons"
+import {Box, BoxExtendedProps, Button, Grid, Heading, Header, Image, Text } from "grommet"
+import { Add, Close, Sort } from "grommet-icons"
 
 import useAlbum, { AlbumScreenVisualizationFragment, AlbumScreenProjectFragment, AlbumScreenAlbumPageCoverFragment, AlbumScreenAlbumPageVisualizationFragment, AlbumScreenSettingsFragment, PageOrientation as PageOrientationEnum, AlbumScreenHouseRoomFragment } from "./useAlbum"
 
@@ -272,6 +272,7 @@ function orientationToAspectRation(orientation?: PageOrientationEnum): string {
 }
 
 
+/* eslint-disable  @typescript-eslint/no-explicit-any */
 function ids(pages: (AlbumScreenAlbumPageCoverFragment | AlbumScreenAlbumPageVisualizationFragment)[]): string[] {
     const vis =  pages.filter((p => p.__typename === "AlbumPageVisualization" && p.visualization.__typename === "Visualization")) as ({ visualization: { __typename?: 'Visualization', id: string, file: { __typename?: 'File', url: any } }})[]
 

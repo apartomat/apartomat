@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"
 
 import { Box, BoxExtendedProps, RadioButtonGroup } from "grommet"
-import { Document, Icon } from "grommet-icons"
+import { Document } from "grommet-icons"
 import { RoundType } from "grommet/utils"
 
 import { useChangeAlbumPageOrientation, PageOrientation as PageOrientationEnum } from "./useChangeAlbumPageOrientation"
@@ -23,7 +23,7 @@ export function PageOrientation({
 
     const [ pageOrientation, setPageOrientation ] = useState<string>(orientation)
 
-    const [ change, { data, error, loading } ] = useChangeAlbumPageOrientation(albumId)
+    const [ change, { data, error } ] = useChangeAlbumPageOrientation(albumId)
 
     useEffect(() => {
         if (!data) {
@@ -31,11 +31,12 @@ export function PageOrientation({
         }
 
         switch (data?.changeAlbumPageOrientation.__typename) {
-            case "AlbumPageOrientationChanged":
-                const { album } = data.changeAlbumPageOrientation
+            case "AlbumPageOrientationChanged": {
+                const { changeAlbumPageOrientation: { album } } = data
                 setPageOrientation(album.settings.pageOrientation)
                 onAlbumPageOrientationChanged && onAlbumPageOrientationChanged()
                 break
+            }
             default:
                 setPageOrientation(orientation)
         }
@@ -43,7 +44,7 @@ export function PageOrientation({
 
     useEffect(() => {
         if (error) {
-            setPageOrientation(orientation) 
+            setPageOrientation(orientation)
         }
     }, [ error ])
 

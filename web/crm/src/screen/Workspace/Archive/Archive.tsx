@@ -1,6 +1,6 @@
 import React from "react"
 
-import { WorkspaceScreenProjectFragment, WorkspaceScreenArchiveProjectsFragment } from "../useWorkspace"
+import { WorkspaceScreenArchiveProjectsFragment } from "../useWorkspace"
 
 import { Box, Heading, List, Text } from "grommet"
 import AnchorLink from "common/AnchorLink"

@@ -23,20 +23,19 @@ export default function CreateAlbumOnClick({
     useEffect(() => {
         switch (data?.createAlbum.__typename) {
             case "AlbumCreated":
-                const { id } = data.createAlbum.album
-                onAlbumCreated && onAlbumCreated(id)
+                onAlbumCreated && onAlbumCreated(data?.createAlbum.album.id)
         }
     }, [ data ])
 
     return (
         <>
-            {React.Children.map(children, (child, i) => {
+            {React.Children.map(children, (child) => {
                 if (React.isValidElement(child)) {
                     return React.cloneElement(child, { onClick: handleClick })
                 }
-        
+
                 return child
-            
+
             })}
         </>
     )
