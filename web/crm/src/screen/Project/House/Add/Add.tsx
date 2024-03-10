@@ -24,17 +24,22 @@ export function Add({
 
     const [addHouse, { data, error, loading }] = useAddHouse()
 
-    const handleSubmit = (event: React.FormEvent) => {
-        addHouse(projectId, { ...value })
+    const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault()
+        await addHouse(projectId, { ...value })
     }
 
     useEffect(() => {
         if (data?.addHouse) {
             switch (data.addHouse.__typename) {
-                case "HouseAdded":
-                    onAdd && onAdd(data?.addHouse.house)
+                case "HouseAdded": {
+                    const {
+                        addHouse: { house },
+                    } = data
+                    onAdd && onAdd(house)
                     break
+                }
+
                 case "NotFound":
                     setErrorMessage("Неизвестный проект")
                     break

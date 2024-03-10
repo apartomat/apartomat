@@ -70,7 +70,10 @@ function first(houses: ProjectHouses) {
 
 function address(house?: HouseType): string {
     if (house) {
-        return [house.city, house.address, house.housingComplex].join(", ").replace(/,\s*$/, "")
+        return [house.city, house.address, house.housingComplex]
+            .filter((val) => val !== "")
+            .join(", ")
+            .replace(/,\s*$/, "")
     }
 
     return ""
