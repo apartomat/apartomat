@@ -100,14 +100,14 @@ FROM (
 type record struct {
 	bun.BaseModel `bun:"table:apartomat.rooms,alias:r"`
 
-	ID              string    `pg:"id,pk"`
-	Name            string    `pg:"name"`
-	Square          *float64  `pg:"square"`
-	Level           *int      `pg:"level"`
-	SortingPosition int       `pg:"sorting_position"`
-	CreatedAt       time.Time `pg:"created_at"`
-	ModifiedAt      time.Time `pg:"modified_at"`
-	HouseID         string    `pg:"house_id"`
+	ID              string    `bun:"id,pk"`
+	Name            string    `bun:"name"`
+	Square          *float64  `bun:"square"`
+	Level           *int      `bun:"level"`
+	SortingPosition int       `bun:"sorting_position"`
+	CreatedAt       time.Time `bun:"created_at"`
+	ModifiedAt      time.Time `bun:"modified_at"`
+	HouseID         string    `bun:"house_id"`
 }
 
 func toRecord(val *Room) record {
