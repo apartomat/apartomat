@@ -1,6 +1,6 @@
 import { Navigate } from "react-router-dom"
 
-import { useAuthContext } from "context/auth/context"
+import { useAuthContext } from "shared/context/auth/context"
 
 export function RedirectToDefaultWorkspace() {
     const { user } = useAuthContext()

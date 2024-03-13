@@ -4,7 +4,7 @@ import { Navigate, Outlet } from "react-router-dom"
 import { Main, Box, Text, Heading, Paragraph } from "grommet"
 import { Spinner } from "shared/ui/Spinner"
 
-import { useAuthContext, UserContextStatus } from "context/auth"
+import { useAuthContext, UserContextStatus } from "shared/context/auth"
 
 export function AuthRequired() {
     const { user, check, error } = useAuthContext()

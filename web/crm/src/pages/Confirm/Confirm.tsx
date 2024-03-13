@@ -3,8 +3,8 @@ import React, { useEffect, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 
 import useConfirmLogin from "./useConfirmLogin"
-import { useAuthContext } from "context/auth/context"
-import useToken from "context/useToken"
+import { useAuthContext } from "shared/context/auth/context"
+import { useToken } from "shared/browser/token"
 
 export function Confirm({ redirectTo = "/" }: { redirectTo?: string }) {
     const location = useLocation()

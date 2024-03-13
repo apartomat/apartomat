@@ -3,8 +3,8 @@ import { useEffect, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 
 import useAcceptInvite from "./useAcceptInvite"
-import { useAuthContext } from "context/auth/context"
-import useToken from "context/useToken"
+import { useAuthContext } from "shared/context/auth/context"
+import { useToken } from "shared/browser/token"
 
 export function AcceptInvite({ redirectTo = "/" }: { redirectTo?: string }) {
     const location = useLocation()

@@ -1,8 +1,8 @@
 import { useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 
-import useToken from "context/useToken"
-import { useAuthContext } from "context/auth/context"
+import { useToken } from "shared/browser/token"
+import { useAuthContext } from "shared/context/auth/context"
 
 export function Logout() {
     const [, , removeToken] = useToken()

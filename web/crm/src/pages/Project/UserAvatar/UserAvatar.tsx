@@ -1,4 +1,4 @@
-import { UserContext, UserContextStatus } from "context/auth/context"
+import { UserContext, UserContextStatus } from "shared/context/auth/context"
 
 import { Avatar, AvatarExtendedProps } from "grommet"
 

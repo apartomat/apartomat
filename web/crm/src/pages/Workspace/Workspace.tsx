@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
 
-import { useAuthContext } from "context/auth/context"
+import { useAuthContext } from "shared/context/auth/context"
 import { useWorkspace, WorkspaceScreenFragment } from "./useWorkspace"
 
 import { Box, Button, Header, Heading, Text, Main, Paragraph } from "grommet"

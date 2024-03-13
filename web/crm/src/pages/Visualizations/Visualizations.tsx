@@ -1,7 +1,7 @@
 import React, { MouseEvent, useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
 
-import { useAuthContext } from "context/auth/context"
+import { useAuthContext } from "shared/context/auth/context"
 
 import { useVisualizations, VisualizationStatus } from "./useVisualizations"
 import { useDeleteVisualizations } from "./useDeleteVisualizations"

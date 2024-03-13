@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom"
 
 import { useConfirmLoginPin, ConfirmLoginPinMutation } from "./useConfirmLoginPin"
 
-import { useAuthContext } from "context/auth/context"
-import useToken from "context/useToken"
+import { useAuthContext } from "shared/context/auth/context"
+import { useToken } from "shared/browser/token"
 
 import { Main, Heading, Box, Form, FormField, Button, MaskedInput, Text } from "grommet"
 

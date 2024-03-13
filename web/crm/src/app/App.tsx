@@ -7,7 +7,7 @@ import { getMainDefinition } from "@apollo/client/utilities"
 
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 
-import { AuthProvider } from "context/auth"
+import { AuthProvider } from "./providers/"
 import { AuthRequired, RedirectToDefaultWorkspace } from "./routes"
 
 import { AcceptInvite, Album, Confirm, Login, Logout, Project, Visualizations, Workspace } from "pages"

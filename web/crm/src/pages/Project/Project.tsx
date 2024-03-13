@@ -19,7 +19,7 @@ import { Add, StatusGood } from "grommet-icons"
 import { AnchorLink } from "shared/ui/AnchorLink"
 import UserAvatar from "./UserAvatar/UserAvatar"
 
-import { useAuthContext } from "context/auth/context"
+import { useAuthContext } from "shared/context/auth/context"
 
 import { useProject, Project as ProjectType } from "./useProject"
 import { ProjectStatusDictionary } from "api/graphql"

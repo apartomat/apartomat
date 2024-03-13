@@ -1,7 +1,7 @@
 import React, { useEffect } from "react"
 
 import { useLoginByEmail } from "./useLoginByEmail"
-import { useAuthContext, UserContextStatus } from "context/auth/context"
+import { useAuthContext, UserContextStatus } from "shared/context/auth/context"
 import { useNavigate } from "react-router-dom"
 
 import LoginForm from "./LoginForm"
