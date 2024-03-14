@@ -2,8 +2,10 @@ package postgres
 
 import (
 	"errors"
+
 	. "github.com/apartomat/apartomat/internal/store/visualizations"
 	"github.com/doug-martin/goqu/v9"
+	"github.com/doug-martin/goqu/v9/exp"
 )
 
 type specQuery interface {
@@ -115,16 +117,60 @@ func (s orSpecQuery) Expression() (goqu.Expression, error) {
 	return goqu.Or(exs...), nil
 }
 
-func selectBySpec(tablename string, spec Spec, limit, offset int) (string, []interface{}, error) {
-	qs, err := toSpecQuery(spec)
+func selectBySpec(spec Spec, sort Sort, limit, offset int) (string, []interface{}, error) {
+	sq, err := toSpecQuery(spec)
 	if err != nil {
 		return "", nil, err
 	}
 
-	expr, err := qs.Expression()
+	expr, err := sq.Expression()
 	if err != nil {
 		return "", nil, err
 	}
 
-	return goqu.From(tablename).Where(expr).Limit(uint(limit)).Offset(uint(offset)).ToSQL()
+	type Join struct {
+		Table goqu.Expression
+		Cond  exp.JoinCondition
+	}
+
+	var (
+		order = make([]exp.OrderedExpression, 0)
+
+		join *Join
+	)
+
+	switch sort {
+	case SortDefault:
+	case SortIDAsc:
+		order = append(order, goqu.I("v.id").Asc())
+	case SortIDDesc:
+		order = append(order, goqu.I("v.id").Desc())
+	case SortPositionAsc:
+		order = append(order, goqu.I("v.sorting_position").Asc())
+	case SortPositionDesc:
+		order = append(order, goqu.I("v.sorting_position").Desc())
+	case SortRoomAscPositionAsc:
+		join = &Join{
+			Table: goqu.T("rooms").Schema("apartomat").As("r"),
+			Cond:  goqu.On(goqu.Ex{"r.id": goqu.I("v.room_id")}),
+		}
+
+		order = append(order, goqu.I("r.sorting_position").Asc(), goqu.I("v.sorting_position").Asc())
+	}
+
+	var (
+		q = goqu.From(goqu.T("visualizations").Schema("apartomat").As("v")).Select("v.*")
+	)
+
+	if join != nil {
+		q = q.Join(join.Table, join.Cond)
+	}
+
+	q = q.Where(expr).Limit(uint(limit)).Offset(uint(offset))
+
+	if len(order) > 0 {
+		q = q.Order(order...)
+	}
+
+	return q.ToSQL()
 }

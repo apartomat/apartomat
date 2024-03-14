@@ -100,6 +100,7 @@ create table apartomat.visualizations (
     description text not null,
     version integer not null default 0,
     status text not null,
+    sorting_position integer not null default 0,
     created_at timestamp with time zone not null default now(),
     modified_at timestamp with time zone not null default now(),
     deleted_at timestamp with time zone,

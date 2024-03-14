@@ -20,8 +20,8 @@ var (
 	_ Store = (*store)(nil)
 )
 
-func (s *store) List(ctx context.Context, spec Spec, limit, offset int) ([]*Visualization, error) {
-	sql, args, err := selectBySpec(`apartomat.visualizations`, spec, limit, offset)
+func (s *store) List(ctx context.Context, spec Spec, sort Sort, limit, offset int) ([]*Visualization, error) {
+	sql, args, err := selectBySpec(spec, sort, limit, offset)
 	if err != nil {
 		return nil, err
 	}
@@ -35,6 +35,19 @@ func (s *store) List(ctx context.Context, spec Spec, limit, offset int) ([]*Visu
 	}
 
 	return fromRecords(recs), nil
+}
+
+func (s *store) Get(ctx context.Context, spec Spec) (*Visualization, error) {
+	res, err := s.List(ctx, spec, SortIDAsc, 1, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(res) == 0 {
+		return nil, ErrVisualizationNotFound
+	}
+
+	return res[0], nil
 }
 
 func (s *store) Save(ctx context.Context, visualizations ...*Visualization) error {
@@ -63,32 +76,34 @@ func (s *store) Delete(ctx context.Context, visualizations ...*Visualization) er
 type record struct {
 	bun.BaseModel `bun:"table:apartomat.visualizations,alias:v"`
 
-	ID          string     `pg:"id,pk"`
-	Name        string     `pg:"name"`
-	Description string     `pg:"description"`
-	Version     int        `pg:"version"`
-	Status      string     `pg:"status"`
-	CreatedAt   time.Time  `pg:"created_at"`
-	ModifiedAt  time.Time  `pg:"modified_at"`
-	DeletedAt   *time.Time `pg:"deleted_at"`
-	ProjectID   string     `pg:"project_id"`
-	FileID      string     `pg:"file_id"`
-	RoomID      *string    `pg:"room_id"`
+	ID              string     `bun:"id,pk"`
+	Name            string     `bun:"name"`
+	Description     string     `bun:"description"`
+	Version         int        `bun:"version"`
+	Status          string     `bun:"status"`
+	SortingPosition int        `bun:"sorting_position"`
+	CreatedAt       time.Time  `bun:"created_at"`
+	ModifiedAt      time.Time  `bun:"modified_at"`
+	DeletedAt       *time.Time `bun:"deleted_at"`
+	ProjectID       string     `bun:"project_id"`
+	FileID          string     `bun:"file_id"`
+	RoomID          *string    `bun:"room_id"`
 }
 
 func toRecord(val *Visualization) record {
 	return record{
-		ID:          val.ID,
-		Name:        val.Name,
-		Description: val.Description,
-		Version:     val.Version,
-		Status:      string(val.Status),
-		CreatedAt:   val.CreatedAt,
-		ModifiedAt:  val.ModifiedAt,
-		DeletedAt:   val.DeletedAt,
-		ProjectID:   val.ProjectID,
-		FileID:      val.FileID,
-		RoomID:      val.RoomID,
+		ID:              val.ID,
+		Name:            val.Name,
+		Description:     val.Description,
+		Version:         val.Version,
+		Status:          string(val.Status),
+		SortingPosition: val.SortingPosition,
+		CreatedAt:       val.CreatedAt,
+		ModifiedAt:      val.ModifiedAt,
+		DeletedAt:       val.DeletedAt,
+		ProjectID:       val.ProjectID,
+		FileID:          val.FileID,
+		RoomID:          val.RoomID,
 	}
 }
 
@@ -111,17 +126,18 @@ func fromRecords(records []record) []*Visualization {
 
 	for i, r := range records {
 		res[i] = &Visualization{
-			ID:          r.ID,
-			Name:        r.Name,
-			Description: r.Description,
-			Version:     r.Version,
-			Status:      VisualizationStatus(r.Status),
-			CreatedAt:   r.CreatedAt,
-			ModifiedAt:  r.ModifiedAt,
-			DeletedAt:   r.DeletedAt,
-			ProjectID:   r.ProjectID,
-			FileID:      r.FileID,
-			RoomID:      r.RoomID,
+			ID:              r.ID,
+			Name:            r.Name,
+			Description:     r.Description,
+			Version:         r.Version,
+			Status:          VisualizationStatus(r.Status),
+			SortingPosition: r.SortingPosition,
+			CreatedAt:       r.CreatedAt,
+			ModifiedAt:      r.ModifiedAt,
+			DeletedAt:       r.DeletedAt,
+			ProjectID:       r.ProjectID,
+			FileID:          r.FileID,
+			RoomID:          r.RoomID,
 		}
 	}
 

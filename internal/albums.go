@@ -242,18 +242,10 @@ func (u *Apartomat) AddVisualizationsToAlbum(
 	albumID string,
 	visualizationID []string,
 ) ([]VisualizationWithPosition, error) {
-	albums, err := u.Albums.List(ctx, IDIn(albumID), 1, 0)
+	album, err := u.Albums.Get(ctx, IDIn(albumID))
 	if err != nil {
 		return nil, err
 	}
-
-	if len(albums) == 0 {
-		return nil, fmt.Errorf("album (id=%s): %w", albumID, ErrNotFound)
-	}
-
-	var (
-		album = albums[0]
-	)
 
 	if ok, err := u.CanAddPageToAlbum(ctx, auth.UserFromCtx(ctx), album); err != nil {
 		return nil, err
@@ -261,7 +253,13 @@ func (u *Apartomat) AddVisualizationsToAlbum(
 		return nil, fmt.Errorf("can't add visualization to album (id=%s): %w", album.ID, ErrForbidden)
 	}
 
-	list, err := u.Visualizations.List(ctx, visualizations.IDIn(visualizationID...), len(visualizationID), 0)
+	list, err := u.Visualizations.List(
+		ctx,
+		visualizations.IDIn(visualizationID...),
+		visualizations.SortDefault,
+		len(visualizationID),
+		0,
+	)
 	if err != nil {
 		return nil, err
 	}

@@ -130,7 +130,7 @@ func (u *Apartomat) GetVisualizations(
 		return nil, fmt.Errorf("can't get project (id=%s) visualizations: %w", project.ID, ErrForbidden)
 	}
 
-	return u.Visualizations.List(ctx, And(spec, ProjectIDIn(project.ID)), limit, offset)
+	return u.Visualizations.List(ctx, And(spec, ProjectIDIn(project.ID)), SortRoomAscPositionAsc, limit, offset)
 }
 
 func (u *Apartomat) CanGetVisualizations(ctx context.Context, subj *auth.UserCtx, obj *projects.Project) (bool, error) {
@@ -141,7 +141,7 @@ func (u *Apartomat) DeleteVisualizations(
 	ctx context.Context,
 	id []string,
 ) ([]*Visualization, error) {
-	vis, err := u.Visualizations.List(ctx, IDIn(id...), len(id), 0)
+	vis, err := u.Visualizations.List(ctx, IDIn(id...), SortDefault, len(id), 0)
 	if err != nil {
 		return nil, err
 	}
@@ -184,18 +184,10 @@ func (u *Apartomat) GetVisualization(
 	ctx context.Context,
 	id string,
 ) (*Visualization, error) {
-	res, err := u.Visualizations.List(ctx, IDIn(id), 1, 0)
+	visualization, err := u.Visualizations.Get(ctx, IDIn(id))
 	if err != nil {
 		return nil, err
 	}
-
-	if len(res) == 0 {
-		return nil, fmt.Errorf("visualization (id=%s): %w", id, ErrNotFound)
-	}
-
-	var (
-		visualization = res[0]
-	)
 
 	prjs, err := u.Projects.List(ctx, projects.IDIn(visualization.ProjectID), 1, 0)
 	if err != nil {
