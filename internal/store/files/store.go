@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	ErrFileNotFound = fmt.Errorf("album file: %w", store.ErrNotFound)
+	ErrFileNotFound = fmt.Errorf("file: %w", store.ErrNotFound)
 )
 
 type Sort int

@@ -92,7 +92,7 @@ FROM (
 		r2.*,
 		row_number() OVER (ORDER BY sorting_position, modified_at ?) AS pos
 	FROM apartomat.rooms r2 WHERE r2.house_id = ?
-) r2 WHERE r1.id = r2.id`, bun.Safe(sort), houseID).Exec(ctx)
+) r2 WHERE r1.id = r2.id`, bun.Safe(sort), houseID).Exec(bunhook.WithQueryContext(ctx, "Rooms.Reorder"))
 
 	return err
 }

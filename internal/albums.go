@@ -57,7 +57,7 @@ func (u *Apartomat) GetAlbums(
 		spec = ProjectIDIn(projectID)
 	)
 
-	res, err := u.Albums.List(ctx, spec, limit, offset)
+	res, err := u.Albums.List(ctx, spec, SortDefault, limit, offset)
 	if err != nil {
 		return nil, err
 	}

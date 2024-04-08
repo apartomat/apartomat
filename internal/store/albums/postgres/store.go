@@ -2,10 +2,9 @@ package postgres
 
 import (
 	"context"
-	"github.com/apartomat/apartomat/internal/postgres"
+	bunhook "github.com/apartomat/apartomat/internal/pkg/bun"
 	. "github.com/apartomat/apartomat/internal/store/albums"
-	"github.com/doug-martin/goqu/v9"
-	"github.com/go-pg/pg/v10"
+	"github.com/uptrace/bun"
 	"time"
 )
 
@@ -14,10 +13,10 @@ const (
 )
 
 type store struct {
-	db *pg.DB
+	db *bun.DB
 }
 
-func NewStore(db *pg.DB) *store {
+func NewStore(db *bun.DB) *store {
 	return &store{db}
 }
 
@@ -25,30 +24,18 @@ var (
 	_ Store = (*store)(nil)
 )
 
-func (s *store) List(ctx context.Context, spec Spec, limit, offset int) ([]*Album, error) {
-	qs, err := toQuery(spec)
+func (s *store) List(ctx context.Context, spec Spec, sort Sort, limit, offset int) ([]*Album, error) {
+	sql, args, err := selectBySpec(albumsTableName, spec, sort, limit, offset)
 	if err != nil {
 		return nil, err
 	}
 
-	expr, err := qs.Expression()
-	if err != nil {
-		return nil, err
-	}
+	var (
+		recs = make([]record, 0)
+	)
 
-	orderExpr := goqu.I("created_at").Asc()
-
-	q := goqu.From(albumsTableName).Where(expr).Order(orderExpr)
-
-	sql, args, err := q.Limit(uint(limit)).Offset(uint(offset)).ToSQL()
-	if err != nil {
-		return nil, err
-	}
-
-	recs := make([]*record, 0)
-
-	_, err = s.db.QueryContext(postgres.WithQueryContext(ctx, "albums.List"), &recs, sql, args...)
-	if err != nil {
+	if err := s.db.NewRaw(sql, args...).
+		Scan(bunhook.WithQueryContext(ctx, "Albums.List"), &recs); err != nil {
 		return nil, err
 	}
 
@@ -56,7 +43,7 @@ func (s *store) List(ctx context.Context, spec Spec, limit, offset int) ([]*Albu
 }
 
 func (s *store) Get(ctx context.Context, spec Spec) (*Album, error) {
-	res, err := s.List(ctx, spec, 1, 0)
+	res, err := s.List(ctx, spec, SortDefault, 1, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -69,17 +56,7 @@ func (s *store) Get(ctx context.Context, spec Spec) (*Album, error) {
 }
 
 func (s *store) Count(ctx context.Context, spec Spec) (int, error) {
-	qs, err := toQuery(spec)
-	if err != nil {
-		return 0, err
-	}
-
-	expr, err := qs.Expression()
-	if err != nil {
-		return 0, err
-	}
-
-	sql, args, err := goqu.Select(goqu.COUNT(goqu.Star())).From(albumsTableName).Where(expr).ToSQL()
+	sql, args, err := countBySpec(albumsTableName, spec)
 	if err != nil {
 		return 0, err
 	}
@@ -88,17 +65,20 @@ func (s *store) Count(ctx context.Context, spec Spec) (int, error) {
 		c int
 	)
 
-	_, err = s.db.QueryOneContext(postgres.WithQueryContext(ctx, "albums.Count"), pg.Scan(&c), sql, args...)
+	if err = s.db.NewRaw(sql, args).Scan(bunhook.WithQueryContext(ctx, "Albums.Count"), &c); err != nil {
+		return 0, err
+	}
 
-	return c, err
+	return c, nil
 }
 
 func (s *store) Save(ctx context.Context, albums ...*Album) error {
 	recs := toRecords(albums)
 
-	_, err := s.db.ModelContext(postgres.WithQueryContext(ctx, "albums.Save"), &recs).
+	_, err := s.db.NewInsert().Model(&recs).
 		Returning("NULL").
-		OnConflict("(id) DO UPDATE").Insert()
+		On("CONFLICT (id) DO UPDATE").
+		Exec(bunhook.WithQueryContext(ctx, "Albums.Save"))
 
 	return err
 }
@@ -108,27 +88,29 @@ func (s *store) Delete(ctx context.Context, albums ...*Album) error {
 		ids = make([]string, len(albums))
 	)
 
-	for i, album := range albums {
-		ids[i] = album.ID
+	for i, f := range albums {
+		ids[i] = f.ID
 	}
 
-	_, err := s.db.ModelContext(postgres.WithQueryContext(ctx, "albums.Delete"), (*record)(nil)).
-		Where(`id IN (?)`, pg.In(ids)).
-		Delete()
+	_, err := s.db.NewDelete().
+		Model((*record)(nil)).
+		Where(`id IN (?)`, bun.In(ids)).
+		Exec(bunhook.WithQueryContext(ctx, "Albums.Delete"))
 
 	return err
 }
 
 type record struct {
-	tableName  struct{}       `pg:"apartomat.albums"`
-	ID         string         `pg:"id,pk"`
-	Name       string         `pg:"name"`
-	Version    int            `pg:"version"`
-	Settings   settingsRecord `pg:"settings"`
-	Pages      []pageRecord   `pg:"pages"`
-	CreatedAt  time.Time      `pg:"created_at"`
-	ModifiedAt time.Time      `pg:"modified_at"`
-	ProjectID  string         `pg:"project_id"`
+	bun.BaseModel `bun:"table:apartomat.albums,alias:a"`
+
+	ID         string         `bun:"id,pk"`
+	Name       string         `bun:"name"`
+	Version    int            `bun:"version"`
+	Settings   settingsRecord `bun:"settings"`
+	Pages      []pageRecord   `bun:"pages"`
+	CreatedAt  time.Time      `bun:"created_at"`
+	ModifiedAt time.Time      `bun:"modified_at"`
+	ProjectID  string         `bun:"project_id"`
 }
 
 type settingsRecord struct {
@@ -137,12 +119,12 @@ type settingsRecord struct {
 }
 
 type pageRecord struct {
-	VisualizationID string `pg:"visualization_id"`
-	FileID          string `pg:"file_id"`
+	VisualizationID string `json:"visualization_id"`
+	FileID          string `json:"file_id"`
 }
 
-func toRecord(album *Album) *record {
-	return &record{
+func toRecord(album *Album) record {
+	return record{
 		ID:         album.ID,
 		Name:       album.Name,
 		Version:    album.Version,
@@ -154,9 +136,9 @@ func toRecord(album *Album) *record {
 	}
 }
 
-func toRecords(albums []*Album) []*record {
+func toRecords(albums []*Album) []record {
 	var (
-		res = make([]*record, len(albums))
+		res = make([]record, len(albums))
 	)
 
 	for i, c := range albums {
@@ -166,7 +148,7 @@ func toRecords(albums []*Album) []*record {
 	return res
 }
 
-func fromRecords(recs []*record) []*Album {
+func fromRecords(recs []record) []*Album {
 	var (
 		res = make([]*Album, len(recs))
 	)

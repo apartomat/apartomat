@@ -2,7 +2,7 @@ package postgres
 
 import (
 	"context"
-	bunhooks "github.com/apartomat/apartomat/internal/pkg/bun"
+	bunhook "github.com/apartomat/apartomat/internal/pkg/bun"
 	"time"
 
 	. "github.com/apartomat/apartomat/internal/store/public_sites"
@@ -21,7 +21,7 @@ var (
 	_ Store = (*store)(nil)
 )
 
-func (s *store) List(ctx context.Context, spec Spec, limit, offset int) ([]PublicSite, error) {
+func (s *store) List(ctx context.Context, spec Spec, sort Sort, limit, offset int) ([]PublicSite, error) {
 	sql, args, err := selectBySpec(`apartomat.public_sites`, spec, limit, offset)
 	if err != nil {
 		return nil, err
@@ -29,7 +29,7 @@ func (s *store) List(ctx context.Context, spec Spec, limit, offset int) ([]Publi
 
 	recs := make([]record, 0)
 
-	if err := s.db.NewRaw(sql, args...).Scan(bunhooks.WithQueryContext(ctx, "PublicSites.List"), &recs); err != nil {
+	if err := s.db.NewRaw(sql, args...).Scan(bunhook.WithQueryContext(ctx, "PublicSites.List"), &recs); err != nil {
 		return nil, err
 	}
 
@@ -37,7 +37,7 @@ func (s *store) List(ctx context.Context, spec Spec, limit, offset int) ([]Publi
 }
 
 func (s *store) Get(ctx context.Context, spec Spec) (*PublicSite, error) {
-	res, err := s.List(ctx, spec, 1, 0)
+	res, err := s.List(ctx, spec, SortDefault, 1, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +55,7 @@ func (s *store) Save(ctx context.Context, sites ...PublicSite) error {
 	_, err := s.db.NewInsert().Model(&recs).
 		Returning("NULL").
 		On("CONFLICT (id) DO UPDATE").
-		Exec(bunhooks.WithQueryContext(ctx, "PublicSites.Save"))
+		Exec(bunhook.WithQueryContext(ctx, "PublicSites.Save"))
 
 	return err
 }

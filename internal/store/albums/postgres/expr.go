@@ -4,13 +4,14 @@ import (
 	"errors"
 	. "github.com/apartomat/apartomat/internal/store/albums"
 	"github.com/doug-martin/goqu/v9"
+	"github.com/doug-martin/goqu/v9/exp"
 )
 
 type specQuery interface {
 	Expression() (goqu.Expression, error)
 }
 
-func toQuery(spec Spec) (specQuery, error) {
+func toSpecQuery(spec Spec) (specQuery, error) {
 	if s, ok := spec.(specQuery); ok {
 		return s, nil
 	}
@@ -37,7 +38,7 @@ func (s andSpecQuery) Expression() (goqu.Expression, error) {
 	exs := make([]goqu.Expression, 0, len(s.spec.Specs))
 
 	for _, spec := range s.spec.Specs {
-		if ps, err := toQuery(spec); err != nil {
+		if ps, err := toSpecQuery(spec); err != nil {
 			return nil, err
 		} else {
 			expr, err := ps.Expression()
@@ -60,7 +61,7 @@ func (s orSpecQuery) Expression() (goqu.Expression, error) {
 	exs := make([]goqu.Expression, 0, len(s.spec.Specs))
 
 	for _, spec := range s.spec.Specs {
-		if ps, err := toQuery(spec); err != nil {
+		if ps, err := toSpecQuery(spec); err != nil {
 			return nil, err
 		} else {
 			expr, err := ps.Expression()
@@ -89,4 +90,49 @@ type projectIDInSpecQuery struct {
 
 func (s projectIDInSpecQuery) Expression() (goqu.Expression, error) {
 	return goqu.Ex{"project_id": s.spec.ProjectID}, nil
+}
+
+func selectBySpec(tableName string, spec Spec, sort Sort, limit, offset int) (string, []interface{}, error) {
+	qs, err := toSpecQuery(spec)
+	if err != nil {
+		return "", nil, err
+	}
+
+	expr, err := qs.Expression()
+	if err != nil {
+		return "", nil, err
+	}
+
+	var (
+		order = make([]exp.OrderedExpression, 0)
+	)
+
+	switch sort {
+	case SortDefault:
+		//
+	}
+
+	var (
+		q = goqu.From(tableName).Where(expr).Limit(uint(limit)).Offset(uint(offset))
+	)
+
+	if len(order) > 0 {
+		q = q.Order(order...)
+	}
+
+	return q.ToSQL()
+}
+
+func countBySpec(tableName string, spec Spec) (string, []interface{}, error) {
+	qs, err := toSpecQuery(spec)
+	if err != nil {
+		return "", nil, err
+	}
+
+	expr, err := qs.Expression()
+	if err != nil {
+		return "", nil, err
+	}
+
+	return goqu.Select(goqu.COUNT(goqu.Star())).From(tableName).Where(expr).ToSQL()
 }

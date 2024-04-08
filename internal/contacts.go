@@ -21,7 +21,7 @@ func (u *Apartomat) GetContacts(ctx context.Context, projectID string, limit, of
 		return nil, fmt.Errorf("can't get project (id=%s) contacts: %w", projectID, ErrForbidden)
 	}
 
-	return u.Contacts.List(ctx, ProjectIDIn(projectID), limit, offset)
+	return u.Contacts.List(ctx, ProjectIDIn(projectID), SortDefault, limit, offset)
 }
 
 func (u *Apartomat) AddContact(ctx context.Context, projectID string, params AddContactParams) (*Contact, error) {
@@ -57,18 +57,10 @@ type UpdateContactParams struct {
 }
 
 func (u *Apartomat) UpdateContact(ctx context.Context, contactID string, params UpdateContactParams) (*Contact, error) {
-	contacts, err := u.Contacts.List(ctx, IDIn(contactID), 1, 0)
+	contact, err := u.Contacts.Get(ctx, IDIn(contactID))
 	if err != nil {
 		return nil, err
 	}
-
-	if len(contacts) == 0 {
-		return nil, fmt.Errorf("contact (id=%s): %w", contactID, ErrNotFound)
-	}
-
-	var (
-		contact = contacts[0]
-	)
 
 	if ok, err := u.Acl.CanUpdateContact(ctx, auth.UserFromCtx(ctx), contact); err != nil {
 		return nil, err
@@ -86,18 +78,10 @@ func (u *Apartomat) UpdateContact(ctx context.Context, contactID string, params 
 }
 
 func (u *Apartomat) DeleteContact(ctx context.Context, contactID string) (*Contact, error) {
-	contacts, err := u.Contacts.List(ctx, IDIn(contactID), 1, 0)
+	contact, err := u.Contacts.Get(ctx, IDIn(contactID))
 	if err != nil {
 		return nil, err
 	}
-
-	if len(contacts) == 0 {
-		return nil, fmt.Errorf("contact (id=%s): %w", contactID, ErrNotFound)
-	}
-
-	var (
-		contact = contacts[0]
-	)
 
 	if ok, err := u.Acl.CanDeleteContact(ctx, auth.UserFromCtx(ctx), contact); err != nil {
 		return nil, err

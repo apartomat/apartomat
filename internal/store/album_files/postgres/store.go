@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	bunhook "github.com/apartomat/apartomat/internal/pkg/bun"
 	"time"
 
 	. "github.com/apartomat/apartomat/internal/store/album_files"
@@ -34,7 +35,7 @@ func (s *store) List(ctx context.Context, spec Spec, sort Sort, limit, offset in
 		recs = make([]record, 0)
 	)
 
-	if err := s.db.NewRaw(sql, args...).Scan(ctx, &recs); err != nil {
+	if err := s.db.NewRaw(sql, args...).Scan(bunhook.WithQueryContext(ctx, "AlbumFiles.List"), &recs); err != nil {
 		return nil, err
 	}
 
@@ -77,7 +78,7 @@ func (s *store) Count(ctx context.Context, spec Spec) (int, error) {
 		c int
 	)
 
-	if err = s.db.NewRaw(sql, args).Scan(ctx, &c); err != nil {
+	if err = s.db.NewRaw(sql, args).Scan(bunhook.WithQueryContext(ctx, "AlbumFiles.Count"), &c); err != nil {
 		return 0, err
 	}
 
@@ -90,7 +91,7 @@ func (s *store) Save(ctx context.Context, files ...*AlbumFile) error {
 	_, err := s.db.NewInsert().Model(&recs).
 		Returning("NULL").
 		On("CONFLICT (id) DO UPDATE").
-		Exec(ctx)
+		Exec(bunhook.WithQueryContext(ctx, "AlbumFiles.Save"))
 
 	return err
 }
@@ -107,7 +108,7 @@ func (s *store) Delete(ctx context.Context, files ...*AlbumFile) error {
 	_, err := s.db.NewDelete().
 		Model((*record)(nil)).
 		Where(`id IN (?)`, bun.In(ids)).
-		Exec(ctx)
+		Exec(bunhook.WithQueryContext(ctx, "AlbumFiles.Delete"))
 
 	return err
 }

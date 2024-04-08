@@ -104,7 +104,7 @@ func main() {
 		//
 
 		albumFilesStore := albumFiles.NewStore(bundb)
-		albumsStore := albums.NewStore(pgdb)
+		albumsStore := albums.NewStore(bundb)
 		contactsStore := contacts.NewStore(pgdb)
 		filesStore := files.NewStore(pgdb)
 		housesStore := houses.NewStore(pgdb)
