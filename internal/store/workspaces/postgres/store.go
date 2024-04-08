@@ -25,7 +25,7 @@ var (
 	_ Store = (*store)(nil)
 )
 
-func (s *store) List(ctx context.Context, spec Spec, limit, offset int) ([]*Workspace, error) {
+func (s *store) List(ctx context.Context, spec Spec, sort Sort, limit, offset int) ([]*Workspace, error) {
 	qs, err := toQuery(spec)
 	if err != nil {
 		return nil, err
@@ -49,6 +49,19 @@ func (s *store) List(ctx context.Context, spec Spec, limit, offset int) ([]*Work
 	}
 
 	return fromRecords(rows), nil
+}
+
+func (s *store) Get(ctx context.Context, spec Spec) (*Workspace, error) {
+	res, err := s.List(ctx, spec, SortDefault, 1, 0)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(res) == 0 {
+		return nil, ErrWorkspaceNotFound
+	}
+
+	return res[0], nil
 }
 
 func (s *store) Save(ctx context.Context, workspaces ...*Workspace) error {

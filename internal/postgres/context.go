@@ -1,6 +1,9 @@
 package postgres
 
-import "context"
+import (
+	"context"
+	"strings"
+)
 
 type Context string
 
@@ -9,7 +12,19 @@ const (
 )
 
 func WithQueryContext(ctx context.Context, val string) context.Context {
-	return context.WithValue(ctx, queryContext, val)
+	var (
+		qc = QueryContext(ctx)
+
+		nval = make([]string, 0, 2)
+	)
+
+	if qc != "Unknown" {
+		nval = append(nval, qc)
+	}
+
+	nval = append(nval, val)
+
+	return context.WithValue(ctx, queryContext, strings.Join(nval, ":"))
 }
 
 func QueryContext(ctx context.Context) string {

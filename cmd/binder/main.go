@@ -183,7 +183,7 @@ func download(filesStore files.Store) func(ctx context.Context, pages []albums.A
 			ids[i] = p.FileID
 		}
 
-		res, err := filesStore.List(ctx, files.IDIn(ids...), len(ids), 0)
+		res, err := filesStore.List(ctx, files.IDIn(ids...), files.SortDefault, len(ids), 0)
 		if err != nil {
 			return nil, err
 		}

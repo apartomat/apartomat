@@ -4,6 +4,7 @@ import (
 	"errors"
 	. "github.com/apartomat/apartomat/internal/store/workspace_users"
 	"github.com/doug-martin/goqu/v9"
+	"github.com/doug-martin/goqu/v9/exp"
 )
 
 type specQuery interface {
@@ -103,4 +104,48 @@ func (s orSpecQuery) Expression() (goqu.Expression, error) {
 	}
 
 	return goqu.Or(exs...), nil
+}
+
+func selectBySpec(spec Spec, sort Sort, limit, offset int) (string, []interface{}, error) {
+	sq, err := toSpecQuery(spec)
+	if err != nil {
+		return "", nil, err
+	}
+
+	expr, err := sq.Expression()
+	if err != nil {
+		return "", nil, err
+	}
+
+	type Join struct {
+		Table goqu.Expression
+		Cond  exp.JoinCondition
+	}
+
+	var (
+		order = make([]exp.OrderedExpression, 0)
+
+		join *Join
+	)
+
+	switch sort {
+	case SortDefault:
+		order = append(order, goqu.I("wu.id").Asc())
+	}
+
+	var (
+		q = goqu.From(goqu.T("workspace_users").Schema("apartomat").As("wu")).Select("wu.*")
+	)
+
+	if join != nil {
+		q = q.Join(join.Table, join.Cond)
+	}
+
+	q = q.Where(expr).Limit(uint(limit)).Offset(uint(offset))
+
+	if len(order) > 0 {
+		q = q.Order(order...)
+	}
+
+	return q.ToSQL()
 }

@@ -1,12 +1,12 @@
 package main
 
 import (
-	"context"
 	"crypto/ed25519"
 	"crypto/x509"
 	"database/sql"
 	"encoding/pem"
 	"fmt"
+	"github.com/apartomat/apartomat/internal/dataloaders"
 	"io/ioutil"
 	"os"
 
@@ -18,7 +18,6 @@ import (
 
 	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/auth/paseto"
-	"github.com/apartomat/apartomat/internal/dataloader"
 	"github.com/apartomat/apartomat/internal/image/minio"
 	"github.com/apartomat/apartomat/internal/mail"
 	"github.com/apartomat/apartomat/internal/mail/smtp"
@@ -49,8 +48,6 @@ func main() {
 	if len(os.Args) < 2 {
 		log.Fatal("expect command (run or gen-key-pair)")
 	}
-
-	ctx := context.Background()
 
 	switch os.Args[1] {
 	case "gen-key-pair":
@@ -106,20 +103,18 @@ func main() {
 
 		//
 
-		usersStore := users.NewStore(pgdb)
-		workspacesStore := workspaces.NewStore(pgdb)
-		workspaceUsersStore := workspace_users.NewStore(pgdb)
-		projectsStore := projects.NewStore(pgdb)
-		filesStore := files.NewStore(pgdb)
-		albumsStore := albums.NewStore(pgdb)
 		albumFilesStore := albumFiles.NewStore(bundb)
+		albumsStore := albums.NewStore(pgdb)
 		contactsStore := contacts.NewStore(pgdb)
+		filesStore := files.NewStore(pgdb)
 		housesStore := houses.NewStore(pgdb)
-		roomsStore := rooms.NewStore(bundb)
-		visualizationsStore := visualizations.NewStore(bundb)
+		projectsStore := projects.NewStore(pgdb)
 		publicSitesStore := sites.NewStore(bundb)
-
-		usersLoader := dataloader.NewUserLoader(dataloader.NewUserLoaderConfig(ctx, usersStore))
+		roomsStore := rooms.NewStore(bundb)
+		usersStore := users.NewStore(pgdb)
+		visualizationsStore := visualizations.NewStore(bundb)
+		workspaceUsersStore := workspace_users.NewStore(bundb)
+		workspacesStore := workspaces.NewStore(pgdb)
 
 		//uploader, err := s3.NewS3ImageUploaderWithCred(
 		//	ctx,
@@ -162,6 +157,11 @@ func main() {
 			Workspaces:     workspacesStore,
 			WorkspaceUsers: workspaceUsersStore,
 			Logger:         log,
+			Acl: apartomat.NewAcl(
+				workspaceUsersStore,
+				projectsStore,
+				housesStore,
+			),
 		}
 
 		var (
@@ -175,8 +175,13 @@ func main() {
 		NewServer(
 			bundb,
 			usecases,
-			&dataloader.DataLoaders{
-				Users: usersLoader,
+			func() *dataloaders.DataLoaders {
+				return dataloaders.NewLoaders(
+					filesStore,
+					roomsStore,
+					usersStore,
+					workspacesStore,
+				)
 			},
 			reg,
 			log,

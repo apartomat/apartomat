@@ -2,8 +2,7 @@ package graphql
 
 import (
 	"context"
-	"github.com/apartomat/apartomat/internal/store/files"
-	"github.com/apartomat/apartomat/internal/store/rooms"
+	"github.com/apartomat/apartomat/internal/dataloaders"
 )
 
 func (r *rootResolver) Visualization() VisualizationResolver {
@@ -15,12 +14,16 @@ type visualizationResolver struct {
 }
 
 func (r *visualizationResolver) File(ctx context.Context, obj *Visualization) (*File, error) {
-	res, err := r.useCases.Files.List(ctx, files.IDIn(obj.File.ID), 1, 0)
+	if obj.File == nil {
+		return nil, nil
+	}
+
+	f, err := dataloaders.FromContext(ctx).Files.Load(ctx, obj.File.ID)
 	if err != nil {
 		return nil, err
 	}
 
-	return fileToGraphQL(res[0]), nil
+	return fileToGraphQL(f), nil
 }
 
 func (r *visualizationResolver) Room(ctx context.Context, obj *Visualization) (*Room, error) {
@@ -28,7 +31,7 @@ func (r *visualizationResolver) Room(ctx context.Context, obj *Visualization) (*
 		return nil, nil
 	}
 
-	room, err := r.useCases.Rooms.Get(ctx, rooms.IDIn(obj.Room.ID))
+	room, err := dataloaders.FromContext(ctx).Rooms.Load(ctx, obj.Room.ID)
 	if err != nil {
 		return nil, err
 	}

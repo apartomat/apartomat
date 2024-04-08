@@ -13,7 +13,8 @@ var (
 type Sort int
 
 const (
-	SortIDAsc Sort = iota
+	SortDefault Sort = iota
+	SortIDAsc
 	SortIDDesc
 	SortPositionAsc
 	SortPositionDesc

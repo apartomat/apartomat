@@ -59,19 +59,28 @@ func selectBySpec(tablename string, spec Spec, sort Sort, limit, offset int) (st
 	}
 
 	var (
-		order exp.OrderedExpression
+		order = make([]exp.OrderedExpression, 0)
 	)
 
 	switch sort {
+	case SortDefault:
 	case SortIDAsc:
-		order = goqu.I("id").Asc()
+		order = append(order, goqu.I("id").Asc())
 	case SortIDDesc:
-		order = goqu.I("id").Desc()
+		order = append(order, goqu.I("id").Desc())
 	case SortPositionAsc:
-		order = goqu.I("sorting_position").Asc()
+		order = append(order, goqu.I("sorting_position").Asc())
 	case SortPositionDesc:
-		order = goqu.I("sorting_position").Desc()
+		order = append(order, goqu.I("sorting_position").Desc())
 	}
 
-	return goqu.From(tablename).Where(expr).Limit(uint(limit)).Offset(uint(offset)).Order(order).ToSQL()
+	var (
+		q = goqu.From(tablename).Where(expr).Limit(uint(limit)).Offset(uint(offset))
+	)
+
+	if len(order) > 0 {
+		q = q.Order(order...)
+	}
+
+	return q.ToSQL()
 }

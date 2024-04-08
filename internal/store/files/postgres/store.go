@@ -25,7 +25,7 @@ var (
 	_ Store = (*store)(nil)
 )
 
-func (s *store) List(ctx context.Context, spec Spec, limit, offset int) ([]*File, error) {
+func (s *store) List(ctx context.Context, spec Spec, sort Sort, limit, offset int) ([]*File, error) {
 	qs, err := toQuery(spec)
 	if err != nil {
 		return nil, err
@@ -52,7 +52,7 @@ func (s *store) List(ctx context.Context, spec Spec, limit, offset int) ([]*File
 }
 
 func (s *store) Get(ctx context.Context, spec Spec) (*File, error) {
-	res, err := s.List(ctx, spec, 1, 0)
+	res, err := s.List(ctx, spec, SortDefault, 1, 0)
 	if err != nil {
 		return nil, err
 	}

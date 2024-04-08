@@ -7,7 +7,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler/lru"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/apartomat/apartomat/internal/auth"
-	"github.com/apartomat/apartomat/internal/dataloader"
+	"github.com/apartomat/apartomat/internal/dataloaders"
 	"github.com/gorilla/websocket"
 	"net/http"
 	"strings"
@@ -18,7 +18,7 @@ type CheckAuthTokenFn func(str string) (auth.AuthToken, error)
 
 func Handler(
 	ch CheckAuthTokenFn,
-	loaders *dataloader.DataLoaders,
+	loadersFn func() *dataloaders.DataLoaders,
 	resolver ResolverRoot,
 	complexityLimit int,
 ) http.Handler {
@@ -33,12 +33,12 @@ func Handler(
 				return true
 			},
 		},
-		InitFunc: func(ctx context.Context, payload transport.InitPayload) (context.Context, error) {
+		InitFunc: func(ctx context.Context, payload transport.InitPayload) (context.Context, *transport.InitPayload, error) {
 			if t, _ := ch(payload.Authorization()); t != nil {
-				return auth.WithUserCtx(ctx, &auth.UserCtx{ID: t.UserID()}), nil
+				return auth.WithUserCtx(ctx, &auth.UserCtx{ID: t.UserID()}), &payload, nil
 			}
 
-			return ctx, nil
+			return ctx, &payload, nil
 		},
 	})
 
@@ -59,7 +59,7 @@ func Handler(
 
 	return CorsHandler(
 		WithDataLoadersHandler(
-			loaders,
+			loadersFn,
 			WithUserHandler(ch, gh),
 		),
 	)
@@ -85,9 +85,12 @@ func WithUserHandler(checkAuthToken CheckAuthTokenFn, next http.Handler) http.Ha
 	})
 }
 
-func WithDataLoadersHandler(loaders *dataloader.DataLoaders, next http.Handler) http.Handler {
+func WithDataLoadersHandler(
+	loadersFn func() *dataloaders.DataLoaders,
+	next http.Handler,
+) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		r = r.WithContext(dataloader.WithDataLoadersCtx(r.Context(), loaders))
+		r = r.WithContext(dataloaders.WithDataLoaders(r.Context(), loadersFn()))
 		next.ServeHTTP(w, r)
 	})
 }

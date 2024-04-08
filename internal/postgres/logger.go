@@ -21,7 +21,7 @@ func (h *ZapLogQueryHook) BeforeQuery(ctx context.Context, q *pg.QueryEvent) (co
 	return ctx, nil
 }
 
-func (h *ZapLogQueryHook) AfterQuery(c context.Context, q *pg.QueryEvent) error {
+func (h *ZapLogQueryHook) AfterQuery(ctx context.Context, q *pg.QueryEvent) error {
 	var (
 		dur = time.Now().Sub(q.StartTime)
 	)
@@ -29,7 +29,11 @@ func (h *ZapLogQueryHook) AfterQuery(c context.Context, q *pg.QueryEvent) error 
 	query, err := q.FormattedQuery()
 
 	if err == nil {
-		h.logger.Debug(string(query), zap.Duration("dur", dur))
+		h.logger.Debug(
+			string(query),
+			zap.Duration("dur", dur),
+			zap.String("qctx", QueryContext(ctx)),
+		)
 	}
 
 	return nil

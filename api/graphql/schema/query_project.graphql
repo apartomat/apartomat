@@ -10,11 +10,11 @@ type Project {
     status: ProjectStatus!
     startAt: Time
     endAt: Time
-    period(timezone: String): String
-    contacts: ProjectContacts!
-    houses: ProjectHouses!
-    visualizations: ProjectVisualizations!
-    files: ProjectFiles!
+    period(timezone: String): String @goField(forceResolver: true)
+    contacts: ProjectContacts! @goField(forceResolver: true)
+    houses: ProjectHouses! @goField(forceResolver: true)
+    visualizations: ProjectVisualizations! @goField(forceResolver: true)
+    files: ProjectFiles! @goField(forceResolver: true)
     albums: ProjectAlbums! @goField(forceResolver: true)
     publicSite: ProjectPublicSite! @goField(forceResolver: true)
     statuses: ProjectStatusDictionary! @goField(forceResolver: true)
@@ -28,8 +28,8 @@ enum ProjectStatus {
 }
 
 type ProjectContacts {
-    list(filter: ProjectContactsFilter! = {} limit: Int! = 10 offset: Int! = 0): ProjectContactsListResult!
-    total(filter: ProjectContactsFilter! = {}): ProjectContactsTotalResult!
+    list(filter: ProjectContactsFilter! = {} limit: Int! = 10 offset: Int! = 0): ProjectContactsListResult! @goField(forceResolver: true)
+    total(filter: ProjectContactsFilter! = {}): ProjectContactsTotalResult! @goField(forceResolver: true)
 }
 
 input ProjectContactsFilter {
@@ -72,8 +72,8 @@ type ContactDetails {
 }
 
 type ProjectHouses {
-    list(filter: ProjectHousesFilter! = {} limit: Int! = 10 offset: Int! = 0): ProjectHousesListResult!
-    total(filter: ProjectHousesFilter! = {}): ProjectHousesTotalResult!
+    list(filter: ProjectHousesFilter! = {} limit: Int! = 10 offset: Int! = 0): ProjectHousesListResult! @goField(forceResolver: true)
+    total(filter: ProjectHousesFilter! = {}): ProjectHousesTotalResult! @goField(forceResolver: true)
 }
 
 input ProjectHousesFilter {
@@ -99,11 +99,11 @@ type House {
     housingComplex: String!
     createdAt:  Time!
     modifiedAt: Time!
-    rooms: HouseRooms!
+    rooms: HouseRooms! @goField(forceResolver: true)
 }
 
 type HouseRooms {
-    list(limit: Int! = 100 offset: Int! = 0): HouseRoomsListResult!
+    list(limit: Int! = 100 offset: Int! = 0): HouseRoomsListResult! @goField(forceResolver: true)
 }
 
 union HouseRoomsListResult = HouseRoomsList | Forbidden | ServerError
@@ -122,8 +122,8 @@ type Room {
 }
 
 type ProjectVisualizations {
-    list(filter: ProjectVisualizationsListFilter! = {} limit: Int! = 10 offset: Int! = 0): ProjectVisualizationsListResult!
-    total(filter: ProjectVisualizationsListFilter! = {}): ProjectVisualizationsTotalResult!
+    list(filter: ProjectVisualizationsListFilter! = {} limit: Int! = 10 offset: Int! = 0): ProjectVisualizationsListResult! @goField(forceResolver: true)
+    total(filter: ProjectVisualizationsListFilter! = {}): ProjectVisualizationsTotalResult! @goField(forceResolver: true)
 }
 
 input ProjectVisualizationsListFilter {
@@ -159,8 +159,8 @@ type Visualization {
     status: VisualizationStatus!
     createdAt:  Time!
     modifiedAt: Time!
-    file: File!
-    room: Room
+    file: File! @goField(forceResolver: true)
+    room: Room @goField(forceResolver: true)
 }
 
 enum VisualizationStatus {
@@ -170,8 +170,8 @@ enum VisualizationStatus {
 }
 
 type ProjectFiles {
-    list(filter: ProjectFilesListFilter! = {} limit: Int! = 10 offset: Int! = 0): ProjectFilesListResult!
-    total(filter: ProjectFilesListFilter! = {}): ProjectFilesTotalResult!
+    list(filter: ProjectFilesListFilter! = {} limit: Int! = 10 offset: Int! = 0): ProjectFilesListResult! @goField(forceResolver: true)
+    total(filter: ProjectFilesListFilter! = {}): ProjectFilesTotalResult! @goField(forceResolver: true)
 }
 
 input ProjectFilesListFilter {

@@ -2,10 +2,11 @@ package postgres
 
 import (
 	"context"
+	"time"
+
 	bunhook "github.com/apartomat/apartomat/internal/pkg/bun"
 	. "github.com/apartomat/apartomat/internal/store/visualizations"
 	"github.com/uptrace/bun"
-	"time"
 )
 
 type store struct {

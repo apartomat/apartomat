@@ -40,6 +40,8 @@ type Apartomat struct {
 
 	Uploader image.Uploader
 
+	Acl *Acl
+
 	Albums         albums.Store
 	AlbumFiles     albumFiles.Store
 	Contacts       contacts.Store

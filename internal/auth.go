@@ -7,7 +7,6 @@ import (
 	"math/rand"
 
 	"github.com/apartomat/apartomat/internal/auth"
-	"github.com/apartomat/apartomat/internal/store/projects"
 	. "github.com/apartomat/apartomat/internal/store/users"
 	"github.com/apartomat/apartomat/internal/store/workspace_users"
 	"github.com/apartomat/apartomat/internal/store/workspaces"
@@ -27,16 +26,12 @@ func (u *Apartomat) ConfirmEmailByToken(ctx context.Context, str string) (string
 
 	email := confirmToken.Email()
 
-	users, err := u.Users.List(ctx, EmailIn(email), 1, 0)
+	user, err := u.Users.Get(ctx, EmailIn(email))
 	if err != nil {
 		return "", err
 	}
 
-	if len(users) == 0 {
-		return "", fmt.Errorf("user (email=%s): %w", email, ErrNotFound)
-	}
-
-	return u.AuthTokenIssuer.Issue(users[0].ID)
+	return u.AuthTokenIssuer.Issue(user.ID)
 }
 
 var (
@@ -59,17 +54,12 @@ func (u *Apartomat) LoginByEmail(ctx context.Context, email string, workspaceNam
 		return "", fmt.Errorf("sent error: %w", err)
 	}
 
-	var (
-		user      *User
-		workspace *workspaces.Workspace
-	)
-
-	users, err := u.Users.List(ctx, EmailIn(email), 1, 0)
-	if err != nil {
+	user, err := u.Users.Get(ctx, EmailIn(email))
+	if err != nil && !errors.Is(err, ErrUserNotFound) {
 		return "", err
 	}
 
-	if len(users) == 0 {
+	if user == nil {
 		id, err := GenerateNanoID()
 		if err != nil {
 			return "", err
@@ -80,16 +70,14 @@ func (u *Apartomat) LoginByEmail(ctx context.Context, email string, workspaceNam
 		if err := u.Users.Save(ctx, user); err != nil {
 			return "", err
 		}
-	} else {
-		user = users[0]
 	}
 
-	ws, err := u.Workspaces.List(ctx, workspaces.UserIDIn(user.ID), 1, 0)
-	if err != nil {
+	workspace, err := u.Workspaces.Get(ctx, workspaces.UserIDIn(user.ID))
+	if err != nil && !errors.Is(err, workspaces.ErrWorkspaceNotFound) {
 		return "", err
 	}
 
-	if len(ws) == 0 {
+	if workspace == nil {
 		id, err := GenerateNanoID()
 		if err != nil {
 			return "", err
@@ -146,12 +134,12 @@ func (u *Apartomat) LoginEmailPIN(ctx context.Context, email string, workspaceNa
 		workspace *workspaces.Workspace
 	)
 
-	users, err := u.Users.List(ctx, EmailIn(email), 1, 0)
-	if err != nil {
+	user, err := u.Users.Get(ctx, EmailIn(email))
+	if err != nil && !errors.Is(err, ErrUserNotFound) {
 		return "", "", err
 	}
 
-	if len(users) == 0 {
+	if user == nil {
 		id, err := GenerateNanoID()
 		if err != nil {
 			return "", "", err
@@ -162,16 +150,14 @@ func (u *Apartomat) LoginEmailPIN(ctx context.Context, email string, workspaceNa
 		if err := u.Users.Save(ctx, user); err != nil {
 			return "", "", err
 		}
-	} else {
-		user = users[0]
 	}
 
-	ws, err := u.Workspaces.List(ctx, workspaces.UserIDIn(user.ID), 1, 0)
-	if err != nil {
+	workspace, err := u.Workspaces.Get(ctx, workspaces.UserIDIn(user.ID))
+	if err != nil && !errors.Is(err, workspaces.ErrWorkspaceNotFound) {
 		return "", "", err
 	}
 
-	if len(ws) == 0 {
+	if workspace == nil {
 		id, err := GenerateNanoID()
 		if err != nil {
 			return "", "", err
@@ -216,18 +202,12 @@ func (u *Apartomat) CheckConfirmEmailPINToken(ctx context.Context, str, pin stri
 		return "", ErrForbidden
 	}
 
-	email := confirmToken.Email()
-
-	users, err := u.Users.List(ctx, EmailIn(email), 1, 0)
+	user, err := u.Users.Get(ctx, EmailIn(confirmToken.Email()))
 	if err != nil {
 		return "", err
 	}
 
-	if len(users) == 0 {
-		return "", fmt.Errorf("user (email=%s): %w", email, ErrNotFound)
-	}
-
-	return u.AuthTokenIssuer.Issue(users[0].ID)
+	return u.AuthTokenIssuer.Issue(user.ID)
 }
 
 func (u *Apartomat) AcceptInviteToWorkspace(ctx context.Context, str string) (string, error) {
@@ -236,44 +216,29 @@ func (u *Apartomat) AcceptInviteToWorkspace(ctx context.Context, str string) (st
 		return "", err
 	}
 
-	var (
-		user      *User
-		workspace *workspaces.Workspace
-	)
-
-	ws, err := u.Workspaces.List(ctx, workspaces.IDIn(confirmToken.WorkspaceID()), 1, 0)
+	workspace, err := u.Workspaces.Get(ctx, workspaces.IDIn(confirmToken.WorkspaceID()))
 	if err != nil {
 		return "", err
 	}
 
-	if len(ws) == 0 {
-		return "", fmt.Errorf("can't find workspace (id=%s): %w", confirmToken.WorkspaceID(), ErrNotFound)
-	}
-
-	workspace = ws[0]
-
-	us, err := u.Users.List(ctx, EmailIn(confirmToken.Email()), 1, 0)
-	if err != nil {
+	user, err := u.Users.Get(ctx, EmailIn(confirmToken.Email()))
+	if err != nil && !errors.Is(err, ErrUserNotFound) {
 		return "", err
 	}
 
-	if len(us) != 0 {
-		user = us[0]
-
-		wus, err := u.WorkspaceUsers.List(
+	if user != nil {
+		wus, err := u.WorkspaceUsers.Get(
 			ctx,
 			workspace_users.And(
 				workspace_users.UserIDIn(user.ID),
 				workspace_users.WorkspaceIDIn(workspace.ID),
 			),
-			1,
-			0,
 		)
-		if err != nil {
+		if err != nil && !errors.Is(err, workspace_users.ErrWorkspaceUserNotFound) {
 			return "", err
 		}
 
-		if len(wus) != 0 {
+		if wus != nil {
 			return "", fmt.Errorf("user is in workspace (id=%s) already: %w", confirmToken.WorkspaceID(), ErrAlreadyExists)
 		}
 
@@ -313,88 +278,6 @@ func (u *Apartomat) AcceptInviteToWorkspace(ctx context.Context, str string) (st
 	}
 
 	return u.AuthTokenIssuer.Issue(user.ID)
-}
-
-func (u *Apartomat) isWorkspaceUser(ctx context.Context, subj *auth.UserCtx, obj *workspaces.Workspace) (bool, error) {
-	if subj == nil {
-		return false, nil
-	}
-
-	wu, err := u.WorkspaceUsers.List(
-		ctx,
-		workspace_users.And(
-			workspace_users.WorkspaceIDIn(obj.ID),
-			workspace_users.UserIDIn(subj.ID),
-		),
-		1,
-		0,
-	)
-	if err != nil {
-		return false, err
-	}
-
-	if len(wu) == 0 {
-		return false, nil
-	}
-
-	return wu[0].UserID == subj.ID, nil
-}
-
-func (u *Apartomat) isWorkspaceUserAndRoleIs(
-	ctx context.Context,
-	subj *auth.UserCtx, obj *workspaces.Workspace,
-	role workspace_users.WorkspaceUserRole,
-) (bool, error) {
-	if subj == nil {
-		return false, nil
-	}
-
-	wu, err := u.WorkspaceUsers.List(
-		ctx,
-		workspace_users.And(
-			workspace_users.WorkspaceIDIn(obj.ID),
-			workspace_users.UserIDIn(subj.ID),
-		),
-		1,
-		0,
-	)
-	if err != nil {
-		return false, err
-	}
-
-	if len(wu) == 0 {
-		return false, nil
-	}
-
-	return workspace_users.And(
-		workspace_users.UserIDIn(subj.ID),
-		workspace_users.RoleIn(role),
-	).Is(wu[0]), nil
-}
-
-func (u *Apartomat) isProjectUser(ctx context.Context, subj *auth.UserCtx, obj *projects.Project) (bool, error) {
-	if subj == nil {
-		return false, nil
-	}
-
-	wu, err := u.WorkspaceUsers.List(
-		ctx,
-		workspace_users.And(
-			workspace_users.WorkspaceIDIn(obj.WorkspaceID),
-			workspace_users.UserIDIn(subj.ID),
-		),
-		1,
-		0,
-	)
-	if err != nil {
-		return false, err
-	}
-
-	if len(wu) == 0 {
-		return false, nil
-	}
-
-	return wu[0].UserID == subj.ID, nil
 }
 
 func randn(n int) string {

@@ -633,6 +633,9 @@ func (LoginConfirmed) IsConfirmLoginLinkResult() {}
 
 func (LoginConfirmed) IsConfirmLoginPinResult() {}
 
+type Mutation struct {
+}
+
 type NotFound struct {
 	Message string `json:"message"`
 }
@@ -900,6 +903,9 @@ type PublicSiteSettings struct {
 	Albums         bool `json:"albums"`
 }
 
+type Query struct {
+}
+
 type Room struct {
 	ID         string    `json:"id"`
 	Name       string    `json:"name"`
@@ -1053,6 +1059,9 @@ type SomeVisualizationsUploaded struct {
 }
 
 func (SomeVisualizationsUploaded) IsUploadVisualizationsResult() {}
+
+type Subscription struct {
+}
 
 type Unknown struct {
 	Message string `json:"message"`

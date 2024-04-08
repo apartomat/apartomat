@@ -6,7 +6,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/apartomat/apartomat/api/graphql"
 	apartomat "github.com/apartomat/apartomat/internal"
-	"github.com/apartomat/apartomat/internal/dataloader"
+	"github.com/apartomat/apartomat/internal/dataloaders"
 	"github.com/go-chi/chi/v5"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -31,10 +31,10 @@ func WithAddr(addr string) ServerOption {
 	}
 }
 
-type server struct {
+type Server struct {
 	db         *bun.DB
 	useCases   *apartomat.Apartomat
-	loaders    *dataloader.DataLoaders
+	loadersFn  func() *dataloaders.DataLoaders
 	prometheus *prometheus.Registry
 	logger     *zap.Logger
 }
@@ -42,20 +42,20 @@ type server struct {
 func NewServer(
 	db *bun.DB,
 	useCases *apartomat.Apartomat,
-	loaders *dataloader.DataLoaders,
+	loadersFn func() *dataloaders.DataLoaders,
 	reg *prometheus.Registry,
 	logger *zap.Logger,
-) *server {
-	return &server{
+) *Server {
+	return &Server{
 		db:         db,
 		useCases:   useCases,
-		loaders:    loaders,
+		loadersFn:  loadersFn,
 		prometheus: reg,
 		logger:     logger,
 	}
 }
 
-func (server *server) Run(opts ...ServerOption) {
+func (server *Server) Run(opts ...ServerOption) {
 	var (
 		log = server.logger
 	)
@@ -68,7 +68,7 @@ func (server *server) Run(opts ...ServerOption) {
 
 	mux.Handle("/graphql", graphql.Handler(
 		server.useCases.CheckAuthToken,
-		server.loaders,
+		server.loadersFn,
 		graphql.NewRootResolver(server.db, server.useCases, log),
 		10000,
 	))

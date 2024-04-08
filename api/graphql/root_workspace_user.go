@@ -19,7 +19,7 @@ func (r *rootResolver) WorkspaceUser() WorkspaceUserResolver {
 }
 
 func (r *workspaceUserResolver) Profile(ctx context.Context, obj *WorkspaceUser) (*UserProfile, error) {
-	user, err := r.useCases.GetWorkspaceUserProfile(ctx, obj.Workspace.ID, obj.ID)
+	user, err := r.useCases.GetWorkspaceUserProfileDl(ctx, obj.Workspace.ID, obj.ID)
 	if err != nil {
 		r.logger.Error("can't resolve workspace user profile", zap.String("user", obj.ID), zap.Error(err))
 

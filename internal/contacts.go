@@ -6,7 +6,6 @@ import (
 	"github.com/apartomat/apartomat/internal/auth"
 	. "github.com/apartomat/apartomat/internal/store/contacts"
 	"github.com/apartomat/apartomat/internal/store/projects"
-	"github.com/apartomat/apartomat/internal/store/workspace_users"
 )
 
 type AddContactParams struct {
@@ -15,21 +14,23 @@ type AddContactParams struct {
 	Details  []Details
 }
 
+func (u *Apartomat) GetContacts(ctx context.Context, projectID string, limit, offset int) ([]*Contact, error) {
+	if ok, err := u.Acl.CanGetContactsOfProjectID(ctx, auth.UserFromCtx(ctx), projectID); err != nil {
+		return nil, err
+	} else if !ok {
+		return nil, fmt.Errorf("can't get project (id=%s) contacts: %w", projectID, ErrForbidden)
+	}
+
+	return u.Contacts.List(ctx, ProjectIDIn(projectID), limit, offset)
+}
+
 func (u *Apartomat) AddContact(ctx context.Context, projectID string, params AddContactParams) (*Contact, error) {
-	prjs, err := u.Projects.List(ctx, projects.IDIn(projectID), 1, 0)
+	project, err := u.Projects.Get(ctx, projects.IDIn(projectID))
 	if err != nil {
 		return nil, err
 	}
 
-	if len(prjs) == 0 {
-		return nil, fmt.Errorf("project (id=%s): %w", projectID, ErrNotFound)
-	}
-
-	var (
-		project = prjs[0]
-	)
-
-	if ok, err := u.CanAddContact(ctx, auth.UserFromCtx(ctx), project); err != nil {
+	if ok, err := u.Acl.CanAddContact(ctx, auth.UserFromCtx(ctx), project); err != nil {
 		return nil, err
 	} else if !ok {
 		return nil, fmt.Errorf("can't add contact to project (id=%s): %w", project.ID, ErrForbidden)
@@ -47,79 +48,6 @@ func (u *Apartomat) AddContact(ctx context.Context, projectID string, params Add
 	}
 
 	return contact, nil
-}
-
-func (u *Apartomat) CanAddContact(ctx context.Context, subj *auth.UserCtx, obj *projects.Project) (bool, error) {
-	if subj == nil {
-		return false, nil
-	}
-
-	wu, err := u.WorkspaceUsers.List(
-		ctx,
-		workspace_users.And(
-			workspace_users.WorkspaceIDIn(obj.WorkspaceID),
-			workspace_users.UserIDIn(subj.ID),
-		),
-		1,
-		0,
-	)
-	if err != nil {
-		return false, err
-	}
-
-	if len(wu) == 0 {
-		return false, nil
-	}
-
-	return wu[0].UserID == subj.ID, nil
-}
-
-func (u *Apartomat) GetContacts(ctx context.Context, projectID string, limit, offset int) ([]*Contact, error) {
-	prjs, err := u.Projects.List(ctx, projects.IDIn(projectID), 1, 0)
-	if err != nil {
-		return nil, err
-	}
-
-	if len(prjs) == 0 {
-		return nil, fmt.Errorf("project (id=%s): %w", projectID, ErrNotFound)
-	}
-
-	var (
-		project = prjs[0]
-	)
-
-	if ok, err := u.CanGetContacts(ctx, auth.UserFromCtx(ctx), project); err != nil {
-		return nil, err
-	} else if !ok {
-		return nil, fmt.Errorf("can't get project (id=%s) contacts: %w", project.ID, ErrForbidden)
-	}
-
-	return u.Contacts.List(ctx, ProjectIDIn(project.ID), limit, offset)
-}
-
-func (u *Apartomat) CanGetContacts(ctx context.Context, subj *auth.UserCtx, obj *projects.Project) (bool, error) {
-	if subj == nil {
-		return false, nil
-	}
-
-	wu, err := u.WorkspaceUsers.List(
-		ctx,
-		workspace_users.And(
-			workspace_users.WorkspaceIDIn(obj.WorkspaceID),
-			workspace_users.UserIDIn(subj.ID),
-		),
-		1,
-		0,
-	)
-	if err != nil {
-		return false, err
-	}
-
-	if len(wu) == 0 {
-		return false, nil
-	}
-
-	return wu[0].UserID == subj.ID, nil
 }
 
 type UpdateContactParams struct {
@@ -142,7 +70,7 @@ func (u *Apartomat) UpdateContact(ctx context.Context, contactID string, params 
 		contact = contacts[0]
 	)
 
-	if ok, err := u.CanUpdateContact(ctx, auth.UserFromCtx(ctx), contact); err != nil {
+	if ok, err := u.Acl.CanUpdateContact(ctx, auth.UserFromCtx(ctx), contact); err != nil {
 		return nil, err
 	} else if !ok {
 		return nil, fmt.Errorf("can't update contact (id=%s): %w", contact.ID, ErrForbidden)
@@ -155,44 +83,6 @@ func (u *Apartomat) UpdateContact(ctx context.Context, contactID string, params 
 	}
 
 	return contact, nil
-}
-
-func (u *Apartomat) CanUpdateContact(ctx context.Context, subj *auth.UserCtx, obj *Contact) (bool, error) {
-	if subj == nil {
-		return false, nil
-	}
-
-	prjs, err := u.Projects.List(ctx, projects.IDIn(obj.ProjectID), 1, 0)
-	if err != nil {
-		return false, err
-	}
-
-	if len(prjs) == 0 {
-		return false, fmt.Errorf("project (id=%s): %w", obj.ProjectID, ErrNotFound)
-	}
-
-	var (
-		project = prjs[0]
-	)
-
-	wu, err := u.WorkspaceUsers.List(
-		ctx,
-		workspace_users.And(
-			workspace_users.WorkspaceIDIn(project.WorkspaceID),
-			workspace_users.UserIDIn(subj.ID),
-		),
-		1,
-		0,
-	)
-	if err != nil {
-		return false, err
-	}
-
-	if len(wu) == 0 {
-		return false, nil
-	}
-
-	return wu[0].UserID == subj.ID, nil
 }
 
 func (u *Apartomat) DeleteContact(ctx context.Context, contactID string) (*Contact, error) {
@@ -209,7 +99,7 @@ func (u *Apartomat) DeleteContact(ctx context.Context, contactID string) (*Conta
 		contact = contacts[0]
 	)
 
-	if ok, err := u.CanDeleteContact(ctx, auth.UserFromCtx(ctx), contact); err != nil {
+	if ok, err := u.Acl.CanDeleteContact(ctx, auth.UserFromCtx(ctx), contact); err != nil {
 		return nil, err
 	} else if !ok {
 		return nil, fmt.Errorf("can't delete contact (id=%s): %w", contact.ID, ErrForbidden)
@@ -218,46 +108,4 @@ func (u *Apartomat) DeleteContact(ctx context.Context, contactID string) (*Conta
 	err = u.Contacts.Delete(ctx, contact)
 
 	return contact, err
-}
-
-func (u *Apartomat) CanDeleteContact(ctx context.Context, subj *auth.UserCtx, obj *Contact) (bool, error) {
-	if subj == nil {
-		return false, nil
-	}
-
-	prjs, err := u.Projects.List(ctx, projects.IDIn(obj.ProjectID), 1, 0)
-	if err != nil {
-		return false, err
-	}
-
-	if len(prjs) == 0 {
-		return false, nil
-	}
-
-	var (
-		project = prjs[0]
-	)
-
-	wu, err := u.WorkspaceUsers.List(
-		ctx,
-		workspace_users.And(
-			workspace_users.WorkspaceIDIn(project.WorkspaceID),
-			workspace_users.UserIDIn(subj.ID),
-		),
-		1,
-		0,
-	)
-	if err != nil {
-		return false, err
-	}
-
-	if len(wu) == 0 {
-		return false, nil
-	}
-
-	var (
-		workspace = wu[0]
-	)
-
-	return workspace.UserID == subj.ID, nil
 }

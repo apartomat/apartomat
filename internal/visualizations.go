@@ -50,20 +50,12 @@ func (u *Apartomat) UploadVisualizations(
 		res = make([]*VisualizationWithFile, 0, len(uploads))
 	)
 
-	prjs, err := u.Projects.List(ctx, projects.IDIn(projectID), 1, 0)
+	project, err := u.Projects.Get(ctx, projects.IDIn(projectID))
 	if err != nil {
 		return nil, err
 	}
 
-	if len(prjs) == 0 {
-		return nil, fmt.Errorf("project (id=%s): %w", projectID, ErrNotFound)
-	}
-
-	var (
-		project = prjs[0]
-	)
-
-	if ok, err := u.CanUploadFile(ctx, auth.UserFromCtx(ctx), project); err != nil {
+	if ok, err := u.Acl.CanUploadFile(ctx, auth.UserFromCtx(ctx), project); err != nil {
 		return nil, err
 	} else if !ok {
 		return nil, fmt.Errorf("can't get project (id=%s) files: %w", project.ID, ErrForbidden)
@@ -111,30 +103,13 @@ func (u *Apartomat) GetVisualizations(
 	spec Spec,
 	limit, offset int,
 ) ([]*Visualization, error) {
-	prjs, err := u.Projects.List(ctx, projects.IDIn(projectID), 1, 0)
-	if err != nil {
-		return nil, err
-	}
-
-	if len(prjs) == 0 {
-		return nil, fmt.Errorf("project (id=%s): %w", projectID, ErrNotFound)
-	}
-
-	var (
-		project = prjs[0]
-	)
-
-	if ok, err := u.CanGetVisualizations(ctx, auth.UserFromCtx(ctx), project); err != nil {
+	if ok, err := u.Acl.CanGetVisualizationsOfProjectID(ctx, auth.UserFromCtx(ctx), projectID); err != nil {
 		return nil, err
 	} else if !ok {
-		return nil, fmt.Errorf("can't get project (id=%s) visualizations: %w", project.ID, ErrForbidden)
+		return nil, fmt.Errorf("can't get project (id=%s) visualizations: %w", projectID, ErrForbidden)
 	}
 
-	return u.Visualizations.List(ctx, And(spec, ProjectIDIn(project.ID)), SortRoomAscPositionAsc, limit, offset)
-}
-
-func (u *Apartomat) CanGetVisualizations(ctx context.Context, subj *auth.UserCtx, obj *projects.Project) (bool, error) {
-	return u.isProjectUser(ctx, subj, obj)
+	return u.Visualizations.List(ctx, And(spec, ProjectIDIn(projectID)), SortRoomAscPositionAsc, limit, offset)
 }
 
 func (u *Apartomat) DeleteVisualizations(
@@ -147,7 +122,7 @@ func (u *Apartomat) DeleteVisualizations(
 	}
 
 	for _, v := range vis {
-		if ok, err := u.CanDeleteVisualization(ctx, auth.UserFromCtx(ctx), v); err != nil {
+		if ok, err := u.Acl.CanDeleteVisualization(ctx, auth.UserFromCtx(ctx), v); err != nil {
 			return nil, err
 		} else if !ok {
 			return nil, fmt.Errorf("can't delete visualization (id=%s): %w", v.ID, ErrForbidden)
@@ -163,23 +138,6 @@ func (u *Apartomat) DeleteVisualizations(
 	return vis, err
 }
 
-func (u *Apartomat) CanDeleteVisualization(ctx context.Context, subj *auth.UserCtx, obj *Visualization) (bool, error) {
-	var (
-		project *projects.Project
-	)
-
-	prjs, err := u.Projects.List(ctx, projects.IDIn(obj.ProjectID), 1, 0)
-	if err != nil {
-		return false, err
-	}
-
-	if len(prjs) > 0 {
-		project = prjs[0]
-	}
-
-	return u.isProjectUser(ctx, subj, project)
-}
-
 func (u *Apartomat) GetVisualization(
 	ctx context.Context,
 	id string,
@@ -189,23 +147,10 @@ func (u *Apartomat) GetVisualization(
 		return nil, err
 	}
 
-	prjs, err := u.Projects.List(ctx, projects.IDIn(visualization.ProjectID), 1, 0)
-	if err != nil {
-		return nil, err
-	}
-
-	if len(prjs) == 0 {
-		return nil, fmt.Errorf("project (id=%s): %w", visualization.ProjectID, ErrNotFound)
-	}
-
-	var (
-		project = prjs[0]
-	)
-
-	if ok, err := u.CanGetVisualizations(ctx, auth.UserFromCtx(ctx), project); err != nil {
+	if ok, err := u.Acl.CanGetVisualization(ctx, auth.UserFromCtx(ctx), visualization); err != nil {
 		return nil, err
 	} else if !ok {
-		return nil, fmt.Errorf("can't get project (id=%s) visualizations: %w", project.ID, ErrForbidden)
+		return nil, fmt.Errorf("can't get project (id=%s) visualizations: %w", visualization.ProjectID, ErrForbidden)
 	}
 
 	return visualization, nil

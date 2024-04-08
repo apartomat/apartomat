@@ -24,28 +24,16 @@ func (u *Apartomat) GetFiles(
 	fileType []FileType,
 	limit, offset int,
 ) ([]*File, error) {
-	prjs, err := u.Projects.List(ctx, projects.IDIn(projectID), 1, 0)
-	if err != nil {
-		return nil, err
-	}
-
-	if len(prjs) == 0 {
-		return nil, fmt.Errorf("project (id=%s): %w", projectID, ErrNotFound)
-	}
-
-	var (
-		project = prjs[0]
-	)
-
-	if ok, err := u.CanGetFiles(ctx, auth.UserFromCtx(ctx), project); err != nil {
+	if ok, err := u.Acl.CanGetFilesOfProjectID(ctx, auth.UserFromCtx(ctx), projectID); err != nil {
 		return nil, err
 	} else if !ok {
-		return nil, fmt.Errorf("can't get project (id=%s) files: %w", project.ID, ErrForbidden)
+		return nil, fmt.Errorf("can't get project (id=%s) files: %w", projectID, ErrForbidden)
 	}
 
 	p, err := u.Files.List(
 		ctx,
 		And(ProjectIDIn(projectID), FileTypeIn(fileType...)),
+		SortDefault,
 		limit,
 		offset,
 	)
@@ -56,32 +44,15 @@ func (u *Apartomat) GetFiles(
 	return p, nil
 }
 
-func (u *Apartomat) CanGetFiles(ctx context.Context, subj *auth.UserCtx, obj *projects.Project) (bool, error) {
-	return u.isProjectUser(ctx, subj, obj)
-}
-
 func (u *Apartomat) CountFiles(
 	ctx context.Context,
 	projectID string,
 	fileType []FileType,
 ) (int, error) {
-	prjs, err := u.Projects.List(ctx, projects.IDIn(projectID), 1, 0)
-	if err != nil {
-		return 0, err
-	}
-
-	if len(prjs) == 0 {
-		return 0, fmt.Errorf("project (id=%s): %w", projectID, ErrNotFound)
-	}
-
-	var (
-		project = prjs[0]
-	)
-
-	if ok, err := u.CanCountFiles(ctx, auth.UserFromCtx(ctx), project); err != nil {
+	if ok, err := u.Acl.CanCountFilesOfProjectID(ctx, auth.UserFromCtx(ctx), projectID); err != nil {
 		return 0, err
 	} else if !ok {
-		return 0, fmt.Errorf("can't get project (id=%s) files: %w", project.ID, ErrForbidden)
+		return 0, fmt.Errorf("can't get project (id=%s) files: %w", projectID, ErrForbidden)
 	}
 
 	return u.Files.Count(
@@ -90,30 +61,18 @@ func (u *Apartomat) CountFiles(
 	)
 }
 
-func (u *Apartomat) CanCountFiles(ctx context.Context, subj *auth.UserCtx, obj *projects.Project) (bool, error) {
-	return u.isProjectUser(ctx, subj, obj)
-}
-
 func (u *Apartomat) UploadFile(
 	ctx context.Context,
 	projectID string,
 	upload Upload,
 	fileType FileType,
 ) (*File, error) {
-	prjs, err := u.Projects.List(ctx, projects.IDIn(projectID), 1, 0)
+	project, err := u.Projects.Get(ctx, projects.IDIn(projectID))
 	if err != nil {
 		return nil, err
 	}
 
-	if len(prjs) == 0 {
-		return nil, fmt.Errorf("project (id=%s): %w", projectID, ErrNotFound)
-	}
-
-	var (
-		project = prjs[0]
-	)
-
-	if ok, err := u.CanUploadFile(ctx, auth.UserFromCtx(ctx), project); err != nil {
+	if ok, err := u.Acl.CanUploadFile(ctx, auth.UserFromCtx(ctx), project); err != nil {
 		return nil, err
 	} else if !ok {
 		return nil, fmt.Errorf("can't get project (id=%s) files: %w", project.ID, ErrForbidden)
@@ -138,8 +97,4 @@ func (u *Apartomat) UploadFile(
 	}
 
 	return f, nil
-}
-
-func (u *Apartomat) CanUploadFile(ctx context.Context, subj *auth.UserCtx, obj *projects.Project) (bool, error) {
-	return u.isProjectUser(ctx, subj, obj)
 }

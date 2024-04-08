@@ -7,15 +7,15 @@ union WorkspaceResult = Workspace | NotFound | Forbidden | ServerError
 type Workspace {
     id: String!
     name: String!
-	projects: WorkspaceProjects!
+	projects: WorkspaceProjects! @goField(forceResolver: true)
 	users: WorkspaceUsers! @goField(forceResolver: true)
 	roles: WorkspaceUserRoleDictionary! @goField(forceResolver: true)
 }
 
 
 type WorkspaceProjects {
-	list(filter: WorkspaceProjectsFilter! = {} limit: Int! = 10): WorkspaceProjectsListResult!
-	total(filter: WorkspaceProjectsFilter! = {}): WorkspaceProjectsTotalResult!
+	list(filter: WorkspaceProjectsFilter! = {} limit: Int! = 10): WorkspaceProjectsListResult!  @goField(forceResolver: true)
+	total(filter: WorkspaceProjectsFilter! = {}): WorkspaceProjectsTotalResult!  @goField(forceResolver: true)
 }
 
 input WorkspaceProjectsFilter {
