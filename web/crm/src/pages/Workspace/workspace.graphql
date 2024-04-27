@@ -42,9 +42,6 @@ fragment WorkspaceScreenUsers on WorkspaceUsers {
 
 fragment WorkspaceScreenUser on WorkspaceUser {
     id
-    workspace {
-        id
-    }
     role
     profile {
         id

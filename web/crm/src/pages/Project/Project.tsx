@@ -36,6 +36,8 @@ import CreateAlbumOnClick from "./CreateAlbum/CreateAlbum"
 import Albums from "./Albums/Albums"
 import PublicSite from "./PublicSite/PublicSite"
 import { Spinner } from "shared/ui/Spinner"
+import { Notifications } from "features/notification"
+import { useNotifications } from "shared/context/notiifcations/context"
 
 export function Project() {
     const { id } = useParams<"id">() as { id: string }
@@ -46,37 +48,11 @@ export function Project() {
 
     const { data, loading, error: fetchError, refetch, refetching } = useProject(id)
 
-    const [notification, setNotification] = useState("")
-
-    const [showNotification, setShowNotification] = useState(false)
-
     const respSize = useContext(ResponsiveContext)
 
     const navigate = useNavigate()
 
-    const notify = ({
-        message,
-        callback,
-        timeout = 250,
-        duration = 1500,
-    }: {
-        message: string
-        callback?: () => void
-        timeout?: number
-        duration?: number
-    }) => {
-        setNotification(message)
-
-        callback && callback()
-
-        setTimeout(() => {
-            setShowNotification(true)
-
-            setTimeout(() => {
-                setShowNotification(false)
-            }, duration)
-        }, timeout)
-    }
+    const { notify: notify } = useNotifications()
 
     const [project, setProject] = useState<ProjectType | undefined>(undefined)
 
@@ -152,28 +128,7 @@ export function Project() {
                 </Layer>
             )}
 
-            {showNotification ? (
-                <Layer
-                    position="top"
-                    modal={false}
-                    responsive={false}
-                    margin={{ vertical: "small", horizontal: "small" }}
-                >
-                    <Box
-                        align="center"
-                        direction="row"
-                        gap="xsmall"
-                        justify="between"
-                        elevation="small"
-                        background="status-ok"
-                        round="medium"
-                        pad={{ vertical: "xsmall", horizontal: "small" }}
-                    >
-                        <StatusGood />
-                        <Text>{notification}</Text>
-                    </Box>
-                </Layer>
-            ) : null}
+            <Notifications />
 
             <Header margin={{ vertical: "medium" }}>
                 <Box>
@@ -201,6 +156,9 @@ export function Project() {
                                 if (project) {
                                     setProject({ ...project, status })
                                 }
+                            }}
+                            onForbidden={() => {
+                                notify({ message: "Доступ запрещен", severity: "critical" })
                             }}
                         />
                     </Box>

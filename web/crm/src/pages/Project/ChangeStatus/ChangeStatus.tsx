@@ -11,26 +11,44 @@ export default function ChangeStatus({
     status,
     values,
     onProjectStatusChanged,
+    onNotFound,
+    onForbidden,
+    onServerError,
     ...boxProps
 }: {
     projectId: string
     status: ProjectStatus
     values?: ProjectStatusDictionary
     onProjectStatusChanged?: ({ status }: { status: ProjectStatus }) => void
+    onNotFound?: () => void
+    onForbidden?: () => void
+    onServerError?: () => void
 } & BoxExtendedProps) {
-    const [show, setShow] = useState<boolean>(false)
+    const [showDropMenu, setShowDropMenu] = useState<boolean>(false)
+    const [disabled, setDisabled] = useState(false)
 
     const [state, setState] = useState(status)
 
     const [changeStatus, { data, loading, error }] = useChangeStatus()
 
     const handleItemClick = (projectId: string, status: ProjectStatus) => {
-        changeStatus(projectId, status)
-        setShow(false)
+        void changeStatus(projectId, status)
+        setShowDropMenu(false)
         setState(status)
     }
 
+    const rollback = (status: ProjectStatus) => {
+        setTimeout(() => {
+            setDisabled(loading)
+            setState(status)
+        }, 300)
+    }
+
     useEffect(() => {
+        if (loading) {
+            setDisabled(loading)
+        }
+
         switch (data?.changeProjectStatus.__typename) {
             case "ProjectStatusChanged": {
                 const {
@@ -38,16 +56,27 @@ export default function ChangeStatus({
                         project: { status },
                     },
                 } = data
+                setDisabled(loading)
                 onProjectStatusChanged && onProjectStatusChanged({ status })
-            }
-        }
-    }, [data, onProjectStatusChanged])
 
-    useEffect(() => {
-        if (error) {
-            setTimeout(() => setState(status), 300)
+                break
+            }
+            case "NotFound":
+                rollback(status)
+                onNotFound && onNotFound()
+                break
+            case "Forbidden":
+                rollback(status)
+                onForbidden && onForbidden()
+                break
+            case "ServerError":
+                rollback(status)
+                onServerError && onServerError()
+                break
+            default:
+                error ? rollback(status) : setDisabled(loading)
         }
-    })
+    }, [data, error, loading])
 
     const label = useMemo(() => statusToLabel({ status: state, items: values?.items }), [state, values])
 
@@ -58,18 +87,24 @@ export default function ChangeStatus({
     return (
         <Box {...boxProps} justify="center">
             <Box ref={targetRef}>
-                <Button label={label} color={color} size="small" onClick={() => setShow(true)} disabled={loading} />
+                <Button
+                    label={label}
+                    color={color}
+                    size="small"
+                    onClick={() => setShowDropMenu(true)}
+                    disabled={disabled}
+                />
             </Box>
 
-            {show && targetRef.current && (
+            {showDropMenu && targetRef.current && (
                 <Drop
                     elevation="small"
                     round="small"
                     align={{ top: "bottom", left: "left" }}
                     margin={{ top: "xsmall" }}
                     target={targetRef.current}
-                    onClickOutside={() => setShow(false)}
-                    onEsc={() => setShow(false)}
+                    onClickOutside={() => setShowDropMenu(false)}
+                    onEsc={() => setShowDropMenu(false)}
                 >
                     {values?.items.map((item) => {
                         return (

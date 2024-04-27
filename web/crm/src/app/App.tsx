@@ -7,7 +7,7 @@ import { getMainDefinition } from "@apollo/client/utilities"
 
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 
-import { AuthProvider } from "./providers/"
+import { AuthProvider, NotificationsProvider } from "./providers/"
 import { AuthRequired, RedirectToDefaultWorkspace } from "./routes"
 
 import { AcceptInvite, Album, Confirm, Login, Logout, Project, Visualizations, Workspace } from "pages"
@@ -77,22 +77,24 @@ function App() {
         <Grommet theme={theme}>
             <ApolloProvider client={apolloClient}>
                 <AuthProvider>
-                    <BrowserRouter>
-                        <Routes>
-                            <Route path="/login" element={<Login />} />
-                            <Route path="/logout" element={<Logout />} />
-                            <Route path="/confirm" element={<Confirm />} />
-                            <Route path="/accept-invite" element={<AcceptInvite />} />
-                            <Route element={<AuthRequired />}>
-                                <Route path="/" element={<RedirectToDefaultWorkspace />} />
-                                <Route path="/:id" element={<Workspace />} />
-                                <Route path="/p/:id" element={<Project />} />
-                                <Route path="/vis/:id" element={<Visualizations />} />
-                                <Route path="/album/:id" element={<Album />} />
-                                <Route path="/p/:id/album" element={<Album />} />
-                            </Route>
-                        </Routes>
-                    </BrowserRouter>
+                    <NotificationsProvider>
+                        <BrowserRouter>
+                            <Routes>
+                                <Route path="/login" element={<Login />} />
+                                <Route path="/logout" element={<Logout />} />
+                                <Route path="/confirm" element={<Confirm />} />
+                                <Route path="/accept-invite" element={<AcceptInvite />} />
+                                <Route element={<AuthRequired />}>
+                                    <Route path="/" element={<RedirectToDefaultWorkspace />} />
+                                    <Route path="/:id" element={<Workspace />} />
+                                    <Route path="/p/:id" element={<Project />} />
+                                    <Route path="/vis/:id" element={<Visualizations />} />
+                                    <Route path="/album/:id" element={<Album />} />
+                                    <Route path="/p/:id/album" element={<Album />} />
+                                </Route>
+                            </Routes>
+                        </BrowserRouter>
+                    </NotificationsProvider>
                 </AuthProvider>
             </ApolloProvider>
         </Grommet>
