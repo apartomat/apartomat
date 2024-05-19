@@ -1,16 +1,12 @@
 package main
 
 import (
-	"crypto/ed25519"
-	"crypto/x509"
 	"database/sql"
-	"encoding/pem"
 	"fmt"
 	"github.com/apartomat/apartomat/internal/dataloaders"
-	"io/ioutil"
+	"log/slog"
 	"os"
-
-	"go.uber.org/zap"
+	"strconv"
 
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/pgdialect"
@@ -40,30 +36,46 @@ import (
 )
 
 func main() {
+	var (
+		level, _ = logLevel(os.Getenv("LOG_LEVEL"))
+
+		logopts = &slog.HandlerOptions{Level: level}
+	)
+
+	if ok, _ := strconv.ParseBool(os.Getenv("LOG_TRACE")); ok {
+		logopts.ReplaceAttr = replaceAttr
+	}
+
+	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, logopts)))
+
+	// deprecated
 	log, err := NewLogger(os.Getenv("LOG_LEVEL"))
 	if err != nil {
 		panic(err)
 	}
 
 	if len(os.Args) < 2 {
-		log.Fatal("expect command (run or gen-key-pair)")
+		slog.Error("expect command (run or gen-key-pair)")
+		os.Exit(1)
 	}
 
 	switch os.Args[1] {
 	case "gen-key-pair":
 		_, _, err := genPairToFile("apartomat.key")
 		if err != nil {
-			log.Fatal("can't generate key pair", zap.Error(err))
+			slog.Error("can't generate key pair", slog.Any("err", err))
+			os.Exit(1)
 		}
 
-		log.Info("done")
+		slog.Info("done")
 
 		os.Exit(0)
 
 	case "run":
 		privateKey, err := readPrivateKeyFromFile("apartomat.key")
 		if err != nil {
-			log.Fatal("cant read private key from file", zap.Error(err))
+			slog.Error("cant read private key from file", slog.Any("err", err))
+			os.Exit(1)
 		}
 
 		confirmLoginIssuerVerifier := paseto.NewConfirmEmailTokenIssuerVerifier(privateKey)
@@ -79,7 +91,8 @@ func main() {
 
 		pgopts, err := pg.ParseURL(os.Getenv("POSTGRES_DSN"))
 		if err != nil {
-			log.Fatal("can't parse POSTGRES_DSN %s", zap.Error(err))
+			slog.Error("can't parse POSTGRES_DSN", slog.Any("err", err))
+			os.Exit(1)
 		}
 
 		pgdb := pg.Connect(pgopts)
@@ -188,28 +201,7 @@ func main() {
 		).Run(addr)
 
 	default:
-		log.Info("expect command (run or gen-key-pair)")
+		slog.Info("expect command (run or gen-key-pair)")
 		os.Exit(1)
 	}
-}
-
-func readPrivateKeyFromFile(fileName string) (ed25519.PrivateKey, error) {
-	file, err := os.Open(fileName)
-	if err != nil {
-		return nil, fmt.Errorf("can't read private key from file: %s", err)
-	}
-
-	b, err := ioutil.ReadAll(file)
-	if err != nil {
-		return nil, fmt.Errorf("can't read private key from file: %s", err)
-	}
-
-	block, _ := pem.Decode(b)
-
-	bb, err := x509.ParsePKCS8PrivateKey(block.Bytes)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse private key: %s", err)
-	}
-
-	return bb.(ed25519.PrivateKey), nil
 }

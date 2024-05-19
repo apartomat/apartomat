@@ -6,6 +6,7 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 )
@@ -63,4 +64,25 @@ func genPairToFile(fileNamePrefix string) (ed25519.PublicKey, ed25519.PrivateKey
 	}
 
 	return pubKey, privKey, nil
+}
+
+func readPrivateKeyFromFile(fileName string) (ed25519.PrivateKey, error) {
+	file, err := os.Open(fileName)
+	if err != nil {
+		return nil, fmt.Errorf("can't read private key from file: %s", err)
+	}
+
+	b, err := ioutil.ReadAll(file)
+	if err != nil {
+		return nil, fmt.Errorf("can't read private key from file: %s", err)
+	}
+
+	block, _ := pem.Decode(b)
+
+	bb, err := x509.ParsePKCS8PrivateKey(block.Bytes)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse private key: %s", err)
+	}
+
+	return bb.(ed25519.PrivateKey), nil
 }
