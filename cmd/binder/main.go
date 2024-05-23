@@ -53,7 +53,7 @@ func main() {
 		uploader = minio.NewUploader("apartomat")
 
 		albumFilesStore = albumFilesPostgres.NewStore(db)
-		albumsStore     = albumsPostgres.NewStore(pgdb)
+		albumsStore     = albumsPostgres.NewStore(db)
 		filesStore      = filesPostgres.NewStore(pgdb)
 	)
 
