@@ -22,7 +22,13 @@ import (
 	nanoid "github.com/matoous/go-nanoid/v2"
 )
 
+type Params struct {
+	SendPinByEmail bool
+}
+
 type Apartomat struct {
+	Params Params
+
 	AuthTokenIssuer   auth.AuthTokenIssuer
 	AuthTokenVerifier auth.AuthTokenVerifier
 

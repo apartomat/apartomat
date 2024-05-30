@@ -143,6 +143,9 @@ func main() {
 		uploader := minio.NewUploader("apartomat")
 
 		usecases := &apartomat.Apartomat{
+			Params: apartomat.Params{
+				SendPinByEmail: getBoolEnv("SEND_PIN_BY_EMAIL"),
+			},
 			AuthTokenIssuer:              authIssuerVerifier,
 			AuthTokenVerifier:            authIssuerVerifier,
 			ConfirmTokenByEmailIssuer:    confirmLoginIssuerVerifier,
@@ -204,4 +207,12 @@ func main() {
 		slog.Info("expect command (run or gen-key-pair)")
 		os.Exit(1)
 	}
+}
+
+func getBoolEnv(key string) bool {
+	if val, err := strconv.ParseBool(os.Getenv(key)); err != nil {
+		return val
+	}
+
+	return false
 }
