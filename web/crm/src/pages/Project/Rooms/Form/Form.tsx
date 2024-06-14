@@ -17,6 +17,8 @@ const defaultSuggestions = [
     "Санузел",
     "Спальня",
     "Туалет",
+    "Коридор",
+    "Постирочная",
 ]
 
 const filterSuggestions = (vals: string[], val: string) => {
