@@ -119,7 +119,7 @@ func main() {
 		albumFilesStore := albumFiles.NewStore(bundb)
 		albumsStore := albums.NewStore(bundb)
 		contactsStore := contacts.NewStore(pgdb)
-		filesStore := files.NewStore(pgdb)
+		filesStore := files.NewStore(bundb)
 		housesStore := houses.NewStore(pgdb)
 		projectsStore := projects.NewStore(pgdb)
 		publicSitesStore := sites.NewStore(bundb)

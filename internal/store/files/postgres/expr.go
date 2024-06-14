@@ -6,16 +6,16 @@ import (
 	"github.com/doug-martin/goqu/v9"
 )
 
-type query interface {
+type specQuery interface {
 	Expression() (goqu.Expression, error)
 }
 
-func toQuery(spec Spec) (query, error) {
+func toSpecQuery(spec Spec) (specQuery, error) {
 	if spec == nil {
 		return nil, nil
 	}
 
-	if s, ok := spec.(query); ok {
+	if s, ok := spec.(specQuery); ok {
 		return s, nil
 	}
 
@@ -67,7 +67,7 @@ func (s andSpecQuery) Expression() (goqu.Expression, error) {
 	exs := make([]goqu.Expression, 0, len(s.spec.Specs))
 
 	for _, spec := range s.spec.Specs {
-		if ps, err := toQuery(spec); err != nil {
+		if ps, err := toSpecQuery(spec); err != nil {
 			return nil, err
 		} else if ps != nil {
 			expr, err := ps.Expression()
@@ -90,7 +90,7 @@ func (s orSpecQuery) Expression() (goqu.Expression, error) {
 	exs := make([]goqu.Expression, 0, len(s.spec.Specs))
 
 	for _, spec := range s.spec.Specs {
-		if ps, err := toQuery(spec); err != nil {
+		if ps, err := toSpecQuery(spec); err != nil {
 			return nil, err
 		} else if ps != nil {
 			expr, err := ps.Expression()

@@ -2,10 +2,11 @@ package postgres
 
 import (
 	"context"
-	"github.com/apartomat/apartomat/internal/postgres"
+	bunhook "github.com/apartomat/apartomat/internal/pkg/bun"
 	. "github.com/apartomat/apartomat/internal/store/files"
 	"github.com/doug-martin/goqu/v9"
-	"github.com/go-pg/pg/v10"
+	"github.com/doug-martin/goqu/v9/exp"
+	"github.com/uptrace/bun"
 	"time"
 )
 
@@ -14,10 +15,10 @@ const (
 )
 
 type store struct {
-	db *pg.DB
+	db *bun.DB
 }
 
-func NewStore(db *pg.DB) *store {
+func NewStore(db *bun.DB) *store {
 	return &store{db}
 }
 
@@ -26,29 +27,21 @@ var (
 )
 
 func (s *store) List(ctx context.Context, spec Spec, sort Sort, limit, offset int) ([]*File, error) {
-	qs, err := toQuery(spec)
+	sql, args, err := selectBySpec(filesTableName, spec, sort, limit, offset)
 	if err != nil {
 		return nil, err
 	}
 
-	expr, err := qs.Expression()
-	if err != nil {
+	var (
+		recs = make([]record, 0)
+	)
+
+	if err := s.db.NewRaw(sql, args...).
+		Scan(bunhook.WithQueryContext(ctx, "Files.List"), &recs); err != nil {
 		return nil, err
 	}
 
-	sql, args, err := goqu.From(filesTableName).Where(expr).Limit(uint(limit)).Offset(uint(offset)).ToSQL()
-	if err != nil {
-		return nil, err
-	}
-
-	rows := make([]*record, 0)
-
-	_, err = s.db.QueryContext(postgres.WithQueryContext(ctx, "files.List"), &rows, sql, args...)
-	if err != nil {
-		return nil, err
-	}
-
-	return fromRecords(rows), nil
+	return fromRecords(recs), nil
 }
 
 func (s *store) Get(ctx context.Context, spec Spec) (*File, error) {
@@ -64,28 +57,8 @@ func (s *store) Get(ctx context.Context, spec Spec) (*File, error) {
 	return res[0], nil
 }
 
-func (s *store) Save(ctx context.Context, files ...*File) error {
-	recs := toRecords(files)
-
-	_, err := s.db.ModelContext(postgres.WithQueryContext(ctx, "files.Save"), &recs).Returning("NULL").
-		OnConflict("(id) DO UPDATE").
-		Insert()
-
-	return err
-}
-
 func (s *store) Count(ctx context.Context, spec Spec) (int, error) {
-	qs, err := toQuery(spec)
-	if err != nil {
-		return 0, err
-	}
-
-	expr, err := qs.Expression()
-	if err != nil {
-		return 0, err
-	}
-
-	sql, args, err := goqu.Select(goqu.COUNT(goqu.Star())).From(filesTableName).Where(expr).ToSQL()
+	sql, args, err := countBySpec(filesTableName, spec)
 	if err != nil {
 		return 0, err
 	}
@@ -94,13 +67,44 @@ func (s *store) Count(ctx context.Context, spec Spec) (int, error) {
 		c int
 	)
 
-	_, err = s.db.QueryOneContext(postgres.WithQueryContext(ctx, "files.Count"), pg.Scan(&c), sql, args...)
+	if err = s.db.NewRaw(sql, args).Scan(bunhook.WithQueryContext(ctx, "Files.Count"), &c); err != nil {
+		return 0, err
+	}
 
-	return c, err
+	return c, nil
+}
+
+func (s *store) Save(ctx context.Context, files ...*File) error {
+	recs := toRecords(files)
+
+	_, err := s.db.NewInsert().Model(&recs).
+		Returning("NULL").
+		On("CONFLICT (id) DO UPDATE").
+		Exec(bunhook.WithQueryContext(ctx, "Files.Save"))
+
+	return err
+}
+
+func (s *store) Delete(ctx context.Context, files ...*File) error {
+	var (
+		ids = make([]string, len(files))
+	)
+
+	for i, f := range files {
+		ids[i] = f.ID
+	}
+
+	_, err := s.db.NewDelete().
+		Model((*record)(nil)).
+		Where(`id IN (?)`, bun.In(ids)).
+		Exec(bunhook.WithQueryContext(ctx, "Files.Delete"))
+
+	return err
 }
 
 type record struct {
-	tableName  struct{}  `pg:"apartomat.files"`
+	bun.BaseModel `bun:"table:apartomat.albums,alias:a"`
+
 	ID         string    `pg:"id,pk"`
 	Name       string    `pg:"name"`
 	URL        string    `pg:"url"`
@@ -136,7 +140,7 @@ func toRecords(projects []*File) []*record {
 	return res
 }
 
-func fromRecords(records []*record) []*File {
+func fromRecords(records []record) []*File {
 	files := make([]*File, len(records))
 
 	for i, r := range records {
@@ -153,4 +157,49 @@ func fromRecords(records []*record) []*File {
 	}
 
 	return files
+}
+
+func selectBySpec(tableName string, spec Spec, sort Sort, limit, offset int) (string, []interface{}, error) {
+	qs, err := toSpecQuery(spec)
+	if err != nil {
+		return "", nil, err
+	}
+
+	expr, err := qs.Expression()
+	if err != nil {
+		return "", nil, err
+	}
+
+	var (
+		order = make([]exp.OrderedExpression, 0)
+	)
+
+	switch sort {
+	case SortDefault:
+		//
+	}
+
+	var (
+		q = goqu.From(tableName).Where(expr).Limit(uint(limit)).Offset(uint(offset))
+	)
+
+	if len(order) > 0 {
+		q = q.Order(order...)
+	}
+
+	return q.ToSQL()
+}
+
+func countBySpec(tableName string, spec Spec) (string, []interface{}, error) {
+	qs, err := toSpecQuery(spec)
+	if err != nil {
+		return "", nil, err
+	}
+
+	expr, err := qs.Expression()
+	if err != nil {
+		return "", nil, err
+	}
+
+	return goqu.Select(goqu.COUNT(goqu.Star())).From(tableName).Where(expr).ToSQL()
 }
