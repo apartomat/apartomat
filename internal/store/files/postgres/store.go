@@ -103,7 +103,7 @@ func (s *store) Delete(ctx context.Context, files ...*File) error {
 }
 
 type record struct {
-	bun.BaseModel `bun:"table:apartomat.albums,alias:a"`
+	bun.BaseModel `bun:"table:apartomat.files,alias:f"`
 
 	ID         string    `pg:"id,pk"`
 	Name       string    `pg:"name"`

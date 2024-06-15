@@ -36,14 +36,14 @@ func toRecord(file *AlbumFile) record {
 
 func toRecords(files []*AlbumFile) []record {
 	var (
-		res = make([]record, len(files))
+		records = make([]record, len(files))
 	)
 
 	for i, p := range files {
-		res[i] = toRecord(p)
+		records[i] = toRecord(p)
 	}
 
-	return res
+	return records
 }
 
 func fromRecords(records []record) []*AlbumFile {
