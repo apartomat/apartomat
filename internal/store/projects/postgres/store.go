@@ -2,11 +2,9 @@ package postgres
 
 import (
 	"context"
-	"github.com/apartomat/apartomat/internal/postgres"
+	bunhook "github.com/apartomat/apartomat/internal/pkg/bun"
 	. "github.com/apartomat/apartomat/internal/store/projects"
-	"github.com/doug-martin/goqu/v9"
-	"github.com/go-pg/pg/v10"
-	"time"
+	"github.com/uptrace/bun"
 )
 
 const (
@@ -14,10 +12,10 @@ const (
 )
 
 type store struct {
-	db *pg.DB
+	db *bun.DB
 }
 
-func NewStore(db *pg.DB) *store {
+func NewStore(db *bun.DB) Store {
 	return &store{db}
 }
 
@@ -26,29 +24,20 @@ var (
 )
 
 func (s *store) List(ctx context.Context, spec Spec, sort Sort, limit, offset int) ([]*Project, error) {
-	qs, err := toSpecQuery(spec)
+	sql, args, err := selectBySpec(projectsTableName, spec, sort, limit, offset)
 	if err != nil {
 		return nil, err
 	}
 
-	expr, err := qs.Expression()
-	if err != nil {
+	var (
+		recs = make([]record, 0)
+	)
+
+	if err := s.db.NewRaw(sql, args...).Scan(bunhook.WithQueryContext(ctx, "Projects.List"), &recs); err != nil {
 		return nil, err
 	}
 
-	sql, args, err := goqu.From(projectsTableName).Where(expr).Limit(uint(limit)).Offset(uint(offset)).ToSQL()
-	if err != nil {
-		return nil, err
-	}
-
-	rows := make([]*record, 0)
-
-	_, err = s.db.QueryContext(postgres.WithQueryContext(ctx, "projects.List"), &rows, sql, args...)
-	if err != nil {
-		return nil, err
-	}
-
-	return fromRecords(rows), nil
+	return fromRecords(recs), nil
 }
 
 func (s *store) Get(ctx context.Context, spec Spec) (*Project, error) {
@@ -64,69 +53,47 @@ func (s *store) Get(ctx context.Context, spec Spec) (*Project, error) {
 	return res[0], nil
 }
 
+func (s *store) Count(ctx context.Context, spec Spec) (int, error) {
+	sql, args, err := countBySpec(projectsTableName, spec)
+	if err != nil {
+		return 0, err
+	}
+
+	var (
+		c int
+	)
+
+	if err = s.db.NewRaw(sql, args).Scan(bunhook.WithQueryContext(ctx, "Projects.Count"), &c); err != nil {
+		return 0, err
+	}
+
+	return c, nil
+}
+
 func (s *store) Save(ctx context.Context, projects ...*Project) error {
 	recs := toRecords(projects)
 
-	_, err := s.db.ModelContext(postgres.WithQueryContext(ctx, "projects.Save"), &recs).
+	_, err := s.db.NewInsert().Model(&recs).
 		Returning("NULL").
-		OnConflict("(id) DO UPDATE").
-		Insert()
+		On("CONFLICT (id) DO UPDATE").
+		Exec(bunhook.WithQueryContext(ctx, "Projects.Save"))
 
 	return err
 }
 
-type record struct {
-	tableName   struct{}   `pg:"apartomat.projects"`
-	ID          string     `pg:"id,pk"`
-	Name        string     `pg:"name"`
-	Status      string     `pg:"status"`
-	StartAt     *time.Time `pg:"start_at"`
-	EndAt       *time.Time `pg:"end_at"`
-	CreatedAt   time.Time  `pg:"created_at"`
-	ModifiedAt  time.Time  `pg:"modified_at"`
-	WorkspaceID string     `pg:"workspace_id"`
-}
-
-func toRecord(project *Project) *record {
-	return &record{
-		ID:          project.ID,
-		Name:        project.Name,
-		Status:      string(project.Status),
-		StartAt:     project.StartAt,
-		EndAt:       project.EndAt,
-		CreatedAt:   project.CreatedAt,
-		ModifiedAt:  project.ModifiedAt,
-		WorkspaceID: project.WorkspaceID,
-	}
-}
-
-func toRecords(projects []*Project) []*record {
+func (s *store) Delete(ctx context.Context, projects ...*Project) error {
 	var (
-		res = make([]*record, len(projects))
+		ids = make([]string, len(projects))
 	)
 
-	for i, p := range projects {
-		res[i] = toRecord(p)
+	for i, f := range projects {
+		ids[i] = f.ID
 	}
 
-	return res
-}
+	_, err := s.db.NewDelete().
+		Model((*record)(nil)).
+		Where(`id IN (?)`, bun.In(ids)).
+		Exec(bunhook.WithQueryContext(ctx, "Projects.Delete"))
 
-func fromRecords(records []*record) []*Project {
-	visualizations := make([]*Project, len(records))
-
-	for i, r := range records {
-		visualizations[i] = &Project{
-			ID:          r.ID,
-			Name:        r.Name,
-			Status:      Status(r.Status),
-			StartAt:     r.StartAt,
-			EndAt:       r.EndAt,
-			CreatedAt:   r.CreatedAt,
-			ModifiedAt:  r.ModifiedAt,
-			WorkspaceID: r.WorkspaceID,
-		}
-	}
-
-	return visualizations
+	return err
 }

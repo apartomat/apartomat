@@ -121,7 +121,7 @@ func main() {
 		contactsStore := contacts.NewStore(pgdb)
 		filesStore := files.NewStore(bundb)
 		housesStore := houses.NewStore(pgdb)
-		projectsStore := projects.NewStore(pgdb)
+		projectsStore := projects.NewStore(bundb)
 		publicSitesStore := sites.NewStore(bundb)
 		roomsStore := rooms.NewStore(bundb)
 		usersStore := users.NewStore(pgdb)

@@ -55,7 +55,7 @@ func (u *Apartomat) GetWorkspaceProjects(
 			projects.WorkspaceIDIn(workspaceID),
 			projects.StatusIn(status...),
 		),
-		projects.SortDefault,
+		projects.SortCreatedAtDesc,
 		limit,
 		offset,
 	)

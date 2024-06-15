@@ -4,6 +4,7 @@ import (
 	"errors"
 	. "github.com/apartomat/apartomat/internal/store/projects"
 	"github.com/doug-martin/goqu/v9"
+	"github.com/doug-martin/goqu/v9/exp"
 )
 
 type specQuery interface {
@@ -103,4 +104,45 @@ func (s orSpecQuery) Expression() (goqu.Expression, error) {
 	}
 
 	return goqu.Or(exs...), nil
+}
+
+func selectBySpec(tableName string, spec Spec, sort Sort, limit, offset int) (string, []interface{}, error) {
+	qs, err := toSpecQuery(spec)
+	if err != nil {
+		return "", nil, err
+	}
+
+	expr, err := qs.Expression()
+	if err != nil {
+		return "", nil, err
+	}
+
+	var (
+		order exp.OrderedExpression
+	)
+
+	switch sort {
+	case SortCreatedAtAsc:
+		order = goqu.I("created_at").Asc()
+	case SortCreatedAtDesc:
+		order = goqu.I("created_at").Desc()
+	default:
+		order = goqu.I("id").Asc()
+	}
+
+	return goqu.From(tableName).Where(expr).Limit(uint(limit)).Order(order).Offset(uint(offset)).ToSQL()
+}
+
+func countBySpec(tableName string, spec Spec) (string, []interface{}, error) {
+	qs, err := toSpecQuery(spec)
+	if err != nil {
+		return "", nil, err
+	}
+
+	expr, err := qs.Expression()
+	if err != nil {
+		return "", nil, err
+	}
+
+	return goqu.Select(goqu.COUNT(goqu.Star())).From(tableName).Where(expr).ToSQL()
 }
