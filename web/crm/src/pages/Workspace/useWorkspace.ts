@@ -1,4 +1,4 @@
-import { useApolloClient } from "@apollo/client"
+import { NetworkStatus, useApolloClient } from "@apollo/client"
 import { useWorkspaceScreenQuery } from "api/graphql"
 
 export type {
@@ -11,7 +11,9 @@ export type {
 
 export function useWorkspace({ id, timezone }: { id: string; timezone: string }) {
     const client = useApolloClient()
-    return useWorkspaceScreenQuery({ client, errorPolicy: "all", variables: { id, timezone } })
+    const result = useWorkspaceScreenQuery({ client, errorPolicy: "all", variables: { id, timezone } })
+
+    return { ...result, refetching: result.networkStatus === NetworkStatus.refetch }
 }
 
 export default useWorkspace

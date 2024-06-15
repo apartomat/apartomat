@@ -26,6 +26,7 @@ export function Workspace() {
         data,
         loading,
         error: fetchError,
+        refetch,
     } = useWorkspace({ id, timezone: Intl.DateTimeFormat().resolvedOptions().timeZone })
 
     useEffect(() => {
@@ -74,7 +75,7 @@ export function Workspace() {
         }
     }, [data])
 
-    const [showCreateProjectLayer, setShowCreateProjectLayer] = useState(false)
+    const [showCreateProject, setShowCreateProject] = useState(false)
 
     if (loading) {
         return (
@@ -124,11 +125,7 @@ export function Workspace() {
                             {screen.name}
                         </Heading>
                         <Box justify="center">
-                            <Button
-                                color="brand"
-                                label="Новый проект"
-                                onClick={() => setShowCreateProjectLayer(true)}
-                            />
+                            <Button color="brand" label="Новый проект" onClick={() => setShowCreateProject(true)} />
                         </Box>
                     </Box>
 
@@ -148,7 +145,19 @@ export function Workspace() {
                 />
             </Box>
 
-            {showCreateProjectLayer && <CreateProject workspaceId={screen.id} setShow={setShowCreateProjectLayer} />}
+            {showCreateProject && (
+                <CreateProject
+                    workspaceId={screen.id}
+                    onClickClose={() => setShowCreateProject(false)}
+                    onCreate={async () => {
+                        setShowCreateProject(false)
+                        notify({
+                            message: "Проект создан",
+                        })
+                        await refetch()
+                    }}
+                />
+            )}
         </Main>
     )
 }

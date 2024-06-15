@@ -19,10 +19,12 @@ import { FormClose } from "grommet-icons"
 
 export default function CreateProject({
     workspaceId,
-    setShow,
+    onClickClose,
+    onCreate,
 }: {
     workspaceId: string
-    setShow: (show: boolean) => void
+    onClickClose?: () => void
+    onCreate?: () => void
 }) {
     const [name, setName] = useState("")
     const [create, , state] = useCreateProject()
@@ -47,9 +49,9 @@ export default function CreateProject({
 
     useEffect(() => {
         if (state.state === CreateProjectState.DONE) {
-            setShow(false)
+            onCreate && onCreate()
         }
-    }, [state.state, setShow])
+    }, [state.state])
 
     const handleChangeDates = ({ value }: { value: string | string[] }) => {
         if (Array.isArray(value)) {
@@ -64,7 +66,7 @@ export default function CreateProject({
                     <Heading level={2} margin="none">
                         Новый проект
                     </Heading>
-                    <Button icon={<FormClose />} onClick={() => setShow(false)} />
+                    <Button icon={<FormClose />} onClick={onClickClose} />
                 </Box>
                 <Form onSubmit={handleSubmit} validate="submit">
                     {state.state === CreateProjectState.FAILED && <Text>{state.error.message}</Text>}
