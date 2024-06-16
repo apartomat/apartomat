@@ -15,19 +15,20 @@ type Room struct {
 	HouseID         string
 }
 
-func NewRoom(id, name string, square *float64, level *int, houseID string) *Room {
+func NewRoom(id, name string, square *float64, level *int, position int, houseID string) *Room {
 	var (
 		now = time.Now()
 	)
 
 	return &Room{
-		ID:         id,
-		Name:       name,
-		Square:     square,
-		Level:      level,
-		CreatedAt:  now,
-		ModifiedAt: now,
-		HouseID:    houseID,
+		ID:              id,
+		Name:            name,
+		Square:          square,
+		Level:           level,
+		SortingPosition: position,
+		CreatedAt:       now,
+		ModifiedAt:      now,
+		HouseID:         houseID,
 	}
 }
 

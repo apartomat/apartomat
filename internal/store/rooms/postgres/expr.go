@@ -69,9 +69,17 @@ func selectBySpec(tablename string, spec Spec, sort Sort, limit, offset int) (st
 	case SortIDDesc:
 		order = append(order, goqu.I("id").Desc())
 	case SortPositionAsc:
-		order = append(order, goqu.I("sorting_position").Asc())
+		order = append(
+			order,
+			goqu.I("sorting_position").Asc(),
+			goqu.I("modified_at").Asc(),
+		)
 	case SortPositionDesc:
-		order = append(order, goqu.I("sorting_position").Desc())
+		order = append(
+			order,
+			goqu.I("sorting_position").Desc(),
+			goqu.I("modified_at").Desc(),
+		)
 	}
 
 	var (
