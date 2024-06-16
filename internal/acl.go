@@ -36,6 +36,7 @@ func NewAcl(
 	return &Acl{
 		wuCache:  lru.NewLRU[string, *workspace_users.WorkspaceUser](100, nil, time.Minute),
 		prjCache: lru.NewLRU[string, *projects.Project](100, nil, time.Minute),
+		hCache:   lru.NewLRU[string, *houses.House](100, nil, time.Minute),
 
 		workspaceUsers: workspaceUsersStore,
 		projects:       projectsStore,
