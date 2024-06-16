@@ -1,5 +1,5 @@
 .env
-*.key
+*.key*
 *.key.pub
 .idea/
 bin/
