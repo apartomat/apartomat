@@ -9,15 +9,12 @@ import (
 	"github.com/apartomat/apartomat/internal/bookbinder"
 	"github.com/apartomat/apartomat/internal/image/minio"
 	bunhook "github.com/apartomat/apartomat/internal/pkg/bun"
-	"github.com/apartomat/apartomat/internal/postgres"
 	. "github.com/apartomat/apartomat/internal/store/album_files"
 	albumFilesPostgres "github.com/apartomat/apartomat/internal/store/album_files/postgres"
 	"github.com/apartomat/apartomat/internal/store/albums"
 	albumsPostgres "github.com/apartomat/apartomat/internal/store/albums/postgres"
 	"github.com/apartomat/apartomat/internal/store/files"
 	filesPostgres "github.com/apartomat/apartomat/internal/store/files/postgres"
-	"github.com/go-pg/pg/v10"
-	"github.com/prometheus/client_golang/prometheus"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/pgdialect"
 	"github.com/uptrace/bun/driver/pgdriver"
@@ -36,31 +33,22 @@ func main() {
 		panic(err)
 	}
 
-	pgopts, err := pg.ParseURL(os.Getenv("POSTGRES_DSN"))
-	if err != nil {
-		log.Fatal("can't parse POSTGRES_DSN %s", zap.Error(err))
-	}
-
 	var (
 		ctx = context.Background()
 
-		sqldb = sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(os.Getenv("POSTGRES_DSN"))))
-		db    = bun.NewDB(sqldb, pgdialect.New())
-		pgdb  = pg.Connect(pgopts)
-
-		reg = prometheus.NewRegistry()
+		db = bun.NewDB(
+			sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(os.Getenv("POSTGRES_DSN")))),
+			pgdialect.New(),
+		)
 
 		uploader = minio.NewUploader("apartomat")
 
 		albumFilesStore = albumFilesPostgres.NewStore(db)
 		albumsStore     = albumsPostgres.NewStore(db)
-		filesStore      = filesPostgres.NewStore(pgdb)
+		filesStore      = filesPostgres.NewStore(db)
 	)
 
 	db.AddQueryHook(bunhook.NewZapLoggerQueryHook(log))
-
-	pgdb.AddQueryHook(postgres.NewZapLogQueryHook(log))
-	pgdb.AddQueryHook(postgres.NewQueryLatencyHook(reg))
 
 	for {
 		listFiles, err := albumFilesStore.List(ctx, And(StatusIn(StatusNew)), SortVersionAsc, 1, 0)
@@ -109,7 +97,8 @@ func main() {
 
 			images, err := download(filesStore)(ctx, album.Pages)
 			if err != nil {
-				log.Fatal("can't download images", zap.Error(err))
+				log.Error("can't download images", zap.Error(err))
+				return
 			}
 
 			var (
