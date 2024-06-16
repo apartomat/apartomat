@@ -1,4 +1,4 @@
-.env
+.env*
 *.key*
 *.key.pub
 .idea/
