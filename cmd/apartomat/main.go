@@ -37,16 +37,10 @@ import (
 
 func main() {
 	var (
-		level, _ = logLevel(os.Getenv("LOG_LEVEL"))
-
-		logopts = &slog.HandlerOptions{Level: level}
+		logLevel, _ = logLevel(os.Getenv("LOG_LEVEL"))
 	)
 
-	if ok, _ := strconv.ParseBool(os.Getenv("LOG_TRACE")); ok {
-		logopts.ReplaceAttr = replaceAttr
-	}
-
-	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, logopts)))
+	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: logLevel})))
 
 	// deprecated
 	log, err := NewLogger(os.Getenv("LOG_LEVEL"))
