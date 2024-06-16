@@ -4,8 +4,18 @@ export
 dev:
 	env $(cat .env | xargs) go run ./cmd/apartomat run
 
+dev-public-api:
+	env $(cat .env.public-api | xargs) go run ./cmd/public-api
+
 gen:
-	go generate ./...
+	make gen-crm-api
+	make gen-public-api
+
+gen-crm-api:
+	go generate ./api/...
+
+gen-public-site-api:
+	go generate ./api/public/...
 
 test:
 	env $(cat .env | xargs) go test ./... --tags=test,unit
