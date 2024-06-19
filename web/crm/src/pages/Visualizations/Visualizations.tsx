@@ -7,7 +7,7 @@ import { useVisualizations, VisualizationStatus } from "./useVisualizations"
 import { useDeleteVisualizations } from "./useDeleteVisualizations"
 import { VisualizationsScreenVisualizationFragment, VisualizationsScreenHouseRoomFragment } from "api/graphql"
 
-import { Box, Button, Header, Heading, Grid, Image, Layer, Main, Text } from "grommet"
+import { Box, Button, Header, Heading, Grid, Image, Layer, Main, Text, Stack } from "grommet"
 import { AnchorLink } from "shared/ui/AnchorLink"
 import UserAvatar from "./UserAvatar/UserAvatar"
 import ConfirmDelete from "./ConfirmDelete/ConfirmDelete"
@@ -254,7 +254,7 @@ export function Visualizations() {
                 <Grid
                     columns="small"
                     rows="small"
-                    gap="medium"
+                    gap={{ row: "large", column: "medium" }}
                     onClick={() => {
                         setSelected([])
                     }}
@@ -268,18 +268,19 @@ export function Visualizations() {
                                 justify="center"
                                 align="center"
                             >
-                                <Box
-                                    round="xsmall"
-                                    pad="xxsmall"
+                                <Image
                                     onClick={(event: MouseEvent) => {
                                         selectVis(id, event.metaKey)
                                         event.stopPropagation()
                                     }}
-                                    focusIndicator={false}
-                                    style={{ boxShadow: selected.includes(id) ? "0 0 0px 2px #7D4CDB" : "none" }}
-                                >
-                                    <Image fit="contain" src={`${file.url}?h=192`} />
-                                </Box>
+                                    fit="contain"
+                                    src={`${file.url}?h=192`}
+                                    style={{
+                                        padding: "3px",
+                                        borderRadius: "4px",
+                                        boxShadow: selected.includes(id) ? "0 0 0px 2px #7D4CDB" : "none",
+                                    }}
+                                />
                             </Box>
                         )
                     })}
