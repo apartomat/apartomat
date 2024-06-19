@@ -105,19 +105,19 @@ export default function AddVisualizations({
                                         >
                                             <Button
                                                 badge={
-                                                    selected.includes(vis.id) ? selected.indexOf(vis.id) + 1 : undefined
+                                                    selected.includes(vis.id) ? {
+                                                        value: selected.indexOf(vis.id) + 1,
+                                                        max: 999
+                                                    } : undefined
                                                 }
                                             >
                                                 <Box
-                                                    round="xsmall"
+                                                    round={selected.includes(vis.id) ? "xsmall": "none"}
                                                     pad="xxsmall"
                                                     style={{
                                                         boxShadow: selected.includes(vis.id)
                                                             ? "0 0 0px 2px #7D4CDB"
                                                             : "none",
-                                                    }}
-                                                    background={{
-                                                        color: inAlbum.includes(vis.id) ? "status-disabled" : undefined,
                                                     }}
                                                     focusIndicator={false}
                                                     onClick={(event: MouseEvent) => {
@@ -126,10 +126,10 @@ export default function AddVisualizations({
                                                     }}
                                                 >
                                                     <Image
-                                                        src={`${vis.file.url}?w=90`}
                                                         fit="contain"
+                                                        fill
+                                                        src={`${vis.file.url}?h=96`}
                                                         opacity={inAlbum.includes(vis.id) ? "0.5" : undefined}
-                                                        style={{ color: "blue" }}
                                                     />
                                                 </Box>
                                             </Button>
