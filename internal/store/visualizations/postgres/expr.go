@@ -128,7 +128,7 @@ func selectBySpec(spec Spec, sort Sort, limit, offset int) (string, []interface{
 		return "", nil, err
 	}
 
-	type Join struct {
+	type LeftJoin struct {
 		Table goqu.Expression
 		Cond  exp.JoinCondition
 	}
@@ -136,7 +136,7 @@ func selectBySpec(spec Spec, sort Sort, limit, offset int) (string, []interface{
 	var (
 		order = make([]exp.OrderedExpression, 0)
 
-		join *Join
+		join interface{}
 	)
 
 	switch sort {
@@ -150,7 +150,7 @@ func selectBySpec(spec Spec, sort Sort, limit, offset int) (string, []interface{
 	case SortPositionDesc:
 		order = append(order, goqu.I("v.sorting_position").Desc())
 	case SortRoomAscPositionAsc:
-		join = &Join{
+		join = &LeftJoin{
 			Table: goqu.T("rooms").Schema("apartomat").As("r"),
 			Cond:  goqu.On(goqu.Ex{"r.id": goqu.I("v.room_id")}),
 		}
@@ -163,7 +163,9 @@ func selectBySpec(spec Spec, sort Sort, limit, offset int) (string, []interface{
 	)
 
 	if join != nil {
-		q = q.Join(join.Table, join.Cond)
+		if j, ok := join.(*LeftJoin); ok && j != nil {
+			q = q.LeftJoin(j.Table, j.Cond)
+		}
 	}
 
 	q = q.Where(expr).Limit(uint(limit)).Offset(uint(offset))
