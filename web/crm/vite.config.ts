@@ -11,6 +11,7 @@ export default defineConfig({
             { find: "features", replacement: path.resolve(__dirname, "./src/features") },
             { find: "pages", replacement: path.resolve(__dirname, "./src/pages") },
             { find: "shared", replacement: path.resolve(__dirname, "./src/shared") },
+            { find: "widgets", replacement: path.resolve(__dirname, "./src/widgets") },
         ],
     },
 })

@@ -4,7 +4,7 @@ import { Box, Button, Grid, Heading, Image, Layer, LayerExtendedProps, Text } fr
 import { FormClose } from "grommet-icons"
 
 import { AlbumScreenHouseRoomFragment, AlbumScreenVisualizationFragment } from "api/graphql"
-import RoomsFilter from "pages/Visualizations/RoomsFilter/RoomsFilter"
+import { RoomsFilter } from "features/rooms-filter/RoomsFilter"
 import { useAddVisualizationsToAlbum } from "pages/Album/AddVisualizations/useAddVisualizationsToAlbum"
 
 export default function AddVisualizations({
@@ -105,14 +105,16 @@ export default function AddVisualizations({
                                         >
                                             <Button
                                                 badge={
-                                                    selected.includes(vis.id) ? {
-                                                        value: selected.indexOf(vis.id) + 1,
-                                                        max: 999
-                                                    } : undefined
+                                                    selected.includes(vis.id)
+                                                        ? {
+                                                              value: selected.indexOf(vis.id) + 1,
+                                                              max: 999,
+                                                          }
+                                                        : undefined
                                                 }
                                             >
                                                 <Box
-                                                    round={selected.includes(vis.id) ? "xsmall": "none"}
+                                                    round={selected.includes(vis.id) ? "xsmall" : "none"}
                                                     pad="xxsmall"
                                                     style={{
                                                         boxShadow: selected.includes(vis.id)

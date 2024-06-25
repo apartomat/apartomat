@@ -4,7 +4,7 @@ import { VisualizationsScreenHouseRoomFragment } from "api/graphql"
 
 import { Box, BoxExtendedProps, CheckBox } from "grommet"
 
-export default function RoomsFilter({
+export function RoomsFilter({
     rooms,
     onSelectRooms,
     ...props

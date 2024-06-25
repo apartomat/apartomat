@@ -1,9 +1,7 @@
-import React from "react"
-
-import { Box, Layer, Text } from "grommet"
+import { Box, Layer, LayerExtendedProps, Text } from "grommet"
 import { StatusGood } from "grommet-icons"
 
-export function Notification({ message, ...layerProps }: { message: string }) {
+export function Notification({ message, ...layerProps }: { message: string } & LayerExtendedProps) {
     return (
         <Layer
             position="top"
@@ -28,5 +26,3 @@ export function Notification({ message, ...layerProps }: { message: string }) {
         </Layer>
     )
 }
-
-export default Notification

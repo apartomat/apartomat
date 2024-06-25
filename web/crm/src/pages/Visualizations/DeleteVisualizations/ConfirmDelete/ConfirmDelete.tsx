@@ -3,7 +3,7 @@ import React from "react"
 import { Box, Button, Heading, Layer, LayerExtendedProps, Text } from "grommet"
 import { Alert, FormClose } from "grommet-icons"
 
-export default function ConfirmDelete({
+export function ConfirmDelete({
     count,
     disableButton,
     onClickClose,
