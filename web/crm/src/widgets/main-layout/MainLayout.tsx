@@ -4,9 +4,7 @@ import { Box, BoxExtendedProps, Button, Header, Heading, Layer, Main, Text } fro
 
 import { AnchorLink, Spinner } from "shared/ui"
 import { UserAvatar } from "features/user-avatar"
-
-import { Notification } from "./Notification"
-import { LinkPrevious, Trash } from "grommet-icons"
+import { Notifications } from "features/notification"
 
 export function MainLayout({
     loading,
@@ -22,7 +20,6 @@ export function MainLayout({
     headerMenu?: ReactNode
     error?: string
 } & BoxExtendedProps) {
-    console.log({ loading })
     return (
         <Main pad={{ vertical: "medium", horizontal: "large" }}>
             {loading && (
@@ -34,7 +31,7 @@ export function MainLayout({
                 </Layer>
             )}
 
-            {notification && <Notification message={notification} />}
+            <Notifications />
 
             {error && (
                 <>

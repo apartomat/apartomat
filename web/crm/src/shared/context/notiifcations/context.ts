@@ -48,9 +48,11 @@ export function useNotificationsContextProvider() {
         }) => {
             const id = Math.random().toString(36).slice(2, 9) + new Date().getTime().toString(36)
 
-            callback && callback()
+            if (callback) {
+                setTimeout(callback, timeout + duration)
+            }
 
-            setNotifications((prev) => [...prev, { id, message, severity, timeout, duration }])
+            setNotifications((prev) => [...prev, { id, message, severity, timeout, duration, callback }])
         },
         dismiss: (id: string) => {
             setNotifications((prev) => prev.filter((message) => message.id !== id))
