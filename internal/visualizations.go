@@ -26,7 +26,12 @@ func (u *Apartomat) UploadVisualization(
 		return nil, nil, err
 	}
 
-	vis := NewVisualization(id, projectID, file.ID, roomID)
+	position, err := u.Visualizations.GetMaxSortingPosition(ctx, NotDeletedByProjectAndRoom(projectID, roomID))
+	if err != nil {
+		return nil, nil, fmt.Errorf("can't get max soring position: %w", err)
+	}
+
+	vis := NewVisualization(id, "", "", 0, position+1, projectID, file.ID, roomID)
 
 	if err = u.Visualizations.Save(ctx, vis); err != nil {
 		return nil, nil, err
@@ -61,7 +66,14 @@ func (u *Apartomat) UploadVisualizations(
 		return nil, fmt.Errorf("can't get project (id=%s) files: %w", project.ID, ErrForbidden)
 	}
 
+	position, err := u.Visualizations.GetMaxSortingPosition(ctx, NotDeletedByProjectAndRoom(projectID, roomID))
+	if err != nil {
+		return nil, fmt.Errorf("can't get max soring position: %w", err)
+	}
+
 	for _, file := range uploads {
+		position++
+
 		fileID, err := GenerateNanoID()
 		if err != nil {
 			return nil, err
@@ -85,7 +97,7 @@ func (u *Apartomat) UploadVisualizations(
 			return nil, err
 		}
 
-		vis := NewVisualization(id, projectID, f.ID, roomID)
+		vis := NewVisualization(id, "", "", 0, position, projectID, f.ID, roomID)
 
 		if err := u.Visualizations.Save(ctx, vis); err != nil {
 			return nil, err

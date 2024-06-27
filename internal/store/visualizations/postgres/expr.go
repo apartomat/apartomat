@@ -30,6 +30,8 @@ func toSpecQuery(spec Spec) (specQuery, error) {
 		return roomIDInSpecQuery{s}, nil
 	case StatusInSpec:
 		return statusInSpecQuery{s}, nil
+	case StatusNotInSpec:
+		return statusNotInSpecQuery{s}, nil
 	case AndSpec:
 		return andSpecQuery{spec: s}, nil
 	case OrSpec:
@@ -69,6 +71,14 @@ type statusInSpecQuery struct {
 
 func (s statusInSpecQuery) Expression() (goqu.Expression, error) {
 	return goqu.Ex{"status": s.spec.Status}, nil
+}
+
+type statusNotInSpecQuery struct {
+	spec StatusNotInSpec
+}
+
+func (s statusNotInSpecQuery) Expression() (goqu.Expression, error) {
+	return goqu.Ex{"status": goqu.Op{"notIn": s.spec.Status}}, nil
 }
 
 type andSpecQuery struct {
@@ -117,13 +127,22 @@ func (s orSpecQuery) Expression() (goqu.Expression, error) {
 	return goqu.Or(exs...), nil
 }
 
-func selectBySpec(spec Spec, sort Sort, limit, offset int) (string, []interface{}, error) {
+func specToExpr(spec Spec) (goqu.Expression, error) {
 	sq, err := toSpecQuery(spec)
 	if err != nil {
-		return "", nil, err
+		return nil, err
 	}
 
 	expr, err := sq.Expression()
+	if err != nil {
+		return nil, err
+	}
+
+	return expr, nil
+}
+
+func selectBySpec(spec Spec, sort Sort, limit, offset int) (string, []interface{}, error) {
+	expr, err := specToExpr(spec)
 	if err != nil {
 		return "", nil, err
 	}
@@ -175,4 +194,18 @@ func selectBySpec(spec Spec, sort Sort, limit, offset int) (string, []interface{
 	}
 
 	return q.ToSQL()
+}
+
+func selectMaxSoringPosition(spec Spec) (string, []interface{}, error) {
+	expr, err := specToExpr(spec)
+	if err != nil {
+		return "", nil, err
+	}
+
+	var (
+		q = goqu.From(goqu.T("visualizations").Schema("apartomat").As("v")).
+			Select(goqu.MAX("sorting_position"))
+	)
+
+	return q.Where(expr).ToSQL()
 }

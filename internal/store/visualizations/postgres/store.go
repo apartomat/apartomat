@@ -51,6 +51,24 @@ func (s *store) Get(ctx context.Context, spec Spec) (*Visualization, error) {
 	return res[0], nil
 }
 
+func (s *store) GetMaxSortingPosition(ctx context.Context, spec Spec) (int, error) {
+	var (
+		num int
+	)
+
+	sql, args, err := selectMaxSoringPosition(spec)
+	if err != nil {
+		return 0, err
+	}
+
+	if err := s.db.NewRaw(sql, args...).
+		Scan(bunhook.WithQueryContext(ctx, "Visualizations.GetMaxSortingPosition"), &num); err != nil {
+		return 0, err
+	}
+
+	return num, err
+}
+
 func (s *store) Save(ctx context.Context, visualizations ...*Visualization) error {
 	var (
 		recs = toRecords(visualizations)

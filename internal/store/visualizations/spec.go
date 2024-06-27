@@ -76,6 +76,24 @@ func StatusIn(vals ...VisualizationStatus) Spec {
 	return StatusInSpec{Status: vals}
 }
 
+type StatusNotInSpec struct {
+	Status []VisualizationStatus
+}
+
+func (s StatusNotInSpec) Is(c *Visualization) bool {
+	for _, val := range s.Status {
+		if c.Status == val {
+			return false
+		}
+	}
+
+	return true
+}
+
+func StatusNotIn(vals ...VisualizationStatus) Spec {
+	return StatusNotInSpec{Status: vals}
+}
+
 type AndSpec struct {
 	Specs []Spec
 }
@@ -110,4 +128,19 @@ func (s OrSpec) Is(c *Visualization) bool {
 
 func Or(specs ...Spec) Spec {
 	return OrSpec{Specs: specs}
+}
+
+func NotDeletedByProjectAndRoom(projectID string, roomID *string) Spec {
+	var (
+		spec = And(
+			ProjectIDIn(projectID),
+			StatusNotIn(VisualizationStatusDeleted),
+		)
+	)
+
+	if roomID != nil {
+		spec = And(spec, RoomIDIn(*roomID))
+	}
+
+	return spec
 }

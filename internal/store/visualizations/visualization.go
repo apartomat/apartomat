@@ -27,23 +27,32 @@ const (
 	VisualizationStatusDeleted  VisualizationStatus = "DELETED"
 )
 
-func NewVisualization(id, projectID, projectFileID string, roomID *string) *Visualization {
+func NewVisualization(
+	id,
+	name, description string,
+	version int,
+	sortingPosition int,
+	projectID,
+	projectFileID string,
+	roomID *string,
+) *Visualization {
 	var (
 		now = time.Now()
 	)
 
 	return &Visualization{
-		ID:          id,
-		Name:        "",
-		Description: "",
-		Version:     0,
-		Status:      VisualizationStatusUnknown,
-		CreatedAt:   now,
-		ModifiedAt:  now,
-		DeletedAt:   nil,
-		ProjectID:   projectID,
-		FileID:      projectFileID,
-		RoomID:      roomID,
+		ID:              id,
+		Name:            name,
+		Description:     description,
+		Version:         version,
+		Status:          VisualizationStatusUnknown,
+		SortingPosition: sortingPosition,
+		CreatedAt:       now,
+		ModifiedAt:      now,
+		DeletedAt:       nil,
+		ProjectID:       projectID,
+		FileID:          projectFileID,
+		RoomID:          roomID,
 	}
 }
 
