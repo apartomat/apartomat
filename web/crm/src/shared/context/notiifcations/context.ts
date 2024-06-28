@@ -37,7 +37,7 @@ export function useNotificationsContextProvider() {
             message,
             severity = "ok",
             timeout = 250,
-            duration = 1500,
+            duration = 1000,
             callback,
         }: {
             message: string
