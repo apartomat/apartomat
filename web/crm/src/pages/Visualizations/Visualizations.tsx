@@ -10,6 +10,9 @@ import { Box, Button, Grid, Image, Text } from "grommet"
 import { Rooms, useSearchParamsRoomsFilter } from "./Rooms"
 import { DeleteVisualizations } from "./DeleteVisualizations"
 import { useNotifications } from "shared/context/notiifcations/context"
+import { Upload } from "./Upload"
+
+type Rooms = Pick<VisualizationsScreenHouseRoomFragment, "id" | "name">[]
 
 export function Visualizations() {
     const { id } = useParams<"id">() as { id: string }
@@ -110,6 +113,23 @@ export function Visualizations() {
                             })
                         }}
                     />
+
+                    {project && (
+                        <Upload
+                            projectId={project.id}
+                            rooms={rooms as Rooms}
+                            roomId={roomsFilter.length == 1 ? roomsFilter[0] : undefined}
+                            onVisualizationsUploaded={({ files }) => {
+                                notify({
+                                    message:
+                                        files?.length === 1
+                                            ? "Визуализация загружена"
+                                            : `Загружено визуализаций ${files?.length}`,
+                                    callback: refetch,
+                                })
+                            }}
+                        />
+                    )}
                 </Box>
             }
         >

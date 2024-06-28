@@ -42,7 +42,7 @@ export function DeleteVisualizations({ visualizations, onDelete }: { visualizati
             <Button
                 disabled={visualizations.length === 0}
                 icon={<Trash color="brand" />}
-                label="Удалить"
+                // label="Удалить"
                 onClick={handleClickDelete}
             />
 

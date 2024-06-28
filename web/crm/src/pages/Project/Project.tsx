@@ -14,7 +14,7 @@ import {
     BoxExtendedProps,
     Drop,
 } from "grommet"
-import { Add, StatusGood } from "grommet-icons"
+import { Add } from "grommet-icons"
 
 import { AnchorLink } from "shared/ui/AnchorLink"
 import UserAvatar from "./UserAvatar/UserAvatar"
@@ -22,7 +22,7 @@ import UserAvatar from "./UserAvatar/UserAvatar"
 import { useAuthContext } from "shared/context/auth/context"
 
 import { useProject, Project as ProjectType } from "./useProject"
-import { ProjectStatusDictionary } from "api/graphql"
+import { ProjectStatusDictionary, VisualizationsScreenHouseRoomFragment } from "api/graphql"
 
 import ChangeStatus from "./ChangeStatus/ChangeStatus"
 import Contacts from "./Contacts/Contacts"
@@ -31,7 +31,7 @@ import ProjectDates from "./Dates/Dates"
 import House from "./House/House"
 import Rooms from "./Rooms/Rooms"
 import Visualizations from "./Visualizations/Visualizations"
-import UploadVisualizations from "./UploadVisualizations/UploadVisualizations"
+import { UploadVisualizations, Rooms as RoomsForUpload } from "features/upload-visualizations"
 import CreateAlbumOnClick from "./CreateAlbum/CreateAlbum"
 import Albums from "./Albums/Albums"
 import PublicSite from "./PublicSite/PublicSite"
@@ -60,6 +60,8 @@ export function Project() {
         undefined
     )
 
+    const [rooms, setRooms] = useState<VisualizationsScreenHouseRoomFragment[]>()
+
     useEffect(() => {
         if (fetchError) {
             setError("Ошибка сервера")
@@ -67,11 +69,22 @@ export function Project() {
     }, [fetchError])
 
     useEffect(() => {
-        if (data?.project) {
-            switch (data.project.__typename) {
+        const res = data?.project
+
+        if (res) {
+            switch (res.__typename) {
                 case "Project":
-                    setProject(data.project)
-                    setProjectStatusDictionary(data.project.statuses)
+                    setProject(res)
+                    setProjectStatusDictionary(res.statuses)
+
+                    if (res.houses.list.__typename === "ProjectHousesList" && res.houses.list.items.length > 0) {
+                        const h = res.houses.list.items[0]
+
+                        if (h.rooms.list.__typename === "HouseRoomsList") {
+                            setRooms(h.rooms.list.items)
+                        }
+                    }
+
                     break
                 case "NotFound":
                     setError("Проект не найден")
@@ -272,18 +285,24 @@ export function Project() {
                 {showUploadVisualizations && (
                     <UploadVisualizations
                         projectId={project.id}
-                        houses={project.houses}
-                        onUploadComplete={({ files }: { files: File[] }) => {
+                        rooms={rooms as RoomsForUpload}
+                        onVisualizationsUploaded={({ files }: { files: File[] }) => {
                             setShowUploadVisualizations(false)
                             notify({
-                                message: files?.length === 1 ? "Файл загружен" : `Загружено файлов ${files?.length}`,
+                                message:
+                                    files?.length === 1
+                                        ? "Визуализация загружена"
+                                        : `Загружено визуализаций ${files?.length}`,
+                                callback: refetch,
                             })
-                            refetch()
                         }}
                         onClickOutside={() => {
                             setShowUploadVisualizations(false)
                         }}
                         onClickClose={() => {
+                            setShowUploadVisualizations(false)
+                        }}
+                        onEsc={() => {
                             setShowUploadVisualizations(false)
                         }}
                     />

@@ -5,6 +5,8 @@ import {
     UploadVisualizationsMutationResult,
 } from "api/graphql"
 
+export type { Room } from "api/graphql"
+
 export function useUploadVisualizations(): [
     ({
         projectId,

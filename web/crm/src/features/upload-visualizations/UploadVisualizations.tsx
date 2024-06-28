@@ -1,4 +1,13 @@
-import React, { useState, DragEvent, ChangeEvent, useEffect, useCallback } from "react"
+import React, {
+    useState,
+    DragEvent,
+    ChangeEvent,
+    useEffect,
+    useCallback,
+    useRef,
+    useImperativeHandle,
+    forwardRef,
+} from "react"
 
 import {
     Layer,
@@ -16,31 +25,32 @@ import {
     FormField,
     Select,
 } from "grommet"
+
 import { Image as ImageIcon, FormClose } from "grommet-icons"
 
-import { Room, ProjectHouses } from "../useProject"
-import { useUploadVisualizations } from "./useUploadVisualizations"
-import { useRef } from "react"
-import { useImperativeHandle } from "react"
-import { forwardRef } from "react"
+import { useUploadVisualizations } from "./api/useUploadVisualizations"
 
-export default function UploadVisualizations({
+export type Rooms = { id: string; name: string }[]
+
+export function UploadVisualizations({
     projectId,
+    rooms,
+    roomId,
     onClickClose,
-    onUploadComplete,
-    houses,
+    onVisualizationsUploaded,
     ...layerProps
 }: {
     projectId: string
-    houses: ProjectHouses
+    rooms: Rooms
+    roomId?: string
     onClickClose?: () => void
-    onUploadComplete?: ({ files }: { files: File[] }) => void
+    onVisualizationsUploaded?: ({ files }: { files: File[] }) => void
 } & LayerExtendedProps) {
     const [files, setFiles] = useState<File[]>([])
 
-    const [room, setRoom] = useState<{ key: string; value: string } | undefined>(undefined)
+    const [room, setRoom] = useState<string | undefined>(roomId)
 
-    const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined)
+    const [errorMessage, setErrorMessage] = useState<string | undefined>()
 
     const [upload, { loading, error, data }] = useUploadVisualizations()
 
@@ -48,17 +58,17 @@ export default function UploadVisualizations({
         const complete = data?.uploadVisualizations.__typename === "VisualizationsUploaded"
 
         if (complete) {
-            onUploadComplete && onUploadComplete({ files })
+            onVisualizationsUploaded && onVisualizationsUploaded({ files })
         }
-    }, [data, files, onUploadComplete])
+    }, [data, files, onVisualizationsUploaded])
 
     useEffect(() => {
         const complete = data?.uploadVisualizations.__typename === "SomeVisualizationsUploaded"
 
         if (complete) {
-            onUploadComplete && onUploadComplete({ files })
+            onVisualizationsUploaded && onVisualizationsUploaded({ files })
         }
-    }, [data, files, onUploadComplete])
+    }, [data, files, onVisualizationsUploaded])
 
     useEffect(() => {
         const error = data?.uploadVisualizations.__typename === "Forbidden"
@@ -74,11 +84,11 @@ export default function UploadVisualizations({
 
     const [dragCounter, setDragCounter] = useState(0)
 
-    const handleSubmit = (event: React.FormEvent) => {
+    const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault()
 
         if (files && !loading) {
-            upload({ projectId, files, roomId: room?.value })
+            await upload({ projectId, files, roomId: room })
         }
     }
 
@@ -109,10 +119,6 @@ export default function UploadVisualizations({
     }
 
     const inputFile = useRef<HTMLInputElement>()
-
-    const roomscb = useCallback(() => {
-        return rooms(houses)
-    }, [houses])
 
     return (
         <Layer {...layerProps}>
@@ -182,17 +188,17 @@ export default function UploadVisualizations({
                             {files.length > 0 && <Files files={files} onClickRemove={removeFile} />}
                         </FormField>
 
-                        {roomscb() && (
+                        {rooms.length > 0 && (
                             <FormField label="Комната" width="medium">
                                 <Select
-                                    labelKey="label"
-                                    valueKey="value"
+                                    labelKey="name"
+                                    valueKey="id"
                                     value={room}
-                                    options={roomscb().map((room) => {
-                                        return { label: room.name, value: room.id }
+                                    options={rooms.map((room) => {
+                                        return room
                                     })}
                                     onChange={({ value }) => {
-                                        setRoom(value)
+                                        setRoom(value.id)
                                     }}
                                 />
                             </FormField>
@@ -266,7 +272,7 @@ const UploadFiles = forwardRef(
 
             if (event.target.files) {
                 for (const h in event.target.files) {
-                    const item = event.target.files[h]
+                    const item = event.target?.files[h]
 
                     if (item instanceof File) {
                         nextFiles.push(item)
@@ -355,28 +361,4 @@ function FileForUpload({
             </Stack>
         </Box>
     )
-}
-
-function rooms(houses: ProjectHouses): Room[] {
-    const house = firstHouse(houses)
-
-    if (house) {
-        switch (house.rooms.list.__typename) {
-            case "HouseRoomsList":
-                return house.rooms.list.items
-            default:
-                return []
-        }
-    }
-
-    return []
-}
-
-function firstHouse(houses: ProjectHouses) {
-    switch (houses.list.__typename) {
-        case "ProjectHousesList":
-            return houses.list.items[0]
-        default:
-            return undefined
-    }
 }
