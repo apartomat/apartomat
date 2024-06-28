@@ -1,5 +1,6 @@
 export * from "./AcceptInvite"
 export * from "./Album"
+export * from "./AlbumCover"
 export * from "./Confirm"
 export * from "./Login"
 export * from "./Logout"

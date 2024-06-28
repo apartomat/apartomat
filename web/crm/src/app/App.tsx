@@ -10,7 +10,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom"
 import { AuthProvider, NotificationsProvider } from "./providers/"
 import { AuthRequired, RedirectToDefaultWorkspace } from "./routes"
 
-import { AcceptInvite, Album, Confirm, Login, Logout, Project, Visualizations, Workspace } from "pages"
+import { AcceptInvite, Album, AlbumCover, Confirm, Login, Logout, Project, Visualizations, Workspace } from "pages"
 import { GraphQLWsLink } from "@apollo/client/link/subscriptions"
 import { createClient } from "graphql-ws"
 
@@ -90,7 +90,7 @@ function App() {
                                     <Route path="/p/:id" element={<Project />} />
                                     <Route path="/vis/:id" element={<Visualizations />} />
                                     <Route path="/album/:id" element={<Album />} />
-                                    <Route path="/p/:id/album" element={<Album />} />
+                                    <Route path="/album/:id/cover" element={<AlbumCover />} />
                                 </Route>
                             </Routes>
                         </BrowserRouter>
