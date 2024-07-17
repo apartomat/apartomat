@@ -11,7 +11,7 @@ export default function AddVisualizations({
     albumId,
     visualizations,
     rooms,
-    inAlbum,
+    alreadyAdded,
     onClickClose,
     onVisualizationsAdded,
     ...layerProps
@@ -19,7 +19,7 @@ export default function AddVisualizations({
     albumId: string
     visualizations: AlbumScreenVisualizationFragment[]
     rooms: AlbumScreenHouseRoomFragment[]
-    inAlbum: string[]
+    alreadyAdded: string[]
     onVisualizationsAdded?: () => void
     onClickClose?: () => void
 } & LayerExtendedProps) {
@@ -131,7 +131,7 @@ export default function AddVisualizations({
                                                         fit="contain"
                                                         fill
                                                         src={`${vis.file.url}?h=96`}
-                                                        opacity={inAlbum.includes(vis.id) ? "0.5" : undefined}
+                                                        opacity={alreadyAdded.includes(vis.id) ? "0.5" : undefined}
                                                     />
                                                 </Box>
                                             </Button>

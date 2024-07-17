@@ -1,8 +1,9 @@
-import { MouseEventHandler, useEffect, useState } from "react"
+import React, { MouseEventHandler, useEffect, useRef, useState } from "react"
 import { useParams, useNavigate } from "react-router-dom"
+import { InView } from "react-intersection-observer"
 
-import { Box, BoxExtendedProps, Button, Grid, Heading, Header, Image, Text } from "grommet"
-import { Add, Close, Sort } from "grommet-icons"
+import { Box, BoxExtendedProps, Button, Grid, Heading, Header, Image, Text, Drop, Main } from "grommet"
+import { Add, Close } from "grommet-icons"
 
 import useAlbum, {
     AlbumScreenVisualizationFragment,
@@ -17,7 +18,6 @@ import useAlbum, {
 import { PageSize, PageOrientation } from "./Settings/"
 import AddVisualizations from "pages/Album/AddVisualizations/AddVisualizations"
 import GenerateAlbumFile from "pages/Album/GenerateFile/GenerateFile"
-import { Pages } from "./Pages"
 
 export function Album() {
     const { id } = useParams<"id">() as { id: string }
@@ -67,53 +67,66 @@ export function Album() {
         }
     }, [data])
 
-    const [currentPage, setCurrentPage] = useState<number>(0)
-
-    const [redirectTo, setRedirectTo] = useState<string | undefined>(undefined)
-
     const navigate = useNavigate()
 
-    if (redirectTo) {
-        navigate(redirectTo)
-    }
+    const [inView, setInView] = useState(0)
 
     return (
-        <Grid
-            fill
-            columns={["small", "flex", "small"]}
-            rows={["auto", "flex", "auto"]}
-            areas={[
-                { name: "header", start: [0, 0], end: [2, 0] },
-                { name: "left", start: [0, 1], end: [0, 1] },
-                { name: "main", start: [1, 1], end: [1, 1] },
-                { name: "right", start: [2, 1], end: [2, 1] },
-                { name: "footer", start: [0, 2], end: [2, 2] },
-            ]}
-            width={{ width: "100vw" }}
-            height={{ height: "100vh" }}
-            pad="medium"
-            responsive
-        >
-            <Header gridArea="header">
-                <Box>
-                    <Text size="xlarge" weight="bold">
-                        {data?.album.__typename === "Album" && <>{data?.album.name}</>}
-                    </Text>
-                </Box>
-                <Box>
-                    <Button
-                        icon={<Close />}
-                        onClick={() => {
-                            project && setRedirectTo(`/p/${project.id}`)
-                        }}
-                    />
-                </Box>
+        <Main overflow="scroll" style={{ position: "fixed", inset: 0 }}>
+            <Header
+                style={{
+                    position: "fixed",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                }}
+                background={{
+                    color: "white",
+                    opacity: "strong",
+                }}
+                pad={{ top: "medium", bottom: "small", horizontal: "large" }}
+                justify="between"
+            >
+                <Grid columns={{ count: 3, size: "auto" }} gap="small" width="100%">
+                    <Box align="start" justify="center">
+                        <Text size="xlarge" weight="bold">
+                            {data?.album.__typename === "Album" && <>{data?.album.name}</>}
+                        </Text>
+                    </Box>
+                    <Box align="center" justify="center">
+                        {pages.length > 0 && (
+                            <Text weight="bold" color="text-xweak">
+                                {inView + 1} / {pages.length}
+                            </Text>
+                        )}
+                    </Box>
+                    <Box align="end" justify="center">
+                        <Button
+                            icon={<Close />}
+                            onClick={() => {
+                                project && navigate(`/p/${project.id}`)
+                            }}
+                        />
+                    </Box>
+                </Grid>
             </Header>
 
-            <Box gridArea="right">
+            <Box
+                style={{
+                    position: "fixed",
+                    top: "84px",
+                    right: "60px",
+                }}
+                background="background-back"
+                pad="medium"
+                round="xsmall"
+                margin={{ top: "large" }}
+            >
                 {settings && (
-                    <Box gap="small" align="end" margin={{ top: "large" }}>
-                        <Heading level={5}>Настройки для печати</Heading>
+                    <Box gap="small" align="end">
+                        <Heading level={5} margin={{ top: "none" }}>
+                            Настройки для печати
+                        </Heading>
                         <PageSize albumId={id} size={settings.pageSize} onAlbumPageSizeChanged={() => refetch()} />
                         <PageOrientation
                             albumId={id}
@@ -123,104 +136,81 @@ export function Album() {
                     </Box>
                 )}
                 {data?.album.__typename === "Album" && (
-                    <Box gap="small" align="end" margin={{ top: "large" }}>
+                    <Box gap="small" align="end" margin={{ top: "medium" }}>
                         <GenerateAlbumFile album={data.album} onAlbumFileGenerated={() => refetch()} />
                     </Box>
                 )}
             </Box>
 
-            <Box gridArea="left"></Box>
-
-            {pages.length === 0 && !loading && (
-                <Box gridArea="main" align="center" justify="center">
-                    <Box margin={{ bottom: "medium" }}>
-                        <Text size="small" color="text-xweak" textAlign="center">
-                            В альбом можно добавить обложку, визуализации и другие материалы
-                        </Text>
-                    </Box>
-                    <Button
-                        icon={<Add />}
-                        label="Добавить..."
-                        primary
-                        onClick={() => {
-                            setShowAddVisualizations(true)
-                        }}
-                    />
-                </Box>
-            )}
+            <AddVariants
+                style={{
+                    position: "fixed",
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                }}
+                direction="row"
+                justify="center"
+                pad="small"
+                onClickAddVisualizations={() => setShowAddVisualizations(true)}
+            />
 
             {pages.length > 0 && (
-                <Box gridArea="main" align="center" justify="center">
-                    {pages
-                        .filter((_, i) => i === currentPage)
-                        .map((p, key) => {
+                <Box align="center" pad={{ top: "84px", bottom: "68px" }}>
+                    <Grid>
+                        {pages.map((p, key) => {
                             return (
-                                <Box
+                                <InView
                                     key={key}
-                                    style={{ aspectRatio: orientationToAspectRation(settings?.pageOrientation) }}
-                                    pad="medium"
-                                    background="background-contrast"
-                                    round="xsmall"
-                                >
-                                    {(() => {
-                                        switch (p.__typename) {
-                                            case "AlbumPageVisualization":
-                                                switch (p.visualization.__typename) {
-                                                    case "Visualization":
-                                                        return (
-                                                            <Image
-                                                                key={key}
-                                                                fit="contain"
-                                                                src={p.visualization.file.url}
-                                                            />
-                                                        )
-                                                    default:
-                                                        return <></>
-                                                }
-                                            default:
-                                                return <></>
+                                    onChange={(inView) => {
+                                        if (inView) {
+                                            setInView(key)
                                         }
-                                    })()}
-                                </Box>
+                                    }}
+                                    threshold={1.0}
+                                >
+                                    <Box
+                                        style={{ aspectRatio: orientationToAspectRation(settings?.pageOrientation) }}
+                                        background="background-contrast"
+                                        round="xsmall"
+                                        margin={{ vertical: "xxsmall" }}
+                                        justify="center"
+                                        pad="small"
+                                        width={orientationWidth(settings?.pageOrientation, 1.0)}
+                                    >
+                                        {(() => {
+                                            switch (p.__typename) {
+                                                case "AlbumPageVisualization":
+                                                    switch (p.visualization.__typename) {
+                                                        case "Visualization":
+                                                            return (
+                                                                <Image
+                                                                    key={key}
+                                                                    fit="contain"
+                                                                    src={p.visualization.file.url}
+                                                                />
+                                                            )
+                                                        default:
+                                                            return <></>
+                                                    }
+                                                default:
+                                                    return <></>
+                                            }
+                                        })()}
+                                    </Box>
+                                </InView>
                             )
                         })}
+                    </Grid>
                 </Box>
             )}
-
-            <Box gridArea="footer">
-                {pages.length > 0 && (
-                    <Box direction="row" align="center" justify="center">
-                        <Box align="center" margin={{ right: "medium" }}>
-                            <Box round="full" overflow="hidden" background="light-2">
-                                <Button icon={<Sort />} hoverIndicator />
-                            </Box>
-                        </Box>
-
-                        {pages.length > 0 && (
-                            <Pages
-                                pages={pages}
-                                current={currentPage}
-                                onClickPage={(n) => setCurrentPage(n)}
-                                width={{ max: "large" }}
-                            />
-                        )}
-
-                        <AddVisualizationsCircleButton
-                            margin={{ left: "medium" }}
-                            onClick={() => {
-                                setShowAddVisualizations(true)
-                            }}
-                        />
-                    </Box>
-                )}
-            </Box>
 
             {showAddVisualizations && (
                 <AddVisualizations
                     albumId={id}
                     visualizations={visualizations}
                     rooms={rooms}
-                    inAlbum={ids(pages)}
+                    alreadyAdded={ids(pages)}
                     onVisualizationsAdded={() => {
                         setShowAddVisualizations(false)
                         refetch()
@@ -230,7 +220,7 @@ export function Album() {
                     onClickClose={() => setShowAddVisualizations(false)}
                 />
             )}
-        </Grid>
+        </Main>
     )
 }
 
@@ -261,6 +251,15 @@ function orientationToAspectRation(orientation?: PageOrientationEnum): string {
     return port
 }
 
+function orientationWidth(orientation?: PageOrientationEnum, scale): string {
+    switch (orientation) {
+        case PageOrientationEnum.Landscape:
+            return "564px"
+        case PageOrientationEnum.Portrait:
+            return "400px"
+    }
+}
+
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 function ids(pages: (AlbumScreenAlbumPageCoverFragment | AlbumScreenAlbumPageVisualizationFragment)[]): string[] {
     const vis = pages.filter(
@@ -268,4 +267,46 @@ function ids(pages: (AlbumScreenAlbumPageCoverFragment | AlbumScreenAlbumPageVis
     ) as { visualization: { __typename?: "Visualization"; id: string; file: { __typename?: "File"; url: any } } }[]
 
     return vis.map((v) => v.visualization.id)
+}
+
+function AddVariants({
+    onClickAddVisualizations,
+    ...boxProps
+}: { onClickAddVisualizations?: () => void } & {boxProps: BoxExtendedProps}) {
+    const [open, setOpen] = useState(false)
+
+    const targetRef = useRef<HTMLDivElement>(null)
+
+    return (
+        <Box {...boxProps}>
+            <Box ref={targetRef} border={{ color: "background-front", size: "medium" }} round="large">
+                <Button label="Добавить..." icon={<Add />} primary onClick={() => setOpen(true)} />
+            </Box>
+
+            {open && targetRef.current && (
+                <Drop
+                    elevation="none"
+                    target={targetRef.current}
+                    onClickOutside={() => setOpen(false)}
+                    onEsc={() => setOpen(false)}
+                    align={{ bottom: "bottom" }}
+                    round="large"
+                >
+                    <Box gap="small" border={{ color: "background-front", size: "medium" }} direction="row">
+                        <Button primary label="Титульник" />
+                        <Button
+                            primary
+                            label="Визуализации"
+                            color="accent-3"
+                            onClick={() => {
+                                setOpen(false)
+                                onClickAddVisualizations && onClickAddVisualizations()
+                            }}
+                        />
+                        <Button primary label="Ссылку на сайт" color="status-ok" />
+                    </Box>
+                </Drop>
+            )}
+        </Box>
+    )
 }
