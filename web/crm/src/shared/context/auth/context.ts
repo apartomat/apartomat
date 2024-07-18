@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react"
+import { createContext, useContext, useEffect, useMemo, useState } from "react"
 
 import { useProfileLazyQuery } from "api/graphql"
 
@@ -111,5 +111,5 @@ export function useAuthProvider() {
         }
     }, [data, error, loading])
 
-    return { user, concreteUser, check, reset, error: error?.message }
+    return useMemo(() => ({ user, concreteUser, check, reset, error: error?.message }), [user, concreteUser, error])
 }
