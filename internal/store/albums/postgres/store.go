@@ -118,8 +118,19 @@ type settingsRecord struct {
 	PageSize        string `json:"pageSize"`
 }
 
+type pageRecordType string
+
+const (
+	pageRecordTypeCover         = "COVER"
+	pageRecordTypeCoverUploaded = "COVER_UPLOADED"
+	pageRecordTypeVisualization = "VISUALIZATION"
+)
+
 type pageRecord struct {
-	VisualizationID string `json:"visualization_id"`
+	Type            pageRecordType
+	Rotate          float64
+	CoverID         string `json:"cover_id,omitempty"`
+	VisualizationID string `json:"visualization_id,omitempty"`
 	FileID          string `json:"file_id"`
 }
 
@@ -176,15 +187,43 @@ func toSettingsRecord(settings Settings) settingsRecord {
 	}
 }
 
-func toPageRecords(pages []AlbumPageVisualization) []pageRecord {
+func toPageRecords(pages []AlbumPage) []pageRecord {
 	var (
 		res = make([]pageRecord, len(pages))
 	)
 
 	for i, p := range pages {
-		res[i] = pageRecord{
-			VisualizationID: p.VisualizationID,
-			FileID:          p.FileID,
+		switch p.(type) {
+		case AlbumPageCover:
+			var (
+				page = (p).(AlbumPageCover)
+			)
+			res[i] = pageRecord{
+				Type:    pageRecordTypeCover,
+				CoverID: page.CoverID,
+				FileID:  page.FileID,
+				Rotate:  page.Rotate,
+			}
+		case AlbumPageCoverUploaded:
+			var (
+				page = (p).(AlbumPageCoverUploaded)
+			)
+			res[i] = pageRecord{
+				Type:   pageRecordTypeCoverUploaded,
+				FileID: page.FileID,
+				Rotate: page.Rotate,
+			}
+		case AlbumPageVisualization:
+			var (
+				page = (p).(AlbumPageVisualization)
+			)
+
+			res[i] = pageRecord{
+				Type:            pageRecordTypeVisualization,
+				VisualizationID: page.VisualizationID,
+				FileID:          page.FileID,
+				Rotate:          page.Rotate,
+			}
 		}
 	}
 
@@ -198,15 +237,37 @@ func fromSettingsRecord(rec settingsRecord) Settings {
 	}
 }
 
-func fromPageRecords(recs []pageRecord) []AlbumPageVisualization {
+func fromPageRecords(recs []pageRecord) []AlbumPage {
 	var (
-		res = make([]AlbumPageVisualization, len(recs))
+		res = make([]AlbumPage, len(recs))
 	)
 
 	for i, rec := range recs {
-		res[i] = AlbumPageVisualization{
-			VisualizationID: rec.VisualizationID,
-			FileID:          rec.FileID,
+		switch rec.Type {
+		case pageRecordTypeCover:
+			res[i] = AlbumPageCover{
+				CoverID: rec.CoverID,
+				FileID:  rec.FileID,
+				Rotate:  rec.Rotate,
+			}
+		case pageRecordTypeCoverUploaded:
+			res[i] = AlbumPageCoverUploaded{
+				FileID: rec.FileID,
+				Rotate: rec.Rotate,
+			}
+		case pageRecordTypeVisualization:
+			res[i] = AlbumPageVisualization{
+				VisualizationID: rec.VisualizationID,
+				FileID:          rec.FileID,
+				Rotate:          rec.Rotate,
+			}
+		default:
+			// for backward compatibility
+			res[i] = AlbumPageVisualization{
+				VisualizationID: rec.VisualizationID,
+				FileID:          rec.FileID,
+				Rotate:          rec.Rotate,
+			}
 		}
 	}
 

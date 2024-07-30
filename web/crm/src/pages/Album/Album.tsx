@@ -193,6 +193,19 @@ export function Album() {
                                                         default:
                                                             return <></>
                                                     }
+                                                case "AlbumPageCover":
+                                                    switch (p.cover.__typename) {
+                                                        case "CoverUploaded":
+                                                            return (
+                                                                <Image
+                                                                    key={key}
+                                                                    fit="contain"
+                                                                    src={p.cover.file.url}
+                                                                />
+                                                            )
+                                                        default:
+                                                            return <></>
+                                                    }
                                                 default:
                                                     return <></>
                                             }
@@ -293,7 +306,7 @@ function AddVariants({
                     round="large"
                 >
                     <Box gap="small" border={{ color: "background-front", size: "medium" }} direction="row">
-                        <Button primary label="Титульник" />
+                        <Button primary label="Обложку" />
                         <Button
                             primary
                             label="Визуализации"

@@ -12,7 +12,7 @@ func (r *mutationResolver) AddVisualizationsToAlbum(
 	albumID string,
 	visualizations []string,
 ) (AddVisualizationsToAlbumResult, error) {
-	pages, err := r.useCases.AddVisualizationsToAlbum(ctx, albumID, visualizations)
+	pages, n, err := r.useCases.AddVisualizationsToAlbum(ctx, albumID, visualizations)
 	if err != nil {
 		if errors.Is(err, apartomat.ErrForbidden) {
 			return forbidden()
@@ -27,13 +27,19 @@ func (r *mutationResolver) AddVisualizationsToAlbum(
 		res = VisualizationsAddedToAlbum{
 			Pages: make([]*AlbumPageVisualization, len(pages)),
 		}
+
+		num = n
 	)
 
 	for i, p := range pages {
 		res.Pages[i] = &AlbumPageVisualization{
-			Position:      p.Position,
-			Visualization: visualizationToGraphQL(p.Visualization, nil),
+			Number: num,
+			Rotate: p.Rotate,
+			Visualization: Visualization{
+				ID: p.VisualizationID,
+			},
 		}
+		num++
 	}
 
 	return res, nil

@@ -3,7 +3,8 @@ mutation addVisualizationsToAlbum($albumId: String!, $visualizations: [String!]!
         __typename
         ... on VisualizationsAddedToAlbum {
             pages {
-                position
+                number
+                rotate
                 visualization {
                     ... on Visualization {
                         id

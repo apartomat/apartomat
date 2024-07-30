@@ -98,3 +98,21 @@ func (u *Apartomat) UploadFile(
 
 	return f, nil
 }
+
+func (u *Apartomat) GetFile(
+	ctx context.Context,
+	id string,
+) (*File, error) {
+	f, err := u.Files.Get(ctx, IDIn(id))
+	if err != nil {
+		return nil, err
+	}
+
+	if ok, err := u.Acl.CanGetFilesOfProjectID(ctx, auth.UserFromCtx(ctx), f.ProjectID); err != nil {
+		return nil, err
+	} else if !ok {
+		return nil, fmt.Errorf("can't get file (id=%s): %w", id, ErrForbidden)
+	}
+
+	return f, nil
+}

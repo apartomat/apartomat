@@ -41,7 +41,10 @@ type Config struct {
 
 type ResolverRoot interface {
 	Album() AlbumResolver
+	AlbumPageCover() AlbumPageCoverResolver
 	AlbumPageVisualization() AlbumPageVisualizationResolver
+	Cover() CoverResolver
+	CoverUploaded() CoverUploadedResolver
 	House() HouseResolver
 	HouseRooms() HouseRoomsResolver
 	Mutation() MutationResolver
@@ -97,7 +100,9 @@ type ComplexityRoot struct {
 	}
 
 	AlbumPageCover struct {
-		Position func(childComplexity int) int
+		Cover  func(childComplexity int) int
+		Number func(childComplexity int) int
+		Rotate func(childComplexity int) int
 	}
 
 	AlbumPageOrientationChanged struct {
@@ -109,7 +114,8 @@ type ComplexityRoot struct {
 	}
 
 	AlbumPageVisualization struct {
-		Position      func(childComplexity int) int
+		Number        func(childComplexity int) int
+		Rotate        func(childComplexity int) int
 		Visualization func(childComplexity int) int
 	}
 
@@ -154,6 +160,15 @@ type ComplexityRoot struct {
 
 	ContactUpdated struct {
 		Contact func(childComplexity int) int
+	}
+
+	Cover struct {
+		File func(childComplexity int) int
+		ID   func(childComplexity int) int
+	}
+
+	CoverUploaded struct {
+		File func(childComplexity int) int
 	}
 
 	ExpiredToken struct {
@@ -561,8 +576,17 @@ type AlbumResolver interface {
 	Pages(ctx context.Context, obj *Album) (AlbumPagesResult, error)
 	File(ctx context.Context, obj *Album) (AlbumRecentFileResult, error)
 }
+type AlbumPageCoverResolver interface {
+	Cover(ctx context.Context, obj *AlbumPageCover) (AlbumPageCoverResult, error)
+}
 type AlbumPageVisualizationResolver interface {
 	Visualization(ctx context.Context, obj *AlbumPageVisualization) (AlbumPageVisualizationResult, error)
+}
+type CoverResolver interface {
+	File(ctx context.Context, obj *Cover) (CoverFileResult, error)
+}
+type CoverUploadedResolver interface {
+	File(ctx context.Context, obj *CoverUploaded) (CoverFileResult, error)
 }
 type HouseResolver interface {
 	Rooms(ctx context.Context, obj *House) (*HouseRooms, error)
@@ -799,12 +823,26 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.AlbumFileGenerationStarted.File(childComplexity), true
 
-	case "AlbumPageCover.position":
-		if e.complexity.AlbumPageCover.Position == nil {
+	case "AlbumPageCover.cover":
+		if e.complexity.AlbumPageCover.Cover == nil {
 			break
 		}
 
-		return e.complexity.AlbumPageCover.Position(childComplexity), true
+		return e.complexity.AlbumPageCover.Cover(childComplexity), true
+
+	case "AlbumPageCover.number":
+		if e.complexity.AlbumPageCover.Number == nil {
+			break
+		}
+
+		return e.complexity.AlbumPageCover.Number(childComplexity), true
+
+	case "AlbumPageCover.rotate":
+		if e.complexity.AlbumPageCover.Rotate == nil {
+			break
+		}
+
+		return e.complexity.AlbumPageCover.Rotate(childComplexity), true
 
 	case "AlbumPageOrientationChanged.album":
 		if e.complexity.AlbumPageOrientationChanged.Album == nil {
@@ -820,12 +858,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.AlbumPageSizeChanged.Album(childComplexity), true
 
-	case "AlbumPageVisualization.position":
-		if e.complexity.AlbumPageVisualization.Position == nil {
+	case "AlbumPageVisualization.number":
+		if e.complexity.AlbumPageVisualization.Number == nil {
 			break
 		}
 
-		return e.complexity.AlbumPageVisualization.Position(childComplexity), true
+		return e.complexity.AlbumPageVisualization.Number(childComplexity), true
+
+	case "AlbumPageVisualization.rotate":
+		if e.complexity.AlbumPageVisualization.Rotate == nil {
+			break
+		}
+
+		return e.complexity.AlbumPageVisualization.Rotate(childComplexity), true
 
 	case "AlbumPageVisualization.visualization":
 		if e.complexity.AlbumPageVisualization.Visualization == nil {
@@ -945,6 +990,27 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ContactUpdated.Contact(childComplexity), true
+
+	case "Cover.file":
+		if e.complexity.Cover.File == nil {
+			break
+		}
+
+		return e.complexity.Cover.File(childComplexity), true
+
+	case "Cover.id":
+		if e.complexity.Cover.ID == nil {
+			break
+		}
+
+		return e.complexity.Cover.ID(childComplexity), true
+
+	case "CoverUploaded.file":
+		if e.complexity.CoverUploaded.File == nil {
+			break
+		}
+
+		return e.complexity.CoverUploaded.File(childComplexity), true
 
 	case "ExpiredToken.message":
 		if e.complexity.ExpiredToken.Message == nil {
@@ -4429,8 +4495,8 @@ func (ec *executionContext) fieldContext_AlbumFileGenerationStarted_file(_ conte
 	return fc, nil
 }
 
-func (ec *executionContext) _AlbumPageCover_position(ctx context.Context, field graphql.CollectedField, obj *AlbumPageCover) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_AlbumPageCover_position(ctx, field)
+func (ec *executionContext) _AlbumPageCover_number(ctx context.Context, field graphql.CollectedField, obj *AlbumPageCover) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AlbumPageCover_number(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -4443,7 +4509,7 @@ func (ec *executionContext) _AlbumPageCover_position(ctx context.Context, field 
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Position, nil
+		return obj.Number, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4460,7 +4526,7 @@ func (ec *executionContext) _AlbumPageCover_position(ctx context.Context, field 
 	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_AlbumPageCover_position(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_AlbumPageCover_number(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "AlbumPageCover",
 		Field:      field,
@@ -4468,6 +4534,94 @@ func (ec *executionContext) fieldContext_AlbumPageCover_position(_ context.Conte
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AlbumPageCover_rotate(ctx context.Context, field graphql.CollectedField, obj *AlbumPageCover) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AlbumPageCover_rotate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Rotate, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AlbumPageCover_rotate(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AlbumPageCover",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AlbumPageCover_cover(ctx context.Context, field graphql.CollectedField, obj *AlbumPageCover) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AlbumPageCover_cover(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.AlbumPageCover().Cover(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(AlbumPageCoverResult)
+	fc.Result = res
+	return ec.marshalNAlbumPageCoverResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumPageCoverResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AlbumPageCover_cover(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AlbumPageCover",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type AlbumPageCoverResult does not have child fields")
 		},
 	}
 	return fc, nil
@@ -4593,8 +4747,8 @@ func (ec *executionContext) fieldContext_AlbumPageSizeChanged_album(_ context.Co
 	return fc, nil
 }
 
-func (ec *executionContext) _AlbumPageVisualization_position(ctx context.Context, field graphql.CollectedField, obj *AlbumPageVisualization) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_AlbumPageVisualization_position(ctx, field)
+func (ec *executionContext) _AlbumPageVisualization_number(ctx context.Context, field graphql.CollectedField, obj *AlbumPageVisualization) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AlbumPageVisualization_number(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -4607,7 +4761,7 @@ func (ec *executionContext) _AlbumPageVisualization_position(ctx context.Context
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Position, nil
+		return obj.Number, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -4624,7 +4778,7 @@ func (ec *executionContext) _AlbumPageVisualization_position(ctx context.Context
 	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_AlbumPageVisualization_position(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_AlbumPageVisualization_number(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "AlbumPageVisualization",
 		Field:      field,
@@ -4632,6 +4786,50 @@ func (ec *executionContext) fieldContext_AlbumPageVisualization_position(_ conte
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AlbumPageVisualization_rotate(ctx context.Context, field graphql.CollectedField, obj *AlbumPageVisualization) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AlbumPageVisualization_rotate(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Rotate, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(float64)
+	fc.Result = res
+	return ec.marshalNFloat2float64(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AlbumPageVisualization_rotate(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AlbumPageVisualization",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Float does not have child fields")
 		},
 	}
 	return fc, nil
@@ -4719,7 +4917,7 @@ func (ec *executionContext) fieldContext_AlbumPages_items(_ context.Context, fie
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type AlbumPage does not have child fields")
+			return nil, errors.New("FieldContext.Child cannot be called on type INTERFACE")
 		},
 	}
 	return fc, nil
@@ -5428,6 +5626,138 @@ func (ec *executionContext) fieldContext_ContactUpdated_contact(_ context.Contex
 				return ec.fieldContext_Contact_modifiedAt(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Contact", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Cover_id(ctx context.Context, field graphql.CollectedField, obj *Cover) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Cover_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Cover_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Cover",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Cover_file(ctx context.Context, field graphql.CollectedField, obj *Cover) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Cover_file(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Cover().File(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(CoverFileResult)
+	fc.Result = res
+	return ec.marshalNCoverFileResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐCoverFileResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Cover_file(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Cover",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type CoverFileResult does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CoverUploaded_file(ctx context.Context, field graphql.CollectedField, obj *CoverUploaded) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CoverUploaded_file(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.CoverUploaded().File(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(CoverFileResult)
+	fc.Result = res
+	return ec.marshalNCoverFileResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐCoverFileResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CoverUploaded_file(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CoverUploaded",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type CoverFileResult does not have child fields")
 		},
 	}
 	return fc, nil
@@ -13156,8 +13486,10 @@ func (ec *executionContext) fieldContext_VisualizationsAddedToAlbum_pages(_ cont
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "position":
-				return ec.fieldContext_AlbumPageVisualization_position(ctx, field)
+			case "number":
+				return ec.fieldContext_AlbumPageVisualization_number(ctx, field)
+			case "rotate":
+				return ec.fieldContext_AlbumPageVisualization_rotate(ctx, field)
 			case "visualization":
 				return ec.fieldContext_AlbumPageVisualization_visualization(ctx, field)
 			}
@@ -16958,6 +17290,50 @@ func (ec *executionContext) _AlbumPage(ctx context.Context, sel ast.SelectionSet
 	}
 }
 
+func (ec *executionContext) _AlbumPageCoverResult(ctx context.Context, sel ast.SelectionSet, obj AlbumPageCoverResult) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
+	case NotFound:
+		return ec._NotFound(ctx, sel, &obj)
+	case *NotFound:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._NotFound(ctx, sel, obj)
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
+	case Cover:
+		return ec._Cover(ctx, sel, &obj)
+	case *Cover:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Cover(ctx, sel, obj)
+	case CoverUploaded:
+		return ec._CoverUploaded(ctx, sel, &obj)
+	case *CoverUploaded:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._CoverUploaded(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
 func (ec *executionContext) _AlbumPageVisualizationResult(ctx context.Context, sel ast.SelectionSet, obj AlbumPageVisualizationResult) graphql.Marshaler {
 	switch obj := (obj).(type) {
 	case nil:
@@ -17015,13 +17391,6 @@ func (ec *executionContext) _AlbumProjectResult(ctx context.Context, sel ast.Sel
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
-	case NotFound:
-		return ec._NotFound(ctx, sel, &obj)
-	case *NotFound:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._NotFound(ctx, sel, obj)
 	case Forbidden:
 		return ec._Forbidden(ctx, sel, &obj)
 	case *Forbidden:
@@ -17029,6 +17398,13 @@ func (ec *executionContext) _AlbumProjectResult(ctx context.Context, sel ast.Sel
 			return graphql.Null
 		}
 		return ec._Forbidden(ctx, sel, obj)
+	case NotFound:
+		return ec._NotFound(ctx, sel, &obj)
+	case *NotFound:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._NotFound(ctx, sel, obj)
 	case ServerError:
 		return ec._ServerError(ctx, sel, &obj)
 	case *ServerError:
@@ -17089,13 +17465,6 @@ func (ec *executionContext) _AlbumResult(ctx context.Context, sel ast.SelectionS
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
-	case NotFound:
-		return ec._NotFound(ctx, sel, &obj)
-	case *NotFound:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._NotFound(ctx, sel, obj)
 	case Forbidden:
 		return ec._Forbidden(ctx, sel, &obj)
 	case *Forbidden:
@@ -17103,6 +17472,13 @@ func (ec *executionContext) _AlbumResult(ctx context.Context, sel ast.SelectionS
 			return graphql.Null
 		}
 		return ec._Forbidden(ctx, sel, obj)
+	case NotFound:
+		return ec._NotFound(ctx, sel, &obj)
+	case *NotFound:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._NotFound(ctx, sel, obj)
 	case ServerError:
 		return ec._ServerError(ctx, sel, &obj)
 	case *ServerError:
@@ -17346,6 +17722,43 @@ func (ec *executionContext) _ConfirmLoginPinResult(ctx context.Context, sel ast.
 			return graphql.Null
 		}
 		return ec._LoginConfirmed(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
+func (ec *executionContext) _CoverFileResult(ctx context.Context, sel ast.SelectionSet, obj CoverFileResult) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case NotFound:
+		return ec._NotFound(ctx, sel, &obj)
+	case *NotFound:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._NotFound(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
+	case File:
+		return ec._File(ctx, sel, &obj)
+	case *File:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._File(ctx, sel, obj)
 	default:
 		panic(fmt.Errorf("unexpected type %T", obj))
 	}
@@ -19033,11 +19446,52 @@ func (ec *executionContext) _AlbumPageCover(ctx context.Context, sel ast.Selecti
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AlbumPageCover")
-		case "position":
-			out.Values[i] = ec._AlbumPageCover_position(ctx, field, obj)
+		case "number":
+			out.Values[i] = ec._AlbumPageCover_number(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "rotate":
+			out.Values[i] = ec._AlbumPageCover_rotate(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "cover":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._AlbumPageCover_cover(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -19150,8 +19604,13 @@ func (ec *executionContext) _AlbumPageVisualization(ctx context.Context, sel ast
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AlbumPageVisualization")
-		case "position":
-			out.Values[i] = ec._AlbumPageVisualization_position(ctx, field, obj)
+		case "number":
+			out.Values[i] = ec._AlbumPageVisualization_number(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "rotate":
+			out.Values[i] = ec._AlbumPageVisualization_rotate(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
@@ -19600,6 +20059,151 @@ func (ec *executionContext) _ContactUpdated(ctx context.Context, sel ast.Selecti
 	return out
 }
 
+var coverImplementors = []string{"Cover", "AlbumPageCoverResult"}
+
+func (ec *executionContext) _Cover(ctx context.Context, sel ast.SelectionSet, obj *Cover) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, coverImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Cover")
+		case "id":
+			out.Values[i] = ec._Cover_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "file":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Cover_file(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var coverUploadedImplementors = []string{"CoverUploaded", "AlbumPageCoverResult"}
+
+func (ec *executionContext) _CoverUploaded(ctx context.Context, sel ast.SelectionSet, obj *CoverUploaded) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, coverUploadedImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CoverUploaded")
+		case "file":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._CoverUploaded_file(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var expiredTokenImplementors = []string{"ExpiredToken", "AcceptInviteResult", "ConfirmLoginLinkResult", "Error", "ConfirmLoginPinResult"}
 
 func (ec *executionContext) _ExpiredToken(ctx context.Context, sel ast.SelectionSet, obj *ExpiredToken) graphql.Marshaler {
@@ -19639,7 +20243,7 @@ func (ec *executionContext) _ExpiredToken(ctx context.Context, sel ast.Selection
 	return out
 }
 
-var fileImplementors = []string{"File"}
+var fileImplementors = []string{"File", "CoverFileResult"}
 
 func (ec *executionContext) _File(ctx context.Context, sel ast.SelectionSet, obj *File) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, fileImplementors)
@@ -19737,7 +20341,7 @@ func (ec *executionContext) _FileUploaded(ctx context.Context, sel ast.Selection
 	return out
 }
 
-var forbiddenImplementors = []string{"Forbidden", "AddContactResult", "AddHouseResult", "AddRoomResult", "AddVisualizationsToAlbumResult", "ChangeAlbumPageOrientationResult", "ChangeAlbumPageSizeResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "CreateAlbumResult", "CreateProjectResult", "DeleteAlbumResult", "DeleteContactResult", "DeleteRoomResult", "DeleteVisualizationsResult", "GenerateAlbumFileResult", "InviteUserToWorkspaceResult", "MakeProjectNotPublicResult", "MakeProjectPublicResult", "MoveRoomToPositionResult", "UpdateContactResult", "UpdateHouseResult", "UpdateRoomResult", "UploadFileResult", "UploadVisualizationResult", "UploadVisualizationsResult", "AlbumResult", "AlbumProjectResult", "AlbumRecentFileResult", "UserProfileResult", "ProjectResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "ProjectVisualizationsListResult", "ProjectVisualizationsTotalResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectAlbumsListResult", "ProjectAlbumsTotalResult", "WorkspaceResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "WorkspaceUsersListResult", "WorkspaceUsersTotalResult", "Error", "AlbumFileGenerated"}
+var forbiddenImplementors = []string{"Forbidden", "AddContactResult", "AddHouseResult", "AddRoomResult", "AddVisualizationsToAlbumResult", "ChangeAlbumPageOrientationResult", "ChangeAlbumPageSizeResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "CreateAlbumResult", "CreateProjectResult", "DeleteAlbumResult", "DeleteContactResult", "DeleteRoomResult", "DeleteVisualizationsResult", "GenerateAlbumFileResult", "InviteUserToWorkspaceResult", "MakeProjectNotPublicResult", "MakeProjectPublicResult", "MoveRoomToPositionResult", "UpdateContactResult", "UpdateHouseResult", "UpdateRoomResult", "UploadFileResult", "UploadVisualizationResult", "UploadVisualizationsResult", "AlbumResult", "AlbumProjectResult", "AlbumPageCoverResult", "CoverFileResult", "AlbumRecentFileResult", "UserProfileResult", "ProjectResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "ProjectVisualizationsListResult", "ProjectVisualizationsTotalResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectAlbumsListResult", "ProjectAlbumsTotalResult", "WorkspaceResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "WorkspaceUsersListResult", "WorkspaceUsersTotalResult", "Error", "AlbumFileGenerated"}
 
 func (ec *executionContext) _Forbidden(ctx context.Context, sel ast.SelectionSet, obj *Forbidden) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, forbiddenImplementors)
@@ -20671,7 +21275,7 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 	return out
 }
 
-var notFoundImplementors = []string{"NotFound", "AddHouseResult", "AddRoomResult", "ChangeAlbumPageOrientationResult", "ChangeAlbumPageSizeResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "DeleteAlbumResult", "DeleteContactResult", "DeleteRoomResult", "DeleteVisualizationsResult", "GenerateAlbumFileResult", "InviteUserToWorkspaceResult", "MakeProjectNotPublicResult", "MakeProjectPublicResult", "MoveRoomToPositionResult", "UpdateContactResult", "UpdateHouseResult", "UpdateRoomResult", "AlbumResult", "AlbumProjectResult", "AlbumPageVisualizationResult", "AlbumRecentFileResult", "ProjectResult", "ProjectPublicSite", "WorkspaceResult", "Error", "AlbumFileGenerated"}
+var notFoundImplementors = []string{"NotFound", "AddHouseResult", "AddRoomResult", "ChangeAlbumPageOrientationResult", "ChangeAlbumPageSizeResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "DeleteAlbumResult", "DeleteContactResult", "DeleteRoomResult", "DeleteVisualizationsResult", "GenerateAlbumFileResult", "InviteUserToWorkspaceResult", "MakeProjectNotPublicResult", "MakeProjectPublicResult", "MoveRoomToPositionResult", "UpdateContactResult", "UpdateHouseResult", "UpdateRoomResult", "AlbumResult", "AlbumProjectResult", "AlbumPageCoverResult", "CoverFileResult", "AlbumPageVisualizationResult", "AlbumRecentFileResult", "ProjectResult", "ProjectPublicSite", "WorkspaceResult", "Error", "AlbumFileGenerated"}
 
 func (ec *executionContext) _NotFound(ctx context.Context, sel ast.SelectionSet, obj *NotFound) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, notFoundImplementors)
@@ -22862,7 +23466,7 @@ func (ec *executionContext) _RoomUpdated(ctx context.Context, sel ast.SelectionS
 	return out
 }
 
-var serverErrorImplementors = []string{"ServerError", "AcceptInviteResult", "AddContactResult", "AddHouseResult", "AddVisualizationsToAlbumResult", "ChangeAlbumPageOrientationResult", "ChangeAlbumPageSizeResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "ConfirmLoginLinkResult", "ConfirmLoginPinResult", "CreateAlbumResult", "CreateProjectResult", "DeleteAlbumResult", "DeleteContactResult", "DeleteVisualizationsResult", "GenerateAlbumFileResult", "InviteUserToWorkspaceResult", "LoginByEmailResult", "MakeProjectNotPublicResult", "MakeProjectPublicResult", "MoveRoomToPositionResult", "UpdateContactResult", "UpdateHouseResult", "UploadFileResult", "UploadVisualizationResult", "UploadVisualizationsResult", "AlbumResult", "AlbumProjectResult", "AlbumPagesResult", "AlbumPageVisualizationResult", "AlbumRecentFileResult", "UserProfileResult", "ProjectResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "ProjectVisualizationsListResult", "ProjectVisualizationsTotalResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectAlbumsListResult", "ProjectAlbumsTotalResult", "ProjectPublicSite", "WorkspaceResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "WorkspaceUsersListResult", "WorkspaceUsersTotalResult", "Error", "AlbumFileGenerated"}
+var serverErrorImplementors = []string{"ServerError", "AcceptInviteResult", "AddContactResult", "AddHouseResult", "AddVisualizationsToAlbumResult", "ChangeAlbumPageOrientationResult", "ChangeAlbumPageSizeResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "ConfirmLoginLinkResult", "ConfirmLoginPinResult", "CreateAlbumResult", "CreateProjectResult", "DeleteAlbumResult", "DeleteContactResult", "DeleteVisualizationsResult", "GenerateAlbumFileResult", "InviteUserToWorkspaceResult", "LoginByEmailResult", "MakeProjectNotPublicResult", "MakeProjectPublicResult", "MoveRoomToPositionResult", "UpdateContactResult", "UpdateHouseResult", "UploadFileResult", "UploadVisualizationResult", "UploadVisualizationsResult", "AlbumResult", "AlbumProjectResult", "AlbumPagesResult", "AlbumPageCoverResult", "CoverFileResult", "AlbumPageVisualizationResult", "AlbumRecentFileResult", "UserProfileResult", "ProjectResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "ProjectVisualizationsListResult", "ProjectVisualizationsTotalResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectAlbumsListResult", "ProjectAlbumsTotalResult", "ProjectPublicSite", "WorkspaceResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "WorkspaceUsersListResult", "WorkspaceUsersTotalResult", "Error", "AlbumFileGenerated"}
 
 func (ec *executionContext) _ServerError(ctx context.Context, sel ast.SelectionSet, obj *ServerError) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, serverErrorImplementors)
@@ -24648,6 +25252,16 @@ func (ec *executionContext) marshalNAlbumPage2ᚕgithubᚗcomᚋapartomatᚋapar
 	return ret
 }
 
+func (ec *executionContext) marshalNAlbumPageCoverResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumPageCoverResult(ctx context.Context, sel ast.SelectionSet, v AlbumPageCoverResult) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._AlbumPageCoverResult(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNAlbumPageVisualization2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumPageVisualizationᚄ(ctx context.Context, sel ast.SelectionSet, v []*AlbumPageVisualization) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
@@ -24972,6 +25586,16 @@ func (ec *executionContext) marshalNContactType2githubᚗcomᚋapartomatᚋapart
 	return v
 }
 
+func (ec *executionContext) marshalNCoverFileResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐCoverFileResult(ctx context.Context, sel ast.SelectionSet, v CoverFileResult) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._CoverFileResult(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNCreateAlbumResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐCreateAlbumResult(ctx context.Context, sel ast.SelectionSet, v CreateAlbumResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -25108,6 +25732,21 @@ func (ec *executionContext) unmarshalNFileType2githubᚗcomᚋapartomatᚋaparto
 
 func (ec *executionContext) marshalNFileType2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐFileType(ctx context.Context, sel ast.SelectionSet, v FileType) graphql.Marshaler {
 	return v
+}
+
+func (ec *executionContext) unmarshalNFloat2float64(ctx context.Context, v interface{}) (float64, error) {
+	res, err := graphql.UnmarshalFloatContext(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNFloat2float64(ctx context.Context, sel ast.SelectionSet, v float64) graphql.Marshaler {
+	res := graphql.MarshalFloatContext(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return graphql.WrapContextMarshaler(ctx, res)
 }
 
 func (ec *executionContext) marshalNGenerateAlbumFileResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐGenerateAlbumFileResult(ctx context.Context, sel ast.SelectionSet, v GenerateAlbumFileResult) graphql.Marshaler {

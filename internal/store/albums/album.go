@@ -10,7 +10,7 @@ type Album struct {
 	Name       string
 	Version    int
 	Settings   Settings
-	Pages      []AlbumPageVisualization
+	Pages      []AlbumPage
 	CreatedAt  time.Time
 	ModifiedAt time.Time
 	ProjectID  string
@@ -49,21 +49,50 @@ const (
 	A4 PageSize = "A4"
 )
 
+type AlbumPage interface {
+	IsAlbumPage() bool
+}
+
+type AlbumPageCover struct {
+	CoverID string
+	FileID  string
+	Rotate  float64
+}
+
+func (AlbumPageCover) IsAlbumPage() bool {
+	return true
+}
+
+type AlbumPageCoverUploaded struct {
+	FileID string
+	Rotate float64
+}
+
+func (AlbumPageCoverUploaded) IsAlbumPage() bool {
+	return true
+}
+
 type AlbumPageVisualization struct {
 	VisualizationID string
 	FileID          string
+	Rotate          float64
 }
 
-func (album *Album) AddPageWithVisualization(vis *visualizations.Visualization) (int, error) {
-	album.Pages = append(
-		album.Pages,
-		AlbumPageVisualization{
+func (AlbumPageVisualization) IsAlbumPage() bool {
+	return true
+}
+
+func (album *Album) AddPageWithVisualization(vis *visualizations.Visualization) (AlbumPageVisualization, int) {
+	var (
+		page = AlbumPageVisualization{
 			VisualizationID: vis.ID,
 			FileID:          vis.FileID,
-		},
+		}
 	)
 
-	return len(album.Pages) - 1, nil
+	album.Pages = append(album.Pages, page)
+
+	return page, len(album.Pages) - 1
 }
 
 func (album *Album) ChangePageSize(size PageSize) {

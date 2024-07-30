@@ -37,6 +37,12 @@ type AlbumFileGenerated interface {
 
 type AlbumPage interface {
 	IsAlbumPage()
+	GetNumber() int
+	GetRotate() float64
+}
+
+type AlbumPageCoverResult interface {
+	IsAlbumPageCoverResult()
 }
 
 type AlbumPageVisualizationResult interface {
@@ -81,6 +87,10 @@ type ConfirmLoginLinkResult interface {
 
 type ConfirmLoginPinResult interface {
 	IsConfirmLoginPinResult()
+}
+
+type CoverFileResult interface {
+	IsCoverFileResult()
 }
 
 type CreateAlbumResult interface {
@@ -297,10 +307,14 @@ type AlbumFileGenerationStarted struct {
 func (AlbumFileGenerationStarted) IsGenerateAlbumFileResult() {}
 
 type AlbumPageCover struct {
-	Position int `json:"position"`
+	Number int                  `json:"number"`
+	Rotate float64              `json:"rotate"`
+	Cover  AlbumPageCoverResult `json:"cover"`
 }
 
-func (AlbumPageCover) IsAlbumPage() {}
+func (AlbumPageCover) IsAlbumPage()            {}
+func (this AlbumPageCover) GetNumber() int     { return this.Number }
+func (this AlbumPageCover) GetRotate() float64 { return this.Rotate }
 
 type AlbumPageOrientationChanged struct {
 	Album *Album `json:"album"`
@@ -315,11 +329,14 @@ type AlbumPageSizeChanged struct {
 func (AlbumPageSizeChanged) IsChangeAlbumPageSizeResult() {}
 
 type AlbumPageVisualization struct {
-	Position      int                          `json:"position"`
+	Number        int                          `json:"number"`
+	Rotate        float64                      `json:"rotate"`
 	Visualization AlbumPageVisualizationResult `json:"visualization"`
 }
 
-func (AlbumPageVisualization) IsAlbumPage() {}
+func (AlbumPageVisualization) IsAlbumPage()            {}
+func (this AlbumPageVisualization) GetNumber() int     { return this.Number }
+func (this AlbumPageVisualization) GetRotate() float64 { return this.Rotate }
 
 type AlbumPages struct {
 	Items []AlbumPage `json:"items"`
@@ -394,6 +411,19 @@ type ContactUpdated struct {
 
 func (ContactUpdated) IsUpdateContactResult() {}
 
+type Cover struct {
+	ID   string          `json:"id"`
+	File CoverFileResult `json:"file"`
+}
+
+func (Cover) IsAlbumPageCoverResult() {}
+
+type CoverUploaded struct {
+	File CoverFileResult `json:"file"`
+}
+
+func (CoverUploaded) IsAlbumPageCoverResult() {}
+
 type CreateAlbumSettingsInput struct {
 	PageSize    PageSize        `json:"pageSize"`
 	Orientation PageOrientation `json:"orientation"`
@@ -426,6 +456,8 @@ type File struct {
 	Type     FileType `json:"type"`
 	MimeType string   `json:"mimeType"`
 }
+
+func (File) IsCoverFileResult() {}
 
 type FileUploaded struct {
 	File *File `json:"file"`
@@ -490,6 +522,10 @@ func (Forbidden) IsUploadVisualizationsResult() {}
 func (Forbidden) IsAlbumResult() {}
 
 func (Forbidden) IsAlbumProjectResult() {}
+
+func (Forbidden) IsAlbumPageCoverResult() {}
+
+func (Forbidden) IsCoverFileResult() {}
 
 func (Forbidden) IsAlbumRecentFileResult() {}
 
@@ -679,6 +715,10 @@ func (NotFound) IsUpdateRoomResult() {}
 func (NotFound) IsAlbumResult() {}
 
 func (NotFound) IsAlbumProjectResult() {}
+
+func (NotFound) IsAlbumPageCoverResult() {}
+
+func (NotFound) IsCoverFileResult() {}
 
 func (NotFound) IsAlbumPageVisualizationResult() {}
 
@@ -1000,6 +1040,10 @@ func (ServerError) IsAlbumResult() {}
 func (ServerError) IsAlbumProjectResult() {}
 
 func (ServerError) IsAlbumPagesResult() {}
+
+func (ServerError) IsAlbumPageCoverResult() {}
+
+func (ServerError) IsCoverFileResult() {}
 
 func (ServerError) IsAlbumPageVisualizationResult() {}
 

@@ -126,16 +126,16 @@ func (u *Apartomat) AddVisualizationsToAlbum(
 	ctx context.Context,
 	albumID string,
 	visualizationID []string,
-) ([]VisualizationWithPosition, error) {
+) ([]AlbumPageVisualization, int, error) {
 	album, err := u.Albums.Get(ctx, IDIn(albumID))
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	if ok, err := u.Acl.CanAddPageToAlbum(ctx, auth.UserFromCtx(ctx), album); err != nil {
-		return nil, err
+		return nil, 0, err
 	} else if !ok {
-		return nil, fmt.Errorf("can't add visualization to album (id=%s): %w", album.ID, ErrForbidden)
+		return nil, 0, fmt.Errorf("can't add visualization to album (id=%s): %w", album.ID, ErrForbidden)
 	}
 
 	list, err := u.Visualizations.List(
@@ -146,30 +146,28 @@ func (u *Apartomat) AddVisualizationsToAlbum(
 		0,
 	)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	if len(list) != len(visualizationID) {
-		return nil, fmt.Errorf("visualization (id=%s): %w", visualizationID, ErrNotFound)
+		return nil, 0, fmt.Errorf("visualization (id=%s): %w", visualizationID, ErrNotFound)
 	}
 
 	var (
-		res = make([]VisualizationWithPosition, len(visualizationID))
+		res = make([]AlbumPageVisualization, len(visualizationID))
+		num *int
 	)
 
 visLoop:
 	for i, id := range visualizationID {
 		for _, vis := range list {
 			if vis.ID == id {
-				pos, err := album.AddPageWithVisualization(vis)
-				if err != nil {
-					return nil, err
+				page, n := album.AddPageWithVisualization(vis)
+				if num == nil {
+					num = &n
 				}
 
-				res[i] = VisualizationWithPosition{
-					Position:      pos,
-					Visualization: vis,
-				}
+				res[i] = page
 
 				continue visLoop
 			}
@@ -179,10 +177,14 @@ visLoop:
 	album.UpVersion()
 
 	if err := u.Albums.Save(ctx, album); err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
-	return res, nil
+	if num == nil {
+		return res, 0, nil
+	}
+
+	return res, *num, nil
 }
 
 func (u *Apartomat) ChangeAlbumPageSize(

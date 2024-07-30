@@ -129,11 +129,39 @@ fragment AlbumScreenHouseRooms on HouseRooms {
 }
 
 fragment AlbumScreenAlbumPageCover on AlbumPageCover {
-    position
+    number
+    rotate
+    cover {
+        ... on Cover {
+            id
+            file {
+                ... on File {
+                    url
+                }
+                ... on Error {
+                    message
+                }
+            }
+        }
+        ... on CoverUploaded {
+            file {
+                ... on File {
+                    url
+                }
+                ... on Error {
+                    message
+                }
+            }
+        }
+        ... on Error {
+            message
+        }
+    }
 }
 
 fragment AlbumScreenAlbumPageVisualization on AlbumPageVisualization {
-    position
+    number
+    rotate
     visualization {
         ... on Visualization {
             id

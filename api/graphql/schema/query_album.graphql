@@ -2,7 +2,7 @@ extend type Query {
     album(id: String!): AlbumResult!
 }
 
-union AlbumResult = Album | NotFound | Forbidden | ServerError
+union AlbumResult = Album | Forbidden | NotFound | ServerError
 
 type Album {
     id: String!
@@ -14,7 +14,7 @@ type Album {
     file: AlbumRecentFileResult @goField(forceResolver: true)
 }
 
-union AlbumProjectResult = Project | NotFound | Forbidden | ServerError
+union AlbumProjectResult = Project | Forbidden | NotFound | ServerError
 
 type AlbumSettings {
     pageSize: PageSize!
@@ -37,14 +37,33 @@ type AlbumPages {
     items: [AlbumPage!]!
 }
 
-union AlbumPage = AlbumPageCover | AlbumPageVisualization
-
-type AlbumPageCover {
-    position: Int!
+interface AlbumPage {
+    number: Int!
+    rotate: Float!
 }
 
-type AlbumPageVisualization {
-    position: Int!
+type AlbumPageCover implements AlbumPage {
+    number: Int!
+    rotate: Float!
+    cover: AlbumPageCoverResult! @goField(forceResolver: true)
+}
+
+union AlbumPageCoverResult = Cover | CoverUploaded | Forbidden | NotFound | ServerError
+
+type Cover {
+    id: String!
+    file: CoverFileResult! @goField(forceResolver: true)
+}
+
+type CoverUploaded {
+    file: CoverFileResult! @goField(forceResolver: true)
+}
+
+union CoverFileResult = File | NotFound | Forbidden | ServerError
+
+type AlbumPageVisualization implements AlbumPage {
+    number: Int!
+    rotate: Float!
     visualization: AlbumPageVisualizationResult! @goField(forceResolver: true)
 }
 

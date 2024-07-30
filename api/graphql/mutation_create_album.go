@@ -3,7 +3,6 @@ package graphql
 import (
 	"context"
 	"errors"
-
 	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/store/albums"
 	"go.uber.org/zap"
@@ -47,18 +46,53 @@ func albumToGraphQL(album *albums.Album) *Album {
 	}
 }
 
-func albumPagesToGraphQL(pages []albums.AlbumPageVisualization) []AlbumPage {
+func albumPagesToGraphQL(pages []albums.AlbumPage) []AlbumPage {
 	var (
 		res = make([]AlbumPage, len(pages))
 	)
 
 	for i, p := range pages {
-		res[i] = &AlbumPageVisualization{
-			Position: 0,
-			Visualization: &Visualization{
-				ID: p.VisualizationID,
-			},
+		switch p.(type) {
+		case albums.AlbumPageCover:
+			var (
+				page = p.(albums.AlbumPageCover)
+			)
+			res[i] = &AlbumPageCover{
+				Number: i,
+				Rotate: page.Rotate,
+				Cover: &CoverUploaded{
+					File: File{
+						ID: page.FileID,
+					},
+				},
+			}
+		case albums.AlbumPageCoverUploaded:
+			var (
+				page = p.(albums.AlbumPageCoverUploaded)
+			)
+			res[i] = &AlbumPageCover{
+				Number: i,
+				Rotate: page.Rotate,
+				Cover: &CoverUploaded{
+					File: File{
+						ID: page.FileID,
+					},
+				},
+			}
+		case albums.AlbumPageVisualization:
+			var (
+				page = p.(albums.AlbumPageVisualization)
+			)
+
+			res[i] = &AlbumPageVisualization{
+				Number: i,
+				Rotate: page.Rotate,
+				Visualization: &Visualization{
+					ID: page.VisualizationID,
+				},
+			}
 		}
+
 	}
 
 	return res
