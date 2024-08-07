@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	apartomat "github.com/apartomat/apartomat/internal"
+	"github.com/apartomat/apartomat/internal/dataloaders"
 	albumFiles "github.com/apartomat/apartomat/internal/store/album_files"
 	"github.com/apartomat/apartomat/internal/store/albums"
 	"go.uber.org/zap"
@@ -80,6 +81,34 @@ func (r *albumResolver) File(ctx context.Context, obj *Album) (AlbumRecentFileRe
 	}
 
 	return res, nil
+}
+
+func (r *albumResolver) Cover(ctx context.Context, obj *Album) (AlbumCoverResult, error) {
+	if pages, ok := obj.Pages.(*AlbumPages); ok {
+		if len(pages.Items) == 0 {
+			return notFound()
+		}
+
+		if p, ok := pages.Items[0].(*AlbumPageCover); ok {
+
+			if c, ok := p.Cover.(*CoverUploaded); ok {
+				if f, ok := c.File.(File); ok {
+					file, err := dataloaders.FromContext(ctx).Files.Load(ctx, f.ID)
+					if err != nil {
+						return nil, err
+					}
+
+					return fileToGraphQL(file), nil
+				}
+			}
+		}
+
+		return notFound()
+	}
+
+	r.logger.Error("obj.Pages is not a *AlbumPages")
+
+	return serverError()
 }
 
 func albumFileToGraphQL(file *albumFiles.AlbumFile) *AlbumFile {

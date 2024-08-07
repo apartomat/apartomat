@@ -170,6 +170,14 @@ fragment ProjectScreenAlbums on ProjectAlbums {
 fragment ProjectScreenAlbum on Album {
     id
     name
+    cover {
+        ... on File {
+            url
+        }
+        ... on Error {
+            message
+        }
+    }
 }
 
 fragment ProjectScreenPublicSite on ProjectPublicSite {

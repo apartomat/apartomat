@@ -2,14 +2,14 @@ import React, { useEffect, useState } from "react"
 
 import { Box, BoxExtendedProps, Grid } from "grommet"
 
-import { Album } from "./Album/Album"
-import { ConfirmDelete } from "./ConfirmDelete/ConfirmDelete"
+import { Album } from "./Album"
+import { ConfirmDelete } from "./ConfirmDelete"
 
 import { ProjectScreenAlbumsFragment as ProjectScreenAlbums } from "api/graphql"
 
 import { useDeleteAlbum } from "./useDeleteAlbum"
 
-export default function Albums({
+export function Albums({
     albums,
     onDelete,
     ...props
@@ -65,7 +65,7 @@ export default function Albums({
                             {albums.list.items.map((item) => {
                                 switch (item.__typename) {
                                     case "Album":
-                                        return <Album id={item.id} key={item.id} onClickDelete={handleClickDelete} />
+                                        return <Album album={item} key={item.id} onClickDelete={handleClickDelete} />
                                     default:
                                         return null
                                 }

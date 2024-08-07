@@ -23,6 +23,7 @@ export type {
     ProjectScreenHouseRoomFragment as Room,
     ProjectScreenProjectFragment as Project,
     ProjectScreenHouseFragment as ProjectScreenHouse,
+    ProjectScreenAlbumFragment as ProjectScreenAlbum,
 } from "api/graphql"
 
 export { ProjectStatus } from "api/graphql"

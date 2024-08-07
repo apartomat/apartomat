@@ -1,16 +1,18 @@
 import React, { useState } from "react"
 
-import { Box, BoxExtendedProps, Button } from "grommet"
+import { Box, BoxExtendedProps, Button, Image } from "grommet"
 import { Print, Trash } from "grommet-icons"
 
 import { AnchorLink } from "shared/ui/AnchorLink"
 
+import { ProjectScreenAlbum } from "pages/Project/useProject"
+
 export function Album({
-    id,
+    album: { id, cover },
     onClickDelete,
     ...props
 }: {
-    id: string
+    album: ProjectScreenAlbum
     onClickDelete?: (id: string) => void
 } & BoxExtendedProps) {
     const [showDeleteButton, setShowDeleteButton] = useState(false)
@@ -27,23 +29,37 @@ export function Album({
         <Box
             height="small"
             width="small"
+            flex={{ shrink: 0 }}
+            background="light-2"
             onMouseEnter={() => setShowDeleteButton(true)}
             onMouseLeave={() => setShowDeleteButton(false)}
             style={{ position: "relative" }}
             {...props}
         >
             {showDeleteButton && (
-                <Box pad="small" style={{ position: "absolute", right: 0 }}>
+                <Box
+                    pad="xsmall"
+                    style={{ position: "absolute", right: 0 }}
+                    background="background-back"
+                    round="xxsmall"
+                    margin="xxsmall"
+                >
                     <Button plain onClick={handleClickDeleteButton}>
-                        <Trash />
+                        <Trash color="control" />
                     </Button>
                 </Box>
             )}
 
             <AnchorLink to={`/album/${id}`}>
-                <Box background="light-2" direction="column" justify="center" align="center" height="small">
-                    <Print size="large" color="dark-6" />
-                </Box>
+                {cover.__typename === "File" ? (
+                    <Box background="light-2" height="small" width="small">
+                        <Image fit="cover" src={cover.url} />
+                    </Box>
+                ) : (
+                    <Box background="light-2" height="small" width="small" align="center" justify="center">
+                        <Print size="large" color="dark-6" />
+                    </Box>
+                )}
             </AnchorLink>
         </Box>
     )

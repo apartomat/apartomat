@@ -31,6 +31,10 @@ type AddVisualizationsToAlbumResult interface {
 	IsAddVisualizationsToAlbumResult()
 }
 
+type AlbumCoverResult interface {
+	IsAlbumCoverResult()
+}
+
 type AlbumFileGenerated interface {
 	IsAlbumFileGenerated()
 }
@@ -271,6 +275,7 @@ type Album struct {
 	Settings *AlbumSettings        `json:"settings"`
 	Pages    AlbumPagesResult      `json:"pages"`
 	File     AlbumRecentFileResult `json:"file,omitempty"`
+	Cover    AlbumCoverResult      `json:"cover"`
 }
 
 func (Album) IsAlbumResult() {}
@@ -459,6 +464,8 @@ type File struct {
 
 func (File) IsCoverFileResult() {}
 
+func (File) IsAlbumCoverResult() {}
+
 type FileUploaded struct {
 	File *File `json:"file"`
 }
@@ -528,6 +535,8 @@ func (Forbidden) IsAlbumPageCoverResult() {}
 func (Forbidden) IsCoverFileResult() {}
 
 func (Forbidden) IsAlbumRecentFileResult() {}
+
+func (Forbidden) IsAlbumCoverResult() {}
 
 func (Forbidden) IsUserProfileResult() {}
 
@@ -723,6 +732,8 @@ func (NotFound) IsCoverFileResult() {}
 func (NotFound) IsAlbumPageVisualizationResult() {}
 
 func (NotFound) IsAlbumRecentFileResult() {}
+
+func (NotFound) IsAlbumCoverResult() {}
 
 func (NotFound) IsProjectResult() {}
 
@@ -1048,6 +1059,8 @@ func (ServerError) IsCoverFileResult() {}
 func (ServerError) IsAlbumPageVisualizationResult() {}
 
 func (ServerError) IsAlbumRecentFileResult() {}
+
+func (ServerError) IsAlbumCoverResult() {}
 
 func (ServerError) IsUserProfileResult() {}
 

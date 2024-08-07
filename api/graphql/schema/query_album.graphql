@@ -12,6 +12,7 @@ type Album {
     settings: AlbumSettings!
     pages: AlbumPagesResult! @goField(forceResolver: true)
     file: AlbumRecentFileResult @goField(forceResolver: true)
+    cover: AlbumCoverResult! @goField(forceResolver: true)
 }
 
 union AlbumProjectResult = Project | Forbidden | NotFound | ServerError
@@ -85,3 +86,5 @@ enum AlbumFileStatus {
     GENERATING_IN_PROGRESS
     GENERATING_DONE
 }
+
+union AlbumCoverResult = File | NotFound | Forbidden | ServerError
