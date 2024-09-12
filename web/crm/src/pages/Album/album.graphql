@@ -131,6 +131,14 @@ fragment AlbumScreenHouseRooms on HouseRooms {
 fragment AlbumScreenAlbumPageCover on AlbumPageCover {
     number
     rotate
+    svg {
+        ... on Svg {
+            svg
+        }
+        ... on Error {
+            message
+        }
+    }
     cover {
         ... on Cover {
             id
@@ -162,6 +170,14 @@ fragment AlbumScreenAlbumPageCover on AlbumPageCover {
 fragment AlbumScreenAlbumPageVisualization on AlbumPageVisualization {
     number
     rotate
+    svg {
+        ... on Svg {
+            svg
+        }
+        ... on Error {
+            message
+        }
+    }
     visualization {
         ... on Visualization {
             id

@@ -95,6 +95,7 @@ export enum AlbumFileStatus {
 export type AlbumPage = {
   number: Scalars['Int'];
   rotate: Scalars['Float'];
+  svg: AlbumPageSvgResult;
 };
 
 export type AlbumPageCover = AlbumPage & {
@@ -102,6 +103,7 @@ export type AlbumPageCover = AlbumPage & {
   cover: AlbumPageCoverResult;
   number: Scalars['Int'];
   rotate: Scalars['Float'];
+  svg: AlbumPageSvgResult;
 };
 
 export type AlbumPageCoverResult = Cover | CoverUploaded | Forbidden | NotFound | ServerError;
@@ -116,10 +118,13 @@ export type AlbumPageSizeChanged = {
   album: Album;
 };
 
+export type AlbumPageSvgResult = NotFound | ServerError | Svg;
+
 export type AlbumPageVisualization = AlbumPage & {
   __typename?: 'AlbumPageVisualization';
   number: Scalars['Int'];
   rotate: Scalars['Float'];
+  svg: AlbumPageSvgResult;
   visualization: AlbumPageVisualizationResult;
 };
 
@@ -964,6 +969,11 @@ export type SubscriptionAlbumFileGeneratedArgs = {
   id: Scalars['String'];
 };
 
+export type Svg = {
+  __typename?: 'Svg';
+  svg: Scalars['String'];
+};
+
 export type Unknown = Error & {
   __typename?: 'Unknown';
   message: Scalars['String'];
@@ -1226,9 +1236,9 @@ export type AlbumScreenQueryVariables = Exact<{
 }>;
 
 
-export type AlbumScreenQuery = { __typename?: 'Query', album: { __typename: 'Album', id: string, name: string, version: number, project: { __typename?: 'Forbidden', message: string } | { __typename?: 'NotFound', message: string } | { __typename?: 'Project', id: string, name: string, visualizations: { __typename?: 'ProjectVisualizations', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'ProjectVisualizationsList', items: Array<{ __typename?: 'Visualization', id: string, name: string, description: string, version: number, file: { __typename?: 'File', id: string, name: string, url: any, type: FileType, mimeType: string }, room?: { __typename?: 'Room', id: string, name: string, square?: number | null, level?: number | null } | null }> } | { __typename?: 'ServerError', message: string } }, houses: { __typename?: 'ProjectHouses', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectHousesList', items: Array<{ __typename?: 'House', rooms: { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null, level?: number | null }> } | { __typename?: 'ServerError', message: string } } }> } | { __typename: 'ServerError', message: string } } } | { __typename?: 'ServerError', message: string }, pages: { __typename?: 'AlbumPages', items: Array<{ __typename?: 'AlbumPageCover', number: number, rotate: number, cover: { __typename?: 'Cover', id: string, file: { __typename?: 'File', url: any } | { __typename?: 'Forbidden', message: string } | { __typename?: 'NotFound', message: string } | { __typename?: 'ServerError', message: string } } | { __typename?: 'CoverUploaded', file: { __typename?: 'File', url: any } | { __typename?: 'Forbidden', message: string } | { __typename?: 'NotFound', message: string } | { __typename?: 'ServerError', message: string } } | { __typename?: 'Forbidden', message: string } | { __typename?: 'NotFound', message: string } | { __typename?: 'ServerError', message: string } } | { __typename?: 'AlbumPageVisualization', number: number, rotate: number, visualization: { __typename?: 'NotFound', message: string } | { __typename?: 'ServerError', message: string } | { __typename?: 'Visualization', id: string, file: { __typename?: 'File', url: any } } }> } | { __typename?: 'ServerError', message: string }, settings: { __typename?: 'AlbumSettings', pageSize: PageSize, pageOrientation: PageOrientation }, file?: { __typename?: 'AlbumFile', id: string, status: AlbumFileStatus, version: number, generatingStartedAt?: any | null, generatingDoneAt?: any | null, file?: { __typename?: 'File', url: any, type: FileType, mimeType: string } | null } | { __typename?: 'Forbidden', message: string } | { __typename?: 'NotFound', message: string } | { __typename?: 'ServerError', message: string } | null } | { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'ServerError', message: string } };
+export type AlbumScreenQuery = { __typename?: 'Query', album: { __typename: 'Album', id: string, name: string, version: number, project: { __typename?: 'Forbidden', message: string } | { __typename?: 'NotFound', message: string } | { __typename?: 'Project', id: string, name: string, visualizations: { __typename?: 'ProjectVisualizations', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'ProjectVisualizationsList', items: Array<{ __typename?: 'Visualization', id: string, name: string, description: string, version: number, file: { __typename?: 'File', id: string, name: string, url: any, type: FileType, mimeType: string }, room?: { __typename?: 'Room', id: string, name: string, square?: number | null, level?: number | null } | null }> } | { __typename?: 'ServerError', message: string } }, houses: { __typename?: 'ProjectHouses', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectHousesList', items: Array<{ __typename?: 'House', rooms: { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null, level?: number | null }> } | { __typename?: 'ServerError', message: string } } }> } | { __typename: 'ServerError', message: string } } } | { __typename?: 'ServerError', message: string }, pages: { __typename?: 'AlbumPages', items: Array<{ __typename?: 'AlbumPageCover', number: number, rotate: number, svg: { __typename?: 'NotFound', message: string } | { __typename?: 'ServerError', message: string } | { __typename?: 'Svg', svg: string }, cover: { __typename?: 'Cover', id: string, file: { __typename?: 'File', url: any } | { __typename?: 'Forbidden', message: string } | { __typename?: 'NotFound', message: string } | { __typename?: 'ServerError', message: string } } | { __typename?: 'CoverUploaded', file: { __typename?: 'File', url: any } | { __typename?: 'Forbidden', message: string } | { __typename?: 'NotFound', message: string } | { __typename?: 'ServerError', message: string } } | { __typename?: 'Forbidden', message: string } | { __typename?: 'NotFound', message: string } | { __typename?: 'ServerError', message: string } } | { __typename?: 'AlbumPageVisualization', number: number, rotate: number, svg: { __typename?: 'NotFound', message: string } | { __typename?: 'ServerError', message: string } | { __typename?: 'Svg', svg: string }, visualization: { __typename?: 'NotFound', message: string } | { __typename?: 'ServerError', message: string } | { __typename?: 'Visualization', id: string, file: { __typename?: 'File', url: any } } }> } | { __typename?: 'ServerError', message: string }, settings: { __typename?: 'AlbumSettings', pageSize: PageSize, pageOrientation: PageOrientation }, file?: { __typename?: 'AlbumFile', id: string, status: AlbumFileStatus, version: number, generatingStartedAt?: any | null, generatingDoneAt?: any | null, file?: { __typename?: 'File', url: any, type: FileType, mimeType: string } | null } | { __typename?: 'Forbidden', message: string } | { __typename?: 'NotFound', message: string } | { __typename?: 'ServerError', message: string } | null } | { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'ServerError', message: string } };
 
-export type AlbumScreenAlbumFragment = { __typename?: 'Album', id: string, name: string, version: number, project: { __typename?: 'Forbidden', message: string } | { __typename?: 'NotFound', message: string } | { __typename?: 'Project', id: string, name: string, visualizations: { __typename?: 'ProjectVisualizations', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'ProjectVisualizationsList', items: Array<{ __typename?: 'Visualization', id: string, name: string, description: string, version: number, file: { __typename?: 'File', id: string, name: string, url: any, type: FileType, mimeType: string }, room?: { __typename?: 'Room', id: string, name: string, square?: number | null, level?: number | null } | null }> } | { __typename?: 'ServerError', message: string } }, houses: { __typename?: 'ProjectHouses', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectHousesList', items: Array<{ __typename?: 'House', rooms: { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null, level?: number | null }> } | { __typename?: 'ServerError', message: string } } }> } | { __typename: 'ServerError', message: string } } } | { __typename?: 'ServerError', message: string }, pages: { __typename?: 'AlbumPages', items: Array<{ __typename?: 'AlbumPageCover', number: number, rotate: number, cover: { __typename?: 'Cover', id: string, file: { __typename?: 'File', url: any } | { __typename?: 'Forbidden', message: string } | { __typename?: 'NotFound', message: string } | { __typename?: 'ServerError', message: string } } | { __typename?: 'CoverUploaded', file: { __typename?: 'File', url: any } | { __typename?: 'Forbidden', message: string } | { __typename?: 'NotFound', message: string } | { __typename?: 'ServerError', message: string } } | { __typename?: 'Forbidden', message: string } | { __typename?: 'NotFound', message: string } | { __typename?: 'ServerError', message: string } } | { __typename?: 'AlbumPageVisualization', number: number, rotate: number, visualization: { __typename?: 'NotFound', message: string } | { __typename?: 'ServerError', message: string } | { __typename?: 'Visualization', id: string, file: { __typename?: 'File', url: any } } }> } | { __typename?: 'ServerError', message: string }, settings: { __typename?: 'AlbumSettings', pageSize: PageSize, pageOrientation: PageOrientation }, file?: { __typename?: 'AlbumFile', id: string, status: AlbumFileStatus, version: number, generatingStartedAt?: any | null, generatingDoneAt?: any | null, file?: { __typename?: 'File', url: any, type: FileType, mimeType: string } | null } | { __typename?: 'Forbidden', message: string } | { __typename?: 'NotFound', message: string } | { __typename?: 'ServerError', message: string } | null };
+export type AlbumScreenAlbumFragment = { __typename?: 'Album', id: string, name: string, version: number, project: { __typename?: 'Forbidden', message: string } | { __typename?: 'NotFound', message: string } | { __typename?: 'Project', id: string, name: string, visualizations: { __typename?: 'ProjectVisualizations', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'ProjectVisualizationsList', items: Array<{ __typename?: 'Visualization', id: string, name: string, description: string, version: number, file: { __typename?: 'File', id: string, name: string, url: any, type: FileType, mimeType: string }, room?: { __typename?: 'Room', id: string, name: string, square?: number | null, level?: number | null } | null }> } | { __typename?: 'ServerError', message: string } }, houses: { __typename?: 'ProjectHouses', list: { __typename: 'Forbidden', message: string } | { __typename: 'ProjectHousesList', items: Array<{ __typename?: 'House', rooms: { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null, level?: number | null }> } | { __typename?: 'ServerError', message: string } } }> } | { __typename: 'ServerError', message: string } } } | { __typename?: 'ServerError', message: string }, pages: { __typename?: 'AlbumPages', items: Array<{ __typename?: 'AlbumPageCover', number: number, rotate: number, svg: { __typename?: 'NotFound', message: string } | { __typename?: 'ServerError', message: string } | { __typename?: 'Svg', svg: string }, cover: { __typename?: 'Cover', id: string, file: { __typename?: 'File', url: any } | { __typename?: 'Forbidden', message: string } | { __typename?: 'NotFound', message: string } | { __typename?: 'ServerError', message: string } } | { __typename?: 'CoverUploaded', file: { __typename?: 'File', url: any } | { __typename?: 'Forbidden', message: string } | { __typename?: 'NotFound', message: string } | { __typename?: 'ServerError', message: string } } | { __typename?: 'Forbidden', message: string } | { __typename?: 'NotFound', message: string } | { __typename?: 'ServerError', message: string } } | { __typename?: 'AlbumPageVisualization', number: number, rotate: number, svg: { __typename?: 'NotFound', message: string } | { __typename?: 'ServerError', message: string } | { __typename?: 'Svg', svg: string }, visualization: { __typename?: 'NotFound', message: string } | { __typename?: 'ServerError', message: string } | { __typename?: 'Visualization', id: string, file: { __typename?: 'File', url: any } } }> } | { __typename?: 'ServerError', message: string }, settings: { __typename?: 'AlbumSettings', pageSize: PageSize, pageOrientation: PageOrientation }, file?: { __typename?: 'AlbumFile', id: string, status: AlbumFileStatus, version: number, generatingStartedAt?: any | null, generatingDoneAt?: any | null, file?: { __typename?: 'File', url: any, type: FileType, mimeType: string } | null } | { __typename?: 'Forbidden', message: string } | { __typename?: 'NotFound', message: string } | { __typename?: 'ServerError', message: string } | null };
 
 export type AlbumScreenSettingsFragment = { __typename?: 'AlbumSettings', pageSize: PageSize, pageOrientation: PageOrientation };
 
@@ -1242,9 +1252,9 @@ export type AlbumScreenHousesFragment = { __typename?: 'ProjectHouses', list: { 
 
 export type AlbumScreenHouseRoomsFragment = { __typename?: 'HouseRooms', list: { __typename?: 'Forbidden', message: string } | { __typename?: 'HouseRoomsList', items: Array<{ __typename?: 'Room', id: string, name: string, square?: number | null, level?: number | null }> } | { __typename?: 'ServerError', message: string } };
 
-export type AlbumScreenAlbumPageCoverFragment = { __typename?: 'AlbumPageCover', number: number, rotate: number, cover: { __typename?: 'Cover', id: string, file: { __typename?: 'File', url: any } | { __typename?: 'Forbidden', message: string } | { __typename?: 'NotFound', message: string } | { __typename?: 'ServerError', message: string } } | { __typename?: 'CoverUploaded', file: { __typename?: 'File', url: any } | { __typename?: 'Forbidden', message: string } | { __typename?: 'NotFound', message: string } | { __typename?: 'ServerError', message: string } } | { __typename?: 'Forbidden', message: string } | { __typename?: 'NotFound', message: string } | { __typename?: 'ServerError', message: string } };
+export type AlbumScreenAlbumPageCoverFragment = { __typename?: 'AlbumPageCover', number: number, rotate: number, svg: { __typename?: 'NotFound', message: string } | { __typename?: 'ServerError', message: string } | { __typename?: 'Svg', svg: string }, cover: { __typename?: 'Cover', id: string, file: { __typename?: 'File', url: any } | { __typename?: 'Forbidden', message: string } | { __typename?: 'NotFound', message: string } | { __typename?: 'ServerError', message: string } } | { __typename?: 'CoverUploaded', file: { __typename?: 'File', url: any } | { __typename?: 'Forbidden', message: string } | { __typename?: 'NotFound', message: string } | { __typename?: 'ServerError', message: string } } | { __typename?: 'Forbidden', message: string } | { __typename?: 'NotFound', message: string } | { __typename?: 'ServerError', message: string } };
 
-export type AlbumScreenAlbumPageVisualizationFragment = { __typename?: 'AlbumPageVisualization', number: number, rotate: number, visualization: { __typename?: 'NotFound', message: string } | { __typename?: 'ServerError', message: string } | { __typename?: 'Visualization', id: string, file: { __typename?: 'File', url: any } } };
+export type AlbumScreenAlbumPageVisualizationFragment = { __typename?: 'AlbumPageVisualization', number: number, rotate: number, svg: { __typename?: 'NotFound', message: string } | { __typename?: 'ServerError', message: string } | { __typename?: 'Svg', svg: string }, visualization: { __typename?: 'NotFound', message: string } | { __typename?: 'ServerError', message: string } | { __typename?: 'Visualization', id: string, file: { __typename?: 'File', url: any } } };
 
 export type AlbumScreenFileFragment = { __typename?: 'AlbumFile', id: string, status: AlbumFileStatus, version: number, generatingStartedAt?: any | null, generatingDoneAt?: any | null, file?: { __typename?: 'File', url: any, type: FileType, mimeType: string } | null };
 
@@ -1564,6 +1574,14 @@ export const AlbumScreenAlbumPageCoverFragmentDoc = gql`
     fragment AlbumScreenAlbumPageCover on AlbumPageCover {
   number
   rotate
+  svg {
+    ... on Svg {
+      svg
+    }
+    ... on Error {
+      message
+    }
+  }
   cover {
     ... on Cover {
       id
@@ -1596,6 +1614,14 @@ export const AlbumScreenAlbumPageVisualizationFragmentDoc = gql`
     fragment AlbumScreenAlbumPageVisualization on AlbumPageVisualization {
   number
   rotate
+  svg {
+    ... on Svg {
+      svg
+    }
+    ... on Error {
+      message
+    }
+  }
   visualization {
     ... on Visualization {
       id

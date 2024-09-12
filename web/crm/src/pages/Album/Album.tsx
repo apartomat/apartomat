@@ -2,7 +2,7 @@ import React, { MouseEventHandler, useEffect, useRef, useState } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { InView } from "react-intersection-observer"
 
-import { Box, BoxExtendedProps, Button, Grid, Heading, Header, Image, Text, Drop, Main } from "grommet"
+import { Box, BoxExtendedProps, Button, Grid, Heading, Header, Image, Text, Drop, Main, RangeInput } from "grommet"
 import { Add, Close } from "grommet-icons"
 
 import useAlbum, {
@@ -37,6 +37,8 @@ export function Album() {
     const { data, loading, refetch } = useAlbum({ id })
 
     const [showAddVisualizations, setShowAddVisualizations] = useState(false)
+
+    const [ scale, setScale ] = useState(0.5)
 
     useEffect(() => {
         if (data?.album?.__typename === "Album") {
@@ -79,6 +81,7 @@ export function Album() {
                     top: 0,
                     left: 0,
                     right: 0,
+                    zIndex: 2,
                 }}
                 background={{
                     color: "white",
@@ -116,6 +119,7 @@ export function Album() {
                     position: "fixed",
                     top: "84px",
                     right: "60px",
+                    zIndex: 1
                 }}
                 background="background-back"
                 pad="medium"
@@ -140,6 +144,12 @@ export function Album() {
                         <GenerateAlbumFile album={data.album} onAlbumFileGenerated={() => refetch()} />
                     </Box>
                 )}
+                <RangeInput
+                    value={scale * 100}
+                    onChange={(event) => {
+                        setScale(event.target.value / 100)
+                    }}
+                />
             </Box>
 
             <AddVariants
@@ -148,6 +158,7 @@ export function Album() {
                     bottom: 0,
                     left: 0,
                     right: 0,
+                    zIndex: 1
                 }}
                 direction="row"
                 justify="center"
@@ -170,13 +181,11 @@ export function Album() {
                                     threshold={1.0}
                                 >
                                     <Box
-                                        style={{ aspectRatio: orientationToAspectRation(settings?.pageOrientation) }}
                                         background="background-contrast"
-                                        round="xsmall"
+                                        // round="small"
                                         margin={{ vertical: "xxsmall" }}
-                                        justify="center"
-                                        pad="small"
-                                        width={orientationWidth(settings?.pageOrientation, 1.0)}
+                                        width={orientationWidth(settings?.pageOrientation, scale)}
+                                        height={orientationHeight(settings?.pageOrientation, scale)}
                                     >
                                         {(() => {
                                             switch (p.__typename) {
@@ -184,11 +193,13 @@ export function Album() {
                                                     switch (p.visualization.__typename) {
                                                         case "Visualization":
                                                             return (
-                                                                <Image
-                                                                    key={key}
-                                                                    fit="contain"
-                                                                    src={p.visualization.file.url}
-                                                                />
+                                                                <Box
+                                                                    style={{transform: `scale(${scale})`, transformOrigin: "left top"}}
+                                                                >
+                                                                    {p.svg.__typename === "Svg" &&
+                                                                        <div dangerouslySetInnerHTML={svg(p.svg.svg)}/>
+                                                                    }
+                                                                </Box>
                                                             )
                                                         default:
                                                             return <></>
@@ -197,11 +208,13 @@ export function Album() {
                                                     switch (p.cover.__typename) {
                                                         case "CoverUploaded":
                                                             return (
-                                                                <Image
-                                                                    key={key}
-                                                                    fit="contain"
-                                                                    src={p.cover.file.url}
-                                                                />
+                                                                <Box
+                                                                    style={{transform: `scale(${scale})`, transformOrigin: "left top"}}
+                                                                >
+                                                                    {p.svg.__typename === "Svg" &&
+                                                                        <div dangerouslySetInnerHTML={svg(p.svg.svg)}/>
+                                                                    }
+                                                                </Box>
                                                             )
                                                         default:
                                                             return <></>
@@ -238,14 +251,14 @@ export function Album() {
 }
 
 function AddVisualizationsCircleButton({
-    onClick,
-    ...boxProps
-}: {
+                                           onClick,
+                                           ...boxProps
+                                       }: {
     onClick?: MouseEventHandler | undefined
 } & BoxExtendedProps) {
     return (
         <Box {...boxProps} round="full" overflow="hidden" background="brand">
-            <Button icon={<Add />} hoverIndicator onClick={onClick} />
+            <Button icon={<Add/>} hoverIndicator onClick={onClick}/>
         </Box>
     )
 }
@@ -264,12 +277,25 @@ function orientationToAspectRation(orientation?: PageOrientationEnum): string {
     return port
 }
 
-function orientationWidth(orientation?: PageOrientationEnum, scale): string {
+function orientationWidth(orientation: PageOrientationEnum = PageOrientationEnum.Landscape, scale: Number = 1.0): string {
+    const landscapeWidth = 420, portraitWidth = 297
+
     switch (orientation) {
         case PageOrientationEnum.Landscape:
-            return "564px"
+            return `${landscapeWidth  * scale}mm`
         case PageOrientationEnum.Portrait:
-            return "400px"
+            return `${portraitWidth  * scale}mm`
+    }
+}
+
+function orientationHeight(orientation: PageOrientationEnum = PageOrientationEnum.Landscape, scale: Number = 1.0): string {
+    const landscapeHeight = 297, portraitHeight = 420
+
+    switch (orientation) {
+        case PageOrientationEnum.Landscape:
+            return `${landscapeHeight  * scale}mm`
+        case PageOrientationEnum.Portrait:
+            return `${portraitHeight  * scale}mm`
     }
 }
 
@@ -322,4 +348,8 @@ function AddVariants({
             )}
         </Box>
     )
+}
+
+function svg(html: string) {
+    return {__html: html}
 }

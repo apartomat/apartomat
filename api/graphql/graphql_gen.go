@@ -104,6 +104,7 @@ type ComplexityRoot struct {
 		Cover  func(childComplexity int) int
 		Number func(childComplexity int) int
 		Rotate func(childComplexity int) int
+		SVG    func(childComplexity int) int
 	}
 
 	AlbumPageOrientationChanged struct {
@@ -117,6 +118,7 @@ type ComplexityRoot struct {
 	AlbumPageVisualization struct {
 		Number        func(childComplexity int) int
 		Rotate        func(childComplexity int) int
+		SVG           func(childComplexity int) int
 		Visualization func(childComplexity int) int
 	}
 
@@ -478,6 +480,10 @@ type ComplexityRoot struct {
 		Ping               func(childComplexity int) int
 	}
 
+	Svg struct {
+		SVG func(childComplexity int) int
+	}
+
 	Unknown struct {
 		Message func(childComplexity int) int
 	}
@@ -579,9 +585,11 @@ type AlbumResolver interface {
 	Cover(ctx context.Context, obj *Album) (AlbumCoverResult, error)
 }
 type AlbumPageCoverResolver interface {
+	SVG(ctx context.Context, obj *AlbumPageCover) (AlbumPageSVGResult, error)
 	Cover(ctx context.Context, obj *AlbumPageCover) (AlbumPageCoverResult, error)
 }
 type AlbumPageVisualizationResolver interface {
+	SVG(ctx context.Context, obj *AlbumPageVisualization) (AlbumPageSVGResult, error)
 	Visualization(ctx context.Context, obj *AlbumPageVisualization) (AlbumPageVisualizationResult, error)
 }
 type CoverResolver interface {
@@ -853,6 +861,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.AlbumPageCover.Rotate(childComplexity), true
 
+	case "AlbumPageCover.svg":
+		if e.complexity.AlbumPageCover.SVG == nil {
+			break
+		}
+
+		return e.complexity.AlbumPageCover.SVG(childComplexity), true
+
 	case "AlbumPageOrientationChanged.album":
 		if e.complexity.AlbumPageOrientationChanged.Album == nil {
 			break
@@ -880,6 +895,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.AlbumPageVisualization.Rotate(childComplexity), true
+
+	case "AlbumPageVisualization.svg":
+		if e.complexity.AlbumPageVisualization.SVG == nil {
+			break
+		}
+
+		return e.complexity.AlbumPageVisualization.SVG(childComplexity), true
 
 	case "AlbumPageVisualization.visualization":
 		if e.complexity.AlbumPageVisualization.Visualization == nil {
@@ -2164,6 +2186,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Subscription.Ping(childComplexity), true
+
+	case "Svg.svg":
+		if e.complexity.Svg.SVG == nil {
+			break
+		}
+
+		return e.complexity.Svg.SVG(childComplexity), true
 
 	case "Unknown.message":
 		if e.complexity.Unknown.Message == nil {
@@ -4640,6 +4669,50 @@ func (ec *executionContext) fieldContext_AlbumPageCover_rotate(_ context.Context
 	return fc, nil
 }
 
+func (ec *executionContext) _AlbumPageCover_svg(ctx context.Context, field graphql.CollectedField, obj *AlbumPageCover) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AlbumPageCover_svg(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.AlbumPageCover().SVG(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(AlbumPageSVGResult)
+	fc.Result = res
+	return ec.marshalNAlbumPageSvgResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumPageSVGResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AlbumPageCover_svg(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AlbumPageCover",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type AlbumPageSvgResult does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _AlbumPageCover_cover(ctx context.Context, field graphql.CollectedField, obj *AlbumPageCover) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_AlbumPageCover_cover(ctx, field)
 	if err != nil {
@@ -4891,6 +4964,50 @@ func (ec *executionContext) fieldContext_AlbumPageVisualization_rotate(_ context
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Float does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AlbumPageVisualization_svg(ctx context.Context, field graphql.CollectedField, obj *AlbumPageVisualization) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AlbumPageVisualization_svg(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.AlbumPageVisualization().SVG(rctx, obj)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(AlbumPageSVGResult)
+	fc.Result = res
+	return ec.marshalNAlbumPageSvgResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumPageSVGResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AlbumPageVisualization_svg(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AlbumPageVisualization",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type AlbumPageSvgResult does not have child fields")
 		},
 	}
 	return fc, nil
@@ -12646,6 +12763,50 @@ func (ec *executionContext) fieldContext_Subscription_albumFileGenerated(ctx con
 	return fc, nil
 }
 
+func (ec *executionContext) _Svg_svg(ctx context.Context, field graphql.CollectedField, obj *SVG) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Svg_svg(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SVG, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Svg_svg(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Svg",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Unknown_message(ctx context.Context, field graphql.CollectedField, obj *Unknown) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Unknown_message(ctx, field)
 	if err != nil {
@@ -13555,6 +13716,8 @@ func (ec *executionContext) fieldContext_VisualizationsAddedToAlbum_pages(_ cont
 				return ec.fieldContext_AlbumPageVisualization_number(ctx, field)
 			case "rotate":
 				return ec.fieldContext_AlbumPageVisualization_rotate(ctx, field)
+			case "svg":
+				return ec.fieldContext_AlbumPageVisualization_svg(ctx, field)
 			case "visualization":
 				return ec.fieldContext_AlbumPageVisualization_visualization(ctx, field)
 			}
@@ -17436,6 +17599,36 @@ func (ec *executionContext) _AlbumPageCoverResult(ctx context.Context, sel ast.S
 	}
 }
 
+func (ec *executionContext) _AlbumPageSvgResult(ctx context.Context, sel ast.SelectionSet, obj AlbumPageSVGResult) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case NotFound:
+		return ec._NotFound(ctx, sel, &obj)
+	case *NotFound:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._NotFound(ctx, sel, obj)
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
+	case SVG:
+		return ec._Svg(ctx, sel, &obj)
+	case *SVG:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Svg(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
 func (ec *executionContext) _AlbumPageVisualizationResult(ctx context.Context, sel ast.SelectionSet, obj AlbumPageVisualizationResult) graphql.Marshaler {
 	switch obj := (obj).(type) {
 	case nil:
@@ -19594,6 +19787,42 @@ func (ec *executionContext) _AlbumPageCover(ctx context.Context, sel ast.Selecti
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "svg":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._AlbumPageCover_svg(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "cover":
 			field := field
 
@@ -19752,6 +19981,42 @@ func (ec *executionContext) _AlbumPageVisualization(ctx context.Context, sel ast
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "svg":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._AlbumPageVisualization_svg(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "visualization":
 			field := field
 
@@ -21413,7 +21678,7 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 	return out
 }
 
-var notFoundImplementors = []string{"NotFound", "AddHouseResult", "AddRoomResult", "ChangeAlbumPageOrientationResult", "ChangeAlbumPageSizeResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "DeleteAlbumResult", "DeleteContactResult", "DeleteRoomResult", "DeleteVisualizationsResult", "GenerateAlbumFileResult", "InviteUserToWorkspaceResult", "MakeProjectNotPublicResult", "MakeProjectPublicResult", "MoveRoomToPositionResult", "UpdateContactResult", "UpdateHouseResult", "UpdateRoomResult", "AlbumResult", "AlbumProjectResult", "AlbumPageCoverResult", "CoverFileResult", "AlbumPageVisualizationResult", "AlbumRecentFileResult", "AlbumCoverResult", "ProjectResult", "ProjectPublicSite", "WorkspaceResult", "Error", "AlbumFileGenerated"}
+var notFoundImplementors = []string{"NotFound", "AddHouseResult", "AddRoomResult", "ChangeAlbumPageOrientationResult", "ChangeAlbumPageSizeResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "DeleteAlbumResult", "DeleteContactResult", "DeleteRoomResult", "DeleteVisualizationsResult", "GenerateAlbumFileResult", "InviteUserToWorkspaceResult", "MakeProjectNotPublicResult", "MakeProjectPublicResult", "MoveRoomToPositionResult", "UpdateContactResult", "UpdateHouseResult", "UpdateRoomResult", "AlbumResult", "AlbumProjectResult", "AlbumPageSvgResult", "AlbumPageCoverResult", "CoverFileResult", "AlbumPageVisualizationResult", "AlbumRecentFileResult", "AlbumCoverResult", "ProjectResult", "ProjectPublicSite", "WorkspaceResult", "Error", "AlbumFileGenerated"}
 
 func (ec *executionContext) _NotFound(ctx context.Context, sel ast.SelectionSet, obj *NotFound) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, notFoundImplementors)
@@ -23604,7 +23869,7 @@ func (ec *executionContext) _RoomUpdated(ctx context.Context, sel ast.SelectionS
 	return out
 }
 
-var serverErrorImplementors = []string{"ServerError", "AcceptInviteResult", "AddContactResult", "AddHouseResult", "AddVisualizationsToAlbumResult", "ChangeAlbumPageOrientationResult", "ChangeAlbumPageSizeResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "ConfirmLoginLinkResult", "ConfirmLoginPinResult", "CreateAlbumResult", "CreateProjectResult", "DeleteAlbumResult", "DeleteContactResult", "DeleteVisualizationsResult", "GenerateAlbumFileResult", "InviteUserToWorkspaceResult", "LoginByEmailResult", "MakeProjectNotPublicResult", "MakeProjectPublicResult", "MoveRoomToPositionResult", "UpdateContactResult", "UpdateHouseResult", "UploadFileResult", "UploadVisualizationResult", "UploadVisualizationsResult", "AlbumResult", "AlbumProjectResult", "AlbumPagesResult", "AlbumPageCoverResult", "CoverFileResult", "AlbumPageVisualizationResult", "AlbumRecentFileResult", "AlbumCoverResult", "UserProfileResult", "ProjectResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "ProjectVisualizationsListResult", "ProjectVisualizationsTotalResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectAlbumsListResult", "ProjectAlbumsTotalResult", "ProjectPublicSite", "WorkspaceResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "WorkspaceUsersListResult", "WorkspaceUsersTotalResult", "Error", "AlbumFileGenerated"}
+var serverErrorImplementors = []string{"ServerError", "AcceptInviteResult", "AddContactResult", "AddHouseResult", "AddVisualizationsToAlbumResult", "ChangeAlbumPageOrientationResult", "ChangeAlbumPageSizeResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "ConfirmLoginLinkResult", "ConfirmLoginPinResult", "CreateAlbumResult", "CreateProjectResult", "DeleteAlbumResult", "DeleteContactResult", "DeleteVisualizationsResult", "GenerateAlbumFileResult", "InviteUserToWorkspaceResult", "LoginByEmailResult", "MakeProjectNotPublicResult", "MakeProjectPublicResult", "MoveRoomToPositionResult", "UpdateContactResult", "UpdateHouseResult", "UploadFileResult", "UploadVisualizationResult", "UploadVisualizationsResult", "AlbumResult", "AlbumProjectResult", "AlbumPagesResult", "AlbumPageSvgResult", "AlbumPageCoverResult", "CoverFileResult", "AlbumPageVisualizationResult", "AlbumRecentFileResult", "AlbumCoverResult", "UserProfileResult", "ProjectResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "ProjectVisualizationsListResult", "ProjectVisualizationsTotalResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectAlbumsListResult", "ProjectAlbumsTotalResult", "ProjectPublicSite", "WorkspaceResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "WorkspaceUsersListResult", "WorkspaceUsersTotalResult", "Error", "AlbumFileGenerated"}
 
 func (ec *executionContext) _ServerError(ctx context.Context, sel ast.SelectionSet, obj *ServerError) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, serverErrorImplementors)
@@ -23741,6 +24006,45 @@ func (ec *executionContext) _Subscription(ctx context.Context, sel ast.Selection
 	default:
 		panic("unknown field " + strconv.Quote(fields[0].Name))
 	}
+}
+
+var svgImplementors = []string{"Svg", "AlbumPageSvgResult"}
+
+func (ec *executionContext) _Svg(ctx context.Context, sel ast.SelectionSet, obj *SVG) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, svgImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Svg")
+		case "svg":
+			out.Values[i] = ec._Svg_svg(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
 }
 
 var unknownImplementors = []string{"Unknown", "Error", "AlbumFileGenerated"}
@@ -25408,6 +25712,16 @@ func (ec *executionContext) marshalNAlbumPageCoverResult2githubᚗcomᚋapartoma
 		return graphql.Null
 	}
 	return ec._AlbumPageCoverResult(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNAlbumPageSvgResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumPageSVGResult(ctx context.Context, sel ast.SelectionSet, v AlbumPageSVGResult) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._AlbumPageSvgResult(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNAlbumPageVisualization2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumPageVisualizationᚄ(ctx context.Context, sel ast.SelectionSet, v []*AlbumPageVisualization) graphql.Marshaler {
