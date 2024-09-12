@@ -103,6 +103,11 @@ func main() {
 
 		bundb := bun.NewDB(sqldb, pgdialect.New())
 
+		if err := bundb.Ping(); err != nil {
+			slog.Error("can't connect to database", slog.Any("err", err))
+			os.Exit(1)
+		}
+
 		// todo: write to logger
 		bundb.AddQueryHook(zapbun.NewZapLoggerQueryHook(log))
 
