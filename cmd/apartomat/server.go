@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/99designs/gqlgen/graphql/playground"
-	"github.com/apartomat/apartomat/api/graphql"
+	"github.com/apartomat/apartomat/api/crm/graphql"
 	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/dataloaders"
 	"github.com/go-chi/chi/v5"

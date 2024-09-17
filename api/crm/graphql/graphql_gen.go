@@ -2752,7 +2752,7 @@ func (ec *executionContext) field_Mutation_addContact_args(ctx context.Context, 
 	var arg1 AddContactInput
 	if tmp, ok := rawArgs["contact"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contact"))
-		arg1, err = ec.unmarshalNAddContactInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAddContactInput(ctx, tmp)
+		arg1, err = ec.unmarshalNAddContactInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAddContactInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2776,7 +2776,7 @@ func (ec *executionContext) field_Mutation_addHouse_args(ctx context.Context, ra
 	var arg1 AddHouseInput
 	if tmp, ok := rawArgs["house"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("house"))
-		arg1, err = ec.unmarshalNAddHouseInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAddHouseInput(ctx, tmp)
+		arg1, err = ec.unmarshalNAddHouseInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAddHouseInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2800,7 +2800,7 @@ func (ec *executionContext) field_Mutation_addRoom_args(ctx context.Context, raw
 	var arg1 AddRoomInput
 	if tmp, ok := rawArgs["room"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("room"))
-		arg1, err = ec.unmarshalNAddRoomInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAddRoomInput(ctx, tmp)
+		arg1, err = ec.unmarshalNAddRoomInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAddRoomInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2848,7 +2848,7 @@ func (ec *executionContext) field_Mutation_changeAlbumPageOrientation_args(ctx c
 	var arg1 PageOrientation
 	if tmp, ok := rawArgs["orientation"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orientation"))
-		arg1, err = ec.unmarshalNPageOrientation2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐPageOrientation(ctx, tmp)
+		arg1, err = ec.unmarshalNPageOrientation2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐPageOrientation(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2872,7 +2872,7 @@ func (ec *executionContext) field_Mutation_changeAlbumPageSize_args(ctx context.
 	var arg1 PageSize
 	if tmp, ok := rawArgs["size"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("size"))
-		arg1, err = ec.unmarshalNPageSize2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐPageSize(ctx, tmp)
+		arg1, err = ec.unmarshalNPageSize2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐPageSize(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2896,7 +2896,7 @@ func (ec *executionContext) field_Mutation_changeProjectDates_args(ctx context.C
 	var arg1 ChangeProjectDatesInput
 	if tmp, ok := rawArgs["dates"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("dates"))
-		arg1, err = ec.unmarshalNChangeProjectDatesInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐChangeProjectDatesInput(ctx, tmp)
+		arg1, err = ec.unmarshalNChangeProjectDatesInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐChangeProjectDatesInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2920,7 +2920,7 @@ func (ec *executionContext) field_Mutation_changeProjectStatus_args(ctx context.
 	var arg1 ProjectStatus
 	if tmp, ok := rawArgs["status"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-		arg1, err = ec.unmarshalNProjectStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectStatus(ctx, tmp)
+		arg1, err = ec.unmarshalNProjectStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectStatus(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2992,7 +2992,7 @@ func (ec *executionContext) field_Mutation_createAlbum_args(ctx context.Context,
 	var arg2 CreateAlbumSettingsInput
 	if tmp, ok := rawArgs["settings"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("settings"))
-		arg2, err = ec.unmarshalNCreateAlbumSettingsInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐCreateAlbumSettingsInput(ctx, tmp)
+		arg2, err = ec.unmarshalNCreateAlbumSettingsInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐCreateAlbumSettingsInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -3007,7 +3007,7 @@ func (ec *executionContext) field_Mutation_createProject_args(ctx context.Contex
 	var arg0 CreateProjectInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNCreateProjectInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐCreateProjectInput(ctx, tmp)
+		arg0, err = ec.unmarshalNCreateProjectInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐCreateProjectInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -3115,7 +3115,7 @@ func (ec *executionContext) field_Mutation_inviteUser_args(ctx context.Context, 
 	var arg2 WorkspaceUserRole
 	if tmp, ok := rawArgs["role"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role"))
-		arg2, err = ec.unmarshalNWorkspaceUserRole2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserRole(ctx, tmp)
+		arg2, err = ec.unmarshalNWorkspaceUserRole2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceUserRole(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -3217,7 +3217,7 @@ func (ec *executionContext) field_Mutation_updateContact_args(ctx context.Contex
 	var arg1 UpdateContactInput
 	if tmp, ok := rawArgs["data"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("data"))
-		arg1, err = ec.unmarshalNUpdateContactInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐUpdateContactInput(ctx, tmp)
+		arg1, err = ec.unmarshalNUpdateContactInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐUpdateContactInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -3241,7 +3241,7 @@ func (ec *executionContext) field_Mutation_updateHouse_args(ctx context.Context,
 	var arg1 UpdateHouseInput
 	if tmp, ok := rawArgs["data"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("data"))
-		arg1, err = ec.unmarshalNUpdateHouseInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐUpdateHouseInput(ctx, tmp)
+		arg1, err = ec.unmarshalNUpdateHouseInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐUpdateHouseInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -3265,7 +3265,7 @@ func (ec *executionContext) field_Mutation_updateRoom_args(ctx context.Context, 
 	var arg1 UpdateRoomInput
 	if tmp, ok := rawArgs["data"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("data"))
-		arg1, err = ec.unmarshalNUpdateRoomInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐUpdateRoomInput(ctx, tmp)
+		arg1, err = ec.unmarshalNUpdateRoomInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐUpdateRoomInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -3280,7 +3280,7 @@ func (ec *executionContext) field_Mutation_uploadFile_args(ctx context.Context, 
 	var arg0 UploadFileInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNUploadFileInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐUploadFileInput(ctx, tmp)
+		arg0, err = ec.unmarshalNUploadFileInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐUploadFileInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -3385,7 +3385,7 @@ func (ec *executionContext) field_ProjectContacts_list_args(ctx context.Context,
 	var arg0 ProjectContactsFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalNProjectContactsFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectContactsFilter(ctx, tmp)
+		arg0, err = ec.unmarshalNProjectContactsFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectContactsFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -3418,7 +3418,7 @@ func (ec *executionContext) field_ProjectContacts_total_args(ctx context.Context
 	var arg0 ProjectContactsFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalNProjectContactsFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectContactsFilter(ctx, tmp)
+		arg0, err = ec.unmarshalNProjectContactsFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectContactsFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -3433,7 +3433,7 @@ func (ec *executionContext) field_ProjectFiles_list_args(ctx context.Context, ra
 	var arg0 ProjectFilesListFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalNProjectFilesListFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectFilesListFilter(ctx, tmp)
+		arg0, err = ec.unmarshalNProjectFilesListFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectFilesListFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -3466,7 +3466,7 @@ func (ec *executionContext) field_ProjectFiles_total_args(ctx context.Context, r
 	var arg0 ProjectFilesListFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalNProjectFilesListFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectFilesListFilter(ctx, tmp)
+		arg0, err = ec.unmarshalNProjectFilesListFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectFilesListFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -3481,7 +3481,7 @@ func (ec *executionContext) field_ProjectHouses_list_args(ctx context.Context, r
 	var arg0 ProjectHousesFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalNProjectHousesFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectHousesFilter(ctx, tmp)
+		arg0, err = ec.unmarshalNProjectHousesFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectHousesFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -3514,7 +3514,7 @@ func (ec *executionContext) field_ProjectHouses_total_args(ctx context.Context, 
 	var arg0 ProjectHousesFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalNProjectHousesFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectHousesFilter(ctx, tmp)
+		arg0, err = ec.unmarshalNProjectHousesFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectHousesFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -3529,7 +3529,7 @@ func (ec *executionContext) field_ProjectVisualizations_list_args(ctx context.Co
 	var arg0 ProjectVisualizationsListFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalNProjectVisualizationsListFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectVisualizationsListFilter(ctx, tmp)
+		arg0, err = ec.unmarshalNProjectVisualizationsListFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectVisualizationsListFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -3562,7 +3562,7 @@ func (ec *executionContext) field_ProjectVisualizations_total_args(ctx context.C
 	var arg0 ProjectVisualizationsListFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalNProjectVisualizationsListFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectVisualizationsListFilter(ctx, tmp)
+		arg0, err = ec.unmarshalNProjectVisualizationsListFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectVisualizationsListFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -3667,7 +3667,7 @@ func (ec *executionContext) field_WorkspaceProjects_list_args(ctx context.Contex
 	var arg0 WorkspaceProjectsFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalNWorkspaceProjectsFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceProjectsFilter(ctx, tmp)
+		arg0, err = ec.unmarshalNWorkspaceProjectsFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceProjectsFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -3691,7 +3691,7 @@ func (ec *executionContext) field_WorkspaceProjects_total_args(ctx context.Conte
 	var arg0 WorkspaceProjectsFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalNWorkspaceProjectsFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceProjectsFilter(ctx, tmp)
+		arg0, err = ec.unmarshalNWorkspaceProjectsFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceProjectsFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -3706,7 +3706,7 @@ func (ec *executionContext) field_WorkspaceUsers_list_args(ctx context.Context, 
 	var arg0 WorkspaceUsersFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalNWorkspaceUsersFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUsersFilter(ctx, tmp)
+		arg0, err = ec.unmarshalNWorkspaceUsersFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceUsersFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -3730,7 +3730,7 @@ func (ec *executionContext) field_WorkspaceUsers_total_args(ctx context.Context,
 	var arg0 WorkspaceUsersFilter
 	if tmp, ok := rawArgs["filter"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalNWorkspaceUsersFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUsersFilter(ctx, tmp)
+		arg0, err = ec.unmarshalNWorkspaceUsersFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceUsersFilter(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -3937,7 +3937,7 @@ func (ec *executionContext) _Album_project(ctx context.Context, field graphql.Co
 	}
 	res := resTmp.(AlbumProjectResult)
 	fc.Result = res
-	return ec.marshalNAlbumProjectResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumProjectResult(ctx, field.Selections, res)
+	return ec.marshalNAlbumProjectResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAlbumProjectResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Album_project(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3981,7 +3981,7 @@ func (ec *executionContext) _Album_settings(ctx context.Context, field graphql.C
 	}
 	res := resTmp.(*AlbumSettings)
 	fc.Result = res
-	return ec.marshalNAlbumSettings2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumSettings(ctx, field.Selections, res)
+	return ec.marshalNAlbumSettings2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAlbumSettings(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Album_settings(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4031,7 +4031,7 @@ func (ec *executionContext) _Album_pages(ctx context.Context, field graphql.Coll
 	}
 	res := resTmp.(AlbumPagesResult)
 	fc.Result = res
-	return ec.marshalNAlbumPagesResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumPagesResult(ctx, field.Selections, res)
+	return ec.marshalNAlbumPagesResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAlbumPagesResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Album_pages(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4072,7 +4072,7 @@ func (ec *executionContext) _Album_file(ctx context.Context, field graphql.Colle
 	}
 	res := resTmp.(AlbumRecentFileResult)
 	fc.Result = res
-	return ec.marshalOAlbumRecentFileResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumRecentFileResult(ctx, field.Selections, res)
+	return ec.marshalOAlbumRecentFileResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAlbumRecentFileResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Album_file(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4116,7 +4116,7 @@ func (ec *executionContext) _Album_cover(ctx context.Context, field graphql.Coll
 	}
 	res := resTmp.(AlbumCoverResult)
 	fc.Result = res
-	return ec.marshalNAlbumCoverResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumCoverResult(ctx, field.Selections, res)
+	return ec.marshalNAlbumCoverResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAlbumCoverResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Album_cover(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4160,7 +4160,7 @@ func (ec *executionContext) _AlbumCreated_album(ctx context.Context, field graph
 	}
 	res := resTmp.(*Album)
 	fc.Result = res
-	return ec.marshalNAlbum2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbum(ctx, field.Selections, res)
+	return ec.marshalNAlbum2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAlbum(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_AlbumCreated_album(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4222,7 +4222,7 @@ func (ec *executionContext) _AlbumDeleted_album(ctx context.Context, field graph
 	}
 	res := resTmp.(*Album)
 	fc.Result = res
-	return ec.marshalNAlbum2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbum(ctx, field.Selections, res)
+	return ec.marshalNAlbum2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAlbum(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_AlbumDeleted_album(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4328,7 +4328,7 @@ func (ec *executionContext) _AlbumFile_status(ctx context.Context, field graphql
 	}
 	res := resTmp.(AlbumFileStatus)
 	fc.Result = res
-	return ec.marshalNAlbumFileStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumFileStatus(ctx, field.Selections, res)
+	return ec.marshalNAlbumFileStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAlbumFileStatus(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_AlbumFile_status(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4413,7 +4413,7 @@ func (ec *executionContext) _AlbumFile_file(ctx context.Context, field graphql.C
 	}
 	res := resTmp.(*File)
 	fc.Result = res
-	return ec.marshalOFile2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐFile(ctx, field.Selections, res)
+	return ec.marshalOFile2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐFile(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_AlbumFile_file(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4551,7 +4551,7 @@ func (ec *executionContext) _AlbumFileGenerationStarted_file(ctx context.Context
 	}
 	res := resTmp.(*AlbumFile)
 	fc.Result = res
-	return ec.marshalNAlbumFile2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumFile(ctx, field.Selections, res)
+	return ec.marshalNAlbumFile2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAlbumFile(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_AlbumFileGenerationStarted_file(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4697,7 +4697,7 @@ func (ec *executionContext) _AlbumPageCover_svg(ctx context.Context, field graph
 	}
 	res := resTmp.(AlbumPageSVGResult)
 	fc.Result = res
-	return ec.marshalNAlbumPageSvgResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumPageSVGResult(ctx, field.Selections, res)
+	return ec.marshalNAlbumPageSvgResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAlbumPageSVGResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_AlbumPageCover_svg(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4741,7 +4741,7 @@ func (ec *executionContext) _AlbumPageCover_cover(ctx context.Context, field gra
 	}
 	res := resTmp.(AlbumPageCoverResult)
 	fc.Result = res
-	return ec.marshalNAlbumPageCoverResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumPageCoverResult(ctx, field.Selections, res)
+	return ec.marshalNAlbumPageCoverResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAlbumPageCoverResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_AlbumPageCover_cover(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4785,7 +4785,7 @@ func (ec *executionContext) _AlbumPageOrientationChanged_album(ctx context.Conte
 	}
 	res := resTmp.(*Album)
 	fc.Result = res
-	return ec.marshalNAlbum2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbum(ctx, field.Selections, res)
+	return ec.marshalNAlbum2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAlbum(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_AlbumPageOrientationChanged_album(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4847,7 +4847,7 @@ func (ec *executionContext) _AlbumPageSizeChanged_album(ctx context.Context, fie
 	}
 	res := resTmp.(*Album)
 	fc.Result = res
-	return ec.marshalNAlbum2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbum(ctx, field.Selections, res)
+	return ec.marshalNAlbum2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAlbum(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_AlbumPageSizeChanged_album(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4997,7 +4997,7 @@ func (ec *executionContext) _AlbumPageVisualization_svg(ctx context.Context, fie
 	}
 	res := resTmp.(AlbumPageSVGResult)
 	fc.Result = res
-	return ec.marshalNAlbumPageSvgResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumPageSVGResult(ctx, field.Selections, res)
+	return ec.marshalNAlbumPageSvgResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAlbumPageSVGResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_AlbumPageVisualization_svg(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5041,7 +5041,7 @@ func (ec *executionContext) _AlbumPageVisualization_visualization(ctx context.Co
 	}
 	res := resTmp.(AlbumPageVisualizationResult)
 	fc.Result = res
-	return ec.marshalNAlbumPageVisualizationResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumPageVisualizationResult(ctx, field.Selections, res)
+	return ec.marshalNAlbumPageVisualizationResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAlbumPageVisualizationResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_AlbumPageVisualization_visualization(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5085,7 +5085,7 @@ func (ec *executionContext) _AlbumPages_items(ctx context.Context, field graphql
 	}
 	res := resTmp.([]AlbumPage)
 	fc.Result = res
-	return ec.marshalNAlbumPage2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumPageᚄ(ctx, field.Selections, res)
+	return ec.marshalNAlbumPage2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAlbumPageᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_AlbumPages_items(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5129,7 +5129,7 @@ func (ec *executionContext) _AlbumSettings_pageSize(ctx context.Context, field g
 	}
 	res := resTmp.(PageSize)
 	fc.Result = res
-	return ec.marshalNPageSize2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐPageSize(ctx, field.Selections, res)
+	return ec.marshalNPageSize2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐPageSize(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_AlbumSettings_pageSize(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5173,7 +5173,7 @@ func (ec *executionContext) _AlbumSettings_pageOrientation(ctx context.Context, 
 	}
 	res := resTmp.(PageOrientation)
 	fc.Result = res
-	return ec.marshalNPageOrientation2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐPageOrientation(ctx, field.Selections, res)
+	return ec.marshalNPageOrientation2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐPageOrientation(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_AlbumSettings_pageOrientation(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5437,7 +5437,7 @@ func (ec *executionContext) _Contact_details(ctx context.Context, field graphql.
 	}
 	res := resTmp.([]*ContactDetails)
 	fc.Result = res
-	return ec.marshalNContactDetails2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐContactDetailsᚄ(ctx, field.Selections, res)
+	return ec.marshalNContactDetails2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐContactDetailsᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Contact_details(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5575,7 +5575,7 @@ func (ec *executionContext) _ContactAdded_contact(ctx context.Context, field gra
 	}
 	res := resTmp.(*Contact)
 	fc.Result = res
-	return ec.marshalNContact2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐContact(ctx, field.Selections, res)
+	return ec.marshalNContact2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐContact(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ContactAdded_contact(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5633,7 +5633,7 @@ func (ec *executionContext) _ContactDeleted_contact(ctx context.Context, field g
 	}
 	res := resTmp.(*Contact)
 	fc.Result = res
-	return ec.marshalNContact2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐContact(ctx, field.Selections, res)
+	return ec.marshalNContact2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐContact(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ContactDeleted_contact(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5691,7 +5691,7 @@ func (ec *executionContext) _ContactDetails_type(ctx context.Context, field grap
 	}
 	res := resTmp.(ContactType)
 	fc.Result = res
-	return ec.marshalNContactType2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐContactType(ctx, field.Selections, res)
+	return ec.marshalNContactType2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐContactType(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ContactDetails_type(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5779,7 +5779,7 @@ func (ec *executionContext) _ContactUpdated_contact(ctx context.Context, field g
 	}
 	res := resTmp.(*Contact)
 	fc.Result = res
-	return ec.marshalNContact2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐContact(ctx, field.Selections, res)
+	return ec.marshalNContact2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐContact(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ContactUpdated_contact(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5881,7 +5881,7 @@ func (ec *executionContext) _Cover_file(ctx context.Context, field graphql.Colle
 	}
 	res := resTmp.(CoverFileResult)
 	fc.Result = res
-	return ec.marshalNCoverFileResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐCoverFileResult(ctx, field.Selections, res)
+	return ec.marshalNCoverFileResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐCoverFileResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Cover_file(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5925,7 +5925,7 @@ func (ec *executionContext) _CoverUploaded_file(ctx context.Context, field graph
 	}
 	res := resTmp.(CoverFileResult)
 	fc.Result = res
-	return ec.marshalNCoverFileResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐCoverFileResult(ctx, field.Selections, res)
+	return ec.marshalNCoverFileResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐCoverFileResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CoverUploaded_file(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6145,7 +6145,7 @@ func (ec *executionContext) _File_type(ctx context.Context, field graphql.Collec
 	}
 	res := resTmp.(FileType)
 	fc.Result = res
-	return ec.marshalNFileType2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐFileType(ctx, field.Selections, res)
+	return ec.marshalNFileType2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐFileType(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_File_type(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6233,7 +6233,7 @@ func (ec *executionContext) _FileUploaded_file(ctx context.Context, field graphq
 	}
 	res := resTmp.(*File)
 	fc.Result = res
-	return ec.marshalNFile2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐFile(ctx, field.Selections, res)
+	return ec.marshalNFile2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐFile(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_FileUploaded_file(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6641,7 +6641,7 @@ func (ec *executionContext) _House_rooms(ctx context.Context, field graphql.Coll
 	}
 	res := resTmp.(*HouseRooms)
 	fc.Result = res
-	return ec.marshalNHouseRooms2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐHouseRooms(ctx, field.Selections, res)
+	return ec.marshalNHouseRooms2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐHouseRooms(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_House_rooms(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6689,7 +6689,7 @@ func (ec *executionContext) _HouseAdded_house(ctx context.Context, field graphql
 	}
 	res := resTmp.(*House)
 	fc.Result = res
-	return ec.marshalNHouse2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐHouse(ctx, field.Selections, res)
+	return ec.marshalNHouse2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐHouse(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_HouseAdded_house(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6749,7 +6749,7 @@ func (ec *executionContext) _HouseRooms_list(ctx context.Context, field graphql.
 	}
 	res := resTmp.(HouseRoomsListResult)
 	fc.Result = res
-	return ec.marshalNHouseRoomsListResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐHouseRoomsListResult(ctx, field.Selections, res)
+	return ec.marshalNHouseRoomsListResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐHouseRoomsListResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_HouseRooms_list(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6804,7 +6804,7 @@ func (ec *executionContext) _HouseRoomsList_items(ctx context.Context, field gra
 	}
 	res := resTmp.([]*Room)
 	fc.Result = res
-	return ec.marshalNRoom2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐRoomᚄ(ctx, field.Selections, res)
+	return ec.marshalNRoom2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐRoomᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_HouseRoomsList_items(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6862,7 +6862,7 @@ func (ec *executionContext) _HouseUpdated_house(ctx context.Context, field graph
 	}
 	res := resTmp.(*House)
 	fc.Result = res
-	return ec.marshalNHouse2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐHouse(ctx, field.Selections, res)
+	return ec.marshalNHouse2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐHouse(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_HouseUpdated_house(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7362,7 +7362,7 @@ func (ec *executionContext) _Mutation_acceptInvite(ctx context.Context, field gr
 	}
 	res := resTmp.(AcceptInviteResult)
 	fc.Result = res
-	return ec.marshalNAcceptInviteResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAcceptInviteResult(ctx, field.Selections, res)
+	return ec.marshalNAcceptInviteResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAcceptInviteResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_acceptInvite(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7417,7 +7417,7 @@ func (ec *executionContext) _Mutation_addContact(ctx context.Context, field grap
 	}
 	res := resTmp.(AddContactResult)
 	fc.Result = res
-	return ec.marshalNAddContactResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAddContactResult(ctx, field.Selections, res)
+	return ec.marshalNAddContactResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAddContactResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_addContact(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7472,7 +7472,7 @@ func (ec *executionContext) _Mutation_addHouse(ctx context.Context, field graphq
 	}
 	res := resTmp.(AddHouseResult)
 	fc.Result = res
-	return ec.marshalNAddHouseResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAddHouseResult(ctx, field.Selections, res)
+	return ec.marshalNAddHouseResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAddHouseResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_addHouse(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7527,7 +7527,7 @@ func (ec *executionContext) _Mutation_addRoom(ctx context.Context, field graphql
 	}
 	res := resTmp.(AddRoomResult)
 	fc.Result = res
-	return ec.marshalNAddRoomResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAddRoomResult(ctx, field.Selections, res)
+	return ec.marshalNAddRoomResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAddRoomResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_addRoom(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7582,7 +7582,7 @@ func (ec *executionContext) _Mutation_addVisualizationsToAlbum(ctx context.Conte
 	}
 	res := resTmp.(AddVisualizationsToAlbumResult)
 	fc.Result = res
-	return ec.marshalNAddVisualizationsToAlbumResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAddVisualizationsToAlbumResult(ctx, field.Selections, res)
+	return ec.marshalNAddVisualizationsToAlbumResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAddVisualizationsToAlbumResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_addVisualizationsToAlbum(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7637,7 +7637,7 @@ func (ec *executionContext) _Mutation_changeAlbumPageOrientation(ctx context.Con
 	}
 	res := resTmp.(ChangeAlbumPageOrientationResult)
 	fc.Result = res
-	return ec.marshalNChangeAlbumPageOrientationResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐChangeAlbumPageOrientationResult(ctx, field.Selections, res)
+	return ec.marshalNChangeAlbumPageOrientationResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐChangeAlbumPageOrientationResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_changeAlbumPageOrientation(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7692,7 +7692,7 @@ func (ec *executionContext) _Mutation_changeAlbumPageSize(ctx context.Context, f
 	}
 	res := resTmp.(ChangeAlbumPageSizeResult)
 	fc.Result = res
-	return ec.marshalNChangeAlbumPageSizeResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐChangeAlbumPageSizeResult(ctx, field.Selections, res)
+	return ec.marshalNChangeAlbumPageSizeResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐChangeAlbumPageSizeResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_changeAlbumPageSize(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7747,7 +7747,7 @@ func (ec *executionContext) _Mutation_changeProjectDates(ctx context.Context, fi
 	}
 	res := resTmp.(ChangeProjectDatesResult)
 	fc.Result = res
-	return ec.marshalNChangeProjectDatesResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐChangeProjectDatesResult(ctx, field.Selections, res)
+	return ec.marshalNChangeProjectDatesResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐChangeProjectDatesResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_changeProjectDates(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7802,7 +7802,7 @@ func (ec *executionContext) _Mutation_changeProjectStatus(ctx context.Context, f
 	}
 	res := resTmp.(ChangeProjectStatusResult)
 	fc.Result = res
-	return ec.marshalNChangeProjectStatusResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐChangeProjectStatusResult(ctx, field.Selections, res)
+	return ec.marshalNChangeProjectStatusResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐChangeProjectStatusResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_changeProjectStatus(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7857,7 +7857,7 @@ func (ec *executionContext) _Mutation_confirmLoginLink(ctx context.Context, fiel
 	}
 	res := resTmp.(ConfirmLoginLinkResult)
 	fc.Result = res
-	return ec.marshalNConfirmLoginLinkResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐConfirmLoginLinkResult(ctx, field.Selections, res)
+	return ec.marshalNConfirmLoginLinkResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐConfirmLoginLinkResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_confirmLoginLink(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7912,7 +7912,7 @@ func (ec *executionContext) _Mutation_confirmLoginPin(ctx context.Context, field
 	}
 	res := resTmp.(ConfirmLoginPinResult)
 	fc.Result = res
-	return ec.marshalNConfirmLoginPinResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐConfirmLoginPinResult(ctx, field.Selections, res)
+	return ec.marshalNConfirmLoginPinResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐConfirmLoginPinResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_confirmLoginPin(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7967,7 +7967,7 @@ func (ec *executionContext) _Mutation_createAlbum(ctx context.Context, field gra
 	}
 	res := resTmp.(CreateAlbumResult)
 	fc.Result = res
-	return ec.marshalNCreateAlbumResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐCreateAlbumResult(ctx, field.Selections, res)
+	return ec.marshalNCreateAlbumResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐCreateAlbumResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_createAlbum(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8022,7 +8022,7 @@ func (ec *executionContext) _Mutation_createProject(ctx context.Context, field g
 	}
 	res := resTmp.(CreateProjectResult)
 	fc.Result = res
-	return ec.marshalNCreateProjectResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐCreateProjectResult(ctx, field.Selections, res)
+	return ec.marshalNCreateProjectResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐCreateProjectResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_createProject(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8077,7 +8077,7 @@ func (ec *executionContext) _Mutation_deleteAlbum(ctx context.Context, field gra
 	}
 	res := resTmp.(DeleteAlbumResult)
 	fc.Result = res
-	return ec.marshalNDeleteAlbumResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐDeleteAlbumResult(ctx, field.Selections, res)
+	return ec.marshalNDeleteAlbumResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐDeleteAlbumResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_deleteAlbum(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8132,7 +8132,7 @@ func (ec *executionContext) _Mutation_deleteContact(ctx context.Context, field g
 	}
 	res := resTmp.(DeleteContactResult)
 	fc.Result = res
-	return ec.marshalNDeleteContactResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐDeleteContactResult(ctx, field.Selections, res)
+	return ec.marshalNDeleteContactResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐDeleteContactResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_deleteContact(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8187,7 +8187,7 @@ func (ec *executionContext) _Mutation_deleteRoom(ctx context.Context, field grap
 	}
 	res := resTmp.(DeleteRoomResult)
 	fc.Result = res
-	return ec.marshalNDeleteRoomResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐDeleteRoomResult(ctx, field.Selections, res)
+	return ec.marshalNDeleteRoomResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐDeleteRoomResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_deleteRoom(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8242,7 +8242,7 @@ func (ec *executionContext) _Mutation_deleteVisualizations(ctx context.Context, 
 	}
 	res := resTmp.(DeleteVisualizationsResult)
 	fc.Result = res
-	return ec.marshalNDeleteVisualizationsResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐDeleteVisualizationsResult(ctx, field.Selections, res)
+	return ec.marshalNDeleteVisualizationsResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐDeleteVisualizationsResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_deleteVisualizations(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8297,7 +8297,7 @@ func (ec *executionContext) _Mutation_generateAlbumFile(ctx context.Context, fie
 	}
 	res := resTmp.(GenerateAlbumFileResult)
 	fc.Result = res
-	return ec.marshalNGenerateAlbumFileResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐGenerateAlbumFileResult(ctx, field.Selections, res)
+	return ec.marshalNGenerateAlbumFileResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐGenerateAlbumFileResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_generateAlbumFile(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8352,7 +8352,7 @@ func (ec *executionContext) _Mutation_inviteUser(ctx context.Context, field grap
 	}
 	res := resTmp.(InviteUserToWorkspaceResult)
 	fc.Result = res
-	return ec.marshalNInviteUserToWorkspaceResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐInviteUserToWorkspaceResult(ctx, field.Selections, res)
+	return ec.marshalNInviteUserToWorkspaceResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐInviteUserToWorkspaceResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_inviteUser(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8407,7 +8407,7 @@ func (ec *executionContext) _Mutation_loginByEmail(ctx context.Context, field gr
 	}
 	res := resTmp.(LoginByEmailResult)
 	fc.Result = res
-	return ec.marshalNLoginByEmailResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐLoginByEmailResult(ctx, field.Selections, res)
+	return ec.marshalNLoginByEmailResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐLoginByEmailResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_loginByEmail(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8462,7 +8462,7 @@ func (ec *executionContext) _Mutation_makeProjectNotPublic(ctx context.Context, 
 	}
 	res := resTmp.(MakeProjectNotPublicResult)
 	fc.Result = res
-	return ec.marshalNMakeProjectNotPublicResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐMakeProjectNotPublicResult(ctx, field.Selections, res)
+	return ec.marshalNMakeProjectNotPublicResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐMakeProjectNotPublicResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_makeProjectNotPublic(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8517,7 +8517,7 @@ func (ec *executionContext) _Mutation_makeProjectPublic(ctx context.Context, fie
 	}
 	res := resTmp.(MakeProjectPublicResult)
 	fc.Result = res
-	return ec.marshalNMakeProjectPublicResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐMakeProjectPublicResult(ctx, field.Selections, res)
+	return ec.marshalNMakeProjectPublicResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐMakeProjectPublicResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_makeProjectPublic(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8572,7 +8572,7 @@ func (ec *executionContext) _Mutation_moveRoomToPosition(ctx context.Context, fi
 	}
 	res := resTmp.(MoveRoomToPositionResult)
 	fc.Result = res
-	return ec.marshalNMoveRoomToPositionResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐMoveRoomToPositionResult(ctx, field.Selections, res)
+	return ec.marshalNMoveRoomToPositionResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐMoveRoomToPositionResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_moveRoomToPosition(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8627,7 +8627,7 @@ func (ec *executionContext) _Mutation_updateContact(ctx context.Context, field g
 	}
 	res := resTmp.(UpdateContactResult)
 	fc.Result = res
-	return ec.marshalNUpdateContactResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐUpdateContactResult(ctx, field.Selections, res)
+	return ec.marshalNUpdateContactResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐUpdateContactResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_updateContact(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8682,7 +8682,7 @@ func (ec *executionContext) _Mutation_updateHouse(ctx context.Context, field gra
 	}
 	res := resTmp.(UpdateHouseResult)
 	fc.Result = res
-	return ec.marshalNUpdateHouseResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐUpdateHouseResult(ctx, field.Selections, res)
+	return ec.marshalNUpdateHouseResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐUpdateHouseResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_updateHouse(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8737,7 +8737,7 @@ func (ec *executionContext) _Mutation_updateRoom(ctx context.Context, field grap
 	}
 	res := resTmp.(UpdateRoomResult)
 	fc.Result = res
-	return ec.marshalNUpdateRoomResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐUpdateRoomResult(ctx, field.Selections, res)
+	return ec.marshalNUpdateRoomResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐUpdateRoomResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_updateRoom(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8792,7 +8792,7 @@ func (ec *executionContext) _Mutation_uploadFile(ctx context.Context, field grap
 	}
 	res := resTmp.(UploadFileResult)
 	fc.Result = res
-	return ec.marshalNUploadFileResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐUploadFileResult(ctx, field.Selections, res)
+	return ec.marshalNUploadFileResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐUploadFileResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_uploadFile(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8847,7 +8847,7 @@ func (ec *executionContext) _Mutation_uploadVisualization(ctx context.Context, f
 	}
 	res := resTmp.(UploadVisualizationResult)
 	fc.Result = res
-	return ec.marshalNUploadVisualizationResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐUploadVisualizationResult(ctx, field.Selections, res)
+	return ec.marshalNUploadVisualizationResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐUploadVisualizationResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_uploadVisualization(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8902,7 +8902,7 @@ func (ec *executionContext) _Mutation_uploadVisualizations(ctx context.Context, 
 	}
 	res := resTmp.(UploadVisualizationsResult)
 	fc.Result = res
-	return ec.marshalNUploadVisualizationsResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐUploadVisualizationsResult(ctx, field.Selections, res)
+	return ec.marshalNUploadVisualizationsResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐUploadVisualizationsResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_uploadVisualizations(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -9177,7 +9177,7 @@ func (ec *executionContext) _Project_status(ctx context.Context, field graphql.C
 	}
 	res := resTmp.(ProjectStatus)
 	fc.Result = res
-	return ec.marshalNProjectStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectStatus(ctx, field.Selections, res)
+	return ec.marshalNProjectStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectStatus(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Project_status(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -9355,7 +9355,7 @@ func (ec *executionContext) _Project_contacts(ctx context.Context, field graphql
 	}
 	res := resTmp.(*ProjectContacts)
 	fc.Result = res
-	return ec.marshalNProjectContacts2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectContacts(ctx, field.Selections, res)
+	return ec.marshalNProjectContacts2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectContacts(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Project_contacts(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -9405,7 +9405,7 @@ func (ec *executionContext) _Project_houses(ctx context.Context, field graphql.C
 	}
 	res := resTmp.(*ProjectHouses)
 	fc.Result = res
-	return ec.marshalNProjectHouses2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectHouses(ctx, field.Selections, res)
+	return ec.marshalNProjectHouses2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectHouses(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Project_houses(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -9455,7 +9455,7 @@ func (ec *executionContext) _Project_visualizations(ctx context.Context, field g
 	}
 	res := resTmp.(*ProjectVisualizations)
 	fc.Result = res
-	return ec.marshalNProjectVisualizations2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectVisualizations(ctx, field.Selections, res)
+	return ec.marshalNProjectVisualizations2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectVisualizations(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Project_visualizations(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -9505,7 +9505,7 @@ func (ec *executionContext) _Project_files(ctx context.Context, field graphql.Co
 	}
 	res := resTmp.(*ProjectFiles)
 	fc.Result = res
-	return ec.marshalNProjectFiles2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectFiles(ctx, field.Selections, res)
+	return ec.marshalNProjectFiles2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectFiles(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Project_files(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -9555,7 +9555,7 @@ func (ec *executionContext) _Project_albums(ctx context.Context, field graphql.C
 	}
 	res := resTmp.(*ProjectAlbums)
 	fc.Result = res
-	return ec.marshalNProjectAlbums2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectAlbums(ctx, field.Selections, res)
+	return ec.marshalNProjectAlbums2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectAlbums(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Project_albums(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -9605,7 +9605,7 @@ func (ec *executionContext) _Project_publicSite(ctx context.Context, field graph
 	}
 	res := resTmp.(ProjectPublicSite)
 	fc.Result = res
-	return ec.marshalNProjectPublicSite2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectPublicSite(ctx, field.Selections, res)
+	return ec.marshalNProjectPublicSite2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectPublicSite(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Project_publicSite(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -9649,7 +9649,7 @@ func (ec *executionContext) _Project_statuses(ctx context.Context, field graphql
 	}
 	res := resTmp.(*ProjectStatusDictionary)
 	fc.Result = res
-	return ec.marshalNProjectStatusDictionary2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectStatusDictionary(ctx, field.Selections, res)
+	return ec.marshalNProjectStatusDictionary2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectStatusDictionary(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Project_statuses(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -9697,7 +9697,7 @@ func (ec *executionContext) _ProjectAlbums_list(ctx context.Context, field graph
 	}
 	res := resTmp.(ProjectAlbumsListResult)
 	fc.Result = res
-	return ec.marshalNProjectAlbumsListResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectAlbumsListResult(ctx, field.Selections, res)
+	return ec.marshalNProjectAlbumsListResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectAlbumsListResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ProjectAlbums_list(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -9752,7 +9752,7 @@ func (ec *executionContext) _ProjectAlbums_total(ctx context.Context, field grap
 	}
 	res := resTmp.(ProjectAlbumsTotalResult)
 	fc.Result = res
-	return ec.marshalNProjectAlbumsTotalResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectAlbumsTotalResult(ctx, field.Selections, res)
+	return ec.marshalNProjectAlbumsTotalResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectAlbumsTotalResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ProjectAlbums_total(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -9796,7 +9796,7 @@ func (ec *executionContext) _ProjectAlbumsList_items(ctx context.Context, field 
 	}
 	res := resTmp.([]*Album)
 	fc.Result = res
-	return ec.marshalNAlbum2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumᚄ(ctx, field.Selections, res)
+	return ec.marshalNAlbum2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAlbumᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ProjectAlbumsList_items(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -9902,7 +9902,7 @@ func (ec *executionContext) _ProjectContacts_list(ctx context.Context, field gra
 	}
 	res := resTmp.(ProjectContactsListResult)
 	fc.Result = res
-	return ec.marshalNProjectContactsListResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectContactsListResult(ctx, field.Selections, res)
+	return ec.marshalNProjectContactsListResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectContactsListResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ProjectContacts_list(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -9957,7 +9957,7 @@ func (ec *executionContext) _ProjectContacts_total(ctx context.Context, field gr
 	}
 	res := resTmp.(ProjectContactsTotalResult)
 	fc.Result = res
-	return ec.marshalNProjectContactsTotalResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectContactsTotalResult(ctx, field.Selections, res)
+	return ec.marshalNProjectContactsTotalResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectContactsTotalResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ProjectContacts_total(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -10012,7 +10012,7 @@ func (ec *executionContext) _ProjectContactsList_items(ctx context.Context, fiel
 	}
 	res := resTmp.([]*Contact)
 	fc.Result = res
-	return ec.marshalNContact2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐContactᚄ(ctx, field.Selections, res)
+	return ec.marshalNContact2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐContactᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ProjectContactsList_items(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -10114,7 +10114,7 @@ func (ec *executionContext) _ProjectCreated_project(ctx context.Context, field g
 	}
 	res := resTmp.(*Project)
 	fc.Result = res
-	return ec.marshalNProject2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProject(ctx, field.Selections, res)
+	return ec.marshalNProject2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProject(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ProjectCreated_project(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -10186,7 +10186,7 @@ func (ec *executionContext) _ProjectDatesChanged_project(ctx context.Context, fi
 	}
 	res := resTmp.(*Project)
 	fc.Result = res
-	return ec.marshalNProject2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProject(ctx, field.Selections, res)
+	return ec.marshalNProject2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProject(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ProjectDatesChanged_project(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -10258,7 +10258,7 @@ func (ec *executionContext) _ProjectFiles_list(ctx context.Context, field graphq
 	}
 	res := resTmp.(ProjectFilesListResult)
 	fc.Result = res
-	return ec.marshalNProjectFilesListResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectFilesListResult(ctx, field.Selections, res)
+	return ec.marshalNProjectFilesListResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectFilesListResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ProjectFiles_list(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -10313,7 +10313,7 @@ func (ec *executionContext) _ProjectFiles_total(ctx context.Context, field graph
 	}
 	res := resTmp.(ProjectFilesTotalResult)
 	fc.Result = res
-	return ec.marshalNProjectFilesTotalResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectFilesTotalResult(ctx, field.Selections, res)
+	return ec.marshalNProjectFilesTotalResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectFilesTotalResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ProjectFiles_total(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -10368,7 +10368,7 @@ func (ec *executionContext) _ProjectFilesList_items(ctx context.Context, field g
 	}
 	res := resTmp.([]*File)
 	fc.Result = res
-	return ec.marshalNFile2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐFileᚄ(ctx, field.Selections, res)
+	return ec.marshalNFile2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐFileᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ProjectFilesList_items(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -10468,7 +10468,7 @@ func (ec *executionContext) _ProjectHouses_list(ctx context.Context, field graph
 	}
 	res := resTmp.(ProjectHousesListResult)
 	fc.Result = res
-	return ec.marshalNProjectHousesListResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectHousesListResult(ctx, field.Selections, res)
+	return ec.marshalNProjectHousesListResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectHousesListResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ProjectHouses_list(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -10523,7 +10523,7 @@ func (ec *executionContext) _ProjectHouses_total(ctx context.Context, field grap
 	}
 	res := resTmp.(ProjectHousesTotalResult)
 	fc.Result = res
-	return ec.marshalNProjectHousesTotalResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectHousesTotalResult(ctx, field.Selections, res)
+	return ec.marshalNProjectHousesTotalResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectHousesTotalResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ProjectHouses_total(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -10578,7 +10578,7 @@ func (ec *executionContext) _ProjectHousesList_items(ctx context.Context, field 
 	}
 	res := resTmp.([]*House)
 	fc.Result = res
-	return ec.marshalNHouse2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐHouseᚄ(ctx, field.Selections, res)
+	return ec.marshalNHouse2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐHouseᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ProjectHousesList_items(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -10770,7 +10770,7 @@ func (ec *executionContext) _ProjectMadeNotPublic_publicSite(ctx context.Context
 	}
 	res := resTmp.(*PublicSite)
 	fc.Result = res
-	return ec.marshalNPublicSite2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐPublicSite(ctx, field.Selections, res)
+	return ec.marshalNPublicSite2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐPublicSite(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ProjectMadeNotPublic_publicSite(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -10824,7 +10824,7 @@ func (ec *executionContext) _ProjectMadePublic_publicSite(ctx context.Context, f
 	}
 	res := resTmp.(*PublicSite)
 	fc.Result = res
-	return ec.marshalNPublicSite2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐPublicSite(ctx, field.Selections, res)
+	return ec.marshalNPublicSite2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐPublicSite(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ProjectMadePublic_publicSite(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -10878,7 +10878,7 @@ func (ec *executionContext) _ProjectStatusChanged_project(ctx context.Context, f
 	}
 	res := resTmp.(*Project)
 	fc.Result = res
-	return ec.marshalNProject2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProject(ctx, field.Selections, res)
+	return ec.marshalNProject2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProject(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ProjectStatusChanged_project(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -10950,7 +10950,7 @@ func (ec *executionContext) _ProjectStatusDictionary_items(ctx context.Context, 
 	}
 	res := resTmp.([]*ProjectStatusDictionaryItem)
 	fc.Result = res
-	return ec.marshalNProjectStatusDictionaryItem2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectStatusDictionaryItemᚄ(ctx, field.Selections, res)
+	return ec.marshalNProjectStatusDictionaryItem2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectStatusDictionaryItemᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ProjectStatusDictionary_items(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -11000,7 +11000,7 @@ func (ec *executionContext) _ProjectStatusDictionaryItem_key(ctx context.Context
 	}
 	res := resTmp.(ProjectStatus)
 	fc.Result = res
-	return ec.marshalNProjectStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectStatus(ctx, field.Selections, res)
+	return ec.marshalNProjectStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectStatus(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ProjectStatusDictionaryItem_key(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -11088,7 +11088,7 @@ func (ec *executionContext) _ProjectVisualizations_list(ctx context.Context, fie
 	}
 	res := resTmp.(ProjectVisualizationsListResult)
 	fc.Result = res
-	return ec.marshalNProjectVisualizationsListResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectVisualizationsListResult(ctx, field.Selections, res)
+	return ec.marshalNProjectVisualizationsListResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectVisualizationsListResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ProjectVisualizations_list(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -11143,7 +11143,7 @@ func (ec *executionContext) _ProjectVisualizations_total(ctx context.Context, fi
 	}
 	res := resTmp.(ProjectVisualizationsTotalResult)
 	fc.Result = res
-	return ec.marshalNProjectVisualizationsTotalResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectVisualizationsTotalResult(ctx, field.Selections, res)
+	return ec.marshalNProjectVisualizationsTotalResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectVisualizationsTotalResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ProjectVisualizations_total(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -11198,7 +11198,7 @@ func (ec *executionContext) _ProjectVisualizationsList_items(ctx context.Context
 	}
 	res := resTmp.([]*Visualization)
 	fc.Result = res
-	return ec.marshalNVisualization2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐVisualizationᚄ(ctx, field.Selections, res)
+	return ec.marshalNVisualization2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐVisualizationᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ProjectVisualizationsList_items(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -11350,7 +11350,7 @@ func (ec *executionContext) _PublicSite_status(ctx context.Context, field graphq
 	}
 	res := resTmp.(PublicSiteStatus)
 	fc.Result = res
-	return ec.marshalNPublicSiteStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐPublicSiteStatus(ctx, field.Selections, res)
+	return ec.marshalNPublicSiteStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐPublicSiteStatus(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_PublicSite_status(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -11438,7 +11438,7 @@ func (ec *executionContext) _PublicSite_settings(ctx context.Context, field grap
 	}
 	res := resTmp.(*PublicSiteSettings)
 	fc.Result = res
-	return ec.marshalNPublicSiteSettings2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐPublicSiteSettings(ctx, field.Selections, res)
+	return ec.marshalNPublicSiteSettings2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐPublicSiteSettings(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_PublicSite_settings(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -11664,7 +11664,7 @@ func (ec *executionContext) _Query_album(ctx context.Context, field graphql.Coll
 	}
 	res := resTmp.(AlbumResult)
 	fc.Result = res
-	return ec.marshalNAlbumResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumResult(ctx, field.Selections, res)
+	return ec.marshalNAlbumResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAlbumResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_album(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -11719,7 +11719,7 @@ func (ec *executionContext) _Query_profile(ctx context.Context, field graphql.Co
 	}
 	res := resTmp.(UserProfileResult)
 	fc.Result = res
-	return ec.marshalNUserProfileResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐUserProfileResult(ctx, field.Selections, res)
+	return ec.marshalNUserProfileResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐUserProfileResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_profile(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -11763,7 +11763,7 @@ func (ec *executionContext) _Query_project(ctx context.Context, field graphql.Co
 	}
 	res := resTmp.(ProjectResult)
 	fc.Result = res
-	return ec.marshalNProjectResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectResult(ctx, field.Selections, res)
+	return ec.marshalNProjectResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_project(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -11818,7 +11818,7 @@ func (ec *executionContext) _Query_workspace(ctx context.Context, field graphql.
 	}
 	res := resTmp.(WorkspaceResult)
 	fc.Result = res
-	return ec.marshalNWorkspaceResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceResult(ctx, field.Selections, res)
+	return ec.marshalNWorkspaceResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_workspace(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -12260,7 +12260,7 @@ func (ec *executionContext) _RoomAdded_room(ctx context.Context, field graphql.C
 	}
 	res := resTmp.(*Room)
 	fc.Result = res
-	return ec.marshalNRoom2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐRoom(ctx, field.Selections, res)
+	return ec.marshalNRoom2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐRoom(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_RoomAdded_room(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -12318,7 +12318,7 @@ func (ec *executionContext) _RoomDeleted_room(ctx context.Context, field graphql
 	}
 	res := resTmp.(*Room)
 	fc.Result = res
-	return ec.marshalNRoom2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐRoom(ctx, field.Selections, res)
+	return ec.marshalNRoom2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐRoom(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_RoomDeleted_room(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -12376,7 +12376,7 @@ func (ec *executionContext) _RoomMovedToPosition_room(ctx context.Context, field
 	}
 	res := resTmp.(*Room)
 	fc.Result = res
-	return ec.marshalNRoom2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐRoom(ctx, field.Selections, res)
+	return ec.marshalNRoom2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐRoom(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_RoomMovedToPosition_room(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -12434,7 +12434,7 @@ func (ec *executionContext) _RoomUpdated_room(ctx context.Context, field graphql
 	}
 	res := resTmp.(*Room)
 	fc.Result = res
-	return ec.marshalNRoom2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐRoom(ctx, field.Selections, res)
+	return ec.marshalNRoom2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐRoom(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_RoomUpdated_room(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -12536,7 +12536,7 @@ func (ec *executionContext) _SomeVisualizationsDeleted_visualizations(ctx contex
 	}
 	res := resTmp.([]*Visualization)
 	fc.Result = res
-	return ec.marshalNVisualization2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐVisualizationᚄ(ctx, field.Selections, res)
+	return ec.marshalNVisualization2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐVisualizationᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_SomeVisualizationsDeleted_visualizations(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -12600,7 +12600,7 @@ func (ec *executionContext) _SomeVisualizationsUploaded_visualizations(ctx conte
 	}
 	res := resTmp.([]*Visualization)
 	fc.Result = res
-	return ec.marshalNVisualization2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐVisualizationᚄ(ctx, field.Selections, res)
+	return ec.marshalNVisualization2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐVisualizationᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_SomeVisualizationsUploaded_visualizations(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -12730,7 +12730,7 @@ func (ec *executionContext) _Subscription_albumFileGenerated(ctx context.Context
 				w.Write([]byte{'{'})
 				graphql.MarshalString(field.Alias).MarshalGQL(w)
 				w.Write([]byte{':'})
-				ec.marshalNAlbumFileGenerated2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumFileGenerated(ctx, field.Selections, res).MarshalGQL(w)
+				ec.marshalNAlbumFileGenerated2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAlbumFileGenerated(ctx, field.Selections, res).MarshalGQL(w)
 				w.Write([]byte{'}'})
 			})
 		case <-ctx.Done():
@@ -13052,7 +13052,7 @@ func (ec *executionContext) _UserProfile_gravatar(ctx context.Context, field gra
 	}
 	res := resTmp.(*Gravatar)
 	fc.Result = res
-	return ec.marshalOGravatar2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐGravatar(ctx, field.Selections, res)
+	return ec.marshalOGravatar2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐGravatar(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_UserProfile_gravatar(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -13100,7 +13100,7 @@ func (ec *executionContext) _UserProfile_defaultWorkspace(ctx context.Context, f
 	}
 	res := resTmp.(*Workspace)
 	fc.Result = res
-	return ec.marshalNWorkspace2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspace(ctx, field.Selections, res)
+	return ec.marshalNWorkspace2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspace(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_UserProfile_defaultWorkspace(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -13332,7 +13332,7 @@ func (ec *executionContext) _Visualization_status(ctx context.Context, field gra
 	}
 	res := resTmp.(VisualizationStatus)
 	fc.Result = res
-	return ec.marshalNVisualizationStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐVisualizationStatus(ctx, field.Selections, res)
+	return ec.marshalNVisualizationStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐVisualizationStatus(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Visualization_status(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -13464,7 +13464,7 @@ func (ec *executionContext) _Visualization_file(ctx context.Context, field graph
 	}
 	res := resTmp.(*File)
 	fc.Result = res
-	return ec.marshalNFile2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐFile(ctx, field.Selections, res)
+	return ec.marshalNFile2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐFile(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Visualization_file(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -13517,7 +13517,7 @@ func (ec *executionContext) _Visualization_room(ctx context.Context, field graph
 	}
 	res := resTmp.(*Room)
 	fc.Result = res
-	return ec.marshalORoom2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐRoom(ctx, field.Selections, res)
+	return ec.marshalORoom2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐRoom(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Visualization_room(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -13575,7 +13575,7 @@ func (ec *executionContext) _VisualizationUploaded_visualization(ctx context.Con
 	}
 	res := resTmp.(*Visualization)
 	fc.Result = res
-	return ec.marshalNVisualization2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐVisualization(ctx, field.Selections, res)
+	return ec.marshalNVisualization2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐVisualization(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_VisualizationUploaded_visualization(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -13639,7 +13639,7 @@ func (ec *executionContext) _VisualizationsAddedToAlbum_album(ctx context.Contex
 	}
 	res := resTmp.(*Album)
 	fc.Result = res
-	return ec.marshalNAlbum2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbum(ctx, field.Selections, res)
+	return ec.marshalNAlbum2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAlbum(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_VisualizationsAddedToAlbum_album(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -13701,7 +13701,7 @@ func (ec *executionContext) _VisualizationsAddedToAlbum_pages(ctx context.Contex
 	}
 	res := resTmp.([]*AlbumPageVisualization)
 	fc.Result = res
-	return ec.marshalNAlbumPageVisualization2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumPageVisualizationᚄ(ctx, field.Selections, res)
+	return ec.marshalNAlbumPageVisualization2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAlbumPageVisualizationᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_VisualizationsAddedToAlbum_pages(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -13755,7 +13755,7 @@ func (ec *executionContext) _VisualizationsDeleted_visualizations(ctx context.Co
 	}
 	res := resTmp.([]*Visualization)
 	fc.Result = res
-	return ec.marshalNVisualization2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐVisualizationᚄ(ctx, field.Selections, res)
+	return ec.marshalNVisualization2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐVisualizationᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_VisualizationsDeleted_visualizations(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -13819,7 +13819,7 @@ func (ec *executionContext) _VisualizationsUploaded_visualizations(ctx context.C
 	}
 	res := resTmp.([]*Visualization)
 	fc.Result = res
-	return ec.marshalNVisualization2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐVisualizationᚄ(ctx, field.Selections, res)
+	return ec.marshalNVisualization2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐVisualizationᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_VisualizationsUploaded_visualizations(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -13971,7 +13971,7 @@ func (ec *executionContext) _Workspace_projects(ctx context.Context, field graph
 	}
 	res := resTmp.(*WorkspaceProjects)
 	fc.Result = res
-	return ec.marshalNWorkspaceProjects2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceProjects(ctx, field.Selections, res)
+	return ec.marshalNWorkspaceProjects2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceProjects(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Workspace_projects(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -14021,7 +14021,7 @@ func (ec *executionContext) _Workspace_users(ctx context.Context, field graphql.
 	}
 	res := resTmp.(*WorkspaceUsers)
 	fc.Result = res
-	return ec.marshalNWorkspaceUsers2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUsers(ctx, field.Selections, res)
+	return ec.marshalNWorkspaceUsers2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceUsers(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Workspace_users(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -14071,7 +14071,7 @@ func (ec *executionContext) _Workspace_roles(ctx context.Context, field graphql.
 	}
 	res := resTmp.(*WorkspaceUserRoleDictionary)
 	fc.Result = res
-	return ec.marshalNWorkspaceUserRoleDictionary2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserRoleDictionary(ctx, field.Selections, res)
+	return ec.marshalNWorkspaceUserRoleDictionary2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceUserRoleDictionary(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Workspace_roles(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -14119,7 +14119,7 @@ func (ec *executionContext) _WorkspaceProjects_list(ctx context.Context, field g
 	}
 	res := resTmp.(WorkspaceProjectsListResult)
 	fc.Result = res
-	return ec.marshalNWorkspaceProjectsListResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceProjectsListResult(ctx, field.Selections, res)
+	return ec.marshalNWorkspaceProjectsListResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceProjectsListResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_WorkspaceProjects_list(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -14174,7 +14174,7 @@ func (ec *executionContext) _WorkspaceProjects_total(ctx context.Context, field 
 	}
 	res := resTmp.(WorkspaceProjectsTotalResult)
 	fc.Result = res
-	return ec.marshalNWorkspaceProjectsTotalResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceProjectsTotalResult(ctx, field.Selections, res)
+	return ec.marshalNWorkspaceProjectsTotalResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceProjectsTotalResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_WorkspaceProjects_total(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -14229,7 +14229,7 @@ func (ec *executionContext) _WorkspaceProjectsList_items(ctx context.Context, fi
 	}
 	res := resTmp.([]*Project)
 	fc.Result = res
-	return ec.marshalNProject2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectᚄ(ctx, field.Selections, res)
+	return ec.marshalNProject2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_WorkspaceProjectsList_items(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -14389,7 +14389,7 @@ func (ec *executionContext) _WorkspaceUser_workspace(ctx context.Context, field 
 	}
 	res := resTmp.(*ID)
 	fc.Result = res
-	return ec.marshalNId2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐID(ctx, field.Selections, res)
+	return ec.marshalNId2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐID(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_WorkspaceUser_workspace(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -14437,7 +14437,7 @@ func (ec *executionContext) _WorkspaceUser_role(ctx context.Context, field graph
 	}
 	res := resTmp.(WorkspaceUserRole)
 	fc.Result = res
-	return ec.marshalNWorkspaceUserRole2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserRole(ctx, field.Selections, res)
+	return ec.marshalNWorkspaceUserRole2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceUserRole(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_WorkspaceUser_role(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -14481,7 +14481,7 @@ func (ec *executionContext) _WorkspaceUser_profile(ctx context.Context, field gr
 	}
 	res := resTmp.(*UserProfile)
 	fc.Result = res
-	return ec.marshalNUserProfile2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐUserProfile(ctx, field.Selections, res)
+	return ec.marshalNUserProfile2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐUserProfile(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_WorkspaceUser_profile(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -14539,7 +14539,7 @@ func (ec *executionContext) _WorkspaceUserRoleDictionary_items(ctx context.Conte
 	}
 	res := resTmp.([]*WorkspaceUserRoleDictionaryItem)
 	fc.Result = res
-	return ec.marshalNWorkspaceUserRoleDictionaryItem2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserRoleDictionaryItemᚄ(ctx, field.Selections, res)
+	return ec.marshalNWorkspaceUserRoleDictionaryItem2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceUserRoleDictionaryItemᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_WorkspaceUserRoleDictionary_items(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -14589,7 +14589,7 @@ func (ec *executionContext) _WorkspaceUserRoleDictionaryItem_key(ctx context.Con
 	}
 	res := resTmp.(WorkspaceUserRole)
 	fc.Result = res
-	return ec.marshalNWorkspaceUserRole2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserRole(ctx, field.Selections, res)
+	return ec.marshalNWorkspaceUserRole2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceUserRole(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_WorkspaceUserRoleDictionaryItem_key(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -14677,7 +14677,7 @@ func (ec *executionContext) _WorkspaceUsers_list(ctx context.Context, field grap
 	}
 	res := resTmp.(WorkspaceUsersListResult)
 	fc.Result = res
-	return ec.marshalNWorkspaceUsersListResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUsersListResult(ctx, field.Selections, res)
+	return ec.marshalNWorkspaceUsersListResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceUsersListResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_WorkspaceUsers_list(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -14732,7 +14732,7 @@ func (ec *executionContext) _WorkspaceUsers_total(ctx context.Context, field gra
 	}
 	res := resTmp.(WorkspaceUsersTotalResult)
 	fc.Result = res
-	return ec.marshalNWorkspaceUsersTotalResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUsersTotalResult(ctx, field.Selections, res)
+	return ec.marshalNWorkspaceUsersTotalResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceUsersTotalResult(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_WorkspaceUsers_total(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -14787,7 +14787,7 @@ func (ec *executionContext) _WorkspaceUsersList_items(ctx context.Context, field
 	}
 	res := resTmp.([]*WorkspaceUser)
 	fc.Result = res
-	return ec.marshalNWorkspaceUser2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserᚄ(ctx, field.Selections, res)
+	return ec.marshalNWorkspaceUser2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceUserᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_WorkspaceUsersList_items(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -16653,7 +16653,7 @@ func (ec *executionContext) unmarshalInputAddContactInput(ctx context.Context, o
 			it.FullName = data
 		case "details":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("details"))
-			data, err := ec.unmarshalNContactDetailsInput2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐContactDetailsInputᚄ(ctx, v)
+			data, err := ec.unmarshalNContactDetailsInput2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐContactDetailsInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -16796,7 +16796,7 @@ func (ec *executionContext) unmarshalInputContactDetailsInput(ctx context.Contex
 		switch k {
 		case "type":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
-			data, err := ec.unmarshalNContactType2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐContactType(ctx, v)
+			data, err := ec.unmarshalNContactType2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐContactType(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -16830,14 +16830,14 @@ func (ec *executionContext) unmarshalInputCreateAlbumSettingsInput(ctx context.C
 		switch k {
 		case "pageSize":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pageSize"))
-			data, err := ec.unmarshalNPageSize2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐPageSize(ctx, v)
+			data, err := ec.unmarshalNPageSize2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐPageSize(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.PageSize = data
 		case "orientation":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orientation"))
-			data, err := ec.unmarshalNPageOrientation2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐPageOrientation(ctx, v)
+			data, err := ec.unmarshalNPageOrientation2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐPageOrientation(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -16912,7 +16912,7 @@ func (ec *executionContext) unmarshalInputProjectContactsFilter(ctx context.Cont
 		switch k {
 		case "type":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
-			data, err := ec.unmarshalOContactType2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐContactTypeᚄ(ctx, v)
+			data, err := ec.unmarshalOContactType2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐContactTypeᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -16939,7 +16939,7 @@ func (ec *executionContext) unmarshalInputProjectFilesListFilter(ctx context.Con
 		switch k {
 		case "type":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
-			data, err := ec.unmarshalOFileType2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐFileTypeᚄ(ctx, v)
+			data, err := ec.unmarshalOFileType2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐFileTypeᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -17020,14 +17020,14 @@ func (ec *executionContext) unmarshalInputProjectVisualizationsListFilter(ctx co
 		switch k {
 		case "roomID":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("roomID"))
-			data, err := ec.unmarshalOProjectVisualizationRoomIdFilter2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectVisualizationRoomIDFilter(ctx, v)
+			data, err := ec.unmarshalOProjectVisualizationRoomIdFilter2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectVisualizationRoomIDFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.RoomID = data
 		case "status":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			data, err := ec.unmarshalOProjectVisualizationsStatusFilter2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectVisualizationsStatusFilter(ctx, v)
+			data, err := ec.unmarshalOProjectVisualizationsStatusFilter2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectVisualizationsStatusFilter(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -17054,7 +17054,7 @@ func (ec *executionContext) unmarshalInputProjectVisualizationsStatusFilter(ctx 
 		switch k {
 		case "eq":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("eq"))
-			data, err := ec.unmarshalOVisualizationStatus2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐVisualizationStatusᚄ(ctx, v)
+			data, err := ec.unmarshalOVisualizationStatus2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐVisualizationStatusᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -17088,7 +17088,7 @@ func (ec *executionContext) unmarshalInputUpdateContactInput(ctx context.Context
 			it.FullName = data
 		case "details":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("details"))
-			data, err := ec.unmarshalNContactDetailsInput2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐContactDetailsInputᚄ(ctx, v)
+			data, err := ec.unmarshalNContactDetailsInput2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐContactDetailsInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -17204,7 +17204,7 @@ func (ec *executionContext) unmarshalInputUploadFileInput(ctx context.Context, o
 			it.ProjectID = data
 		case "type":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
-			data, err := ec.unmarshalNFileType2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐFileType(ctx, v)
+			data, err := ec.unmarshalNFileType2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐFileType(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -17238,7 +17238,7 @@ func (ec *executionContext) unmarshalInputWorkspaceProjectsFilter(ctx context.Co
 		switch k {
 		case "status":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			data, err := ec.unmarshalOProjectStatus2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectStatusᚄ(ctx, v)
+			data, err := ec.unmarshalOProjectStatus2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectStatusᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -17265,7 +17265,7 @@ func (ec *executionContext) unmarshalInputWorkspaceUsersFilter(ctx context.Conte
 		switch k {
 		case "role":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role"))
-			data, err := ec.unmarshalOWorkspaceUserRole2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserRoleᚄ(ctx, v)
+			data, err := ec.unmarshalOWorkspaceUserRole2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceUserRoleᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -25491,7 +25491,7 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 
 // region    ***************************** type.gotpl *****************************
 
-func (ec *executionContext) marshalNAcceptInviteResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAcceptInviteResult(ctx context.Context, sel ast.SelectionSet, v AcceptInviteResult) graphql.Marshaler {
+func (ec *executionContext) marshalNAcceptInviteResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAcceptInviteResult(ctx context.Context, sel ast.SelectionSet, v AcceptInviteResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -25501,12 +25501,12 @@ func (ec *executionContext) marshalNAcceptInviteResult2githubᚗcomᚋapartomat�
 	return ec._AcceptInviteResult(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNAddContactInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAddContactInput(ctx context.Context, v interface{}) (AddContactInput, error) {
+func (ec *executionContext) unmarshalNAddContactInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAddContactInput(ctx context.Context, v interface{}) (AddContactInput, error) {
 	res, err := ec.unmarshalInputAddContactInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNAddContactResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAddContactResult(ctx context.Context, sel ast.SelectionSet, v AddContactResult) graphql.Marshaler {
+func (ec *executionContext) marshalNAddContactResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAddContactResult(ctx context.Context, sel ast.SelectionSet, v AddContactResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -25516,12 +25516,12 @@ func (ec *executionContext) marshalNAddContactResult2githubᚗcomᚋapartomatᚋ
 	return ec._AddContactResult(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNAddHouseInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAddHouseInput(ctx context.Context, v interface{}) (AddHouseInput, error) {
+func (ec *executionContext) unmarshalNAddHouseInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAddHouseInput(ctx context.Context, v interface{}) (AddHouseInput, error) {
 	res, err := ec.unmarshalInputAddHouseInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNAddHouseResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAddHouseResult(ctx context.Context, sel ast.SelectionSet, v AddHouseResult) graphql.Marshaler {
+func (ec *executionContext) marshalNAddHouseResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAddHouseResult(ctx context.Context, sel ast.SelectionSet, v AddHouseResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -25531,12 +25531,12 @@ func (ec *executionContext) marshalNAddHouseResult2githubᚗcomᚋapartomatᚋap
 	return ec._AddHouseResult(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNAddRoomInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAddRoomInput(ctx context.Context, v interface{}) (AddRoomInput, error) {
+func (ec *executionContext) unmarshalNAddRoomInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAddRoomInput(ctx context.Context, v interface{}) (AddRoomInput, error) {
 	res, err := ec.unmarshalInputAddRoomInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNAddRoomResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAddRoomResult(ctx context.Context, sel ast.SelectionSet, v AddRoomResult) graphql.Marshaler {
+func (ec *executionContext) marshalNAddRoomResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAddRoomResult(ctx context.Context, sel ast.SelectionSet, v AddRoomResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -25546,7 +25546,7 @@ func (ec *executionContext) marshalNAddRoomResult2githubᚗcomᚋapartomatᚋapa
 	return ec._AddRoomResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNAddVisualizationsToAlbumResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAddVisualizationsToAlbumResult(ctx context.Context, sel ast.SelectionSet, v AddVisualizationsToAlbumResult) graphql.Marshaler {
+func (ec *executionContext) marshalNAddVisualizationsToAlbumResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAddVisualizationsToAlbumResult(ctx context.Context, sel ast.SelectionSet, v AddVisualizationsToAlbumResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -25556,7 +25556,7 @@ func (ec *executionContext) marshalNAddVisualizationsToAlbumResult2githubᚗcom�
 	return ec._AddVisualizationsToAlbumResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNAlbum2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumᚄ(ctx context.Context, sel ast.SelectionSet, v []*Album) graphql.Marshaler {
+func (ec *executionContext) marshalNAlbum2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAlbumᚄ(ctx context.Context, sel ast.SelectionSet, v []*Album) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -25580,7 +25580,7 @@ func (ec *executionContext) marshalNAlbum2ᚕᚖgithubᚗcomᚋapartomatᚋapart
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNAlbum2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbum(ctx, sel, v[i])
+			ret[i] = ec.marshalNAlbum2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAlbum(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -25600,7 +25600,7 @@ func (ec *executionContext) marshalNAlbum2ᚕᚖgithubᚗcomᚋapartomatᚋapart
 	return ret
 }
 
-func (ec *executionContext) marshalNAlbum2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbum(ctx context.Context, sel ast.SelectionSet, v *Album) graphql.Marshaler {
+func (ec *executionContext) marshalNAlbum2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAlbum(ctx context.Context, sel ast.SelectionSet, v *Album) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -25610,7 +25610,7 @@ func (ec *executionContext) marshalNAlbum2ᚖgithubᚗcomᚋapartomatᚋapartoma
 	return ec._Album(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNAlbumCoverResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumCoverResult(ctx context.Context, sel ast.SelectionSet, v AlbumCoverResult) graphql.Marshaler {
+func (ec *executionContext) marshalNAlbumCoverResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAlbumCoverResult(ctx context.Context, sel ast.SelectionSet, v AlbumCoverResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -25620,7 +25620,7 @@ func (ec *executionContext) marshalNAlbumCoverResult2githubᚗcomᚋapartomatᚋ
 	return ec._AlbumCoverResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNAlbumFile2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumFile(ctx context.Context, sel ast.SelectionSet, v *AlbumFile) graphql.Marshaler {
+func (ec *executionContext) marshalNAlbumFile2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAlbumFile(ctx context.Context, sel ast.SelectionSet, v *AlbumFile) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -25630,7 +25630,7 @@ func (ec *executionContext) marshalNAlbumFile2ᚖgithubᚗcomᚋapartomatᚋapar
 	return ec._AlbumFile(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNAlbumFileGenerated2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumFileGenerated(ctx context.Context, sel ast.SelectionSet, v AlbumFileGenerated) graphql.Marshaler {
+func (ec *executionContext) marshalNAlbumFileGenerated2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAlbumFileGenerated(ctx context.Context, sel ast.SelectionSet, v AlbumFileGenerated) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -25640,17 +25640,17 @@ func (ec *executionContext) marshalNAlbumFileGenerated2githubᚗcomᚋapartomat�
 	return ec._AlbumFileGenerated(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNAlbumFileStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumFileStatus(ctx context.Context, v interface{}) (AlbumFileStatus, error) {
+func (ec *executionContext) unmarshalNAlbumFileStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAlbumFileStatus(ctx context.Context, v interface{}) (AlbumFileStatus, error) {
 	var res AlbumFileStatus
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNAlbumFileStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumFileStatus(ctx context.Context, sel ast.SelectionSet, v AlbumFileStatus) graphql.Marshaler {
+func (ec *executionContext) marshalNAlbumFileStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAlbumFileStatus(ctx context.Context, sel ast.SelectionSet, v AlbumFileStatus) graphql.Marshaler {
 	return v
 }
 
-func (ec *executionContext) marshalNAlbumPage2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumPage(ctx context.Context, sel ast.SelectionSet, v AlbumPage) graphql.Marshaler {
+func (ec *executionContext) marshalNAlbumPage2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAlbumPage(ctx context.Context, sel ast.SelectionSet, v AlbumPage) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -25660,7 +25660,7 @@ func (ec *executionContext) marshalNAlbumPage2githubᚗcomᚋapartomatᚋapartom
 	return ec._AlbumPage(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNAlbumPage2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumPageᚄ(ctx context.Context, sel ast.SelectionSet, v []AlbumPage) graphql.Marshaler {
+func (ec *executionContext) marshalNAlbumPage2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAlbumPageᚄ(ctx context.Context, sel ast.SelectionSet, v []AlbumPage) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -25684,7 +25684,7 @@ func (ec *executionContext) marshalNAlbumPage2ᚕgithubᚗcomᚋapartomatᚋapar
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNAlbumPage2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumPage(ctx, sel, v[i])
+			ret[i] = ec.marshalNAlbumPage2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAlbumPage(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -25704,7 +25704,7 @@ func (ec *executionContext) marshalNAlbumPage2ᚕgithubᚗcomᚋapartomatᚋapar
 	return ret
 }
 
-func (ec *executionContext) marshalNAlbumPageCoverResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumPageCoverResult(ctx context.Context, sel ast.SelectionSet, v AlbumPageCoverResult) graphql.Marshaler {
+func (ec *executionContext) marshalNAlbumPageCoverResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAlbumPageCoverResult(ctx context.Context, sel ast.SelectionSet, v AlbumPageCoverResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -25714,7 +25714,7 @@ func (ec *executionContext) marshalNAlbumPageCoverResult2githubᚗcomᚋapartoma
 	return ec._AlbumPageCoverResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNAlbumPageSvgResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumPageSVGResult(ctx context.Context, sel ast.SelectionSet, v AlbumPageSVGResult) graphql.Marshaler {
+func (ec *executionContext) marshalNAlbumPageSvgResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAlbumPageSVGResult(ctx context.Context, sel ast.SelectionSet, v AlbumPageSVGResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -25724,7 +25724,7 @@ func (ec *executionContext) marshalNAlbumPageSvgResult2githubᚗcomᚋapartomat�
 	return ec._AlbumPageSvgResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNAlbumPageVisualization2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumPageVisualizationᚄ(ctx context.Context, sel ast.SelectionSet, v []*AlbumPageVisualization) graphql.Marshaler {
+func (ec *executionContext) marshalNAlbumPageVisualization2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAlbumPageVisualizationᚄ(ctx context.Context, sel ast.SelectionSet, v []*AlbumPageVisualization) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -25748,7 +25748,7 @@ func (ec *executionContext) marshalNAlbumPageVisualization2ᚕᚖgithubᚗcomᚋ
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNAlbumPageVisualization2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumPageVisualization(ctx, sel, v[i])
+			ret[i] = ec.marshalNAlbumPageVisualization2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAlbumPageVisualization(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -25768,7 +25768,7 @@ func (ec *executionContext) marshalNAlbumPageVisualization2ᚕᚖgithubᚗcomᚋ
 	return ret
 }
 
-func (ec *executionContext) marshalNAlbumPageVisualization2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumPageVisualization(ctx context.Context, sel ast.SelectionSet, v *AlbumPageVisualization) graphql.Marshaler {
+func (ec *executionContext) marshalNAlbumPageVisualization2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAlbumPageVisualization(ctx context.Context, sel ast.SelectionSet, v *AlbumPageVisualization) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -25778,7 +25778,7 @@ func (ec *executionContext) marshalNAlbumPageVisualization2ᚖgithubᚗcomᚋapa
 	return ec._AlbumPageVisualization(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNAlbumPageVisualizationResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumPageVisualizationResult(ctx context.Context, sel ast.SelectionSet, v AlbumPageVisualizationResult) graphql.Marshaler {
+func (ec *executionContext) marshalNAlbumPageVisualizationResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAlbumPageVisualizationResult(ctx context.Context, sel ast.SelectionSet, v AlbumPageVisualizationResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -25788,7 +25788,7 @@ func (ec *executionContext) marshalNAlbumPageVisualizationResult2githubᚗcomᚋ
 	return ec._AlbumPageVisualizationResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNAlbumPagesResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumPagesResult(ctx context.Context, sel ast.SelectionSet, v AlbumPagesResult) graphql.Marshaler {
+func (ec *executionContext) marshalNAlbumPagesResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAlbumPagesResult(ctx context.Context, sel ast.SelectionSet, v AlbumPagesResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -25798,7 +25798,7 @@ func (ec *executionContext) marshalNAlbumPagesResult2githubᚗcomᚋapartomatᚋ
 	return ec._AlbumPagesResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNAlbumProjectResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumProjectResult(ctx context.Context, sel ast.SelectionSet, v AlbumProjectResult) graphql.Marshaler {
+func (ec *executionContext) marshalNAlbumProjectResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAlbumProjectResult(ctx context.Context, sel ast.SelectionSet, v AlbumProjectResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -25808,7 +25808,7 @@ func (ec *executionContext) marshalNAlbumProjectResult2githubᚗcomᚋapartomat�
 	return ec._AlbumProjectResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNAlbumResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumResult(ctx context.Context, sel ast.SelectionSet, v AlbumResult) graphql.Marshaler {
+func (ec *executionContext) marshalNAlbumResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAlbumResult(ctx context.Context, sel ast.SelectionSet, v AlbumResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -25818,7 +25818,7 @@ func (ec *executionContext) marshalNAlbumResult2githubᚗcomᚋapartomatᚋapart
 	return ec._AlbumResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNAlbumSettings2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumSettings(ctx context.Context, sel ast.SelectionSet, v *AlbumSettings) graphql.Marshaler {
+func (ec *executionContext) marshalNAlbumSettings2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAlbumSettings(ctx context.Context, sel ast.SelectionSet, v *AlbumSettings) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -25843,7 +25843,7 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) marshalNChangeAlbumPageOrientationResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐChangeAlbumPageOrientationResult(ctx context.Context, sel ast.SelectionSet, v ChangeAlbumPageOrientationResult) graphql.Marshaler {
+func (ec *executionContext) marshalNChangeAlbumPageOrientationResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐChangeAlbumPageOrientationResult(ctx context.Context, sel ast.SelectionSet, v ChangeAlbumPageOrientationResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -25853,7 +25853,7 @@ func (ec *executionContext) marshalNChangeAlbumPageOrientationResult2githubᚗco
 	return ec._ChangeAlbumPageOrientationResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNChangeAlbumPageSizeResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐChangeAlbumPageSizeResult(ctx context.Context, sel ast.SelectionSet, v ChangeAlbumPageSizeResult) graphql.Marshaler {
+func (ec *executionContext) marshalNChangeAlbumPageSizeResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐChangeAlbumPageSizeResult(ctx context.Context, sel ast.SelectionSet, v ChangeAlbumPageSizeResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -25863,12 +25863,12 @@ func (ec *executionContext) marshalNChangeAlbumPageSizeResult2githubᚗcomᚋapa
 	return ec._ChangeAlbumPageSizeResult(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNChangeProjectDatesInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐChangeProjectDatesInput(ctx context.Context, v interface{}) (ChangeProjectDatesInput, error) {
+func (ec *executionContext) unmarshalNChangeProjectDatesInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐChangeProjectDatesInput(ctx context.Context, v interface{}) (ChangeProjectDatesInput, error) {
 	res, err := ec.unmarshalInputChangeProjectDatesInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNChangeProjectDatesResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐChangeProjectDatesResult(ctx context.Context, sel ast.SelectionSet, v ChangeProjectDatesResult) graphql.Marshaler {
+func (ec *executionContext) marshalNChangeProjectDatesResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐChangeProjectDatesResult(ctx context.Context, sel ast.SelectionSet, v ChangeProjectDatesResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -25878,7 +25878,7 @@ func (ec *executionContext) marshalNChangeProjectDatesResult2githubᚗcomᚋapar
 	return ec._ChangeProjectDatesResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNChangeProjectStatusResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐChangeProjectStatusResult(ctx context.Context, sel ast.SelectionSet, v ChangeProjectStatusResult) graphql.Marshaler {
+func (ec *executionContext) marshalNChangeProjectStatusResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐChangeProjectStatusResult(ctx context.Context, sel ast.SelectionSet, v ChangeProjectStatusResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -25888,7 +25888,7 @@ func (ec *executionContext) marshalNChangeProjectStatusResult2githubᚗcomᚋapa
 	return ec._ChangeProjectStatusResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNConfirmLoginLinkResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐConfirmLoginLinkResult(ctx context.Context, sel ast.SelectionSet, v ConfirmLoginLinkResult) graphql.Marshaler {
+func (ec *executionContext) marshalNConfirmLoginLinkResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐConfirmLoginLinkResult(ctx context.Context, sel ast.SelectionSet, v ConfirmLoginLinkResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -25898,7 +25898,7 @@ func (ec *executionContext) marshalNConfirmLoginLinkResult2githubᚗcomᚋaparto
 	return ec._ConfirmLoginLinkResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNConfirmLoginPinResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐConfirmLoginPinResult(ctx context.Context, sel ast.SelectionSet, v ConfirmLoginPinResult) graphql.Marshaler {
+func (ec *executionContext) marshalNConfirmLoginPinResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐConfirmLoginPinResult(ctx context.Context, sel ast.SelectionSet, v ConfirmLoginPinResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -25908,7 +25908,7 @@ func (ec *executionContext) marshalNConfirmLoginPinResult2githubᚗcomᚋapartom
 	return ec._ConfirmLoginPinResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNContact2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐContactᚄ(ctx context.Context, sel ast.SelectionSet, v []*Contact) graphql.Marshaler {
+func (ec *executionContext) marshalNContact2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐContactᚄ(ctx context.Context, sel ast.SelectionSet, v []*Contact) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -25932,7 +25932,7 @@ func (ec *executionContext) marshalNContact2ᚕᚖgithubᚗcomᚋapartomatᚋapa
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNContact2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐContact(ctx, sel, v[i])
+			ret[i] = ec.marshalNContact2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐContact(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -25952,7 +25952,7 @@ func (ec *executionContext) marshalNContact2ᚕᚖgithubᚗcomᚋapartomatᚋapa
 	return ret
 }
 
-func (ec *executionContext) marshalNContact2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐContact(ctx context.Context, sel ast.SelectionSet, v *Contact) graphql.Marshaler {
+func (ec *executionContext) marshalNContact2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐContact(ctx context.Context, sel ast.SelectionSet, v *Contact) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -25962,7 +25962,7 @@ func (ec *executionContext) marshalNContact2ᚖgithubᚗcomᚋapartomatᚋaparto
 	return ec._Contact(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNContactDetails2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐContactDetailsᚄ(ctx context.Context, sel ast.SelectionSet, v []*ContactDetails) graphql.Marshaler {
+func (ec *executionContext) marshalNContactDetails2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐContactDetailsᚄ(ctx context.Context, sel ast.SelectionSet, v []*ContactDetails) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -25986,7 +25986,7 @@ func (ec *executionContext) marshalNContactDetails2ᚕᚖgithubᚗcomᚋapartoma
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNContactDetails2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐContactDetails(ctx, sel, v[i])
+			ret[i] = ec.marshalNContactDetails2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐContactDetails(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -26006,7 +26006,7 @@ func (ec *executionContext) marshalNContactDetails2ᚕᚖgithubᚗcomᚋapartoma
 	return ret
 }
 
-func (ec *executionContext) marshalNContactDetails2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐContactDetails(ctx context.Context, sel ast.SelectionSet, v *ContactDetails) graphql.Marshaler {
+func (ec *executionContext) marshalNContactDetails2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐContactDetails(ctx context.Context, sel ast.SelectionSet, v *ContactDetails) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -26016,7 +26016,7 @@ func (ec *executionContext) marshalNContactDetails2ᚖgithubᚗcomᚋapartomat�
 	return ec._ContactDetails(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNContactDetailsInput2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐContactDetailsInputᚄ(ctx context.Context, v interface{}) ([]*ContactDetailsInput, error) {
+func (ec *executionContext) unmarshalNContactDetailsInput2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐContactDetailsInputᚄ(ctx context.Context, v interface{}) ([]*ContactDetailsInput, error) {
 	var vSlice []interface{}
 	if v != nil {
 		vSlice = graphql.CoerceList(v)
@@ -26025,7 +26025,7 @@ func (ec *executionContext) unmarshalNContactDetailsInput2ᚕᚖgithubᚗcomᚋa
 	res := make([]*ContactDetailsInput, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNContactDetailsInput2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐContactDetailsInput(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNContactDetailsInput2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐContactDetailsInput(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -26033,22 +26033,22 @@ func (ec *executionContext) unmarshalNContactDetailsInput2ᚕᚖgithubᚗcomᚋa
 	return res, nil
 }
 
-func (ec *executionContext) unmarshalNContactDetailsInput2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐContactDetailsInput(ctx context.Context, v interface{}) (*ContactDetailsInput, error) {
+func (ec *executionContext) unmarshalNContactDetailsInput2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐContactDetailsInput(ctx context.Context, v interface{}) (*ContactDetailsInput, error) {
 	res, err := ec.unmarshalInputContactDetailsInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNContactType2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐContactType(ctx context.Context, v interface{}) (ContactType, error) {
+func (ec *executionContext) unmarshalNContactType2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐContactType(ctx context.Context, v interface{}) (ContactType, error) {
 	var res ContactType
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNContactType2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐContactType(ctx context.Context, sel ast.SelectionSet, v ContactType) graphql.Marshaler {
+func (ec *executionContext) marshalNContactType2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐContactType(ctx context.Context, sel ast.SelectionSet, v ContactType) graphql.Marshaler {
 	return v
 }
 
-func (ec *executionContext) marshalNCoverFileResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐCoverFileResult(ctx context.Context, sel ast.SelectionSet, v CoverFileResult) graphql.Marshaler {
+func (ec *executionContext) marshalNCoverFileResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐCoverFileResult(ctx context.Context, sel ast.SelectionSet, v CoverFileResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -26058,7 +26058,7 @@ func (ec *executionContext) marshalNCoverFileResult2githubᚗcomᚋapartomatᚋa
 	return ec._CoverFileResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNCreateAlbumResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐCreateAlbumResult(ctx context.Context, sel ast.SelectionSet, v CreateAlbumResult) graphql.Marshaler {
+func (ec *executionContext) marshalNCreateAlbumResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐCreateAlbumResult(ctx context.Context, sel ast.SelectionSet, v CreateAlbumResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -26068,17 +26068,17 @@ func (ec *executionContext) marshalNCreateAlbumResult2githubᚗcomᚋapartomat�
 	return ec._CreateAlbumResult(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNCreateAlbumSettingsInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐCreateAlbumSettingsInput(ctx context.Context, v interface{}) (CreateAlbumSettingsInput, error) {
+func (ec *executionContext) unmarshalNCreateAlbumSettingsInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐCreateAlbumSettingsInput(ctx context.Context, v interface{}) (CreateAlbumSettingsInput, error) {
 	res, err := ec.unmarshalInputCreateAlbumSettingsInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNCreateProjectInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐCreateProjectInput(ctx context.Context, v interface{}) (CreateProjectInput, error) {
+func (ec *executionContext) unmarshalNCreateProjectInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐCreateProjectInput(ctx context.Context, v interface{}) (CreateProjectInput, error) {
 	res, err := ec.unmarshalInputCreateProjectInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNCreateProjectResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐCreateProjectResult(ctx context.Context, sel ast.SelectionSet, v CreateProjectResult) graphql.Marshaler {
+func (ec *executionContext) marshalNCreateProjectResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐCreateProjectResult(ctx context.Context, sel ast.SelectionSet, v CreateProjectResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -26088,7 +26088,7 @@ func (ec *executionContext) marshalNCreateProjectResult2githubᚗcomᚋapartomat
 	return ec._CreateProjectResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNDeleteAlbumResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐDeleteAlbumResult(ctx context.Context, sel ast.SelectionSet, v DeleteAlbumResult) graphql.Marshaler {
+func (ec *executionContext) marshalNDeleteAlbumResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐDeleteAlbumResult(ctx context.Context, sel ast.SelectionSet, v DeleteAlbumResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -26098,7 +26098,7 @@ func (ec *executionContext) marshalNDeleteAlbumResult2githubᚗcomᚋapartomat�
 	return ec._DeleteAlbumResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNDeleteContactResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐDeleteContactResult(ctx context.Context, sel ast.SelectionSet, v DeleteContactResult) graphql.Marshaler {
+func (ec *executionContext) marshalNDeleteContactResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐDeleteContactResult(ctx context.Context, sel ast.SelectionSet, v DeleteContactResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -26108,7 +26108,7 @@ func (ec *executionContext) marshalNDeleteContactResult2githubᚗcomᚋapartomat
 	return ec._DeleteContactResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNDeleteRoomResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐDeleteRoomResult(ctx context.Context, sel ast.SelectionSet, v DeleteRoomResult) graphql.Marshaler {
+func (ec *executionContext) marshalNDeleteRoomResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐDeleteRoomResult(ctx context.Context, sel ast.SelectionSet, v DeleteRoomResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -26118,7 +26118,7 @@ func (ec *executionContext) marshalNDeleteRoomResult2githubᚗcomᚋapartomatᚋ
 	return ec._DeleteRoomResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNDeleteVisualizationsResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐDeleteVisualizationsResult(ctx context.Context, sel ast.SelectionSet, v DeleteVisualizationsResult) graphql.Marshaler {
+func (ec *executionContext) marshalNDeleteVisualizationsResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐDeleteVisualizationsResult(ctx context.Context, sel ast.SelectionSet, v DeleteVisualizationsResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -26128,11 +26128,11 @@ func (ec *executionContext) marshalNDeleteVisualizationsResult2githubᚗcomᚋap
 	return ec._DeleteVisualizationsResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNFile2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐFile(ctx context.Context, sel ast.SelectionSet, v File) graphql.Marshaler {
+func (ec *executionContext) marshalNFile2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐFile(ctx context.Context, sel ast.SelectionSet, v File) graphql.Marshaler {
 	return ec._File(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNFile2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐFileᚄ(ctx context.Context, sel ast.SelectionSet, v []*File) graphql.Marshaler {
+func (ec *executionContext) marshalNFile2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐFileᚄ(ctx context.Context, sel ast.SelectionSet, v []*File) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -26156,7 +26156,7 @@ func (ec *executionContext) marshalNFile2ᚕᚖgithubᚗcomᚋapartomatᚋaparto
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNFile2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐFile(ctx, sel, v[i])
+			ret[i] = ec.marshalNFile2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐFile(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -26176,7 +26176,7 @@ func (ec *executionContext) marshalNFile2ᚕᚖgithubᚗcomᚋapartomatᚋaparto
 	return ret
 }
 
-func (ec *executionContext) marshalNFile2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐFile(ctx context.Context, sel ast.SelectionSet, v *File) graphql.Marshaler {
+func (ec *executionContext) marshalNFile2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐFile(ctx context.Context, sel ast.SelectionSet, v *File) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -26186,13 +26186,13 @@ func (ec *executionContext) marshalNFile2ᚖgithubᚗcomᚋapartomatᚋapartomat
 	return ec._File(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNFileType2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐFileType(ctx context.Context, v interface{}) (FileType, error) {
+func (ec *executionContext) unmarshalNFileType2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐFileType(ctx context.Context, v interface{}) (FileType, error) {
 	var res FileType
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNFileType2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐFileType(ctx context.Context, sel ast.SelectionSet, v FileType) graphql.Marshaler {
+func (ec *executionContext) marshalNFileType2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐFileType(ctx context.Context, sel ast.SelectionSet, v FileType) graphql.Marshaler {
 	return v
 }
 
@@ -26211,7 +26211,7 @@ func (ec *executionContext) marshalNFloat2float64(ctx context.Context, sel ast.S
 	return graphql.WrapContextMarshaler(ctx, res)
 }
 
-func (ec *executionContext) marshalNGenerateAlbumFileResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐGenerateAlbumFileResult(ctx context.Context, sel ast.SelectionSet, v GenerateAlbumFileResult) graphql.Marshaler {
+func (ec *executionContext) marshalNGenerateAlbumFileResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐGenerateAlbumFileResult(ctx context.Context, sel ast.SelectionSet, v GenerateAlbumFileResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -26221,7 +26221,7 @@ func (ec *executionContext) marshalNGenerateAlbumFileResult2githubᚗcomᚋapart
 	return ec._GenerateAlbumFileResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNHouse2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐHouseᚄ(ctx context.Context, sel ast.SelectionSet, v []*House) graphql.Marshaler {
+func (ec *executionContext) marshalNHouse2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐHouseᚄ(ctx context.Context, sel ast.SelectionSet, v []*House) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -26245,7 +26245,7 @@ func (ec *executionContext) marshalNHouse2ᚕᚖgithubᚗcomᚋapartomatᚋapart
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNHouse2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐHouse(ctx, sel, v[i])
+			ret[i] = ec.marshalNHouse2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐHouse(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -26265,7 +26265,7 @@ func (ec *executionContext) marshalNHouse2ᚕᚖgithubᚗcomᚋapartomatᚋapart
 	return ret
 }
 
-func (ec *executionContext) marshalNHouse2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐHouse(ctx context.Context, sel ast.SelectionSet, v *House) graphql.Marshaler {
+func (ec *executionContext) marshalNHouse2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐHouse(ctx context.Context, sel ast.SelectionSet, v *House) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -26275,11 +26275,11 @@ func (ec *executionContext) marshalNHouse2ᚖgithubᚗcomᚋapartomatᚋapartoma
 	return ec._House(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNHouseRooms2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐHouseRooms(ctx context.Context, sel ast.SelectionSet, v HouseRooms) graphql.Marshaler {
+func (ec *executionContext) marshalNHouseRooms2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐHouseRooms(ctx context.Context, sel ast.SelectionSet, v HouseRooms) graphql.Marshaler {
 	return ec._HouseRooms(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNHouseRooms2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐHouseRooms(ctx context.Context, sel ast.SelectionSet, v *HouseRooms) graphql.Marshaler {
+func (ec *executionContext) marshalNHouseRooms2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐHouseRooms(ctx context.Context, sel ast.SelectionSet, v *HouseRooms) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -26289,7 +26289,7 @@ func (ec *executionContext) marshalNHouseRooms2ᚖgithubᚗcomᚋapartomatᚋapa
 	return ec._HouseRooms(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNHouseRoomsListResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐHouseRoomsListResult(ctx context.Context, sel ast.SelectionSet, v HouseRoomsListResult) graphql.Marshaler {
+func (ec *executionContext) marshalNHouseRoomsListResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐHouseRoomsListResult(ctx context.Context, sel ast.SelectionSet, v HouseRoomsListResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -26299,7 +26299,7 @@ func (ec *executionContext) marshalNHouseRoomsListResult2githubᚗcomᚋapartoma
 	return ec._HouseRoomsListResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNId2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐID(ctx context.Context, sel ast.SelectionSet, v *ID) graphql.Marshaler {
+func (ec *executionContext) marshalNId2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐID(ctx context.Context, sel ast.SelectionSet, v *ID) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -26324,7 +26324,7 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 	return res
 }
 
-func (ec *executionContext) marshalNInviteUserToWorkspaceResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐInviteUserToWorkspaceResult(ctx context.Context, sel ast.SelectionSet, v InviteUserToWorkspaceResult) graphql.Marshaler {
+func (ec *executionContext) marshalNInviteUserToWorkspaceResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐInviteUserToWorkspaceResult(ctx context.Context, sel ast.SelectionSet, v InviteUserToWorkspaceResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -26334,7 +26334,7 @@ func (ec *executionContext) marshalNInviteUserToWorkspaceResult2githubᚗcomᚋa
 	return ec._InviteUserToWorkspaceResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNLoginByEmailResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐLoginByEmailResult(ctx context.Context, sel ast.SelectionSet, v LoginByEmailResult) graphql.Marshaler {
+func (ec *executionContext) marshalNLoginByEmailResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐLoginByEmailResult(ctx context.Context, sel ast.SelectionSet, v LoginByEmailResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -26344,7 +26344,7 @@ func (ec *executionContext) marshalNLoginByEmailResult2githubᚗcomᚋapartomat�
 	return ec._LoginByEmailResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNMakeProjectNotPublicResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐMakeProjectNotPublicResult(ctx context.Context, sel ast.SelectionSet, v MakeProjectNotPublicResult) graphql.Marshaler {
+func (ec *executionContext) marshalNMakeProjectNotPublicResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐMakeProjectNotPublicResult(ctx context.Context, sel ast.SelectionSet, v MakeProjectNotPublicResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -26354,7 +26354,7 @@ func (ec *executionContext) marshalNMakeProjectNotPublicResult2githubᚗcomᚋap
 	return ec._MakeProjectNotPublicResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNMakeProjectPublicResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐMakeProjectPublicResult(ctx context.Context, sel ast.SelectionSet, v MakeProjectPublicResult) graphql.Marshaler {
+func (ec *executionContext) marshalNMakeProjectPublicResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐMakeProjectPublicResult(ctx context.Context, sel ast.SelectionSet, v MakeProjectPublicResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -26364,7 +26364,7 @@ func (ec *executionContext) marshalNMakeProjectPublicResult2githubᚗcomᚋapart
 	return ec._MakeProjectPublicResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNMoveRoomToPositionResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐMoveRoomToPositionResult(ctx context.Context, sel ast.SelectionSet, v MoveRoomToPositionResult) graphql.Marshaler {
+func (ec *executionContext) marshalNMoveRoomToPositionResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐMoveRoomToPositionResult(ctx context.Context, sel ast.SelectionSet, v MoveRoomToPositionResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -26374,27 +26374,27 @@ func (ec *executionContext) marshalNMoveRoomToPositionResult2githubᚗcomᚋapar
 	return ec._MoveRoomToPositionResult(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNPageOrientation2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐPageOrientation(ctx context.Context, v interface{}) (PageOrientation, error) {
+func (ec *executionContext) unmarshalNPageOrientation2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐPageOrientation(ctx context.Context, v interface{}) (PageOrientation, error) {
 	var res PageOrientation
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNPageOrientation2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐPageOrientation(ctx context.Context, sel ast.SelectionSet, v PageOrientation) graphql.Marshaler {
+func (ec *executionContext) marshalNPageOrientation2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐPageOrientation(ctx context.Context, sel ast.SelectionSet, v PageOrientation) graphql.Marshaler {
 	return v
 }
 
-func (ec *executionContext) unmarshalNPageSize2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐPageSize(ctx context.Context, v interface{}) (PageSize, error) {
+func (ec *executionContext) unmarshalNPageSize2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐPageSize(ctx context.Context, v interface{}) (PageSize, error) {
 	var res PageSize
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNPageSize2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐPageSize(ctx context.Context, sel ast.SelectionSet, v PageSize) graphql.Marshaler {
+func (ec *executionContext) marshalNPageSize2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐPageSize(ctx context.Context, sel ast.SelectionSet, v PageSize) graphql.Marshaler {
 	return v
 }
 
-func (ec *executionContext) marshalNProject2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectᚄ(ctx context.Context, sel ast.SelectionSet, v []*Project) graphql.Marshaler {
+func (ec *executionContext) marshalNProject2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectᚄ(ctx context.Context, sel ast.SelectionSet, v []*Project) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -26418,7 +26418,7 @@ func (ec *executionContext) marshalNProject2ᚕᚖgithubᚗcomᚋapartomatᚋapa
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNProject2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProject(ctx, sel, v[i])
+			ret[i] = ec.marshalNProject2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProject(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -26438,7 +26438,7 @@ func (ec *executionContext) marshalNProject2ᚕᚖgithubᚗcomᚋapartomatᚋapa
 	return ret
 }
 
-func (ec *executionContext) marshalNProject2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProject(ctx context.Context, sel ast.SelectionSet, v *Project) graphql.Marshaler {
+func (ec *executionContext) marshalNProject2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProject(ctx context.Context, sel ast.SelectionSet, v *Project) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -26448,11 +26448,11 @@ func (ec *executionContext) marshalNProject2ᚖgithubᚗcomᚋapartomatᚋaparto
 	return ec._Project(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNProjectAlbums2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectAlbums(ctx context.Context, sel ast.SelectionSet, v ProjectAlbums) graphql.Marshaler {
+func (ec *executionContext) marshalNProjectAlbums2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectAlbums(ctx context.Context, sel ast.SelectionSet, v ProjectAlbums) graphql.Marshaler {
 	return ec._ProjectAlbums(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNProjectAlbums2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectAlbums(ctx context.Context, sel ast.SelectionSet, v *ProjectAlbums) graphql.Marshaler {
+func (ec *executionContext) marshalNProjectAlbums2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectAlbums(ctx context.Context, sel ast.SelectionSet, v *ProjectAlbums) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -26462,7 +26462,7 @@ func (ec *executionContext) marshalNProjectAlbums2ᚖgithubᚗcomᚋapartomatᚋ
 	return ec._ProjectAlbums(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNProjectAlbumsListResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectAlbumsListResult(ctx context.Context, sel ast.SelectionSet, v ProjectAlbumsListResult) graphql.Marshaler {
+func (ec *executionContext) marshalNProjectAlbumsListResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectAlbumsListResult(ctx context.Context, sel ast.SelectionSet, v ProjectAlbumsListResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -26472,7 +26472,7 @@ func (ec *executionContext) marshalNProjectAlbumsListResult2githubᚗcomᚋapart
 	return ec._ProjectAlbumsListResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNProjectAlbumsTotalResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectAlbumsTotalResult(ctx context.Context, sel ast.SelectionSet, v ProjectAlbumsTotalResult) graphql.Marshaler {
+func (ec *executionContext) marshalNProjectAlbumsTotalResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectAlbumsTotalResult(ctx context.Context, sel ast.SelectionSet, v ProjectAlbumsTotalResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -26482,11 +26482,11 @@ func (ec *executionContext) marshalNProjectAlbumsTotalResult2githubᚗcomᚋapar
 	return ec._ProjectAlbumsTotalResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNProjectContacts2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectContacts(ctx context.Context, sel ast.SelectionSet, v ProjectContacts) graphql.Marshaler {
+func (ec *executionContext) marshalNProjectContacts2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectContacts(ctx context.Context, sel ast.SelectionSet, v ProjectContacts) graphql.Marshaler {
 	return ec._ProjectContacts(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNProjectContacts2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectContacts(ctx context.Context, sel ast.SelectionSet, v *ProjectContacts) graphql.Marshaler {
+func (ec *executionContext) marshalNProjectContacts2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectContacts(ctx context.Context, sel ast.SelectionSet, v *ProjectContacts) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -26496,12 +26496,12 @@ func (ec *executionContext) marshalNProjectContacts2ᚖgithubᚗcomᚋapartomat�
 	return ec._ProjectContacts(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNProjectContactsFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectContactsFilter(ctx context.Context, v interface{}) (ProjectContactsFilter, error) {
+func (ec *executionContext) unmarshalNProjectContactsFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectContactsFilter(ctx context.Context, v interface{}) (ProjectContactsFilter, error) {
 	res, err := ec.unmarshalInputProjectContactsFilter(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNProjectContactsListResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectContactsListResult(ctx context.Context, sel ast.SelectionSet, v ProjectContactsListResult) graphql.Marshaler {
+func (ec *executionContext) marshalNProjectContactsListResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectContactsListResult(ctx context.Context, sel ast.SelectionSet, v ProjectContactsListResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -26511,7 +26511,7 @@ func (ec *executionContext) marshalNProjectContactsListResult2githubᚗcomᚋapa
 	return ec._ProjectContactsListResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNProjectContactsTotalResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectContactsTotalResult(ctx context.Context, sel ast.SelectionSet, v ProjectContactsTotalResult) graphql.Marshaler {
+func (ec *executionContext) marshalNProjectContactsTotalResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectContactsTotalResult(ctx context.Context, sel ast.SelectionSet, v ProjectContactsTotalResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -26521,11 +26521,11 @@ func (ec *executionContext) marshalNProjectContactsTotalResult2githubᚗcomᚋap
 	return ec._ProjectContactsTotalResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNProjectFiles2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectFiles(ctx context.Context, sel ast.SelectionSet, v ProjectFiles) graphql.Marshaler {
+func (ec *executionContext) marshalNProjectFiles2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectFiles(ctx context.Context, sel ast.SelectionSet, v ProjectFiles) graphql.Marshaler {
 	return ec._ProjectFiles(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNProjectFiles2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectFiles(ctx context.Context, sel ast.SelectionSet, v *ProjectFiles) graphql.Marshaler {
+func (ec *executionContext) marshalNProjectFiles2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectFiles(ctx context.Context, sel ast.SelectionSet, v *ProjectFiles) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -26535,12 +26535,12 @@ func (ec *executionContext) marshalNProjectFiles2ᚖgithubᚗcomᚋapartomatᚋa
 	return ec._ProjectFiles(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNProjectFilesListFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectFilesListFilter(ctx context.Context, v interface{}) (ProjectFilesListFilter, error) {
+func (ec *executionContext) unmarshalNProjectFilesListFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectFilesListFilter(ctx context.Context, v interface{}) (ProjectFilesListFilter, error) {
 	res, err := ec.unmarshalInputProjectFilesListFilter(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNProjectFilesListResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectFilesListResult(ctx context.Context, sel ast.SelectionSet, v ProjectFilesListResult) graphql.Marshaler {
+func (ec *executionContext) marshalNProjectFilesListResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectFilesListResult(ctx context.Context, sel ast.SelectionSet, v ProjectFilesListResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -26550,7 +26550,7 @@ func (ec *executionContext) marshalNProjectFilesListResult2githubᚗcomᚋaparto
 	return ec._ProjectFilesListResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNProjectFilesTotalResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectFilesTotalResult(ctx context.Context, sel ast.SelectionSet, v ProjectFilesTotalResult) graphql.Marshaler {
+func (ec *executionContext) marshalNProjectFilesTotalResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectFilesTotalResult(ctx context.Context, sel ast.SelectionSet, v ProjectFilesTotalResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -26560,11 +26560,11 @@ func (ec *executionContext) marshalNProjectFilesTotalResult2githubᚗcomᚋapart
 	return ec._ProjectFilesTotalResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNProjectHouses2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectHouses(ctx context.Context, sel ast.SelectionSet, v ProjectHouses) graphql.Marshaler {
+func (ec *executionContext) marshalNProjectHouses2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectHouses(ctx context.Context, sel ast.SelectionSet, v ProjectHouses) graphql.Marshaler {
 	return ec._ProjectHouses(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNProjectHouses2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectHouses(ctx context.Context, sel ast.SelectionSet, v *ProjectHouses) graphql.Marshaler {
+func (ec *executionContext) marshalNProjectHouses2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectHouses(ctx context.Context, sel ast.SelectionSet, v *ProjectHouses) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -26574,12 +26574,12 @@ func (ec *executionContext) marshalNProjectHouses2ᚖgithubᚗcomᚋapartomatᚋ
 	return ec._ProjectHouses(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNProjectHousesFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectHousesFilter(ctx context.Context, v interface{}) (ProjectHousesFilter, error) {
+func (ec *executionContext) unmarshalNProjectHousesFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectHousesFilter(ctx context.Context, v interface{}) (ProjectHousesFilter, error) {
 	res, err := ec.unmarshalInputProjectHousesFilter(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNProjectHousesListResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectHousesListResult(ctx context.Context, sel ast.SelectionSet, v ProjectHousesListResult) graphql.Marshaler {
+func (ec *executionContext) marshalNProjectHousesListResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectHousesListResult(ctx context.Context, sel ast.SelectionSet, v ProjectHousesListResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -26589,7 +26589,7 @@ func (ec *executionContext) marshalNProjectHousesListResult2githubᚗcomᚋapart
 	return ec._ProjectHousesListResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNProjectHousesTotalResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectHousesTotalResult(ctx context.Context, sel ast.SelectionSet, v ProjectHousesTotalResult) graphql.Marshaler {
+func (ec *executionContext) marshalNProjectHousesTotalResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectHousesTotalResult(ctx context.Context, sel ast.SelectionSet, v ProjectHousesTotalResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -26599,7 +26599,7 @@ func (ec *executionContext) marshalNProjectHousesTotalResult2githubᚗcomᚋapar
 	return ec._ProjectHousesTotalResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNProjectPublicSite2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectPublicSite(ctx context.Context, sel ast.SelectionSet, v ProjectPublicSite) graphql.Marshaler {
+func (ec *executionContext) marshalNProjectPublicSite2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectPublicSite(ctx context.Context, sel ast.SelectionSet, v ProjectPublicSite) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -26609,7 +26609,7 @@ func (ec *executionContext) marshalNProjectPublicSite2githubᚗcomᚋapartomat�
 	return ec._ProjectPublicSite(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNProjectResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectResult(ctx context.Context, sel ast.SelectionSet, v ProjectResult) graphql.Marshaler {
+func (ec *executionContext) marshalNProjectResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectResult(ctx context.Context, sel ast.SelectionSet, v ProjectResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -26619,21 +26619,21 @@ func (ec *executionContext) marshalNProjectResult2githubᚗcomᚋapartomatᚋapa
 	return ec._ProjectResult(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNProjectStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectStatus(ctx context.Context, v interface{}) (ProjectStatus, error) {
+func (ec *executionContext) unmarshalNProjectStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectStatus(ctx context.Context, v interface{}) (ProjectStatus, error) {
 	var res ProjectStatus
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNProjectStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectStatus(ctx context.Context, sel ast.SelectionSet, v ProjectStatus) graphql.Marshaler {
+func (ec *executionContext) marshalNProjectStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectStatus(ctx context.Context, sel ast.SelectionSet, v ProjectStatus) graphql.Marshaler {
 	return v
 }
 
-func (ec *executionContext) marshalNProjectStatusDictionary2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectStatusDictionary(ctx context.Context, sel ast.SelectionSet, v ProjectStatusDictionary) graphql.Marshaler {
+func (ec *executionContext) marshalNProjectStatusDictionary2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectStatusDictionary(ctx context.Context, sel ast.SelectionSet, v ProjectStatusDictionary) graphql.Marshaler {
 	return ec._ProjectStatusDictionary(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNProjectStatusDictionary2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectStatusDictionary(ctx context.Context, sel ast.SelectionSet, v *ProjectStatusDictionary) graphql.Marshaler {
+func (ec *executionContext) marshalNProjectStatusDictionary2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectStatusDictionary(ctx context.Context, sel ast.SelectionSet, v *ProjectStatusDictionary) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -26643,7 +26643,7 @@ func (ec *executionContext) marshalNProjectStatusDictionary2ᚖgithubᚗcomᚋap
 	return ec._ProjectStatusDictionary(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNProjectStatusDictionaryItem2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectStatusDictionaryItemᚄ(ctx context.Context, sel ast.SelectionSet, v []*ProjectStatusDictionaryItem) graphql.Marshaler {
+func (ec *executionContext) marshalNProjectStatusDictionaryItem2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectStatusDictionaryItemᚄ(ctx context.Context, sel ast.SelectionSet, v []*ProjectStatusDictionaryItem) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -26667,7 +26667,7 @@ func (ec *executionContext) marshalNProjectStatusDictionaryItem2ᚕᚖgithubᚗc
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNProjectStatusDictionaryItem2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectStatusDictionaryItem(ctx, sel, v[i])
+			ret[i] = ec.marshalNProjectStatusDictionaryItem2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectStatusDictionaryItem(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -26687,7 +26687,7 @@ func (ec *executionContext) marshalNProjectStatusDictionaryItem2ᚕᚖgithubᚗc
 	return ret
 }
 
-func (ec *executionContext) marshalNProjectStatusDictionaryItem2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectStatusDictionaryItem(ctx context.Context, sel ast.SelectionSet, v *ProjectStatusDictionaryItem) graphql.Marshaler {
+func (ec *executionContext) marshalNProjectStatusDictionaryItem2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectStatusDictionaryItem(ctx context.Context, sel ast.SelectionSet, v *ProjectStatusDictionaryItem) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -26697,11 +26697,11 @@ func (ec *executionContext) marshalNProjectStatusDictionaryItem2ᚖgithubᚗcom�
 	return ec._ProjectStatusDictionaryItem(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNProjectVisualizations2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectVisualizations(ctx context.Context, sel ast.SelectionSet, v ProjectVisualizations) graphql.Marshaler {
+func (ec *executionContext) marshalNProjectVisualizations2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectVisualizations(ctx context.Context, sel ast.SelectionSet, v ProjectVisualizations) graphql.Marshaler {
 	return ec._ProjectVisualizations(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNProjectVisualizations2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectVisualizations(ctx context.Context, sel ast.SelectionSet, v *ProjectVisualizations) graphql.Marshaler {
+func (ec *executionContext) marshalNProjectVisualizations2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectVisualizations(ctx context.Context, sel ast.SelectionSet, v *ProjectVisualizations) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -26711,12 +26711,12 @@ func (ec *executionContext) marshalNProjectVisualizations2ᚖgithubᚗcomᚋapar
 	return ec._ProjectVisualizations(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNProjectVisualizationsListFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectVisualizationsListFilter(ctx context.Context, v interface{}) (ProjectVisualizationsListFilter, error) {
+func (ec *executionContext) unmarshalNProjectVisualizationsListFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectVisualizationsListFilter(ctx context.Context, v interface{}) (ProjectVisualizationsListFilter, error) {
 	res, err := ec.unmarshalInputProjectVisualizationsListFilter(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNProjectVisualizationsListResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectVisualizationsListResult(ctx context.Context, sel ast.SelectionSet, v ProjectVisualizationsListResult) graphql.Marshaler {
+func (ec *executionContext) marshalNProjectVisualizationsListResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectVisualizationsListResult(ctx context.Context, sel ast.SelectionSet, v ProjectVisualizationsListResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -26726,7 +26726,7 @@ func (ec *executionContext) marshalNProjectVisualizationsListResult2githubᚗcom
 	return ec._ProjectVisualizationsListResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNProjectVisualizationsTotalResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectVisualizationsTotalResult(ctx context.Context, sel ast.SelectionSet, v ProjectVisualizationsTotalResult) graphql.Marshaler {
+func (ec *executionContext) marshalNProjectVisualizationsTotalResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectVisualizationsTotalResult(ctx context.Context, sel ast.SelectionSet, v ProjectVisualizationsTotalResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -26736,7 +26736,7 @@ func (ec *executionContext) marshalNProjectVisualizationsTotalResult2githubᚗco
 	return ec._ProjectVisualizationsTotalResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNPublicSite2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐPublicSite(ctx context.Context, sel ast.SelectionSet, v *PublicSite) graphql.Marshaler {
+func (ec *executionContext) marshalNPublicSite2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐPublicSite(ctx context.Context, sel ast.SelectionSet, v *PublicSite) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -26746,7 +26746,7 @@ func (ec *executionContext) marshalNPublicSite2ᚖgithubᚗcomᚋapartomatᚋapa
 	return ec._PublicSite(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNPublicSiteSettings2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐPublicSiteSettings(ctx context.Context, sel ast.SelectionSet, v *PublicSiteSettings) graphql.Marshaler {
+func (ec *executionContext) marshalNPublicSiteSettings2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐPublicSiteSettings(ctx context.Context, sel ast.SelectionSet, v *PublicSiteSettings) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -26756,17 +26756,17 @@ func (ec *executionContext) marshalNPublicSiteSettings2ᚖgithubᚗcomᚋapartom
 	return ec._PublicSiteSettings(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNPublicSiteStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐPublicSiteStatus(ctx context.Context, v interface{}) (PublicSiteStatus, error) {
+func (ec *executionContext) unmarshalNPublicSiteStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐPublicSiteStatus(ctx context.Context, v interface{}) (PublicSiteStatus, error) {
 	var res PublicSiteStatus
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNPublicSiteStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐPublicSiteStatus(ctx context.Context, sel ast.SelectionSet, v PublicSiteStatus) graphql.Marshaler {
+func (ec *executionContext) marshalNPublicSiteStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐPublicSiteStatus(ctx context.Context, sel ast.SelectionSet, v PublicSiteStatus) graphql.Marshaler {
 	return v
 }
 
-func (ec *executionContext) marshalNRoom2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐRoomᚄ(ctx context.Context, sel ast.SelectionSet, v []*Room) graphql.Marshaler {
+func (ec *executionContext) marshalNRoom2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐRoomᚄ(ctx context.Context, sel ast.SelectionSet, v []*Room) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -26790,7 +26790,7 @@ func (ec *executionContext) marshalNRoom2ᚕᚖgithubᚗcomᚋapartomatᚋaparto
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNRoom2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐRoom(ctx, sel, v[i])
+			ret[i] = ec.marshalNRoom2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐRoom(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -26810,7 +26810,7 @@ func (ec *executionContext) marshalNRoom2ᚕᚖgithubᚗcomᚋapartomatᚋaparto
 	return ret
 }
 
-func (ec *executionContext) marshalNRoom2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐRoom(ctx context.Context, sel ast.SelectionSet, v *Room) graphql.Marshaler {
+func (ec *executionContext) marshalNRoom2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐRoom(ctx context.Context, sel ast.SelectionSet, v *Room) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -26882,12 +26882,12 @@ func (ec *executionContext) marshalNTime2timeᚐTime(ctx context.Context, sel as
 	return res
 }
 
-func (ec *executionContext) unmarshalNUpdateContactInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐUpdateContactInput(ctx context.Context, v interface{}) (UpdateContactInput, error) {
+func (ec *executionContext) unmarshalNUpdateContactInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐUpdateContactInput(ctx context.Context, v interface{}) (UpdateContactInput, error) {
 	res, err := ec.unmarshalInputUpdateContactInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNUpdateContactResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐUpdateContactResult(ctx context.Context, sel ast.SelectionSet, v UpdateContactResult) graphql.Marshaler {
+func (ec *executionContext) marshalNUpdateContactResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐUpdateContactResult(ctx context.Context, sel ast.SelectionSet, v UpdateContactResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -26897,12 +26897,12 @@ func (ec *executionContext) marshalNUpdateContactResult2githubᚗcomᚋapartomat
 	return ec._UpdateContactResult(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNUpdateHouseInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐUpdateHouseInput(ctx context.Context, v interface{}) (UpdateHouseInput, error) {
+func (ec *executionContext) unmarshalNUpdateHouseInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐUpdateHouseInput(ctx context.Context, v interface{}) (UpdateHouseInput, error) {
 	res, err := ec.unmarshalInputUpdateHouseInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNUpdateHouseResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐUpdateHouseResult(ctx context.Context, sel ast.SelectionSet, v UpdateHouseResult) graphql.Marshaler {
+func (ec *executionContext) marshalNUpdateHouseResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐUpdateHouseResult(ctx context.Context, sel ast.SelectionSet, v UpdateHouseResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -26912,12 +26912,12 @@ func (ec *executionContext) marshalNUpdateHouseResult2githubᚗcomᚋapartomat�
 	return ec._UpdateHouseResult(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNUpdateRoomInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐUpdateRoomInput(ctx context.Context, v interface{}) (UpdateRoomInput, error) {
+func (ec *executionContext) unmarshalNUpdateRoomInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐUpdateRoomInput(ctx context.Context, v interface{}) (UpdateRoomInput, error) {
 	res, err := ec.unmarshalInputUpdateRoomInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNUpdateRoomResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐUpdateRoomResult(ctx context.Context, sel ast.SelectionSet, v UpdateRoomResult) graphql.Marshaler {
+func (ec *executionContext) marshalNUpdateRoomResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐUpdateRoomResult(ctx context.Context, sel ast.SelectionSet, v UpdateRoomResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -26995,12 +26995,12 @@ func (ec *executionContext) marshalNUpload2ᚖgithubᚗcomᚋ99designsᚋgqlgen�
 	return res
 }
 
-func (ec *executionContext) unmarshalNUploadFileInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐUploadFileInput(ctx context.Context, v interface{}) (UploadFileInput, error) {
+func (ec *executionContext) unmarshalNUploadFileInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐUploadFileInput(ctx context.Context, v interface{}) (UploadFileInput, error) {
 	res, err := ec.unmarshalInputUploadFileInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNUploadFileResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐUploadFileResult(ctx context.Context, sel ast.SelectionSet, v UploadFileResult) graphql.Marshaler {
+func (ec *executionContext) marshalNUploadFileResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐUploadFileResult(ctx context.Context, sel ast.SelectionSet, v UploadFileResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -27010,7 +27010,7 @@ func (ec *executionContext) marshalNUploadFileResult2githubᚗcomᚋapartomatᚋ
 	return ec._UploadFileResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNUploadVisualizationResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐUploadVisualizationResult(ctx context.Context, sel ast.SelectionSet, v UploadVisualizationResult) graphql.Marshaler {
+func (ec *executionContext) marshalNUploadVisualizationResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐUploadVisualizationResult(ctx context.Context, sel ast.SelectionSet, v UploadVisualizationResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -27020,7 +27020,7 @@ func (ec *executionContext) marshalNUploadVisualizationResult2githubᚗcomᚋapa
 	return ec._UploadVisualizationResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNUploadVisualizationsResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐUploadVisualizationsResult(ctx context.Context, sel ast.SelectionSet, v UploadVisualizationsResult) graphql.Marshaler {
+func (ec *executionContext) marshalNUploadVisualizationsResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐUploadVisualizationsResult(ctx context.Context, sel ast.SelectionSet, v UploadVisualizationsResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -27045,11 +27045,11 @@ func (ec *executionContext) marshalNUrl2string(ctx context.Context, sel ast.Sele
 	return res
 }
 
-func (ec *executionContext) marshalNUserProfile2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐUserProfile(ctx context.Context, sel ast.SelectionSet, v UserProfile) graphql.Marshaler {
+func (ec *executionContext) marshalNUserProfile2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐUserProfile(ctx context.Context, sel ast.SelectionSet, v UserProfile) graphql.Marshaler {
 	return ec._UserProfile(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNUserProfile2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐUserProfile(ctx context.Context, sel ast.SelectionSet, v *UserProfile) graphql.Marshaler {
+func (ec *executionContext) marshalNUserProfile2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐUserProfile(ctx context.Context, sel ast.SelectionSet, v *UserProfile) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -27059,7 +27059,7 @@ func (ec *executionContext) marshalNUserProfile2ᚖgithubᚗcomᚋapartomatᚋap
 	return ec._UserProfile(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNUserProfileResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐUserProfileResult(ctx context.Context, sel ast.SelectionSet, v UserProfileResult) graphql.Marshaler {
+func (ec *executionContext) marshalNUserProfileResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐUserProfileResult(ctx context.Context, sel ast.SelectionSet, v UserProfileResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -27069,7 +27069,7 @@ func (ec *executionContext) marshalNUserProfileResult2githubᚗcomᚋapartomat�
 	return ec._UserProfileResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNVisualization2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐVisualizationᚄ(ctx context.Context, sel ast.SelectionSet, v []*Visualization) graphql.Marshaler {
+func (ec *executionContext) marshalNVisualization2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐVisualizationᚄ(ctx context.Context, sel ast.SelectionSet, v []*Visualization) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -27093,7 +27093,7 @@ func (ec *executionContext) marshalNVisualization2ᚕᚖgithubᚗcomᚋapartomat
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNVisualization2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐVisualization(ctx, sel, v[i])
+			ret[i] = ec.marshalNVisualization2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐVisualization(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -27113,7 +27113,7 @@ func (ec *executionContext) marshalNVisualization2ᚕᚖgithubᚗcomᚋapartomat
 	return ret
 }
 
-func (ec *executionContext) marshalNVisualization2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐVisualization(ctx context.Context, sel ast.SelectionSet, v *Visualization) graphql.Marshaler {
+func (ec *executionContext) marshalNVisualization2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐVisualization(ctx context.Context, sel ast.SelectionSet, v *Visualization) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -27123,21 +27123,21 @@ func (ec *executionContext) marshalNVisualization2ᚖgithubᚗcomᚋapartomatᚋ
 	return ec._Visualization(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNVisualizationStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐVisualizationStatus(ctx context.Context, v interface{}) (VisualizationStatus, error) {
+func (ec *executionContext) unmarshalNVisualizationStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐVisualizationStatus(ctx context.Context, v interface{}) (VisualizationStatus, error) {
 	var res VisualizationStatus
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNVisualizationStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐVisualizationStatus(ctx context.Context, sel ast.SelectionSet, v VisualizationStatus) graphql.Marshaler {
+func (ec *executionContext) marshalNVisualizationStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐVisualizationStatus(ctx context.Context, sel ast.SelectionSet, v VisualizationStatus) graphql.Marshaler {
 	return v
 }
 
-func (ec *executionContext) marshalNWorkspace2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspace(ctx context.Context, sel ast.SelectionSet, v Workspace) graphql.Marshaler {
+func (ec *executionContext) marshalNWorkspace2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspace(ctx context.Context, sel ast.SelectionSet, v Workspace) graphql.Marshaler {
 	return ec._Workspace(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNWorkspace2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspace(ctx context.Context, sel ast.SelectionSet, v *Workspace) graphql.Marshaler {
+func (ec *executionContext) marshalNWorkspace2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspace(ctx context.Context, sel ast.SelectionSet, v *Workspace) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -27147,11 +27147,11 @@ func (ec *executionContext) marshalNWorkspace2ᚖgithubᚗcomᚋapartomatᚋapar
 	return ec._Workspace(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNWorkspaceProjects2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceProjects(ctx context.Context, sel ast.SelectionSet, v WorkspaceProjects) graphql.Marshaler {
+func (ec *executionContext) marshalNWorkspaceProjects2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceProjects(ctx context.Context, sel ast.SelectionSet, v WorkspaceProjects) graphql.Marshaler {
 	return ec._WorkspaceProjects(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNWorkspaceProjects2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceProjects(ctx context.Context, sel ast.SelectionSet, v *WorkspaceProjects) graphql.Marshaler {
+func (ec *executionContext) marshalNWorkspaceProjects2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceProjects(ctx context.Context, sel ast.SelectionSet, v *WorkspaceProjects) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -27161,12 +27161,12 @@ func (ec *executionContext) marshalNWorkspaceProjects2ᚖgithubᚗcomᚋapartoma
 	return ec._WorkspaceProjects(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNWorkspaceProjectsFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceProjectsFilter(ctx context.Context, v interface{}) (WorkspaceProjectsFilter, error) {
+func (ec *executionContext) unmarshalNWorkspaceProjectsFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceProjectsFilter(ctx context.Context, v interface{}) (WorkspaceProjectsFilter, error) {
 	res, err := ec.unmarshalInputWorkspaceProjectsFilter(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNWorkspaceProjectsListResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceProjectsListResult(ctx context.Context, sel ast.SelectionSet, v WorkspaceProjectsListResult) graphql.Marshaler {
+func (ec *executionContext) marshalNWorkspaceProjectsListResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceProjectsListResult(ctx context.Context, sel ast.SelectionSet, v WorkspaceProjectsListResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -27176,7 +27176,7 @@ func (ec *executionContext) marshalNWorkspaceProjectsListResult2githubᚗcomᚋa
 	return ec._WorkspaceProjectsListResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNWorkspaceProjectsTotalResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceProjectsTotalResult(ctx context.Context, sel ast.SelectionSet, v WorkspaceProjectsTotalResult) graphql.Marshaler {
+func (ec *executionContext) marshalNWorkspaceProjectsTotalResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceProjectsTotalResult(ctx context.Context, sel ast.SelectionSet, v WorkspaceProjectsTotalResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -27186,7 +27186,7 @@ func (ec *executionContext) marshalNWorkspaceProjectsTotalResult2githubᚗcomᚋ
 	return ec._WorkspaceProjectsTotalResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNWorkspaceResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceResult(ctx context.Context, sel ast.SelectionSet, v WorkspaceResult) graphql.Marshaler {
+func (ec *executionContext) marshalNWorkspaceResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceResult(ctx context.Context, sel ast.SelectionSet, v WorkspaceResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -27196,7 +27196,7 @@ func (ec *executionContext) marshalNWorkspaceResult2githubᚗcomᚋapartomatᚋa
 	return ec._WorkspaceResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNWorkspaceUser2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserᚄ(ctx context.Context, sel ast.SelectionSet, v []*WorkspaceUser) graphql.Marshaler {
+func (ec *executionContext) marshalNWorkspaceUser2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceUserᚄ(ctx context.Context, sel ast.SelectionSet, v []*WorkspaceUser) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -27220,7 +27220,7 @@ func (ec *executionContext) marshalNWorkspaceUser2ᚕᚖgithubᚗcomᚋapartomat
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNWorkspaceUser2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUser(ctx, sel, v[i])
+			ret[i] = ec.marshalNWorkspaceUser2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceUser(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -27240,7 +27240,7 @@ func (ec *executionContext) marshalNWorkspaceUser2ᚕᚖgithubᚗcomᚋapartomat
 	return ret
 }
 
-func (ec *executionContext) marshalNWorkspaceUser2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUser(ctx context.Context, sel ast.SelectionSet, v *WorkspaceUser) graphql.Marshaler {
+func (ec *executionContext) marshalNWorkspaceUser2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceUser(ctx context.Context, sel ast.SelectionSet, v *WorkspaceUser) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -27250,21 +27250,21 @@ func (ec *executionContext) marshalNWorkspaceUser2ᚖgithubᚗcomᚋapartomatᚋ
 	return ec._WorkspaceUser(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNWorkspaceUserRole2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserRole(ctx context.Context, v interface{}) (WorkspaceUserRole, error) {
+func (ec *executionContext) unmarshalNWorkspaceUserRole2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceUserRole(ctx context.Context, v interface{}) (WorkspaceUserRole, error) {
 	var res WorkspaceUserRole
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNWorkspaceUserRole2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserRole(ctx context.Context, sel ast.SelectionSet, v WorkspaceUserRole) graphql.Marshaler {
+func (ec *executionContext) marshalNWorkspaceUserRole2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceUserRole(ctx context.Context, sel ast.SelectionSet, v WorkspaceUserRole) graphql.Marshaler {
 	return v
 }
 
-func (ec *executionContext) marshalNWorkspaceUserRoleDictionary2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserRoleDictionary(ctx context.Context, sel ast.SelectionSet, v WorkspaceUserRoleDictionary) graphql.Marshaler {
+func (ec *executionContext) marshalNWorkspaceUserRoleDictionary2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceUserRoleDictionary(ctx context.Context, sel ast.SelectionSet, v WorkspaceUserRoleDictionary) graphql.Marshaler {
 	return ec._WorkspaceUserRoleDictionary(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNWorkspaceUserRoleDictionary2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserRoleDictionary(ctx context.Context, sel ast.SelectionSet, v *WorkspaceUserRoleDictionary) graphql.Marshaler {
+func (ec *executionContext) marshalNWorkspaceUserRoleDictionary2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceUserRoleDictionary(ctx context.Context, sel ast.SelectionSet, v *WorkspaceUserRoleDictionary) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -27274,7 +27274,7 @@ func (ec *executionContext) marshalNWorkspaceUserRoleDictionary2ᚖgithubᚗcom�
 	return ec._WorkspaceUserRoleDictionary(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNWorkspaceUserRoleDictionaryItem2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserRoleDictionaryItemᚄ(ctx context.Context, sel ast.SelectionSet, v []*WorkspaceUserRoleDictionaryItem) graphql.Marshaler {
+func (ec *executionContext) marshalNWorkspaceUserRoleDictionaryItem2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceUserRoleDictionaryItemᚄ(ctx context.Context, sel ast.SelectionSet, v []*WorkspaceUserRoleDictionaryItem) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -27298,7 +27298,7 @@ func (ec *executionContext) marshalNWorkspaceUserRoleDictionaryItem2ᚕᚖgithub
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNWorkspaceUserRoleDictionaryItem2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserRoleDictionaryItem(ctx, sel, v[i])
+			ret[i] = ec.marshalNWorkspaceUserRoleDictionaryItem2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceUserRoleDictionaryItem(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -27318,7 +27318,7 @@ func (ec *executionContext) marshalNWorkspaceUserRoleDictionaryItem2ᚕᚖgithub
 	return ret
 }
 
-func (ec *executionContext) marshalNWorkspaceUserRoleDictionaryItem2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserRoleDictionaryItem(ctx context.Context, sel ast.SelectionSet, v *WorkspaceUserRoleDictionaryItem) graphql.Marshaler {
+func (ec *executionContext) marshalNWorkspaceUserRoleDictionaryItem2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceUserRoleDictionaryItem(ctx context.Context, sel ast.SelectionSet, v *WorkspaceUserRoleDictionaryItem) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -27328,11 +27328,11 @@ func (ec *executionContext) marshalNWorkspaceUserRoleDictionaryItem2ᚖgithubᚗ
 	return ec._WorkspaceUserRoleDictionaryItem(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNWorkspaceUsers2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUsers(ctx context.Context, sel ast.SelectionSet, v WorkspaceUsers) graphql.Marshaler {
+func (ec *executionContext) marshalNWorkspaceUsers2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceUsers(ctx context.Context, sel ast.SelectionSet, v WorkspaceUsers) graphql.Marshaler {
 	return ec._WorkspaceUsers(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNWorkspaceUsers2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUsers(ctx context.Context, sel ast.SelectionSet, v *WorkspaceUsers) graphql.Marshaler {
+func (ec *executionContext) marshalNWorkspaceUsers2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceUsers(ctx context.Context, sel ast.SelectionSet, v *WorkspaceUsers) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -27342,12 +27342,12 @@ func (ec *executionContext) marshalNWorkspaceUsers2ᚖgithubᚗcomᚋapartomat�
 	return ec._WorkspaceUsers(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNWorkspaceUsersFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUsersFilter(ctx context.Context, v interface{}) (WorkspaceUsersFilter, error) {
+func (ec *executionContext) unmarshalNWorkspaceUsersFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceUsersFilter(ctx context.Context, v interface{}) (WorkspaceUsersFilter, error) {
 	res, err := ec.unmarshalInputWorkspaceUsersFilter(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNWorkspaceUsersListResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUsersListResult(ctx context.Context, sel ast.SelectionSet, v WorkspaceUsersListResult) graphql.Marshaler {
+func (ec *executionContext) marshalNWorkspaceUsersListResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceUsersListResult(ctx context.Context, sel ast.SelectionSet, v WorkspaceUsersListResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -27357,7 +27357,7 @@ func (ec *executionContext) marshalNWorkspaceUsersListResult2githubᚗcomᚋapar
 	return ec._WorkspaceUsersListResult(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNWorkspaceUsersTotalResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUsersTotalResult(ctx context.Context, sel ast.SelectionSet, v WorkspaceUsersTotalResult) graphql.Marshaler {
+func (ec *executionContext) marshalNWorkspaceUsersTotalResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceUsersTotalResult(ctx context.Context, sel ast.SelectionSet, v WorkspaceUsersTotalResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -27620,7 +27620,7 @@ func (ec *executionContext) marshalN__TypeKind2string(ctx context.Context, sel a
 	return res
 }
 
-func (ec *executionContext) marshalOAlbumRecentFileResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐAlbumRecentFileResult(ctx context.Context, sel ast.SelectionSet, v AlbumRecentFileResult) graphql.Marshaler {
+func (ec *executionContext) marshalOAlbumRecentFileResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAlbumRecentFileResult(ctx context.Context, sel ast.SelectionSet, v AlbumRecentFileResult) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -27653,7 +27653,7 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return res
 }
 
-func (ec *executionContext) unmarshalOContactType2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐContactTypeᚄ(ctx context.Context, v interface{}) ([]ContactType, error) {
+func (ec *executionContext) unmarshalOContactType2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐContactTypeᚄ(ctx context.Context, v interface{}) ([]ContactType, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -27665,7 +27665,7 @@ func (ec *executionContext) unmarshalOContactType2ᚕgithubᚗcomᚋapartomatᚋ
 	res := make([]ContactType, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNContactType2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐContactType(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNContactType2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐContactType(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -27673,7 +27673,7 @@ func (ec *executionContext) unmarshalOContactType2ᚕgithubᚗcomᚋapartomatᚋ
 	return res, nil
 }
 
-func (ec *executionContext) marshalOContactType2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐContactTypeᚄ(ctx context.Context, sel ast.SelectionSet, v []ContactType) graphql.Marshaler {
+func (ec *executionContext) marshalOContactType2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐContactTypeᚄ(ctx context.Context, sel ast.SelectionSet, v []ContactType) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -27700,7 +27700,7 @@ func (ec *executionContext) marshalOContactType2ᚕgithubᚗcomᚋapartomatᚋap
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNContactType2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐContactType(ctx, sel, v[i])
+			ret[i] = ec.marshalNContactType2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐContactType(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -27720,14 +27720,14 @@ func (ec *executionContext) marshalOContactType2ᚕgithubᚗcomᚋapartomatᚋap
 	return ret
 }
 
-func (ec *executionContext) marshalOFile2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐFile(ctx context.Context, sel ast.SelectionSet, v *File) graphql.Marshaler {
+func (ec *executionContext) marshalOFile2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐFile(ctx context.Context, sel ast.SelectionSet, v *File) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._File(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalOFileType2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐFileTypeᚄ(ctx context.Context, v interface{}) ([]FileType, error) {
+func (ec *executionContext) unmarshalOFileType2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐFileTypeᚄ(ctx context.Context, v interface{}) ([]FileType, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -27739,7 +27739,7 @@ func (ec *executionContext) unmarshalOFileType2ᚕgithubᚗcomᚋapartomatᚋapa
 	res := make([]FileType, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNFileType2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐFileType(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNFileType2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐFileType(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -27747,7 +27747,7 @@ func (ec *executionContext) unmarshalOFileType2ᚕgithubᚗcomᚋapartomatᚋapa
 	return res, nil
 }
 
-func (ec *executionContext) marshalOFileType2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐFileTypeᚄ(ctx context.Context, sel ast.SelectionSet, v []FileType) graphql.Marshaler {
+func (ec *executionContext) marshalOFileType2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐFileTypeᚄ(ctx context.Context, sel ast.SelectionSet, v []FileType) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -27774,7 +27774,7 @@ func (ec *executionContext) marshalOFileType2ᚕgithubᚗcomᚋapartomatᚋapart
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNFileType2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐFileType(ctx, sel, v[i])
+			ret[i] = ec.marshalNFileType2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐFileType(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -27810,7 +27810,7 @@ func (ec *executionContext) marshalOFloat2ᚖfloat64(ctx context.Context, sel as
 	return graphql.WrapContextMarshaler(ctx, res)
 }
 
-func (ec *executionContext) marshalOGravatar2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐGravatar(ctx context.Context, sel ast.SelectionSet, v *Gravatar) graphql.Marshaler {
+func (ec *executionContext) marshalOGravatar2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐGravatar(ctx context.Context, sel ast.SelectionSet, v *Gravatar) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -27833,7 +27833,7 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 	return res
 }
 
-func (ec *executionContext) unmarshalOProjectStatus2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectStatusᚄ(ctx context.Context, v interface{}) ([]ProjectStatus, error) {
+func (ec *executionContext) unmarshalOProjectStatus2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectStatusᚄ(ctx context.Context, v interface{}) ([]ProjectStatus, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -27845,7 +27845,7 @@ func (ec *executionContext) unmarshalOProjectStatus2ᚕgithubᚗcomᚋapartomat�
 	res := make([]ProjectStatus, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNProjectStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectStatus(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNProjectStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectStatus(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -27853,7 +27853,7 @@ func (ec *executionContext) unmarshalOProjectStatus2ᚕgithubᚗcomᚋapartomat�
 	return res, nil
 }
 
-func (ec *executionContext) marshalOProjectStatus2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectStatusᚄ(ctx context.Context, sel ast.SelectionSet, v []ProjectStatus) graphql.Marshaler {
+func (ec *executionContext) marshalOProjectStatus2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectStatusᚄ(ctx context.Context, sel ast.SelectionSet, v []ProjectStatus) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -27880,7 +27880,7 @@ func (ec *executionContext) marshalOProjectStatus2ᚕgithubᚗcomᚋapartomatᚋ
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNProjectStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectStatus(ctx, sel, v[i])
+			ret[i] = ec.marshalNProjectStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectStatus(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -27900,7 +27900,7 @@ func (ec *executionContext) marshalOProjectStatus2ᚕgithubᚗcomᚋapartomatᚋ
 	return ret
 }
 
-func (ec *executionContext) unmarshalOProjectVisualizationRoomIdFilter2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectVisualizationRoomIDFilter(ctx context.Context, v interface{}) (*ProjectVisualizationRoomIDFilter, error) {
+func (ec *executionContext) unmarshalOProjectVisualizationRoomIdFilter2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectVisualizationRoomIDFilter(ctx context.Context, v interface{}) (*ProjectVisualizationRoomIDFilter, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -27908,7 +27908,7 @@ func (ec *executionContext) unmarshalOProjectVisualizationRoomIdFilter2ᚖgithub
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalOProjectVisualizationsStatusFilter2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐProjectVisualizationsStatusFilter(ctx context.Context, v interface{}) (*ProjectVisualizationsStatusFilter, error) {
+func (ec *executionContext) unmarshalOProjectVisualizationsStatusFilter2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectVisualizationsStatusFilter(ctx context.Context, v interface{}) (*ProjectVisualizationsStatusFilter, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -27916,7 +27916,7 @@ func (ec *executionContext) unmarshalOProjectVisualizationsStatusFilter2ᚖgithu
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalORoom2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐRoom(ctx context.Context, sel ast.SelectionSet, v *Room) graphql.Marshaler {
+func (ec *executionContext) marshalORoom2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐRoom(ctx context.Context, sel ast.SelectionSet, v *Room) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -27993,7 +27993,7 @@ func (ec *executionContext) marshalOTime2ᚖtimeᚐTime(ctx context.Context, sel
 	return res
 }
 
-func (ec *executionContext) unmarshalOVisualizationStatus2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐVisualizationStatusᚄ(ctx context.Context, v interface{}) ([]VisualizationStatus, error) {
+func (ec *executionContext) unmarshalOVisualizationStatus2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐVisualizationStatusᚄ(ctx context.Context, v interface{}) ([]VisualizationStatus, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -28005,7 +28005,7 @@ func (ec *executionContext) unmarshalOVisualizationStatus2ᚕgithubᚗcomᚋapar
 	res := make([]VisualizationStatus, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNVisualizationStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐVisualizationStatus(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNVisualizationStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐVisualizationStatus(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -28013,7 +28013,7 @@ func (ec *executionContext) unmarshalOVisualizationStatus2ᚕgithubᚗcomᚋapar
 	return res, nil
 }
 
-func (ec *executionContext) marshalOVisualizationStatus2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐVisualizationStatusᚄ(ctx context.Context, sel ast.SelectionSet, v []VisualizationStatus) graphql.Marshaler {
+func (ec *executionContext) marshalOVisualizationStatus2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐVisualizationStatusᚄ(ctx context.Context, sel ast.SelectionSet, v []VisualizationStatus) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -28040,7 +28040,7 @@ func (ec *executionContext) marshalOVisualizationStatus2ᚕgithubᚗcomᚋaparto
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNVisualizationStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐVisualizationStatus(ctx, sel, v[i])
+			ret[i] = ec.marshalNVisualizationStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐVisualizationStatus(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -28060,7 +28060,7 @@ func (ec *executionContext) marshalOVisualizationStatus2ᚕgithubᚗcomᚋaparto
 	return ret
 }
 
-func (ec *executionContext) unmarshalOWorkspaceUserRole2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserRoleᚄ(ctx context.Context, v interface{}) ([]WorkspaceUserRole, error) {
+func (ec *executionContext) unmarshalOWorkspaceUserRole2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceUserRoleᚄ(ctx context.Context, v interface{}) ([]WorkspaceUserRole, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -28072,7 +28072,7 @@ func (ec *executionContext) unmarshalOWorkspaceUserRole2ᚕgithubᚗcomᚋaparto
 	res := make([]WorkspaceUserRole, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNWorkspaceUserRole2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserRole(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNWorkspaceUserRole2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceUserRole(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -28080,7 +28080,7 @@ func (ec *executionContext) unmarshalOWorkspaceUserRole2ᚕgithubᚗcomᚋaparto
 	return res, nil
 }
 
-func (ec *executionContext) marshalOWorkspaceUserRole2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserRoleᚄ(ctx context.Context, sel ast.SelectionSet, v []WorkspaceUserRole) graphql.Marshaler {
+func (ec *executionContext) marshalOWorkspaceUserRole2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceUserRoleᚄ(ctx context.Context, sel ast.SelectionSet, v []WorkspaceUserRole) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -28107,7 +28107,7 @@ func (ec *executionContext) marshalOWorkspaceUserRole2ᚕgithubᚗcomᚋapartoma
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNWorkspaceUserRole2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋgraphqlᚐWorkspaceUserRole(ctx, sel, v[i])
+			ret[i] = ec.marshalNWorkspaceUserRole2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceUserRole(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
