@@ -3,9 +3,9 @@ package graphql
 import (
 	"context"
 	"errors"
+	"log/slog"
 
 	apartomat "github.com/apartomat/apartomat/internal"
-	"go.uber.org/zap"
 )
 
 const (
@@ -21,7 +21,7 @@ func (r *mutationResolver) LoginByEmail(ctx context.Context, email string, works
 				return InvalidEmail{Message: err.Error()}, nil
 			}
 
-			r.logger.Error("can't send token by an email", zap.Error(err))
+			slog.ErrorContext(ctx, "can't send token by an email", slog.Any("err", err))
 
 			return serverError()
 		}
@@ -34,7 +34,7 @@ func (r *mutationResolver) LoginByEmail(ctx context.Context, email string, works
 				return InvalidEmail{Message: err.Error()}, nil
 			}
 
-			r.logger.Error("can't send PIN by an email", zap.Error(err))
+			slog.ErrorContext(ctx, "can't send PIN by an email", slog.Any("err", err))
 
 			return serverError()
 		}

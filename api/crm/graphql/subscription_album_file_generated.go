@@ -6,7 +6,7 @@ import (
 	apartomat "github.com/apartomat/apartomat/internal"
 	albumFiles "github.com/apartomat/apartomat/internal/store/album_files"
 	"github.com/apartomat/apartomat/internal/store/albums"
-	"go.uber.org/zap"
+	"log/slog"
 	"time"
 )
 
@@ -44,7 +44,7 @@ func (r *subscriptionResolver) AlbumFileGenerated(ctx context.Context, id string
 						ch <- NotFound{Message: "not found"}
 					default:
 						ch <- ServerError{Message: "server error"}
-						r.logger.Error("can't resolve recent album file", zap.String("project", id), zap.Error(err))
+						slog.ErrorContext(ctx, "can't resolve recent album file", slog.String("project", id), slog.Any("err", err))
 					}
 
 					return

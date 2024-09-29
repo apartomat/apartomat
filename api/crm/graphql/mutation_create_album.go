@@ -5,7 +5,7 @@ import (
 	"errors"
 	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/store/albums"
-	"go.uber.org/zap"
+	"log/slog"
 )
 
 func (r *mutationResolver) CreateAlbum(
@@ -23,7 +23,7 @@ func (r *mutationResolver) CreateAlbum(
 			return forbidden()
 		}
 
-		r.logger.Error("can't create album", zap.Error(err))
+		slog.ErrorContext(ctx, "can't create album", slog.Any("err", err))
 
 		return serverError()
 	}

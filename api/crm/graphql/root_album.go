@@ -8,7 +8,7 @@ import (
 	"github.com/apartomat/apartomat/internal/dataloaders"
 	albumFiles "github.com/apartomat/apartomat/internal/store/album_files"
 	"github.com/apartomat/apartomat/internal/store/albums"
-	"go.uber.org/zap"
+	"log/slog"
 )
 
 func (r *rootResolver) Album() AlbumResolver { return &albumResolver{r} }
@@ -44,7 +44,7 @@ func (r *albumResolver) Project(ctx context.Context, obj *Album) (AlbumProjectRe
 			return notFound()
 		}
 
-		r.logger.Error("can't resolve project", zap.String("project", gp.ID), zap.Error(err))
+		slog.ErrorContext(ctx, "can't resolve project", slog.String("project", gp.ID), slog.Any("err", err))
 
 		return nil, fmt.Errorf("can't resolve project (id=%s): %w", gp.ID, err)
 	}
@@ -67,7 +67,7 @@ func (r *albumResolver) File(ctx context.Context, obj *Album) (AlbumRecentFileRe
 			return notFound()
 		}
 
-		r.logger.Error("can't resolve recent album file", zap.String("project", obj.ID), zap.Error(err))
+		slog.ErrorContext(ctx, "can't resolve recent album file", slog.String("project", obj.ID), slog.Any("err", err))
 
 		return nil, fmt.Errorf("can't resolve album (id=%s) recent file: %w", obj.ID, err)
 	}
@@ -90,7 +90,6 @@ func (r *albumResolver) Cover(ctx context.Context, obj *Album) (AlbumCoverResult
 		}
 
 		if p, ok := pages.Items[0].(*AlbumPageCover); ok {
-
 			if c, ok := p.Cover.(*CoverUploaded); ok {
 				if f, ok := c.File.(File); ok {
 					file, err := dataloaders.FromContext(ctx).Files.Load(ctx, f.ID)
@@ -106,7 +105,7 @@ func (r *albumResolver) Cover(ctx context.Context, obj *Album) (AlbumCoverResult
 		return notFound()
 	}
 
-	r.logger.Error("obj.Pages is not a *AlbumPages")
+	slog.ErrorContext(ctx, "obj.Pages is not a *AlbumPages")
 
 	return serverError()
 }

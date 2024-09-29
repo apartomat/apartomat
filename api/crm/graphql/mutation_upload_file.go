@@ -3,9 +3,9 @@ package graphql
 import (
 	"context"
 	"errors"
+	"log/slog"
 
 	apartomat "github.com/apartomat/apartomat/internal"
-	"go.uber.org/zap"
 )
 
 func (r *mutationResolver) UploadFile(
@@ -28,7 +28,7 @@ func (r *mutationResolver) UploadFile(
 			return forbidden()
 		}
 
-		r.logger.Error("can't upload file to project", zap.String("project", input.ProjectID), zap.Error(err))
+		slog.ErrorContext(ctx, "can't upload file to project", slog.String("project", input.ProjectID), slog.Any("err", err))
 
 		return serverError()
 	}

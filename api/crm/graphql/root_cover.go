@@ -3,6 +3,7 @@ package graphql
 import (
 	"context"
 	"github.com/apartomat/apartomat/internal/dataloaders"
+	"log/slog"
 )
 
 func (r *rootResolver) Cover() CoverResolver {
@@ -27,7 +28,7 @@ func (r *coverResolver) File(ctx context.Context, obj *Cover) (CoverFileResult, 
 		return fileToGraphQL(file), nil
 	}
 
-	r.logger.Error("can't resolver cover file: obj.File is not a *File")
+	slog.ErrorContext(ctx, "can't resolver cover file: obj.File is not a *File")
 
 	return serverError()
 }

@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	apartomat "github.com/apartomat/apartomat/internal"
-	"go.uber.org/zap"
+	"log/slog"
 )
 
 func (r *mutationResolver) GenerateAlbumFile(ctx context.Context, albumID string) (GenerateAlbumFileResult, error) {
@@ -18,7 +18,7 @@ func (r *mutationResolver) GenerateAlbumFile(ctx context.Context, albumID string
 			return notFound()
 		}
 
-		r.logger.Error("can't start generate album file", zap.Error(err))
+		slog.ErrorContext(ctx, "can't start generate album file", slog.Any("err", err))
 
 		return serverError()
 	}

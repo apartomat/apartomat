@@ -5,7 +5,7 @@ import (
 	"errors"
 	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/store/houses"
-	"go.uber.org/zap"
+	"log/slog"
 )
 
 func (r *mutationResolver) AddHouse(
@@ -25,7 +25,7 @@ func (r *mutationResolver) AddHouse(
 			return forbidden()
 		}
 
-		r.logger.Error("can't add house", zap.Error(err))
+		slog.ErrorContext(ctx, "can't add house", slog.Any("err", err))
 
 		return serverError()
 	}

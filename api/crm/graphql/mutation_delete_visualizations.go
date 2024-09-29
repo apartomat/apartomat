@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	apartomat "github.com/apartomat/apartomat/internal"
-	"go.uber.org/zap"
+	"log/slog"
 )
 
 func (r *mutationResolver) DeleteVisualizations(ctx context.Context, id []string) (DeleteVisualizationsResult, error) {
@@ -18,7 +18,7 @@ func (r *mutationResolver) DeleteVisualizations(ctx context.Context, id []string
 			return notFound()
 		}
 
-		r.logger.Error("can't delete visualizations", zap.Error(err))
+		slog.ErrorContext(ctx, "can't delete visualizations", slog.Any("err", err))
 
 		return serverError()
 	}

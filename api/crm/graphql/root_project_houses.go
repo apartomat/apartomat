@@ -6,7 +6,7 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/store/houses"
-	"go.uber.org/zap"
+	"log/slog"
 )
 
 func (r *rootResolver) ProjectHouses() ProjectHousesResolver {
@@ -25,7 +25,7 @@ func (r *projectHousesResolver) List(
 	offset int,
 ) (ProjectHousesListResult, error) {
 	if project, ok := graphql.GetFieldContext(ctx).Parent.Parent.Result.(*Project); !ok {
-		r.logger.Error("can't resolve project houses", zap.Error(errors.New("unknown project")))
+		slog.ErrorContext(ctx, "can't resolve project houses", slog.String("err", "unknown project"))
 
 		return serverError()
 	} else {
@@ -40,10 +40,11 @@ func (r *projectHousesResolver) List(
 				return forbidden()
 			}
 
-			r.logger.Error(
+			slog.ErrorContext(
+				ctx,
 				"can't resolve project houses",
-				zap.String("project", project.ID),
-				zap.Error(err),
+				slog.String("project", project.ID),
+				slog.Any("err", err),
 			)
 
 			return serverError()

@@ -3,9 +3,9 @@ package graphql
 import (
 	"context"
 	"errors"
+	"log/slog"
 
 	apartomat "github.com/apartomat/apartomat/internal"
-	"go.uber.org/zap"
 )
 
 func (r *mutationResolver) UpdateHouse(
@@ -29,7 +29,7 @@ func (r *mutationResolver) UpdateHouse(
 			return notFound()
 		}
 
-		r.logger.Error("can't update house", zap.Error(err))
+		slog.ErrorContext(ctx, "can't update house", slog.Any("err", err))
 
 		return serverError()
 	}

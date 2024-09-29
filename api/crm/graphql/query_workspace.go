@@ -5,7 +5,7 @@ import (
 	"errors"
 	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/store/workspaces"
-	"go.uber.org/zap"
+	"log/slog"
 )
 
 func (r *queryResolver) Workspace(ctx context.Context, id string) (WorkspaceResult, error) {
@@ -19,7 +19,7 @@ func (r *queryResolver) Workspace(ctx context.Context, id string) (WorkspaceResu
 			return notFound()
 		}
 
-		r.logger.Error("can't resolve workspace", zap.String("workspace", id), zap.Error(err))
+		slog.ErrorContext(ctx, "can't resolve workspace", slog.String("workspace", id), slog.Any("err", err))
 
 		return serverError()
 	}

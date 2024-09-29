@@ -3,9 +3,9 @@ package graphql
 import (
 	"context"
 	"errors"
+	"log/slog"
 
 	apartomat "github.com/apartomat/apartomat/internal"
-	"go.uber.org/zap"
 )
 
 func (r *mutationResolver) DeleteContact(ctx context.Context, id string) (DeleteContactResult, error) {
@@ -22,7 +22,7 @@ func (r *mutationResolver) DeleteContact(ctx context.Context, id string) (Delete
 			return notFound()
 		}
 
-		r.logger.Error("can't delete contact", zap.Error(err))
+		slog.ErrorContext(ctx, "can't delete contact", slog.Any("err", err))
 
 		return serverError()
 	}

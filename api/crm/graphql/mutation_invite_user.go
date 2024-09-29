@@ -3,11 +3,11 @@ package graphql
 import (
 	"context"
 	"errors"
+	"log/slog"
 	"math"
 
 	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/store/workspace_users"
-	"go.uber.org/zap"
 )
 
 func (r *mutationResolver) InviteUser(
@@ -30,7 +30,7 @@ func (r *mutationResolver) InviteUser(
 			return AlreadyInWorkspace{Message: "user already in workspace"}, nil
 		}
 
-		r.logger.Error("can't invite user", zap.Error(err))
+		slog.ErrorContext(ctx, "can't invite user", slog.Any("err", err))
 
 		return serverError()
 	}

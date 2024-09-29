@@ -3,9 +3,9 @@ package graphql
 import (
 	"context"
 	"errors"
+	"log/slog"
 
 	apartomat "github.com/apartomat/apartomat/internal"
-	"go.uber.org/zap"
 )
 
 func (r *queryResolver) Album(ctx context.Context, id string) (AlbumResult, error) {
@@ -19,7 +19,7 @@ func (r *queryResolver) Album(ctx context.Context, id string) (AlbumResult, erro
 			return notFound()
 		}
 
-		r.logger.Error("can't resolve project", zap.String("project", id), zap.Error(err))
+		slog.ErrorContext(ctx, "can't resolve project", slog.String("project", id), slog.Any("err", err))
 
 		return serverError()
 	}

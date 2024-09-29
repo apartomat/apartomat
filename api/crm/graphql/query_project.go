@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
 
 	apartomat "github.com/apartomat/apartomat/internal"
-	"go.uber.org/zap"
 )
 
 func (r *queryResolver) Project(ctx context.Context, id string) (ProjectResult, error) {
@@ -20,7 +20,7 @@ func (r *queryResolver) Project(ctx context.Context, id string) (ProjectResult, 
 			return notFound()
 		}
 
-		r.logger.Error("can't resolve project", zap.String("project", id), zap.Error(err))
+		slog.ErrorContext(ctx, "can't resolve project", slog.String("project", id), slog.Any("err", err))
 
 		return nil, fmt.Errorf("can't resolve project (id=%s): %w", id, err)
 	}

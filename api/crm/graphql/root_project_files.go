@@ -3,11 +3,11 @@ package graphql
 import (
 	"context"
 	"errors"
+	"log/slog"
 
 	"github.com/99designs/gqlgen/graphql"
 	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/store/files"
-	"go.uber.org/zap"
 )
 
 func (r *rootResolver) ProjectFiles() ProjectFilesResolver {
@@ -26,7 +26,7 @@ func (r *projectFilesResolver) List(
 	offset int,
 ) (ProjectFilesListResult, error) {
 	if project, ok := graphql.GetFieldContext(ctx).Parent.Parent.Result.(*Project); !ok {
-		r.logger.Error("can't resolve project files", zap.Error(errors.New("unknown project")))
+		slog.ErrorContext(ctx, "can't resolve project files", slog.String("err", "unknown project"))
 
 		return serverError()
 	} else {
@@ -42,7 +42,7 @@ func (r *projectFilesResolver) List(
 				return forbidden()
 			}
 
-			r.logger.Error("can't resolve project files", zap.String("project", project.ID), zap.Error(err))
+			slog.ErrorContext(ctx, "can't resolve project files", slog.String("project", project.ID), slog.Any("err", err))
 
 			return serverError()
 		}
@@ -77,7 +77,7 @@ func (r *projectFilesResolver) Total(
 	filter ProjectFilesListFilter,
 ) (ProjectFilesTotalResult, error) {
 	if project, ok := graphql.GetFieldContext(ctx).Parent.Parent.Result.(*Project); !ok {
-		r.logger.Error("can't resolve project files", zap.Error(errors.New("unknown project")))
+		slog.ErrorContext(ctx, "can't resolve project files", slog.String("err", "unknown project"))
 
 		return nil, errors.New("server error: can't resolver project files")
 	} else {
@@ -91,7 +91,7 @@ func (r *projectFilesResolver) Total(
 				return forbidden()
 			}
 
-			r.logger.Error("can't resolve project files", zap.String("project", project.ID), zap.Error(err))
+			slog.ErrorContext(ctx, "can't resolve project files", slog.String("project", project.ID), slog.Any("err", err))
 
 			return nil, errors.New("server error: can't resolver project files")
 		}

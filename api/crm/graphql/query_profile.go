@@ -3,11 +3,11 @@ package graphql
 import (
 	"context"
 	"errors"
+	"log/slog"
 
 	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/auth"
 	"github.com/apartomat/apartomat/internal/pkg/gravatar"
-	"go.uber.org/zap"
 )
 
 func (r *queryResolver) Profile(ctx context.Context) (UserProfileResult, error) {
@@ -18,7 +18,7 @@ func (r *queryResolver) Profile(ctx context.Context) (UserProfileResult, error) 
 				return forbidden()
 			}
 
-			r.logger.Error("can't get profile", zap.String("user", userCtx.ID), zap.Error(err))
+			slog.ErrorContext(ctx, "can't get profile", slog.String("user", userCtx.ID), slog.Any("err", err))
 
 			return serverError()
 		}

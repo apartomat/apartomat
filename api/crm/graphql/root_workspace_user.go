@@ -4,10 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
 	"strings"
 
 	"github.com/apartomat/apartomat/internal/pkg/gravatar"
-	"go.uber.org/zap"
 )
 
 type workspaceUserResolver struct {
@@ -21,16 +21,17 @@ func (r *rootResolver) WorkspaceUser() WorkspaceUserResolver {
 func (r *workspaceUserResolver) Profile(ctx context.Context, obj *WorkspaceUser) (*UserProfile, error) {
 	user, err := r.useCases.GetWorkspaceUserProfileDl(ctx, obj.Workspace.ID, obj.ID)
 	if err != nil {
-		r.logger.Error("can't resolve workspace user profile", zap.String("user", obj.ID), zap.Error(err))
+		slog.ErrorContext(ctx, "can't resolve workspace user profile", slog.String("user", obj.ID), slog.Any("err", err))
 
 		return nil, errors.New("internal server error")
 	}
 
 	if user == nil {
-		r.logger.Error(
+		slog.ErrorContext(
+			ctx,
 			"can't resolve workspace user profile",
-			zap.String("user", obj.ID),
-			zap.Error(fmt.Errorf("user (id=%s) not found", obj.ID)),
+			slog.String("user", obj.ID),
+			slog.Any("err", fmt.Errorf("user (id=%s) not found", obj.ID)),
 		)
 
 		return nil, errors.New("internal server error")

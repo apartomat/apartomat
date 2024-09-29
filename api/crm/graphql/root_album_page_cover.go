@@ -2,6 +2,7 @@ package graphql
 
 import (
 	"context"
+	"log/slog"
 )
 
 func (r *rootResolver) AlbumPageCover() AlbumPageCoverResolver {
@@ -32,7 +33,7 @@ func (r *albumPageCoverResolver) Cover(
 	case *Cover:
 		return notImplementedYetError()
 	default:
-		r.logger.Error("unknown obj type")
+		slog.ErrorContext(ctx, "unknown obj type")
 		return serverError()
 	}
 }

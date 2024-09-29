@@ -3,10 +3,10 @@ package graphql
 import (
 	"context"
 	"errors"
+	"log/slog"
 
 	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/store/albums"
-	"go.uber.org/zap"
 )
 
 func (r *mutationResolver) ChangeAlbumPageOrientation(
@@ -25,7 +25,7 @@ func (r *mutationResolver) ChangeAlbumPageOrientation(
 			return notFound()
 		}
 
-		r.logger.Error("can't change album page orientation", zap.Error(err))
+		slog.ErrorContext(ctx, "can't change album page orientation", slog.Any("err", err))
 
 		return serverError()
 	}

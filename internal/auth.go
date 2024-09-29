@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
 	"math/rand"
 
 	"github.com/apartomat/apartomat/internal/auth"
@@ -12,7 +13,6 @@ import (
 	"github.com/apartomat/apartomat/internal/store/workspaces"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
-	"go.uber.org/zap"
 )
 
 func (u *Apartomat) CheckAuthToken(str string) (auth.AuthToken, error) {
@@ -125,10 +125,10 @@ func (u *Apartomat) LoginEmailPIN(ctx context.Context, email string, workspaceNa
 		return "", "", err
 	}
 
-	u.Logger.Debug("pin", zap.String("pin", pin))
+	slog.DebugContext(ctx, "pin", slog.String("pin", pin))
 
 	if u.Params.SendPinByEmail {
-		u.Logger.Debug("send pin to", zap.String("email", email), zap.String("pin", pin))
+		slog.DebugContext(ctx, "send pin to", slog.String("email", email), slog.String("pin", pin))
 
 		err = u.Mailer.Send(u.MailFactory.MailPIN(email, pin))
 		if err != nil {

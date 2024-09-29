@@ -3,9 +3,9 @@ package graphql
 import (
 	"context"
 	"errors"
+	"log/slog"
 
 	apartomat "github.com/apartomat/apartomat/internal"
-	"go.uber.org/zap"
 )
 
 func (r *mutationResolver) UpdateRoom(
@@ -29,7 +29,7 @@ func (r *mutationResolver) UpdateRoom(
 			return notFound()
 		}
 
-		r.logger.Error("can't update room", zap.Error(err))
+		slog.ErrorContext(ctx, "can't update room", slog.Any("err", err))
 
 		return nil, errors.New("server error: can't update room")
 	}

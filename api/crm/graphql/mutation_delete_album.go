@@ -3,9 +3,9 @@ package graphql
 import (
 	"context"
 	"errors"
+	"log/slog"
 
 	apartomat "github.com/apartomat/apartomat/internal"
-	"go.uber.org/zap"
 )
 
 func (r *mutationResolver) DeleteAlbum(ctx context.Context, id string) (DeleteAlbumResult, error) {
@@ -19,7 +19,7 @@ func (r *mutationResolver) DeleteAlbum(ctx context.Context, id string) (DeleteAl
 			return notFound()
 		}
 
-		r.logger.Error("can't delete album", zap.Error(err))
+		slog.ErrorContext(ctx, "can't delete album", slog.Any("err", err))
 
 		return serverError()
 	}

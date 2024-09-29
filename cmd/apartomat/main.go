@@ -1,24 +1,28 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
-	"github.com/apartomat/apartomat/internal/dataloaders"
 	"log/slog"
 	"os"
 	"strconv"
 
+	"github.com/go-pg/pg/v10"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/pgdialect"
 	"github.com/uptrace/bun/driver/pgdriver"
 
+	"github.com/apartomat/apartomat/api/crm/graphql"
 	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/auth/paseto"
+	"github.com/apartomat/apartomat/internal/dataloaders"
 	"github.com/apartomat/apartomat/internal/image/minio"
 	"github.com/apartomat/apartomat/internal/mail"
 	"github.com/apartomat/apartomat/internal/mail/smtp"
-	zapbun "github.com/apartomat/apartomat/internal/pkg/bun"
-	"github.com/apartomat/apartomat/internal/postgres"
+	bunhook "github.com/apartomat/apartomat/internal/pkg/bun"
+	postgreshook "github.com/apartomat/apartomat/internal/postgres"
 	albumFiles "github.com/apartomat/apartomat/internal/store/album_files/postgres"
 	albums "github.com/apartomat/apartomat/internal/store/albums/postgres"
 	contacts "github.com/apartomat/apartomat/internal/store/contacts/postgres"
@@ -29,10 +33,8 @@ import (
 	rooms "github.com/apartomat/apartomat/internal/store/rooms/postgres"
 	users "github.com/apartomat/apartomat/internal/store/users/postgres"
 	visualizations "github.com/apartomat/apartomat/internal/store/visualizations/postgres"
-	workspace_users "github.com/apartomat/apartomat/internal/store/workspace_users/postgres"
+	workspaceUsers "github.com/apartomat/apartomat/internal/store/workspace_users/postgres"
 	workspaces "github.com/apartomat/apartomat/internal/store/workspaces/postgres"
-	"github.com/go-pg/pg/v10"
-	"github.com/prometheus/client_golang/prometheus"
 )
 
 func main() {
@@ -40,13 +42,7 @@ func main() {
 		logLevel, _ = logLevel(os.Getenv("LOG_LEVEL"))
 	)
 
-	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: logLevel})))
-
-	// deprecated
-	log, err := NewLogger(os.Getenv("LOG_LEVEL"))
-	if err != nil {
-		panic(err)
-	}
+	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{Level: logLevel, AddSource: false})))
 
 	if len(os.Args) < 2 {
 		slog.Error("expect command (run or gen-key-pair)")
@@ -77,6 +73,8 @@ func main() {
 		confirmEmailPin := paseto.NewConfirmEmailPINTokenIssuerVerifier(privateKey)
 		invite := paseto.NewInviteTokenIssuerVerifier(privateKey)
 
+		reg := prometheus.NewRegistry()
+
 		mailer := smtp.NewMailSender(smtp.Config{
 			Addr:     os.Getenv("SMTP_ADDR"),
 			User:     os.Getenv("SMTP_USER"),
@@ -90,12 +88,13 @@ func main() {
 		}
 
 		pgdb := pg.Connect(pgopts)
+		pgdb.AddQueryHook(postgreshook.NewLogQueryHook(slog.Default()))
+		pgdb.AddQueryHook(postgreshook.NewQueryLatencyHook(reg))
 
-		pgdb.AddQueryHook(postgres.NewZapLogQueryHook(log))
-
-		reg := prometheus.NewRegistry()
-
-		pgdb.AddQueryHook(postgres.NewQueryLatencyHook(reg))
+		if err := pgdb.Ping(postgreshook.WithQueryContext(context.Background(), "ping")); err != nil {
+			slog.Error("can't connect to database", slog.Any("err", err))
+			os.Exit(1)
+		}
 
 		//
 
@@ -108,10 +107,8 @@ func main() {
 			os.Exit(1)
 		}
 
-		// todo: write to logger
-		bundb.AddQueryHook(zapbun.NewZapLoggerQueryHook(log))
-
-		bundb.AddQueryHook(zapbun.NewQueryLatencyHook(reg))
+		bundb.AddQueryHook(bunhook.NewLogQueryHook(slog.Default()))
+		bundb.AddQueryHook(bunhook.NewQueryLatencyHook(reg))
 
 		//
 
@@ -125,7 +122,7 @@ func main() {
 		roomsStore := rooms.NewStore(bundb)
 		usersStore := users.NewStore(pgdb)
 		visualizationsStore := visualizations.NewStore(bundb)
-		workspaceUsersStore := workspace_users.NewStore(bundb)
+		workspaceUsersStore := workspaceUsers.NewStore(bundb)
 		workspacesStore := workspaces.NewStore(pgdb)
 
 		//uploader, err := s3.NewS3ImageUploaderWithCred(
@@ -171,7 +168,6 @@ func main() {
 			Visualizations: visualizationsStore,
 			Workspaces:     workspacesStore,
 			WorkspaceUsers: workspaceUsersStore,
-			Logger:         log,
 			Acl: apartomat.NewAcl(
 				workspaceUsersStore,
 				projectsStore,
@@ -187,9 +183,8 @@ func main() {
 			addr = WithAddr(os.Getenv("SERVER_ADDR"))
 		}
 
-		NewServer(
-			bundb,
-			usecases,
+		h := graphql.Handler(
+			usecases.CheckAuthToken,
 			func() *dataloaders.DataLoaders {
 				return dataloaders.NewLoaders(
 					filesStore,
@@ -198,9 +193,11 @@ func main() {
 					workspacesStore,
 				)
 			},
-			reg,
-			log,
-		).Run(addr)
+			graphql.NewRootResolver(bundb, usecases),
+			10000,
+		)
+
+		NewServer(reg).WithGraphQLHandler(h).WithGraphQLPlayground().Run(context.Background(), addr)
 
 	default:
 		slog.Info("expect command (run or gen-key-pair)")

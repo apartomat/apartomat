@@ -5,6 +5,14 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"io"
+	"log/slog"
+	"mime"
+	"net/http"
+	"os"
+	"strings"
+	"time"
+
 	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/bookbinder"
 	"github.com/apartomat/apartomat/internal/image/minio"
@@ -18,20 +26,10 @@ import (
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/pgdialect"
 	"github.com/uptrace/bun/driver/pgdriver"
-	"go.uber.org/zap"
-	"io"
-	"mime"
-	"net/http"
-	"os"
-	"strings"
-	"time"
 )
 
 func main() {
-	log, err := NewLogger("debug")
-	if err != nil {
-		panic(err)
-	}
+	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug})))
 
 	var (
 		ctx = context.Background()
@@ -48,30 +46,34 @@ func main() {
 		filesStore      = filesPostgres.NewStore(db)
 	)
 
-	db.AddQueryHook(bunhook.NewZapLoggerQueryHook(log))
+	db.AddQueryHook(bunhook.NewLogQueryHook(slog.Default()))
 
 	for {
 		listFiles, err := albumFilesStore.List(ctx, And(StatusIn(StatusNew)), SortVersionAsc, 1, 0)
 		if err != nil {
-			log.Fatal("can't list files", zap.Error(err))
+			slog.Error("can't list files", slog.Any("err", err))
+			os.Exit(1)
 		}
 
-		log.Info("files", zap.Int("len", len(listFiles)))
+		slog.Info("files", slog.Int("len", len(listFiles)))
 
 		for _, f := range listFiles {
 			if err := f.StartNow(); err != nil {
-				log.Fatal("can't start generate file", zap.String("id", f.ID), zap.Error(err))
+				slog.Error("can't start generate file", slog.String("id", f.ID), slog.Any("err", err))
+				os.Exit(1)
 			}
 
 			if err := albumFilesStore.Save(ctx, f); err != nil {
-				log.Fatal("can't save file", zap.String("id", f.ID), zap.Error(err))
+				slog.Error("can't save file", slog.String("id", f.ID), slog.Any("err", err))
+				os.Exit(1)
 			}
 
-			log.Info("start generate file", zap.String("id", f.ID))
+			slog.Info("start generate file", slog.String("id", f.ID))
 
 			album, err := albumsStore.Get(ctx, albums.IDIn(f.AlbumID))
 			if err != nil {
-				log.Fatal("can't find album", zap.String("id", f.AlbumID))
+				slog.Error("can't find album", slog.String("id", f.AlbumID))
+				os.Exit(1)
 			}
 
 			var (
@@ -79,12 +81,12 @@ func main() {
 				format = bookbinder.Format(album.Settings.PageSize)
 			)
 
-			log.Debug(
+			slog.Debug(
 				"found album",
-				zap.String("id", album.ID),
-				zap.String("orientation", orient.String()),
-				zap.String("format", format.String()),
-				zap.Int("pages", len(album.Pages)),
+				slog.String("id", album.ID),
+				slog.String("orientation", orient.String()),
+				slog.String("format", format.String()),
+				slog.Int("pages", len(album.Pages)),
 			)
 
 			var (
@@ -97,7 +99,7 @@ func main() {
 
 			images, err := download(filesStore)(ctx, album.Pages)
 			if err != nil {
-				log.Error("can't download images", zap.Error(err))
+				slog.Error("can't download images", slog.Any("err", err))
 				return
 			}
 
@@ -109,7 +111,8 @@ func main() {
 			)
 
 			if r, err := bookbinder.Bind(orient, format, pages, images); err != nil {
-				log.Fatal("can't bind album", zap.String("id", album.ID), zap.Error(err), zap.String("mime", fileMimeType))
+				slog.Error("can't bind album", slog.String("id", album.ID), slog.Any("err", err), slog.String("mime", fileMimeType))
+				os.Exit(1)
 			} else {
 				var (
 					buf = &bytes.Buffer{}
@@ -117,26 +120,30 @@ func main() {
 				)
 
 				if b, err := io.ReadAll(cp); err != nil {
-					log.Fatal("can't read", zap.Error(err))
+					slog.Error("can't read", slog.Any("err", err))
+					os.Exit(1)
 				} else {
 					var (
 						fileUrl = ""
 					)
 
 					if u, err := uploader.Upload(ctx, buf, int64(len(b)), filePath, mime.TypeByExtension(fileExt)); err != nil {
-						log.Fatal("can't upload file", zap.Error(err), zap.String("filePath", filePath))
+						slog.Error("can't upload file", slog.Any("err", err), slog.String("filePath", filePath))
+						os.Exit(1)
 					} else {
-						log.Info("uploaded", zap.String("filePath", u))
+						slog.Info("uploaded", slog.String("filePath", u))
 						fileUrl = u
 					}
 
 					if err := f.DoneNow(); err != nil {
-						log.Fatal("can't done file")
+						slog.Error("can't done file")
+						os.Exit(1)
 					}
 
 					id, err := apartomat.GenerateNanoID()
 					if err != nil {
-						log.Fatal("can't generate nano id", zap.Error(err))
+						slog.Error("can't generate nano id", slog.Any("err", err))
+						os.Exit(1)
 					}
 
 					var (
@@ -146,11 +153,13 @@ func main() {
 					f.FileID = &file.ID
 
 					if err := filesStore.Save(ctx, file); err != nil {
-						log.Fatal("can't save file", zap.Error(err))
+						slog.Error("can't save file", slog.Any("err", err))
+						os.Exit(1)
 					}
 
 					if err := albumFilesStore.Save(ctx, f); err != nil {
-						log.Fatal("can't save album file", zap.String("id", f.ID), zap.Error(err))
+						slog.Error("can't save album file", slog.String("id", f.ID), slog.Any("err", err))
+						os.Exit(1)
 					}
 				}
 			}

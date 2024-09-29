@@ -6,7 +6,7 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/store/albums"
-	"go.uber.org/zap"
+	"log/slog"
 )
 
 func (r *rootResolver) ProjectAlbums() ProjectAlbumsResolver {
@@ -24,7 +24,7 @@ func (r *projectAlbumsResolver) List(
 	offset int,
 ) (ProjectAlbumsListResult, error) {
 	if project, ok := graphql.GetFieldContext(ctx).Parent.Parent.Result.(*Project); !ok {
-		r.logger.Error("can't resolve project albums list", zap.Error(errors.New("unknown project")))
+		slog.ErrorContext(ctx, "can't resolve project albums list", slog.String("err", "unknown project"))
 
 		return serverError()
 	} else {
@@ -39,10 +39,11 @@ func (r *projectAlbumsResolver) List(
 				return forbidden()
 			}
 
-			r.logger.Error(
+			slog.ErrorContext(
+				ctx,
 				"can't resolve project albums list",
-				zap.String("project", project.ID),
-				zap.Error(err),
+				slog.String("project", project.ID),
+				slog.Any("err", err),
 			)
 
 			return serverError()
@@ -68,7 +69,7 @@ func (r *projectAlbumsResolver) Total(
 	obj *ProjectAlbums,
 ) (ProjectAlbumsTotalResult, error) {
 	if project, ok := graphql.GetFieldContext(ctx).Parent.Parent.Result.(*Project); !ok {
-		r.logger.Error("can't resolve project albums total", zap.Error(errors.New("unknown project")))
+		slog.ErrorContext(ctx, "can't resolve project albums total", slog.Any("err", errors.New("unknown project")))
 
 		return serverError()
 	} else {
@@ -81,10 +82,11 @@ func (r *projectAlbumsResolver) Total(
 				return forbidden()
 			}
 
-			r.logger.Error(
+			slog.ErrorContext(
+				ctx,
 				"can't resolve project albums total",
-				zap.String("project", project.ID),
-				zap.Error(err),
+				slog.String("project", project.ID),
+				slog.Any("err", err),
 			)
 
 			return serverError()

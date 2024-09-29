@@ -3,9 +3,9 @@ package graphql
 import (
 	"context"
 	"errors"
+	"log/slog"
 
 	apartomat "github.com/apartomat/apartomat/internal"
-	"go.uber.org/zap"
 )
 
 func (r *mutationResolver) ChangeProjectStatus(
@@ -27,7 +27,7 @@ func (r *mutationResolver) ChangeProjectStatus(
 			return notFound()
 		}
 
-		r.logger.Error("can't change project status", zap.Error(err))
+		slog.ErrorContext(ctx, "can't change project status", slog.Any("err", err))
 
 		return serverError()
 	}

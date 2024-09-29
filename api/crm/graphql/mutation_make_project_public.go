@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 	"github.com/apartomat/apartomat/internal/store/public_sites"
+	"log/slog"
 
 	apartomat "github.com/apartomat/apartomat/internal"
-	"go.uber.org/zap"
 )
 
 func (r *mutationResolver) MakeProjectPublic(
@@ -27,7 +27,7 @@ func (r *mutationResolver) MakeProjectPublic(
 			return ProjectIsAlreadyPublic{}, nil
 		}
 
-		r.logger.Error("can't make project public", zap.Error(err))
+		slog.ErrorContext(ctx, "can't make project public", slog.Any("err", err))
 
 		return serverError()
 	}

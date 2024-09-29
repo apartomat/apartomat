@@ -3,10 +3,10 @@ package graphql
 import (
 	"context"
 	"errors"
+	"log/slog"
 
 	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/crm/svg"
-	"go.uber.org/zap"
 )
 
 func (r *rootResolver) AlbumPageVisualization() AlbumPageVisualizationResolver {
@@ -25,7 +25,7 @@ func (r *albumPageVisualizationResolver) SVG(ctx context.Context, obj *AlbumPage
 				return notFound()
 			}
 
-			r.logger.Error("can't get album page visualization", zap.Error(err))
+			slog.ErrorContext(ctx, "can't get album page visualization", slog.Any("err", err))
 
 			return serverError()
 		}
@@ -36,7 +36,7 @@ func (r *albumPageVisualizationResolver) SVG(ctx context.Context, obj *AlbumPage
 				return notFound()
 			}
 
-			r.logger.Error("can't get album page visualization file", zap.Error(err))
+			slog.ErrorContext(ctx, "can't get album page visualization file", slog.Any("err", err))
 
 			return serverError()
 		}
@@ -46,7 +46,7 @@ func (r *albumPageVisualizationResolver) SVG(ctx context.Context, obj *AlbumPage
 		}, nil
 	}
 
-	r.logger.Error("can't convert AlbumPageVisualization to Visualization")
+	slog.ErrorContext(ctx, "can't convert AlbumPageVisualization to Visualization")
 
 	return serverError()
 }
@@ -62,7 +62,7 @@ func (r *albumPageVisualizationResolver) Visualization(
 				return notFound()
 			}
 
-			r.logger.Error("can't get album page visualization", zap.Error(err))
+			slog.ErrorContext(ctx, "can't get album page visualization", slog.Any("err", err))
 
 			return serverError()
 		}
@@ -70,7 +70,7 @@ func (r *albumPageVisualizationResolver) Visualization(
 		return visualizationToGraphQL(vis, nil), nil
 	}
 
-	r.logger.Error("can't convert AlbumPageVisualization to Visualization")
+	slog.ErrorContext(ctx, "can't convert AlbumPageVisualization to Visualization")
 
 	return serverError()
 }

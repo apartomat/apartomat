@@ -3,11 +3,11 @@ package graphql
 import (
 	"context"
 	"errors"
+	"log/slog"
 
 	"github.com/99designs/gqlgen/graphql"
 	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/store/rooms"
-	"go.uber.org/zap"
 )
 
 func (r *rootResolver) HouseRooms() HouseRoomsResolver {
@@ -20,7 +20,7 @@ type houseRoomsResolver struct {
 
 func (r *houseRoomsResolver) List(ctx context.Context, obj *HouseRooms, limit int, offset int) (HouseRoomsListResult, error) {
 	if phouse, ok := graphql.GetFieldContext(ctx).Parent.Parent.Result.(**House); !ok {
-		r.logger.Error("can't resolve house rooms", zap.Error(errors.New("unknown house")))
+		slog.ErrorContext(ctx, "can't resolve house rooms", slog.String("err", "unknown house"))
 
 		return serverError()
 	} else {
@@ -37,7 +37,7 @@ func (r *houseRoomsResolver) List(ctx context.Context, obj *HouseRooms, limit in
 				return forbidden()
 			}
 
-			r.logger.Error("can't resolve house rooms", zap.String("house", house.ID), zap.Error(err))
+			slog.ErrorContext(ctx, "can't resolve house rooms", slog.String("house", house.ID), slog.Any("err", err))
 
 			return serverError()
 		}

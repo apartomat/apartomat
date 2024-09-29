@@ -2,16 +2,13 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/99designs/gqlgen/graphql/playground"
-	"github.com/apartomat/apartomat/api/crm/graphql"
-	apartomat "github.com/apartomat/apartomat/internal"
-	"github.com/apartomat/apartomat/internal/dataloaders"
 	"github.com/go-chi/chi/v5"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/uptrace/bun"
-	"go.uber.org/zap"
+	"log/slog"
 	"net"
 	"net/http"
 	"os"
@@ -21,7 +18,12 @@ import (
 	"time"
 )
 
-const defaultAddr = ":80"
+const (
+	defaultAddr = ":80"
+
+	graphQLPath           = "/graphql"
+	graphQLPlaygroundPath = "/pg"
+)
 
 type ServerOption func(server *http.Server)
 
@@ -32,94 +34,90 @@ func WithAddr(addr string) ServerOption {
 }
 
 type Server struct {
-	db         *bun.DB
-	useCases   *apartomat.Apartomat
-	loadersFn  func() *dataloaders.DataLoaders
+	router     *chi.Mux
 	prometheus *prometheus.Registry
-	logger     *zap.Logger
+
+	withGraphQLPlayground bool
 }
 
-func NewServer(
-	db *bun.DB,
-	useCases *apartomat.Apartomat,
-	loadersFn func() *dataloaders.DataLoaders,
-	reg *prometheus.Registry,
-	logger *zap.Logger,
-) *Server {
+func NewServer(reg *prometheus.Registry) *Server {
+	router := chi.NewRouter()
+
+	router.Use(PrometheusLatencyMiddleware(reg))
+	router.Handle("/metrics", promhttp.HandlerFor(reg, promhttp.HandlerOpts{}))
+
 	return &Server{
-		db:         db,
-		useCases:   useCases,
-		loadersFn:  loadersFn,
 		prometheus: reg,
-		logger:     logger,
+		router:     router,
 	}
 }
 
-func (server *Server) Run(opts ...ServerOption) {
+func (server *Server) Run(ctx context.Context, opts ...ServerOption) {
 	var (
-		log = server.logger
+		s = http.Server{
+			Addr:         defaultAddr,
+			Handler:      server.router,
+			ReadTimeout:  5 * time.Second,
+			WriteTimeout: 5 * time.Second,
+		}
 	)
-
-	bgCtx := context.Background()
-
-	mux := chi.NewRouter()
-
-	mux.Use(PrometheusLatencyMiddleware(server.prometheus))
-
-	mux.Handle("/graphql", graphql.Handler(
-		server.useCases.CheckAuthToken,
-		server.loadersFn,
-		graphql.NewRootResolver(server.db, server.useCases, log),
-		10000,
-	))
-
-	mux.Handle("/pg", playground.Handler("GraphQL playground", "/graphql"))
-
-	mux.Handle("/metrics", promhttp.HandlerFor(server.prometheus, promhttp.HandlerOpts{}))
-
-	s := http.Server{
-		Addr:         defaultAddr,
-		Handler:      mux,
-		ReadTimeout:  5 * time.Second,
-		WriteTimeout: 5 * time.Second,
-	}
 
 	for _, opt := range opts {
 		opt(&s)
 	}
 
-	done := make(chan bool)
-	quit := make(chan os.Signal, 1)
+	var (
+		done = make(chan bool)
+		quit = make(chan os.Signal, 1)
+	)
+
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 
 	go func() {
 		<-quit
 
-		log.Info("Stopping server...")
+		slog.InfoContext(ctx, "Stopping server...")
 
-		ctx, cancel := context.WithTimeout(bgCtx, 5*time.Second)
+		shutdCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
 		defer cancel()
 
-		if err := s.Shutdown(ctx); err != nil {
-			log.Fatal("can't stop server", zap.Error(err))
+		if err := s.Shutdown(shutdCtx); err != nil {
+			slog.ErrorContext(ctx, "can't stop server", err)
+			os.Exit(1)
 		}
 
 		close(done)
 	}()
 
-	log.Info(fmt.Sprintf("Starting server at %s...", s.Addr))
+	slog.InfoContext(ctx, fmt.Sprintf("Starting server at %s...", s.Addr))
 
 	go func() {
-		if err := s.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatal("can't start server: %s", zap.Error(err))
+		if err := s.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			slog.ErrorContext(ctx, "Can't start server", slog.Any("err", err))
+			os.Exit(1)
 		}
 	}()
 
-	log.Info(fmt.Sprintf("Visit http://%s/pg for playground", serverHttpAddr(s.Addr)))
+	if server.withGraphQLPlayground {
+		slog.InfoContext(ctx, fmt.Sprintf("Visit http://%s%s for playground", serverHttpAddr(s.Addr), graphQLPlaygroundPath))
+	}
 
 	<-done
 
-	log.Info("Buy")
+	slog.InfoContext(ctx, "Buy")
+}
+
+func (server *Server) WithGraphQLHandler(h http.Handler) *Server {
+	server.router.Handle(graphQLPath, h)
+
+	return server
+}
+
+func (server *Server) WithGraphQLPlayground() *Server {
+	server.withGraphQLPlayground = true
+	server.router.Handle(graphQLPlaygroundPath, playground.Handler("GraphQL playground", graphQLPath))
+
+	return server
 }
 
 func serverHttpAddr(addr string) string {

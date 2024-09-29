@@ -3,9 +3,9 @@ package graphql
 import (
 	"context"
 	"errors"
+	"log/slog"
 
 	apartomat "github.com/apartomat/apartomat/internal"
-	"go.uber.org/zap"
 )
 
 func (r *mutationResolver) AddRoom(ctx context.Context, houseID string, input AddRoomInput) (AddRoomResult, error) {
@@ -25,7 +25,7 @@ func (r *mutationResolver) AddRoom(ctx context.Context, houseID string, input Ad
 			return notFound()
 		}
 
-		r.logger.Error("can't add room", zap.Error(err))
+		slog.ErrorContext(ctx, "can't add room", slog.Any("err", err))
 
 		return nil, errors.New("server error: can't add room")
 	}

@@ -7,7 +7,7 @@ import (
 	"github.com/apartomat/apartomat/internal/store"
 	"github.com/apartomat/apartomat/internal/store/projects"
 	sites "github.com/apartomat/apartomat/internal/store/public_sites"
-	"go.uber.org/zap"
+	"log/slog"
 	"time"
 )
 
@@ -48,10 +48,11 @@ func (r *projectResolver) PublicSite(ctx context.Context, obj *Project) (Project
 			return notFound()
 		}
 
-		r.logger.Error(
+		slog.ErrorContext(
+			ctx,
 			"can't resolve project public site: %s",
-			zap.String("projectId", obj.ID),
-			zap.Error(err),
+			slog.String("projectId", obj.ID),
+			slog.Any("err", err),
 		)
 
 		return serverError()

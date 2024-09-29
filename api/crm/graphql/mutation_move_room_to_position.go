@@ -3,9 +3,9 @@ package graphql
 import (
 	"context"
 	"errors"
+	"log/slog"
 
 	apartomat "github.com/apartomat/apartomat/internal"
-	"go.uber.org/zap"
 )
 
 func (r *mutationResolver) MoveRoomToPosition(
@@ -23,7 +23,7 @@ func (r *mutationResolver) MoveRoomToPosition(
 			return notFound()
 		}
 
-		r.logger.Error("can't move room", zap.Error(err))
+		slog.ErrorContext(ctx, "can't move room", slog.Any("err", err))
 
 		return nil, errors.New("server error: can't move room")
 	}

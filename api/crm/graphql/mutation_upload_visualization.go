@@ -3,12 +3,12 @@ package graphql
 import (
 	"context"
 	"errors"
+	"log/slog"
 
 	"github.com/99designs/gqlgen/graphql"
 	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/store/files"
 	"github.com/apartomat/apartomat/internal/store/visualizations"
-	"go.uber.org/zap"
 )
 
 func (r *mutationResolver) UploadVisualization(
@@ -33,7 +33,7 @@ func (r *mutationResolver) UploadVisualization(
 			return forbidden()
 		}
 
-		r.logger.Error("can't upload file to project", zap.String("project", projectID), zap.Error(err))
+		slog.ErrorContext(ctx, "can't upload file to project", slog.String("project", projectID), slog.Any("err", err))
 
 		return serverError()
 	}

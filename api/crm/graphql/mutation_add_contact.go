@@ -3,10 +3,10 @@ package graphql
 import (
 	"context"
 	"errors"
+	"log/slog"
 
 	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/store/contacts"
-	"go.uber.org/zap"
 )
 
 func (r *mutationResolver) AddContact(
@@ -27,7 +27,7 @@ func (r *mutationResolver) AddContact(
 			return forbidden()
 		}
 
-		r.logger.Error("can't add contact", zap.Error(err))
+		slog.ErrorContext(ctx, "can't add contact", slog.Any("err", err))
 
 		return serverError()
 	}
