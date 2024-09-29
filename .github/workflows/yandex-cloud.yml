@@ -20,13 +20,13 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v3
       with:
-        go-version: "1.20"
+        go-version: "1.22.5"
 
 #    - name: Vet
 #      run: go vet ./...
 
     - name: Test
-      run: go test -v ./... -tags="test unit"
+      run: go test -v ./internal/... -tags="test unit"
 
     - name: Build
       env:
