@@ -2,6 +2,9 @@ package graphql
 
 import (
 	"context"
+	"errors"
+	apartomat "github.com/apartomat/apartomat/internal"
+	"github.com/apartomat/apartomat/internal/crm/svg"
 	"log/slog"
 )
 
@@ -14,9 +17,39 @@ type albumPageCoverResolver struct {
 }
 
 func (r *albumPageCoverResolver) SVG(ctx context.Context, obj *AlbumPageCover) (AlbumPageSVGResult, error) {
-	return SVG{
-		SVG: `<svg width="420mm" height="297mm" xmlns="http://www.w3.org/2000/svg" overflow="visible"><rect x="0" y="0" width="100%" height="100%" fill="lightgray"></rect><rect x="30mm" y="10mm" width="380mm" height="277mm" fill="white"></rect><text color="black" x="40mm" y="30mm" font-size="56px" font-family="Arial, Helvetica, sans-serif">PUHOVA</text><text color="black" x="40mm" y="50mm" font-size="36px" font-family="Arial, Helvetica, sans-serif">Новосибирск 2024</text><text color="black" x="40mm" y="70mm" font-size="24px" font-family="Arial, Helvetica, sans-serif">Дизайн-проект интерьера квартиры 155,87 м²</text><text color="black" x="40mm" y="90mm" font-size="24px" font-family="Arial, Helvetica, sans-serif">Зыряновская, 51</text></svg>`,
-	}, nil
+	switch c := obj.Cover.(type) {
+	case *CoverUploaded:
+		if f, ok := c.File.(File); ok {
+			file, err := r.useCases.GetFile(ctx, f.ID)
+			if err != nil {
+				if errors.Is(err, apartomat.ErrNotFound) {
+					return notFound()
+				}
+
+				slog.ErrorContext(ctx, "can't get album cover file", slog.Any("err", err))
+
+				return serverError()
+			}
+
+			res, err := svg.UploadedCover(obj.Number, file.URL)
+			if err != nil {
+				slog.ErrorContext(ctx, "can't get svg for uploaded cover", slog.Any("err", err))
+
+				return serverError()
+			}
+
+			return SVG{res}, nil
+		}
+
+		slog.ErrorContext(ctx, "can't convert AlbumPageCover.File to CoverUploaded")
+
+		return serverError()
+	case *Cover:
+		return notImplementedYetError()
+	default:
+		slog.ErrorContext(ctx, "unknown obj type")
+		return serverError()
+	}
 }
 
 func (r *albumPageCoverResolver) Cover(

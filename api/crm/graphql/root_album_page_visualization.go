@@ -41,9 +41,12 @@ func (r *albumPageVisualizationResolver) SVG(ctx context.Context, obj *AlbumPage
 			return serverError()
 		}
 
-		return SVG{
-			SVG: svg.Visualization(obj.Number, f.URL),
-		}, nil
+		res, err := svg.Visualization(obj.Number, f.URL)
+		if err != nil {
+			return serverError()
+		}
+
+		return SVG{SVG: res}, nil
 	}
 
 	slog.ErrorContext(ctx, "can't convert AlbumPageVisualization to Visualization")
