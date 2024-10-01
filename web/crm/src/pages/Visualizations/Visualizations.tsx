@@ -9,7 +9,7 @@ import { Box, Button, Grid, Image, Text } from "grommet"
 
 import { Rooms, useSearchParamsRoomsFilter } from "./Rooms"
 import { DeleteVisualizations } from "./DeleteVisualizations"
-import { useNotifications } from "shared/context/notiifcations/context"
+import { useNotifications } from "shared/context/notifications/context"
 import { Upload } from "./Upload"
 
 type Rooms = Pick<VisualizationsScreenHouseRoomFragment, "id" | "name">[]

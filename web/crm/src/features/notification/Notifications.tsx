@@ -1,19 +1,19 @@
 import { Box, Layer, Text } from "grommet"
 import { StatusGood, StatusCritical, CircleAlert, StatusWarning, StatusInfo } from "grommet-icons"
 import React, { useEffect, useState } from "react"
-import { useNotifications, NotificationMessage } from "shared/context/notiifcations/context"
+import { useNotifications, NotificationMessage } from "shared/context/notifications/context"
 
 export function Notifications() {
     const { notifications, dismiss } = useNotifications()
 
     return (
-        notifications.length > 0 && (
+        <>{notifications.length > 0 && (
             <Layer position="top" modal={false} responsive={false} margin={{ vertical: "small", horizontal: "small" }}>
                 {notifications.map((val: NotificationMessage, index: number) => (
                     <Message key={val.id} val={val} dismiss={() => dismiss(val.id)} />
                 ))}
             </Layer>
-        )
+        )}</>
     )
 }
 
@@ -33,7 +33,7 @@ function Message({ val, dismiss }: { val: NotificationMessage; dismiss: (id: str
     }, [])
 
     return (
-        show && (
+        <>{show && (
             <Box
                 align="center"
                 direction="row"
@@ -48,7 +48,7 @@ function Message({ val, dismiss }: { val: NotificationMessage; dismiss: (id: str
                 <Icon severity={val.severity} />
                 <Text>{val.message}</Text>
             </Box>
-        )
+        )}</>
     )
 }
 

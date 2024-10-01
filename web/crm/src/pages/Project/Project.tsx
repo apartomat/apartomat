@@ -37,7 +37,7 @@ import { Albums } from "./Albums"
 import PublicSite from "./PublicSite/PublicSite"
 import { Spinner } from "shared/ui/Spinner"
 import { Notifications } from "features/notification"
-import { useNotifications } from "shared/context/notiifcations/context"
+import { useNotifications } from "shared/context/notifications/context"
 
 export function Project() {
     const { id } = useParams<"id">() as { id: string }

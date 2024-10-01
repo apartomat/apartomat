@@ -1,6 +1,6 @@
 import { ReactNode } from "react"
 
-import { useNotificationsContextProvider, notificationsContext } from "shared/context/notiifcations/context"
+import { useNotificationsContextProvider, notificationsContext } from "shared/context/notifications/context"
 
 export function NotificationsProvider({ children }: { children: ReactNode }) {
     const context = useNotificationsContextProvider()
