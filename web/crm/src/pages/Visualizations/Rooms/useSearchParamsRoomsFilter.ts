@@ -1,7 +1,7 @@
 import { useSearchParams } from "react-router-dom"
 import { useCallback } from "react"
 
-export function useSearchParamsRoomsFilter() {
+export function useSearchParamsRoomsFilter(): [Array<string>, (rooms: string[]) => void] {
     const [searchParams, setSearchParams] = useSearchParams()
 
     const filter = searchParams.getAll("room")

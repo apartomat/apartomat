@@ -118,7 +118,7 @@ export function Visualizations() {
                         <Upload
                             projectId={project.id}
                             rooms={rooms as Rooms}
-                            roomId={roomsFilter.length == 1 ? roomsFilter[0] : undefined}
+                            roomId={roomsFilter[0]}
                             onVisualizationsUploaded={({ files }) => {
                                 notify({
                                     message:
