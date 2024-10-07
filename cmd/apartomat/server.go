@@ -7,7 +7,6 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/go-chi/chi/v5"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"log/slog"
 	"net"
 	"net/http"
@@ -40,16 +39,8 @@ type Server struct {
 	withGraphQLPlayground bool
 }
 
-func NewServer(reg *prometheus.Registry) *Server {
-	router := chi.NewRouter()
-
-	router.Use(PrometheusLatencyMiddleware(reg))
-	router.Handle("/metrics", promhttp.HandlerFor(reg, promhttp.HandlerOpts{}))
-
-	return &Server{
-		prometheus: reg,
-		router:     router,
-	}
+func NewServer() *Server {
+	return &Server{router: chi.NewRouter()}
 }
 
 func (server *Server) Run(ctx context.Context, opts ...ServerOption) {
@@ -107,6 +98,12 @@ func (server *Server) Run(ctx context.Context, opts ...ServerOption) {
 	slog.InfoContext(ctx, "Buy")
 }
 
+func (server *Server) Use(next func(http.Handler) http.Handler) *Server {
+	server.router.Use(next)
+
+	return server
+}
+
 func (server *Server) WithGraphQLHandler(h http.Handler) *Server {
 	server.router.Handle(graphQLPath, h)
 
@@ -116,6 +113,12 @@ func (server *Server) WithGraphQLHandler(h http.Handler) *Server {
 func (server *Server) WithGraphQLPlayground() *Server {
 	server.withGraphQLPlayground = true
 	server.router.Handle(graphQLPlaygroundPath, playground.Handler("GraphQL playground", graphQLPath))
+
+	return server
+}
+
+func (server *Server) WithMetrics(h http.Handler) *Server {
+	server.router.Handle("/metrics", h)
 
 	return server
 }

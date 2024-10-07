@@ -10,7 +10,36 @@ import (
 	"time"
 )
 
-func PrometheusLatencyMiddleware(reg *prometheus.Registry) func(next http.Handler) http.Handler {
+var (
+	sqlHistogramVec *prometheus.HistogramVec
+)
+
+func init() {
+	sqlHistogramVec = prometheus.NewHistogramVec(
+		prometheus.HistogramOpts{
+			Name:    "sql_query_duration_seconds",
+			Help:    "",
+			Buckets: []float64{0.10, 0.2, 0.25, 0.3, 0.5, 1, 2, 2.5, 3, 5, 10},
+		},
+		[]string{"query"},
+	)
+}
+
+func observeSql(dur time.Duration, query string) {
+	sqlHistogramVec.WithLabelValues(query).Observe(dur.Seconds())
+}
+
+func NewMetrics() (prometheus.Registerer, prometheus.Gatherer) {
+	reg := prometheus.NewRegistry()
+
+	wr := prometheus.WrapRegistererWith(prometheus.Labels{"service_name": "crm"}, reg)
+
+	wr.MustRegister(sqlHistogramVec)
+
+	return wr, reg
+}
+
+func PrometheusLatencyMiddleware(reg prometheus.Registerer) func(next http.Handler) http.Handler {
 	var (
 		_requestTimer = prometheus.NewHistogramVec(
 			prometheus.HistogramOpts{

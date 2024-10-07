@@ -4,16 +4,15 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"log/slog"
-	"os"
-	"strconv"
-	"time"
-
+	"github.com/apartomat/apartomat/internal/pkg/log"
 	"github.com/go-pg/pg/v10"
-	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/pgdialect"
 	"github.com/uptrace/bun/driver/pgdriver"
+	"log/slog"
+	"os"
+	"strconv"
 
 	"github.com/apartomat/apartomat/api/crm/graphql"
 	apartomat "github.com/apartomat/apartomat/internal"
@@ -43,7 +42,11 @@ func main() {
 		logLevel, _ = logLevel(os.Getenv("LOG_LEVEL"))
 	)
 
-	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{Level: logLevel, AddSource: false})))
+	slog.SetDefault(slog.New(
+		log.NewAttrHandler(
+			slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{Level: logLevel, AddSource: false}),
+		),
+	))
 
 	if len(os.Args) < 2 {
 		slog.Error("expect command (run or gen-key-pair)")
@@ -75,22 +78,6 @@ func main() {
 		invite := paseto.NewInviteTokenIssuerVerifier(privateKey)
 
 		//
-		reg := prometheus.NewRegistry()
-
-		var (
-			sqlHistrogramVec = prometheus.NewHistogramVec(
-				prometheus.HistogramOpts{
-					Name:    "sql_query_duration_seconds",
-					Help:    "",
-					Buckets: []float64{0.10, 0.2, 0.25, 0.3, 0.5, 1, 2, 2.5, 3, 5, 10},
-				},
-				[]string{"query"},
-			)
-		)
-
-		reg.MustRegister(sqlHistrogramVec)
-
-		//
 
 		mailer := smtp.NewMailSender(smtp.Config{
 			Addr:     os.Getenv("SMTP_ADDR"),
@@ -106,9 +93,7 @@ func main() {
 
 		pgdb := pg.Connect(pgopts)
 		pgdb.AddQueryHook(postgreshook.NewLogQueryHook(slog.Default()))
-		pgdb.AddQueryHook(postgreshook.NewQueryLatencyHook(func(dur time.Duration, query string) {
-			sqlHistrogramVec.WithLabelValues(query).Observe(dur.Seconds())
-		}))
+		pgdb.AddQueryHook(postgreshook.NewQueryLatencyHook(observeSql))
 
 		if err := pgdb.Ping(postgreshook.WithQueryContext(context.Background(), "ping")); err != nil {
 			slog.Error("can't connect to database", slog.Any("err", err))
@@ -127,9 +112,7 @@ func main() {
 		}
 
 		bundb.AddQueryHook(bunhook.NewLogQueryHook(slog.Default()))
-		bundb.AddQueryHook(bunhook.NewQueryLatencyHook(func(dur time.Duration, query string) {
-			sqlHistrogramVec.WithLabelValues(query).Observe(dur.Seconds())
-		}))
+		bundb.AddQueryHook(bunhook.NewQueryLatencyHook(observeSql))
 
 		//
 
@@ -218,7 +201,14 @@ func main() {
 			10000,
 		)
 
-		NewServer(reg).WithGraphQLHandler(h).WithGraphQLPlayground().Run(context.Background(), addr)
+		reg, gath := NewMetrics()
+
+		NewServer().
+			Use(PrometheusLatencyMiddleware(reg)).
+			WithGraphQLHandler(h).
+			WithGraphQLPlayground().
+			WithMetrics(promhttp.HandlerFor(gath, promhttp.HandlerOpts{})).
+			Run(context.Background(), addr)
 
 	default:
 		slog.Info("expect command (run or gen-key-pair)")

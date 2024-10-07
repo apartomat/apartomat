@@ -2,16 +2,19 @@ package graphql
 
 import (
 	"context"
+	"log/slog"
+	"net/http"
+	"strings"
+	"time"
+
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"github.com/99designs/gqlgen/graphql/handler/lru"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/apartomat/apartomat/internal/auth"
 	"github.com/apartomat/apartomat/internal/dataloaders"
+	"github.com/apartomat/apartomat/internal/pkg/log"
 	"github.com/gorilla/websocket"
-	"net/http"
-	"strings"
-	"time"
 )
 
 type CheckAuthTokenFn func(str string) (auth.AuthToken, error)
@@ -35,7 +38,10 @@ func Handler(
 		},
 		InitFunc: func(ctx context.Context, payload transport.InitPayload) (context.Context, *transport.InitPayload, error) {
 			if t, _ := ch(payload.Authorization()); t != nil {
-				return auth.WithUserCtx(ctx, &auth.UserCtx{ID: t.UserID()}), &payload, nil
+				return log.WithLogAttr(
+					auth.WithUserCtx(ctx, &auth.UserCtx{ID: t.UserID()}),
+					slog.String("user-id", t.UserID()),
+				), &payload, nil
 			}
 
 			return ctx, &payload, nil
@@ -78,7 +84,9 @@ func WithUserHandler(checkAuthToken CheckAuthTokenFn, next http.Handler) http.Ha
 		t, _ := checkAuthToken(strings.TrimPrefix(header, "Bearer "))
 		if t != nil {
 			userCtx := &auth.UserCtx{ID: t.UserID()}
-			r = r.WithContext(auth.WithUserCtx(r.Context(), userCtx))
+			r = r.WithContext(
+				log.WithLogAttr(auth.WithUserCtx(r.Context(), userCtx), slog.String("user-id", t.UserID())),
+			)
 		}
 
 		next.ServeHTTP(w, r)
