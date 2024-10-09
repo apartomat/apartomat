@@ -2,11 +2,12 @@ package postgres
 
 import (
 	"context"
-	"github.com/apartomat/apartomat/internal/postgres"
+	"time"
+
+	gopghook "github.com/apartomat/apartomat/internal/pkg/go-pg"
 	. "github.com/apartomat/apartomat/internal/store/workspaces"
 	"github.com/doug-martin/goqu/v9"
 	"github.com/go-pg/pg/v10"
-	"time"
 )
 
 const (
@@ -43,7 +44,7 @@ func (s *store) List(ctx context.Context, spec Spec, sort Sort, limit, offset in
 
 	rows := make([]*record, 0)
 
-	_, err = s.db.QueryContext(postgres.WithQueryContext(ctx, "workspaces.List"), &rows, sql, args...)
+	_, err = s.db.QueryContext(gopghook.WithQueryContext(ctx, "workspaces.List"), &rows, sql, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +68,7 @@ func (s *store) Get(ctx context.Context, spec Spec) (*Workspace, error) {
 func (s *store) Save(ctx context.Context, workspaces ...*Workspace) error {
 	recs := toRecords(workspaces)
 
-	_, err := s.db.ModelContext(postgres.WithQueryContext(ctx, "workspaces.Save"), &recs).
+	_, err := s.db.ModelContext(gopghook.WithQueryContext(ctx, "workspaces.Save"), &recs).
 		Returning("NULL").
 		OnConflict("(id) DO UPDATE").
 		Insert()

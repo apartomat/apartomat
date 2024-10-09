@@ -22,7 +22,7 @@ import (
 	"github.com/apartomat/apartomat/internal/mail"
 	"github.com/apartomat/apartomat/internal/mail/smtp"
 	bunhook "github.com/apartomat/apartomat/internal/pkg/bun"
-	postgreshook "github.com/apartomat/apartomat/internal/postgres"
+	gopghook "github.com/apartomat/apartomat/internal/pkg/go-pg"
 	albumFiles "github.com/apartomat/apartomat/internal/store/album_files/postgres"
 	albums "github.com/apartomat/apartomat/internal/store/albums/postgres"
 	contacts "github.com/apartomat/apartomat/internal/store/contacts/postgres"
@@ -92,10 +92,10 @@ func main() {
 		}
 
 		pgdb := pg.Connect(pgopts)
-		pgdb.AddQueryHook(postgreshook.NewLogQueryHook(slog.Default()))
-		pgdb.AddQueryHook(postgreshook.NewQueryLatencyHook(observeSql))
+		pgdb.AddQueryHook(gopghook.NewLogQueryHook(slog.Default()))
+		pgdb.AddQueryHook(gopghook.NewQueryLatencyHook(observeSql))
 
-		if err := pgdb.Ping(postgreshook.WithQueryContext(context.Background(), "ping")); err != nil {
+		if err := pgdb.Ping(gopghook.WithQueryContext(context.Background(), "ping")); err != nil {
 			slog.Error("can't connect to database", slog.Any("err", err))
 			os.Exit(1)
 		}

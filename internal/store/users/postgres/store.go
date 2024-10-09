@@ -2,11 +2,12 @@ package postgres
 
 import (
 	"context"
-	"github.com/apartomat/apartomat/internal/postgres"
+	"time"
+
+	gopghook "github.com/apartomat/apartomat/internal/pkg/go-pg"
 	. "github.com/apartomat/apartomat/internal/store/users"
 	"github.com/doug-martin/goqu/v9"
 	"github.com/go-pg/pg/v10"
-	"time"
 )
 
 const (
@@ -43,7 +44,7 @@ func (s *store) List(ctx context.Context, spec Spec, sort Sort, limit, offset in
 
 	rows := make([]*record, 0)
 
-	_, err = s.db.QueryContext(postgres.WithQueryContext(ctx, "users.List"), &rows, sql, args...)
+	_, err = s.db.QueryContext(gopghook.WithQueryContext(ctx, "users.List"), &rows, sql, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +68,7 @@ func (s *store) Get(ctx context.Context, spec Spec) (*User, error) {
 func (s *store) Save(ctx context.Context, users ...*User) error {
 	recs := toRecords(users)
 
-	_, err := s.db.ModelContext(postgres.WithQueryContext(ctx, "users.Save"), &recs).
+	_, err := s.db.ModelContext(gopghook.WithQueryContext(ctx, "users.Save"), &recs).
 		Returning("NULL").
 		OnConflict("(id) DO UPDATE").
 		Insert()

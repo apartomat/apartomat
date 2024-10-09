@@ -1,4 +1,4 @@
-package postgres
+package go_pg
 
 import (
 	"context"

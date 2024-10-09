@@ -2,11 +2,12 @@ package postgres
 
 import (
 	"context"
-	"github.com/apartomat/apartomat/internal/postgres"
+	"time"
+
+	gopghook "github.com/apartomat/apartomat/internal/pkg/go-pg"
 	. "github.com/apartomat/apartomat/internal/store/contacts"
 	"github.com/doug-martin/goqu/v9"
 	"github.com/go-pg/pg/v10"
-	"time"
 )
 
 const (
@@ -47,7 +48,7 @@ func (s *store) List(ctx context.Context, spec Spec, sort Sort, limit, offset in
 
 	contacts := make([]*record, 0)
 
-	_, err = s.db.QueryContext(postgres.WithQueryContext(ctx, "contacts.List"), &contacts, sql, args...)
+	_, err = s.db.QueryContext(gopghook.WithQueryContext(ctx, "contacts.List"), &contacts, sql, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +72,7 @@ func (s *store) Get(ctx context.Context, spec Spec) (*Contact, error) {
 func (s *store) Save(ctx context.Context, contacts ...*Contact) error {
 	recs := toRecords(contacts)
 
-	_, err := s.db.ModelContext(postgres.WithQueryContext(ctx, "contacts.Save"), &recs).
+	_, err := s.db.ModelContext(gopghook.WithQueryContext(ctx, "contacts.Save"), &recs).
 		Returning("NULL").
 		OnConflict("(id) DO UPDATE").
 		Insert()
@@ -88,7 +89,7 @@ func (s *store) Delete(ctx context.Context, contacts ...*Contact) error {
 		ids[i] = c.ID
 	}
 
-	_, err := s.db.ModelContext(postgres.WithQueryContext(ctx, "contacts.Delete"), (*record)(nil)).
+	_, err := s.db.ModelContext(gopghook.WithQueryContext(ctx, "contacts.Delete"), (*record)(nil)).
 		Where(`id IN (?)`, pg.In(ids)).
 		Delete()
 
