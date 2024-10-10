@@ -6,17 +6,17 @@ import (
 	"fmt"
 	"log/slog"
 
-	apartomat "github.com/apartomat/apartomat/internal"
+	"github.com/apartomat/apartomat/internal/crm"
 )
 
 func (r *queryResolver) Project(ctx context.Context, id string) (ProjectResult, error) {
 	project, err := r.useCases.GetProject(ctx, id)
 	if err != nil {
-		if errors.Is(err, apartomat.ErrForbidden) {
+		if errors.Is(err, crm.ErrForbidden) {
 			return forbidden()
 		}
 
-		if errors.Is(err, apartomat.ErrNotFound) {
+		if errors.Is(err, crm.ErrNotFound) {
 			return notFound()
 		}
 

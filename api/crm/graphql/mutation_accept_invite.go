@@ -3,10 +3,9 @@ package graphql
 import (
 	"context"
 	"errors"
+	"github.com/apartomat/apartomat/internal/crm"
+	"github.com/apartomat/apartomat/internal/crm/auth/paseto"
 	"log/slog"
-
-	apartomat "github.com/apartomat/apartomat/internal"
-	"github.com/apartomat/apartomat/internal/auth/paseto"
 )
 
 func (r *mutationResolver) AcceptInvite(ctx context.Context, str string) (AcceptInviteResult, error) {
@@ -20,7 +19,7 @@ func (r *mutationResolver) AcceptInvite(ctx context.Context, str string) (Accept
 			return InvalidToken{Message: "token is expired or not valid"}, nil
 		}
 
-		if errors.Is(err, apartomat.ErrAlreadyExists) {
+		if errors.Is(err, crm.ErrAlreadyExists) {
 			return AlreadyInWorkspace{Message: "user already in workspace"}, nil
 		}
 

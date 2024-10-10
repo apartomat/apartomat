@@ -1,10 +1,10 @@
-package apartomat
+package crm
 
 import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/apartomat/apartomat/internal/auth"
+	"github.com/apartomat/apartomat/internal/crm/auth"
 	albumFiles "github.com/apartomat/apartomat/internal/store/album_files"
 	. "github.com/apartomat/apartomat/internal/store/albums"
 	"github.com/apartomat/apartomat/internal/store/files"
@@ -12,7 +12,7 @@ import (
 	"github.com/apartomat/apartomat/internal/store/visualizations"
 )
 
-func (u *Apartomat) CreateAlbum(
+func (u *CRM) CreateAlbum(
 	ctx context.Context,
 	projectID string,
 	name string,
@@ -42,7 +42,7 @@ func (u *Apartomat) CreateAlbum(
 	return album, nil
 }
 
-func (u *Apartomat) GetAlbums(
+func (u *CRM) GetAlbums(
 	ctx context.Context,
 	projectID string,
 	limit, offset int,
@@ -65,7 +65,7 @@ func (u *Apartomat) GetAlbums(
 	return res, nil
 }
 
-func (u *Apartomat) GetAlbum(
+func (u *CRM) GetAlbum(
 	ctx context.Context,
 	id string,
 ) (*Album, error) {
@@ -83,7 +83,7 @@ func (u *Apartomat) GetAlbum(
 	return album, nil
 }
 
-func (u *Apartomat) CountAlbums(
+func (u *CRM) CountAlbums(
 	ctx context.Context,
 	projectID string,
 ) (int, error) {
@@ -100,7 +100,7 @@ func (u *Apartomat) CountAlbums(
 	return u.Albums.Count(ctx, spec)
 }
 
-func (u *Apartomat) DeleteAlbum(ctx context.Context, id string) (*Album, error) {
+func (u *CRM) DeleteAlbum(ctx context.Context, id string) (*Album, error) {
 	album, err := u.Albums.Get(ctx, IDIn(id))
 	if err != nil {
 		return nil, err
@@ -122,7 +122,7 @@ type VisualizationWithPosition struct {
 	Visualization *visualizations.Visualization
 }
 
-func (u *Apartomat) AddVisualizationsToAlbum(
+func (u *CRM) AddVisualizationsToAlbum(
 	ctx context.Context,
 	albumID string,
 	visualizationID []string,
@@ -187,7 +187,7 @@ visLoop:
 	return res, *num, nil
 }
 
-func (u *Apartomat) ChangeAlbumPageSize(
+func (u *CRM) ChangeAlbumPageSize(
 	ctx context.Context,
 	albumID string,
 	size PageSize,
@@ -214,7 +214,7 @@ func (u *Apartomat) ChangeAlbumPageSize(
 	return album, nil
 }
 
-func (u *Apartomat) ChangeAlbumPageOrientation(
+func (u *CRM) ChangeAlbumPageOrientation(
 	ctx context.Context,
 	albumID string,
 	orientation PageOrientation,
@@ -241,7 +241,7 @@ func (u *Apartomat) ChangeAlbumPageOrientation(
 	return album, nil
 }
 
-func (u *Apartomat) GetAlbumRecentFile(ctx context.Context, albumID string) (*albumFiles.AlbumFile, *files.File, error) {
+func (u *CRM) GetAlbumRecentFile(ctx context.Context, albumID string) (*albumFiles.AlbumFile, *files.File, error) {
 	album, err := u.Albums.Get(ctx, IDIn(albumID))
 	if err != nil {
 		return nil, nil, err
@@ -274,7 +274,7 @@ var (
 	ErrAlbumFileVersionExisted = errors.New("album file version existed")
 )
 
-func (u *Apartomat) StartGenerateAlbumFile(ctx context.Context, albumID string) (*albumFiles.AlbumFile, *files.File, error) {
+func (u *CRM) StartGenerateAlbumFile(ctx context.Context, albumID string) (*albumFiles.AlbumFile, *files.File, error) {
 	album, err := u.Albums.Get(ctx, IDIn(albumID))
 	if err != nil {
 		return nil, nil, err

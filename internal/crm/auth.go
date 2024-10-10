@@ -1,13 +1,13 @@
-package apartomat
+package crm
 
 import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/apartomat/apartomat/internal/crm/auth"
 	"log/slog"
 	"math/rand"
 
-	"github.com/apartomat/apartomat/internal/auth"
 	. "github.com/apartomat/apartomat/internal/store/users"
 	"github.com/apartomat/apartomat/internal/store/workspace_users"
 	"github.com/apartomat/apartomat/internal/store/workspaces"
@@ -15,11 +15,11 @@ import (
 	"github.com/go-ozzo/ozzo-validation/v4/is"
 )
 
-func (u *Apartomat) CheckAuthToken(str string) (auth.AuthToken, error) {
+func (u *CRM) CheckAuthToken(str string) (auth.AuthToken, error) {
 	return u.AuthTokenVerifier.Verify(str)
 }
 
-func (u *Apartomat) ConfirmEmailByToken(ctx context.Context, str string) (string, error) {
+func (u *CRM) ConfirmEmailByToken(ctx context.Context, str string) (string, error) {
 	confirmToken, err := u.ConfirmTokenByEmailVerifier.Verify(str)
 	if err != nil {
 		return "", err
@@ -40,7 +40,7 @@ var (
 	ErrSendError    = errors.New("can't send email")
 )
 
-func (u *Apartomat) LoginByEmail(ctx context.Context, email string, workspaceName string) (string, error) {
+func (u *CRM) LoginByEmail(ctx context.Context, email string, workspaceName string) (string, error) {
 	if err := validation.Validate(email, is.EmailFormat); err != nil {
 		return "", ErrInvalidEmail
 	}
@@ -113,7 +113,7 @@ func (u *Apartomat) LoginByEmail(ctx context.Context, email string, workspaceNam
 	return email, nil
 }
 
-func (u *Apartomat) LoginEmailPIN(ctx context.Context, email string, workspaceName string) (string, string, error) {
+func (u *CRM) LoginEmailPIN(ctx context.Context, email string, workspaceName string) (string, string, error) {
 	if err := validation.Validate(email, is.EmailFormat); err != nil {
 		return "", "", ErrInvalidEmail
 	}
@@ -194,7 +194,7 @@ func (u *Apartomat) LoginEmailPIN(ctx context.Context, email string, workspaceNa
 	return email, token, nil
 }
 
-func (u *Apartomat) CheckConfirmEmailPINToken(ctx context.Context, str, pin string) (string, error) {
+func (u *CRM) CheckConfirmEmailPINToken(ctx context.Context, str, pin string) (string, error) {
 	confirmToken, err := u.ConfirmEmailPINTokenVerifier.Verify(str, pin)
 	if err != nil {
 		return "", err
@@ -212,7 +212,7 @@ func (u *Apartomat) CheckConfirmEmailPINToken(ctx context.Context, str, pin stri
 	return u.AuthTokenIssuer.Issue(user.ID)
 }
 
-func (u *Apartomat) AcceptInviteToWorkspace(ctx context.Context, str string) (string, error) {
+func (u *CRM) AcceptInviteToWorkspace(ctx context.Context, str string) (string, error) {
 	confirmToken, err := u.InviteTokenVerifier.Verify(str)
 	if err != nil {
 		return "", err

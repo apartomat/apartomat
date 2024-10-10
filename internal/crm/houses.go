@@ -1,14 +1,14 @@
-package apartomat
+package crm
 
 import (
 	"context"
 	"fmt"
-	"github.com/apartomat/apartomat/internal/auth"
+	"github.com/apartomat/apartomat/internal/crm/auth"
 	. "github.com/apartomat/apartomat/internal/store/houses"
 	"github.com/apartomat/apartomat/internal/store/projects"
 )
 
-func (u *Apartomat) GetHouses(ctx context.Context, projectID string, limit, offset int) ([]*House, error) {
+func (u *CRM) GetHouses(ctx context.Context, projectID string, limit, offset int) ([]*House, error) {
 	if ok, err := u.Acl.CanGetHousesOfProjectID(ctx, auth.UserFromCtx(ctx), projectID); err != nil {
 		return nil, err
 	} else if !ok {
@@ -18,7 +18,7 @@ func (u *Apartomat) GetHouses(ctx context.Context, projectID string, limit, offs
 	return u.Houses.List(ctx, ProjectIDIn(projectID), SortDefault, limit, offset)
 }
 
-func (u *Apartomat) AddHouse(
+func (u *CRM) AddHouse(
 	ctx context.Context,
 	projectID string,
 	city, address, housingComplex string,
@@ -44,7 +44,7 @@ func (u *Apartomat) AddHouse(
 	return house, nil
 }
 
-func (u *Apartomat) UpdateHouse(
+func (u *CRM) UpdateHouse(
 	ctx context.Context,
 	houseID string,
 	city, address, housingComplex string,

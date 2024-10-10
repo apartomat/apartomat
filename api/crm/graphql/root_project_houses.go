@@ -3,10 +3,11 @@ package graphql
 import (
 	"context"
 	"errors"
-	"github.com/99designs/gqlgen/graphql"
-	apartomat "github.com/apartomat/apartomat/internal"
-	"github.com/apartomat/apartomat/internal/store/houses"
 	"log/slog"
+
+	"github.com/99designs/gqlgen/graphql"
+	"github.com/apartomat/apartomat/internal/crm"
+	"github.com/apartomat/apartomat/internal/store/houses"
 )
 
 func (r *rootResolver) ProjectHouses() ProjectHousesResolver {
@@ -36,7 +37,7 @@ func (r *projectHousesResolver) List(
 			offset,
 		)
 		if err != nil {
-			if errors.Is(err, apartomat.ErrForbidden) {
+			if errors.Is(err, crm.ErrForbidden) {
 				return forbidden()
 			}
 

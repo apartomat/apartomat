@@ -1,17 +1,18 @@
-package apartomat
+package crm
 
 import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/apartomat/apartomat/internal/auth"
+	"time"
+
+	"github.com/apartomat/apartomat/internal/crm/auth"
 	. "github.com/apartomat/apartomat/internal/store/projects"
 	sites "github.com/apartomat/apartomat/internal/store/public_sites"
 	"github.com/apartomat/apartomat/internal/store/workspaces"
-	"time"
 )
 
-func (u *Apartomat) GetProject(ctx context.Context, id string) (*Project, error) {
+func (u *CRM) GetProject(ctx context.Context, id string) (*Project, error) {
 	project, err := u.Projects.Get(ctx, IDIn(id))
 	if err != nil {
 		return nil, err
@@ -26,7 +27,7 @@ func (u *Apartomat) GetProject(ctx context.Context, id string) (*Project, error)
 	return project, nil
 }
 
-func (u *Apartomat) CreateProject(
+func (u *CRM) CreateProject(
 	ctx context.Context,
 	workspaceID string,
 	name string,
@@ -69,7 +70,7 @@ func (u *Apartomat) CreateProject(
 	return project, nil
 }
 
-func (u *Apartomat) ChangeProjectStatus(ctx context.Context, projectID string, status Status) (*Project, error) {
+func (u *CRM) ChangeProjectStatus(ctx context.Context, projectID string, status Status) (*Project, error) {
 	project, err := u.Projects.Get(ctx, IDIn(projectID))
 	if err != nil {
 		return nil, err
@@ -90,7 +91,7 @@ func (u *Apartomat) ChangeProjectStatus(ctx context.Context, projectID string, s
 	return project, nil
 }
 
-func (u *Apartomat) ChangeProjectDates(ctx context.Context, projectID string, startAt, endAt *time.Time) (*Project, error) {
+func (u *CRM) ChangeProjectDates(ctx context.Context, projectID string, startAt, endAt *time.Time) (*Project, error) {
 	project, err := u.Projects.Get(ctx, IDIn(projectID))
 	if err != nil {
 		return nil, err
@@ -111,7 +112,7 @@ func (u *Apartomat) ChangeProjectDates(ctx context.Context, projectID string, st
 	return project, nil
 }
 
-func (u *Apartomat) GetProjectPublicSite(ctx context.Context, projectId string) (*sites.PublicSite, error) {
+func (u *CRM) GetProjectPublicSite(ctx context.Context, projectId string) (*sites.PublicSite, error) {
 	if ok, err := u.Acl.CanGetPublicSiteOfProjectID(ctx, auth.UserFromCtx(ctx), projectId); err != nil {
 		return nil, err
 	} else if !ok {
@@ -121,7 +122,7 @@ func (u *Apartomat) GetProjectPublicSite(ctx context.Context, projectId string) 
 	return u.PublicSites.Get(ctx, sites.ProjectIDIn(projectId))
 }
 
-func (u *Apartomat) MakeProjectPublic(ctx context.Context, projectId string) (*sites.PublicSite, error) {
+func (u *CRM) MakeProjectPublic(ctx context.Context, projectId string) (*sites.PublicSite, error) {
 	proj, err := u.Projects.Get(ctx, IDIn(projectId))
 	if err != nil {
 		return nil, err
@@ -165,7 +166,7 @@ func (u *Apartomat) MakeProjectPublic(ctx context.Context, projectId string) (*s
 	return site, nil
 }
 
-func (u *Apartomat) MakeProjectNotPublic(ctx context.Context, projectId string) (*sites.PublicSite, error) {
+func (u *CRM) MakeProjectNotPublic(ctx context.Context, projectId string) (*sites.PublicSite, error) {
 	proj, err := u.Projects.Get(ctx, IDIn(projectId))
 	if err != nil {
 		return nil, err

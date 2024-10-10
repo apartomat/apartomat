@@ -5,7 +5,7 @@ import (
 	"errors"
 	"log/slog"
 
-	apartomat "github.com/apartomat/apartomat/internal"
+	"github.com/apartomat/apartomat/internal/crm"
 )
 
 func (r *mutationResolver) DeleteContact(ctx context.Context, id string) (DeleteContactResult, error) {
@@ -14,11 +14,11 @@ func (r *mutationResolver) DeleteContact(ctx context.Context, id string) (Delete
 		id,
 	)
 	if err != nil {
-		if errors.Is(err, apartomat.ErrForbidden) {
+		if errors.Is(err, crm.ErrForbidden) {
 			return forbidden()
 		}
 
-		if errors.Is(err, apartomat.ErrNotFound) {
+		if errors.Is(err, crm.ErrNotFound) {
 			return notFound()
 		}
 

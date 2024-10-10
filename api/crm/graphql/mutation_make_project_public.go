@@ -3,10 +3,10 @@ package graphql
 import (
 	"context"
 	"errors"
-	"github.com/apartomat/apartomat/internal/store/public_sites"
 	"log/slog"
 
-	apartomat "github.com/apartomat/apartomat/internal"
+	"github.com/apartomat/apartomat/internal/crm"
+	"github.com/apartomat/apartomat/internal/store/public_sites"
 )
 
 func (r *mutationResolver) MakeProjectPublic(
@@ -15,7 +15,7 @@ func (r *mutationResolver) MakeProjectPublic(
 ) (MakeProjectPublicResult, error) {
 	ps, err := r.useCases.MakeProjectPublic(ctx, projectID)
 	if err != nil {
-		if errors.Is(err, apartomat.ErrForbidden) {
+		if errors.Is(err, crm.ErrForbidden) {
 			return forbidden()
 		}
 

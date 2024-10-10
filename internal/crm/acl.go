@@ -1,11 +1,11 @@
-package apartomat
+package crm
 
 import (
 	"context"
 	"fmt"
+	"github.com/apartomat/apartomat/internal/crm/auth"
 	"time"
 
-	"github.com/apartomat/apartomat/internal/auth"
 	"github.com/apartomat/apartomat/internal/store/albums"
 	"github.com/apartomat/apartomat/internal/store/contacts"
 	"github.com/apartomat/apartomat/internal/store/houses"

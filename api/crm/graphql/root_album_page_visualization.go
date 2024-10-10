@@ -5,7 +5,7 @@ import (
 	"errors"
 	"log/slog"
 
-	apartomat "github.com/apartomat/apartomat/internal"
+	"github.com/apartomat/apartomat/internal/crm"
 	"github.com/apartomat/apartomat/internal/crm/svg"
 )
 
@@ -21,7 +21,7 @@ func (r *albumPageVisualizationResolver) SVG(ctx context.Context, obj *AlbumPage
 	if v, ok := obj.Visualization.(*Visualization); ok && v != nil {
 		vis, err := r.useCases.GetVisualization(ctx, v.ID)
 		if err != nil {
-			if errors.Is(err, apartomat.ErrNotFound) {
+			if errors.Is(err, crm.ErrNotFound) {
 				return notFound()
 			}
 
@@ -32,7 +32,7 @@ func (r *albumPageVisualizationResolver) SVG(ctx context.Context, obj *AlbumPage
 
 		f, err := r.useCases.GetFile(ctx, vis.FileID)
 		if err != nil {
-			if errors.Is(err, apartomat.ErrNotFound) {
+			if errors.Is(err, crm.ErrNotFound) {
 				return notFound()
 			}
 
@@ -61,7 +61,7 @@ func (r *albumPageVisualizationResolver) Visualization(
 	if v, ok := obj.Visualization.(*Visualization); ok && v != nil {
 		vis, err := r.useCases.GetVisualization(ctx, v.ID)
 		if err != nil {
-			if errors.Is(err, apartomat.ErrNotFound) {
+			if errors.Is(err, crm.ErrNotFound) {
 				return notFound()
 			}
 

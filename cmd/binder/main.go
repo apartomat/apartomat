@@ -5,6 +5,8 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	apartomat "github.com/apartomat/apartomat/internal/crm"
+	"github.com/apartomat/apartomat/internal/crm/image/minio"
 	"io"
 	"log/slog"
 	"mime"
@@ -13,9 +15,7 @@ import (
 	"strings"
 	"time"
 
-	apartomat "github.com/apartomat/apartomat/internal"
 	"github.com/apartomat/apartomat/internal/bookbinder"
-	"github.com/apartomat/apartomat/internal/image/minio"
 	bunhook "github.com/apartomat/apartomat/internal/pkg/bun"
 	. "github.com/apartomat/apartomat/internal/store/album_files"
 	albumFilesPostgres "github.com/apartomat/apartomat/internal/store/album_files/postgres"

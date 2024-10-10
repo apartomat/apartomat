@@ -1,9 +1,9 @@
-package apartomat
+package crm
 
 import (
 	"context"
 	"fmt"
-	"github.com/apartomat/apartomat/internal/auth"
+	"github.com/apartomat/apartomat/internal/crm/auth"
 	. "github.com/apartomat/apartomat/internal/store/contacts"
 	"github.com/apartomat/apartomat/internal/store/projects"
 )
@@ -14,7 +14,7 @@ type AddContactParams struct {
 	Details  []Details
 }
 
-func (u *Apartomat) GetContacts(ctx context.Context, projectID string, limit, offset int) ([]*Contact, error) {
+func (u *CRM) GetContacts(ctx context.Context, projectID string, limit, offset int) ([]*Contact, error) {
 	if ok, err := u.Acl.CanGetContactsOfProjectID(ctx, auth.UserFromCtx(ctx), projectID); err != nil {
 		return nil, err
 	} else if !ok {
@@ -24,7 +24,7 @@ func (u *Apartomat) GetContacts(ctx context.Context, projectID string, limit, of
 	return u.Contacts.List(ctx, ProjectIDIn(projectID), SortDefault, limit, offset)
 }
 
-func (u *Apartomat) AddContact(ctx context.Context, projectID string, params AddContactParams) (*Contact, error) {
+func (u *CRM) AddContact(ctx context.Context, projectID string, params AddContactParams) (*Contact, error) {
 	project, err := u.Projects.Get(ctx, projects.IDIn(projectID))
 	if err != nil {
 		return nil, err
@@ -56,7 +56,7 @@ type UpdateContactParams struct {
 	Details  []Details
 }
 
-func (u *Apartomat) UpdateContact(ctx context.Context, contactID string, params UpdateContactParams) (*Contact, error) {
+func (u *CRM) UpdateContact(ctx context.Context, contactID string, params UpdateContactParams) (*Contact, error) {
 	contact, err := u.Contacts.Get(ctx, IDIn(contactID))
 	if err != nil {
 		return nil, err
@@ -77,7 +77,7 @@ func (u *Apartomat) UpdateContact(ctx context.Context, contactID string, params 
 	return contact, nil
 }
 
-func (u *Apartomat) DeleteContact(ctx context.Context, contactID string) (*Contact, error) {
+func (u *CRM) DeleteContact(ctx context.Context, contactID string) (*Contact, error) {
 	contact, err := u.Contacts.Get(ctx, IDIn(contactID))
 	if err != nil {
 		return nil, err

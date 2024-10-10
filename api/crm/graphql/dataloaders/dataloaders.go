@@ -20,7 +20,7 @@ type DataLoaders struct {
 	Workspaces *dataloadgen.Loader[string, *workspaces.Workspace]
 }
 
-func NewLoaders(
+func NewDataLoaders(
 	filesStore files.Store,
 	roomsStore rooms.Store,
 	usersStore users.Store,

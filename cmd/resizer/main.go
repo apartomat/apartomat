@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
-	"github.com/apartomat/apartomat/internal/image"
-	"github.com/apartomat/apartomat/internal/image/minio"
+	"github.com/apartomat/apartomat/internal/crm/image"
+	"github.com/apartomat/apartomat/internal/crm/image/minio"
 	"github.com/apartomat/apartomat/internal/resizer"
 	"io"
 	"log"

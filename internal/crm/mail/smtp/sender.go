@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"crypto/tls"
 	"fmt"
-	"github.com/apartomat/apartomat/internal/mail"
+	"github.com/apartomat/apartomat/internal/crm/mail"
 	"net"
 	transport "net/smtp"
 	"net/textproto"

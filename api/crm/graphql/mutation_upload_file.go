@@ -5,7 +5,7 @@ import (
 	"errors"
 	"log/slog"
 
-	apartomat "github.com/apartomat/apartomat/internal"
+	"github.com/apartomat/apartomat/internal/crm"
 )
 
 func (r *mutationResolver) UploadFile(
@@ -15,7 +15,7 @@ func (r *mutationResolver) UploadFile(
 	pf, err := r.useCases.UploadFile(
 		ctx,
 		input.ProjectID,
-		apartomat.Upload{
+		crm.Upload{
 			Name:     input.Data.Filename,
 			MimeType: input.Data.ContentType,
 			Data:     input.Data.File,
@@ -24,7 +24,7 @@ func (r *mutationResolver) UploadFile(
 		toProjectFileType(input.Type),
 	)
 	if err != nil {
-		if errors.Is(err, apartomat.ErrForbidden) {
+		if errors.Is(err, crm.ErrForbidden) {
 			return forbidden()
 		}
 

@@ -3,9 +3,10 @@ package graphql
 import (
 	"context"
 	"errors"
-	apartomat "github.com/apartomat/apartomat/internal"
-	"github.com/apartomat/apartomat/internal/store/albums"
 	"log/slog"
+
+	"github.com/apartomat/apartomat/internal/crm"
+	"github.com/apartomat/apartomat/internal/store/albums"
 )
 
 func (r *mutationResolver) CreateAlbum(
@@ -19,7 +20,7 @@ func (r *mutationResolver) CreateAlbum(
 		name,
 	)
 	if err != nil {
-		if errors.Is(err, apartomat.ErrForbidden) {
+		if errors.Is(err, crm.ErrForbidden) {
 			return forbidden()
 		}
 

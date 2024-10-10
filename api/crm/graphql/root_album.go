@@ -4,11 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	apartomat "github.com/apartomat/apartomat/internal"
-	"github.com/apartomat/apartomat/internal/dataloaders"
+	"log/slog"
+
+	"github.com/apartomat/apartomat/api/crm/graphql/dataloaders"
+	"github.com/apartomat/apartomat/internal/crm"
 	albumFiles "github.com/apartomat/apartomat/internal/store/album_files"
 	"github.com/apartomat/apartomat/internal/store/albums"
-	"log/slog"
 )
 
 func (r *rootResolver) Album() AlbumResolver { return &albumResolver{r} }
@@ -36,11 +37,11 @@ func (r *albumResolver) Project(ctx context.Context, obj *Album) (AlbumProjectRe
 
 	project, err := r.useCases.GetProject(ctx, gp.ID)
 	if err != nil {
-		if errors.Is(err, apartomat.ErrForbidden) {
+		if errors.Is(err, crm.ErrForbidden) {
 			return forbidden()
 		}
 
-		if errors.Is(err, apartomat.ErrNotFound) {
+		if errors.Is(err, crm.ErrNotFound) {
 			return notFound()
 		}
 
@@ -55,7 +56,7 @@ func (r *albumResolver) Project(ctx context.Context, obj *Album) (AlbumProjectRe
 func (r *albumResolver) File(ctx context.Context, obj *Album) (AlbumRecentFileResult, error) {
 	albumFile, file, err := r.useCases.GetAlbumRecentFile(ctx, obj.ID)
 	if err != nil {
-		if errors.Is(err, apartomat.ErrForbidden) {
+		if errors.Is(err, crm.ErrForbidden) {
 			return forbidden()
 		}
 

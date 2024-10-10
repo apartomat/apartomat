@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	parent "github.com/apartomat/apartomat/internal/image"
+	parent "github.com/apartomat/apartomat/internal/crm/image"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/nfnt/resize"

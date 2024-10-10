@@ -1,10 +1,11 @@
-package apartomat
+package crm
 
 import (
 	"errors"
-	"github.com/apartomat/apartomat/internal/auth"
-	"github.com/apartomat/apartomat/internal/image"
-	"github.com/apartomat/apartomat/internal/mail"
+
+	"github.com/apartomat/apartomat/internal/crm/auth"
+	"github.com/apartomat/apartomat/internal/crm/image"
+	"github.com/apartomat/apartomat/internal/crm/mail"
 	albumFiles "github.com/apartomat/apartomat/internal/store/album_files"
 	"github.com/apartomat/apartomat/internal/store/albums"
 	"github.com/apartomat/apartomat/internal/store/contacts"
@@ -24,7 +25,7 @@ type Params struct {
 	SendPinByEmail bool
 }
 
-type Apartomat struct {
+type CRM struct {
 	Params Params
 
 	AuthTokenIssuer   auth.AuthTokenIssuer

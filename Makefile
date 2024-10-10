@@ -2,7 +2,7 @@ include .env
 export
 
 dev:
-	env $(cat .env | xargs) go run ./cmd/apartomat run
+	env $(cat .env | xargs) go run ./cmd/crm run
 
 dev-public-api:
 	env $(cat .env.public-api | xargs) go run ./cmd/public-api

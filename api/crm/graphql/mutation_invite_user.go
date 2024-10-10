@@ -6,7 +6,8 @@ import (
 	"log/slog"
 	"math"
 
-	apartomat "github.com/apartomat/apartomat/internal"
+	"github.com/apartomat/apartomat/internal/crm"
+
 	"github.com/apartomat/apartomat/internal/store/workspace_users"
 )
 
@@ -18,15 +19,15 @@ func (r *mutationResolver) InviteUser(
 ) (InviteUserToWorkspaceResult, error) {
 	res, expiration, err := r.useCases.InviteUserToWorkspace(ctx, workspaceID, email, workspace_users.WorkspaceUserRole(role))
 	if err != nil {
-		if errors.Is(err, apartomat.ErrForbidden) {
+		if errors.Is(err, crm.ErrForbidden) {
 			return forbidden()
 		}
 
-		if errors.Is(err, apartomat.ErrNotFound) {
+		if errors.Is(err, crm.ErrNotFound) {
 			return notFound()
 		}
 
-		if errors.Is(err, apartomat.ErrAlreadyExists) {
+		if errors.Is(err, crm.ErrAlreadyExists) {
 			return AlreadyInWorkspace{Message: "user already in workspace"}, nil
 		}
 

@@ -6,7 +6,7 @@ import (
 	"log/slog"
 
 	"github.com/99designs/gqlgen/graphql"
-	apartomat "github.com/apartomat/apartomat/internal"
+	"github.com/apartomat/apartomat/internal/crm"
 )
 
 func (r *mutationResolver) UploadVisualizations(
@@ -16,11 +16,11 @@ func (r *mutationResolver) UploadVisualizations(
 	roomID *string,
 ) (UploadVisualizationsResult, error) {
 	var (
-		uploads = make([]apartomat.Upload, len(files))
+		uploads = make([]crm.Upload, len(files))
 	)
 
 	for i, f := range files {
-		uploads[i] = apartomat.Upload{
+		uploads[i] = crm.Upload{
 			Name:     f.Filename,
 			MimeType: f.ContentType,
 			Data:     f.File,
@@ -30,7 +30,7 @@ func (r *mutationResolver) UploadVisualizations(
 
 	res, err := r.useCases.UploadVisualizations(ctx, projectID, uploads, roomID)
 	if err != nil {
-		if errors.Is(err, apartomat.ErrForbidden) {
+		if errors.Is(err, crm.ErrForbidden) {
 			return forbidden()
 		}
 
@@ -47,7 +47,7 @@ func (r *mutationResolver) UploadVisualizations(
 
 }
 
-func visualizationsWithFilesToGraphQL(visualizations []*apartomat.VisualizationWithFile) []*Visualization {
+func visualizationsWithFilesToGraphQL(visualizations []*crm.VisualizationWithFile) []*Visualization {
 	var (
 		res = make([]*Visualization, len(visualizations))
 	)

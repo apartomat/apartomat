@@ -3,19 +3,20 @@ package graphql
 import (
 	"context"
 	"errors"
-	apartomat "github.com/apartomat/apartomat/internal"
-	"github.com/apartomat/apartomat/internal/store/workspaces"
 	"log/slog"
+
+	"github.com/apartomat/apartomat/internal/crm"
+	"github.com/apartomat/apartomat/internal/store/workspaces"
 )
 
 func (r *queryResolver) Workspace(ctx context.Context, id string) (WorkspaceResult, error) {
 	ws, err := r.useCases.GetWorkspace(ctx, id)
 	if err != nil {
-		if errors.Is(err, apartomat.ErrForbidden) {
+		if errors.Is(err, crm.ErrForbidden) {
 			return forbidden()
 		}
 
-		if errors.Is(err, apartomat.ErrNotFound) {
+		if errors.Is(err, crm.ErrNotFound) {
 			return notFound()
 		}
 

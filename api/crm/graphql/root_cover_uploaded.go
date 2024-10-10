@@ -2,8 +2,9 @@ package graphql
 
 import (
 	"context"
-	"github.com/apartomat/apartomat/internal/dataloaders"
 	"log/slog"
+
+	"github.com/apartomat/apartomat/api/crm/graphql/dataloaders"
 )
 
 func (r *rootResolver) CoverUploaded() CoverUploadedResolver {

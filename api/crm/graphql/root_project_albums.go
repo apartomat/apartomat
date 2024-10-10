@@ -3,10 +3,11 @@ package graphql
 import (
 	"context"
 	"errors"
-	"github.com/99designs/gqlgen/graphql"
-	apartomat "github.com/apartomat/apartomat/internal"
-	"github.com/apartomat/apartomat/internal/store/albums"
 	"log/slog"
+
+	"github.com/99designs/gqlgen/graphql"
+	"github.com/apartomat/apartomat/internal/crm"
+	"github.com/apartomat/apartomat/internal/store/albums"
 )
 
 func (r *rootResolver) ProjectAlbums() ProjectAlbumsResolver {
@@ -35,7 +36,7 @@ func (r *projectAlbumsResolver) List(
 			offset,
 		)
 		if err != nil {
-			if errors.Is(err, apartomat.ErrForbidden) {
+			if errors.Is(err, crm.ErrForbidden) {
 				return forbidden()
 			}
 
@@ -78,7 +79,7 @@ func (r *projectAlbumsResolver) Total(
 			project.ID,
 		)
 		if err != nil {
-			if errors.Is(err, apartomat.ErrForbidden) {
+			if errors.Is(err, crm.ErrForbidden) {
 				return forbidden()
 			}
 

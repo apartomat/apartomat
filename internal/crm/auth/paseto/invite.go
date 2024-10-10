@@ -3,7 +3,7 @@ package paseto
 import (
 	"crypto/ed25519"
 	"fmt"
-	"github.com/apartomat/apartomat/internal/auth"
+	"github.com/apartomat/apartomat/internal/crm/auth"
 	"github.com/o1egl/paseto"
 	"time"
 )

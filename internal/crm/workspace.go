@@ -1,11 +1,11 @@
-package apartomat
+package crm
 
 import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/apartomat/apartomat/internal/auth"
-	"github.com/apartomat/apartomat/internal/dataloaders"
+	"github.com/apartomat/apartomat/api/crm/graphql/dataloaders"
+	"github.com/apartomat/apartomat/internal/crm/auth"
 	"github.com/apartomat/apartomat/internal/store/projects"
 	"github.com/apartomat/apartomat/internal/store/users"
 	"github.com/apartomat/apartomat/internal/store/workspace_users"
@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-func (u *Apartomat) GetWorkspace(ctx context.Context, id string) (*workspaces.Workspace, error) {
+func (u *CRM) GetWorkspace(ctx context.Context, id string) (*workspaces.Workspace, error) {
 	workspace, err := u.Workspaces.Get(ctx, workspaces.IDIn(id))
 	if err != nil {
 		return nil, err
@@ -28,7 +28,7 @@ func (u *Apartomat) GetWorkspace(ctx context.Context, id string) (*workspaces.Wo
 	return workspace, nil
 }
 
-func (u *Apartomat) GetDefaultWorkspace(ctx context.Context, userID string) (*workspaces.Workspace, error) {
+func (u *CRM) GetDefaultWorkspace(ctx context.Context, userID string) (*workspaces.Workspace, error) {
 	workspace, err := u.Workspaces.Get(ctx, workspaces.UserIDIn(userID))
 	if err != nil {
 		return nil, err
@@ -37,7 +37,7 @@ func (u *Apartomat) GetDefaultWorkspace(ctx context.Context, userID string) (*wo
 	return workspace, nil
 }
 
-func (u *Apartomat) GetWorkspaceProjects(
+func (u *CRM) GetWorkspaceProjects(
 	ctx context.Context,
 	workspaceID string,
 	status []projects.Status,
@@ -66,7 +66,7 @@ func (u *Apartomat) GetWorkspaceProjects(
 	return res, nil
 }
 
-func (u *Apartomat) GetWorkspaceUserProfileDl(ctx context.Context, workspaceID, userID string) (*users.User, error) {
+func (u *CRM) GetWorkspaceUserProfileDl(ctx context.Context, workspaceID, userID string) (*users.User, error) {
 	var (
 		loaders = dataloaders.FromContext(ctx)
 	)
@@ -88,7 +88,7 @@ func (u *Apartomat) GetWorkspaceUserProfileDl(ctx context.Context, workspaceID, 
 	return user, nil
 }
 
-func (u *Apartomat) GetWorkspaceUsers(ctx context.Context, workspaceID string, limit, offset int) ([]*workspace_users.WorkspaceUser, error) {
+func (u *CRM) GetWorkspaceUsers(ctx context.Context, workspaceID string, limit, offset int) ([]*workspace_users.WorkspaceUser, error) {
 	if ok, err := u.Acl.CanGetWorkspaceUsersOfWorkspaceID(ctx, auth.UserFromCtx(ctx), workspaceID); err != nil {
 		return nil, err
 	} else if !ok {
@@ -109,7 +109,7 @@ func (u *Apartomat) GetWorkspaceUsers(ctx context.Context, workspaceID string, l
 	return wu, nil
 }
 
-func (u *Apartomat) InviteUserToWorkspace(
+func (u *CRM) InviteUserToWorkspace(
 	ctx context.Context,
 	workspaceID string,
 	email string,

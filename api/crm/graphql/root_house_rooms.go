@@ -6,7 +6,7 @@ import (
 	"log/slog"
 
 	"github.com/99designs/gqlgen/graphql"
-	apartomat "github.com/apartomat/apartomat/internal"
+	"github.com/apartomat/apartomat/internal/crm"
 	"github.com/apartomat/apartomat/internal/store/rooms"
 )
 
@@ -33,7 +33,7 @@ func (r *houseRoomsResolver) List(ctx context.Context, obj *HouseRooms, limit in
 			offset,
 		)
 		if err != nil {
-			if errors.Is(err, apartomat.ErrForbidden) {
+			if errors.Is(err, crm.ErrForbidden) {
 				return forbidden()
 			}
 

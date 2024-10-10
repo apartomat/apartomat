@@ -1,16 +1,16 @@
 package graphql
 
 import (
-	apartomat "github.com/apartomat/apartomat/internal"
+	"github.com/apartomat/apartomat/internal/crm"
 	"github.com/uptrace/bun"
 )
 
 type rootResolver struct {
 	db       *bun.DB
-	useCases *apartomat.Apartomat
+	useCases *crm.CRM
 }
 
-func NewRootResolver(db *bun.DB, useCases *apartomat.Apartomat) ResolverRoot {
+func NewRootResolver(db *bun.DB, useCases *crm.CRM) ResolverRoot {
 	return &rootResolver{db: db, useCases: useCases}
 }
 

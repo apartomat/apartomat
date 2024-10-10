@@ -5,7 +5,7 @@ import (
 	"errors"
 	"log/slog"
 
-	"github.com/apartomat/apartomat/internal/auth/paseto"
+	"github.com/apartomat/apartomat/internal/crm/auth/paseto"
 )
 
 func (r *mutationResolver) ConfirmLoginPin(ctx context.Context, t, pin string) (ConfirmLoginPinResult, error) {

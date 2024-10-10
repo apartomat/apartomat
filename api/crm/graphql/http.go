@@ -11,8 +11,8 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"github.com/99designs/gqlgen/graphql/handler/lru"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
-	"github.com/apartomat/apartomat/internal/auth"
-	"github.com/apartomat/apartomat/internal/dataloaders"
+	"github.com/apartomat/apartomat/api/crm/graphql/dataloaders"
+	"github.com/apartomat/apartomat/internal/crm/auth"
 	"github.com/apartomat/apartomat/internal/pkg/log"
 	"github.com/gorilla/websocket"
 )

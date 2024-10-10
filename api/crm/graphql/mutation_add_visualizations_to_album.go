@@ -3,8 +3,9 @@ package graphql
 import (
 	"context"
 	"errors"
-	apartomat "github.com/apartomat/apartomat/internal"
 	"log/slog"
+
+	"github.com/apartomat/apartomat/internal/crm"
 )
 
 func (r *mutationResolver) AddVisualizationsToAlbum(
@@ -14,7 +15,7 @@ func (r *mutationResolver) AddVisualizationsToAlbum(
 ) (AddVisualizationsToAlbumResult, error) {
 	pages, n, err := r.useCases.AddVisualizationsToAlbum(ctx, albumID, visualizations)
 	if err != nil {
-		if errors.Is(err, apartomat.ErrForbidden) {
+		if errors.Is(err, crm.ErrForbidden) {
 			return forbidden()
 		}
 

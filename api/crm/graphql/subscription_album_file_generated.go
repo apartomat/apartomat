@@ -3,11 +3,12 @@ package graphql
 import (
 	"context"
 	"errors"
-	apartomat "github.com/apartomat/apartomat/internal"
-	albumFiles "github.com/apartomat/apartomat/internal/store/album_files"
-	"github.com/apartomat/apartomat/internal/store/albums"
 	"log/slog"
 	"time"
+
+	"github.com/apartomat/apartomat/internal/crm"
+	albumFiles "github.com/apartomat/apartomat/internal/store/album_files"
+	"github.com/apartomat/apartomat/internal/store/albums"
 )
 
 func (r *subscriptionResolver) AlbumFileGenerated(ctx context.Context, id string) (<-chan AlbumFileGenerated, error) {
@@ -36,7 +37,7 @@ func (r *subscriptionResolver) AlbumFileGenerated(ctx context.Context, id string
 				albumFile, _, err := r.useCases.GetAlbumRecentFile(ctx, id)
 				if err != nil {
 					switch {
-					case errors.Is(err, apartomat.ErrForbidden):
+					case errors.Is(err, crm.ErrForbidden):
 						ch <- Forbidden{Message: "forbidden"}
 					case errors.Is(err, albums.ErrAlbumNotFound):
 						ch <- NotFound{Message: "not found"}

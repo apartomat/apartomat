@@ -1,9 +1,9 @@
-package apartomat
+package crm
 
 import (
 	"context"
 	"fmt"
-	"github.com/apartomat/apartomat/internal/auth"
+	"github.com/apartomat/apartomat/internal/crm/auth"
 	"io"
 	"path/filepath"
 
@@ -18,7 +18,7 @@ type Upload struct {
 	Size     int64
 }
 
-func (u *Apartomat) GetFiles(
+func (u *CRM) GetFiles(
 	ctx context.Context,
 	projectID string,
 	fileType []FileType,
@@ -44,7 +44,7 @@ func (u *Apartomat) GetFiles(
 	return p, nil
 }
 
-func (u *Apartomat) CountFiles(
+func (u *CRM) CountFiles(
 	ctx context.Context,
 	projectID string,
 	fileType []FileType,
@@ -61,7 +61,7 @@ func (u *Apartomat) CountFiles(
 	)
 }
 
-func (u *Apartomat) UploadFile(
+func (u *CRM) UploadFile(
 	ctx context.Context,
 	projectID string,
 	upload Upload,
@@ -99,7 +99,7 @@ func (u *Apartomat) UploadFile(
 	return f, nil
 }
 
-func (u *Apartomat) GetFile(
+func (u *CRM) GetFile(
 	ctx context.Context,
 	id string,
 ) (*File, error) {

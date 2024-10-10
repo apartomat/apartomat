@@ -5,7 +5,7 @@ import (
 	"errors"
 	"log/slog"
 
-	apartomat "github.com/apartomat/apartomat/internal"
+	"github.com/apartomat/apartomat/internal/crm"
 )
 
 func (r *mutationResolver) UpdateContact(
@@ -16,13 +16,13 @@ func (r *mutationResolver) UpdateContact(
 	contact, err := r.useCases.UpdateContact(
 		ctx,
 		contactID,
-		apartomat.UpdateContactParams{
+		crm.UpdateContactParams{
 			FullName: input.FullName,
 			Details:  contactsDetailsFromGraphQL(input.Details),
 		},
 	)
 	if err != nil {
-		if errors.Is(err, apartomat.ErrForbidden) {
+		if errors.Is(err, crm.ErrForbidden) {
 			return forbidden()
 		}
 

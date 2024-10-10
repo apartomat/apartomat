@@ -1,14 +1,14 @@
-package apartomat
+package crm
 
 import (
 	"context"
 	"fmt"
-	"github.com/apartomat/apartomat/internal/auth"
+	"github.com/apartomat/apartomat/internal/crm/auth"
 	"github.com/apartomat/apartomat/internal/store/houses"
 	. "github.com/apartomat/apartomat/internal/store/rooms"
 )
 
-func (u *Apartomat) GetRooms(ctx context.Context, houseID string, limit, offset int) ([]*Room, error) {
+func (u *CRM) GetRooms(ctx context.Context, houseID string, limit, offset int) ([]*Room, error) {
 	house, err := u.Houses.Get(ctx, houses.IDIn(houseID))
 	if err != nil {
 		return nil, err
@@ -23,7 +23,7 @@ func (u *Apartomat) GetRooms(ctx context.Context, houseID string, limit, offset 
 	return u.Rooms.List(ctx, HouseIDIn(houseID), SortPositionAsc, limit, offset)
 }
 
-func (u *Apartomat) AddRoom(
+func (u *CRM) AddRoom(
 	ctx context.Context,
 	houseID string,
 	name string,
@@ -57,7 +57,7 @@ func (u *Apartomat) AddRoom(
 	return room, nil
 }
 
-func (u *Apartomat) UpdateRoom(
+func (u *CRM) UpdateRoom(
 	ctx context.Context,
 	roomID string,
 	name string,
@@ -86,7 +86,7 @@ func (u *Apartomat) UpdateRoom(
 	return room, nil
 }
 
-func (u *Apartomat) DeleteRoom(ctx context.Context, roomID string) (*Room, error) {
+func (u *CRM) DeleteRoom(ctx context.Context, roomID string) (*Room, error) {
 	room, err := u.Rooms.Get(ctx, IDIn(roomID))
 	if err != nil {
 		return nil, err
@@ -103,7 +103,7 @@ func (u *Apartomat) DeleteRoom(ctx context.Context, roomID string) (*Room, error
 	return room, err
 }
 
-func (u *Apartomat) MoveRoomToPosition(ctx context.Context, roomID string, position int) (*Room, error) {
+func (u *CRM) MoveRoomToPosition(ctx context.Context, roomID string, position int) (*Room, error) {
 	room, err := u.Rooms.Get(ctx, IDIn(roomID))
 	if err != nil {
 		return nil, err

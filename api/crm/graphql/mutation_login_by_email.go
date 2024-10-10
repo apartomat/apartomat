@@ -5,7 +5,7 @@ import (
 	"errors"
 	"log/slog"
 
-	apartomat "github.com/apartomat/apartomat/internal"
+	"github.com/apartomat/apartomat/internal/crm"
 )
 
 const (
@@ -17,7 +17,7 @@ func (r *mutationResolver) LoginByEmail(ctx context.Context, email string, works
 	case true:
 		e, err := r.useCases.LoginByEmail(ctx, email, workspace)
 		if err != nil {
-			if errors.Is(err, apartomat.ErrInvalidEmail) {
+			if errors.Is(err, crm.ErrInvalidEmail) {
 				return InvalidEmail{Message: err.Error()}, nil
 			}
 
@@ -30,7 +30,7 @@ func (r *mutationResolver) LoginByEmail(ctx context.Context, email string, works
 	default:
 		e, token, err := r.useCases.LoginEmailPIN(ctx, email, workspace)
 		if err != nil {
-			if errors.Is(err, apartomat.ErrInvalidEmail) {
+			if errors.Is(err, crm.ErrInvalidEmail) {
 				return InvalidEmail{Message: err.Error()}, nil
 			}
 

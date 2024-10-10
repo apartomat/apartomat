@@ -3,18 +3,19 @@ package graphql
 import (
 	"context"
 	"errors"
-	apartomat "github.com/apartomat/apartomat/internal"
 	"log/slog"
+
+	"github.com/apartomat/apartomat/internal/crm"
 )
 
 func (r *mutationResolver) GenerateAlbumFile(ctx context.Context, albumID string) (GenerateAlbumFileResult, error) {
 	albumFile, file, err := r.useCases.StartGenerateAlbumFile(ctx, albumID)
 	if err != nil {
-		if errors.Is(err, apartomat.ErrForbidden) {
+		if errors.Is(err, crm.ErrForbidden) {
 			return forbidden()
 		}
 
-		if errors.Is(err, apartomat.ErrNotFound) {
+		if errors.Is(err, crm.ErrNotFound) {
 			return notFound()
 		}
 

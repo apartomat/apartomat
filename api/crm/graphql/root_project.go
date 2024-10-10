@@ -4,11 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
+	"time"
+
 	"github.com/apartomat/apartomat/internal/store"
 	"github.com/apartomat/apartomat/internal/store/projects"
 	sites "github.com/apartomat/apartomat/internal/store/public_sites"
-	"log/slog"
-	"time"
 )
 
 func (r *rootResolver) Project() ProjectResolver { return &projectResolver{r} }

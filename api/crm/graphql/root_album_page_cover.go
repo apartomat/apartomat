@@ -5,7 +5,7 @@ import (
 	"errors"
 	"log/slog"
 
-	apartomat "github.com/apartomat/apartomat/internal"
+	"github.com/apartomat/apartomat/internal/crm"
 	"github.com/apartomat/apartomat/internal/crm/svg"
 )
 
@@ -23,7 +23,7 @@ func (r *albumPageCoverResolver) SVG(ctx context.Context, obj *AlbumPageCover) (
 		if f, ok := c.File.(File); ok {
 			file, err := r.useCases.GetFile(ctx, f.ID)
 			if err != nil {
-				if errors.Is(err, apartomat.ErrNotFound) {
+				if errors.Is(err, crm.ErrNotFound) {
 					return notFound()
 				}
 

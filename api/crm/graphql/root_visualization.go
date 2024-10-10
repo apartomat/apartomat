@@ -2,7 +2,7 @@ package graphql
 
 import (
 	"context"
-	"github.com/apartomat/apartomat/internal/dataloaders"
+	"github.com/apartomat/apartomat/api/crm/graphql/dataloaders"
 )
 
 func (r *rootResolver) Visualization() VisualizationResolver {

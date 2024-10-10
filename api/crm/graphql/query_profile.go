@@ -5,8 +5,8 @@ import (
 	"errors"
 	"log/slog"
 
-	apartomat "github.com/apartomat/apartomat/internal"
-	"github.com/apartomat/apartomat/internal/auth"
+	"github.com/apartomat/apartomat/internal/crm"
+	"github.com/apartomat/apartomat/internal/crm/auth"
 	"github.com/apartomat/apartomat/internal/pkg/gravatar"
 )
 
@@ -14,7 +14,7 @@ func (r *queryResolver) Profile(ctx context.Context) (UserProfileResult, error) 
 	if userCtx := auth.UserFromCtx(ctx); userCtx != nil {
 		user, err := r.useCases.GetUserProfile(ctx, userCtx.ID)
 		if err != nil {
-			if errors.Is(err, apartomat.ErrForbidden) {
+			if errors.Is(err, crm.ErrForbidden) {
 				return forbidden()
 			}
 

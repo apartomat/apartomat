@@ -4,6 +4,12 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"github.com/apartomat/apartomat/api/crm/graphql/dataloaders"
+	"github.com/apartomat/apartomat/internal/crm"
+	paseto2 "github.com/apartomat/apartomat/internal/crm/auth/paseto"
+	"github.com/apartomat/apartomat/internal/crm/image/minio"
+	"github.com/apartomat/apartomat/internal/crm/mail"
+	"github.com/apartomat/apartomat/internal/crm/mail/smtp"
 	"github.com/apartomat/apartomat/internal/pkg/log"
 	"github.com/go-pg/pg/v10"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -15,12 +21,6 @@ import (
 	"strconv"
 
 	"github.com/apartomat/apartomat/api/crm/graphql"
-	apartomat "github.com/apartomat/apartomat/internal"
-	"github.com/apartomat/apartomat/internal/auth/paseto"
-	"github.com/apartomat/apartomat/internal/dataloaders"
-	"github.com/apartomat/apartomat/internal/image/minio"
-	"github.com/apartomat/apartomat/internal/mail"
-	"github.com/apartomat/apartomat/internal/mail/smtp"
 	bunhook "github.com/apartomat/apartomat/internal/pkg/bun"
 	gopghook "github.com/apartomat/apartomat/internal/pkg/go-pg"
 	albumFiles "github.com/apartomat/apartomat/internal/store/album_files/postgres"
@@ -72,10 +72,10 @@ func main() {
 			os.Exit(1)
 		}
 
-		confirmLoginIssuerVerifier := paseto.NewConfirmEmailTokenIssuerVerifier(privateKey)
-		authIssuerVerifier := paseto.NewAuthTokenIssuerVerifier(privateKey)
-		confirmEmailPin := paseto.NewConfirmEmailPINTokenIssuerVerifier(privateKey)
-		invite := paseto.NewInviteTokenIssuerVerifier(privateKey)
+		confirmLoginIssuerVerifier := paseto2.NewConfirmEmailTokenIssuerVerifier(privateKey)
+		authIssuerVerifier := paseto2.NewAuthTokenIssuerVerifier(privateKey)
+		confirmEmailPin := paseto2.NewConfirmEmailPINTokenIssuerVerifier(privateKey)
+		invite := paseto2.NewInviteTokenIssuerVerifier(privateKey)
 
 		//
 
@@ -142,8 +142,8 @@ func main() {
 
 		uploader := minio.NewUploader("apartomat")
 
-		usecases := &apartomat.Apartomat{
-			Params: apartomat.Params{
+		usecases := &crm.CRM{
+			Params: crm.Params{
 				SendPinByEmail: getBoolEnv("SEND_PIN_BY_EMAIL"),
 			},
 			AuthTokenIssuer:              authIssuerVerifier,
@@ -172,7 +172,7 @@ func main() {
 			Visualizations: visualizationsStore,
 			Workspaces:     workspacesStore,
 			WorkspaceUsers: workspaceUsersStore,
-			Acl: apartomat.NewAcl(
+			Acl: crm.NewAcl(
 				workspaceUsersStore,
 				projectsStore,
 				housesStore,
@@ -190,7 +190,7 @@ func main() {
 		h := graphql.Handler(
 			usecases.CheckAuthToken,
 			func() *dataloaders.DataLoaders {
-				return dataloaders.NewLoaders(
+				return dataloaders.NewDataLoaders(
 					filesStore,
 					roomsStore,
 					usersStore,

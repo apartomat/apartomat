@@ -1,16 +1,16 @@
-package apartomat
+package crm
 
 import (
 	"context"
 	"fmt"
-	"github.com/apartomat/apartomat/internal/auth"
+	"github.com/apartomat/apartomat/internal/crm/auth"
 	"github.com/apartomat/apartomat/internal/store/files"
 	"github.com/apartomat/apartomat/internal/store/projects"
 	. "github.com/apartomat/apartomat/internal/store/visualizations"
 	"path/filepath"
 )
 
-func (u *Apartomat) UploadVisualization(
+func (u *CRM) UploadVisualization(
 	ctx context.Context,
 	projectID string,
 	upload Upload,
@@ -45,7 +45,7 @@ type VisualizationWithFile struct {
 	File          *files.File
 }
 
-func (u *Apartomat) UploadVisualizations(
+func (u *CRM) UploadVisualizations(
 	ctx context.Context,
 	projectID string,
 	uploads []Upload,
@@ -109,7 +109,7 @@ func (u *Apartomat) UploadVisualizations(
 	return res, err
 }
 
-func (u *Apartomat) GetVisualizations(
+func (u *CRM) GetVisualizations(
 	ctx context.Context,
 	projectID string,
 	spec Spec,
@@ -124,7 +124,7 @@ func (u *Apartomat) GetVisualizations(
 	return u.Visualizations.List(ctx, And(spec, ProjectIDIn(projectID)), SortRoomAscPositionAsc, limit, offset)
 }
 
-func (u *Apartomat) DeleteVisualizations(
+func (u *CRM) DeleteVisualizations(
 	ctx context.Context,
 	id []string,
 ) ([]*Visualization, error) {
@@ -150,7 +150,7 @@ func (u *Apartomat) DeleteVisualizations(
 	return vis, err
 }
 
-func (u *Apartomat) GetVisualization(
+func (u *CRM) GetVisualization(
 	ctx context.Context,
 	id string,
 ) (*Visualization, error) {
