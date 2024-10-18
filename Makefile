@@ -4,18 +4,18 @@ export
 dev:
 	env $(cat .env | xargs) go run ./cmd/crm run
 
-dev-public-api:
-	env $(cat .env.public-api | xargs) go run ./cmd/public-api
+dev-project-page:
+	env $(cat .env.project-page | xargs) go run ./cmd/project-page
 
 gen:
 	make gen-crm-api
-	make gen-public-api
+	make project-page-api
 
 gen-crm-api:
 	go generate ./api/crm/...
 
-gen-public-site-api:
-	go generate ./api/public/...
+gen-project-page-api:
+	go generate ./api/project-page/...
 
 test:
 	env $(cat .env | xargs) go test ./... --tags=test,unit

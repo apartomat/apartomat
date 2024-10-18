@@ -1,0 +1,35 @@
+schema {
+    query: Query
+}
+
+
+interface Error {
+    message: String!
+}
+
+type ServerError implements Error {
+    message: String!
+}
+
+type Forbidden implements Error {
+    message: String!
+}
+
+type NotFound implements Error {
+    message: String!
+}
+
+type Unknown implements Error {
+    message: String!
+}
+
+
+input StringFilter {
+    eq: [String!]
+}
+
+scalar Url
+
+scalar Time
+
+directive @goField(forceResolver: Boolean, name: String) on INPUT_FIELD_DEFINITION | FIELD_DEFINITION

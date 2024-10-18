@@ -1,0 +1,56 @@
+extend type Query {
+    projectPage(id: String!): ProjectPageResult!
+}
+
+union ProjectPageResult = ProjectPage | NotFound | Forbidden | ServerError
+
+type ProjectPage {
+    id: String!
+    visualizations: ProjectPageVisualizations! @goField(forceResolver: true)
+}
+
+type ProjectPageVisualizations {
+    list(filter: ProjectPageVisualizationsFilter! = {} limit: Int! = 10 offset: Int! = 0): ProjectPageVisualizationsListResult! @goField(forceResolver: true)
+    total(filter: ProjectPageVisualizationsFilter! = {}): ProjectPageVisualizationsTotalResult! @goField(forceResolver: true)
+}
+
+input ProjectPageVisualizationsFilter {
+    roomID: StringFilter
+}
+
+union ProjectPageVisualizationsListResult = ProjectPageVisualizationsList | Forbidden | ServerError
+
+type ProjectPageVisualizationsList {
+    items: [Visualization!]!
+}
+
+union ProjectPageVisualizationsTotalResult = ProjectPageVisualizationsTotal | Forbidden | ServerError
+
+type ProjectPageVisualizationsTotal {
+    total: Int!
+}
+
+type Visualization {
+    id: String!
+    name: String!
+    description: String!
+    file: VisualizationFileResult! @goField(forceResolver: true)
+    room: VisualizationRoomResult! @goField(forceResolver: true)
+}
+
+union VisualizationFileResult = VisualizationFile | NotFound | Forbidden | ServerError
+
+type VisualizationFile {
+    id: String!
+    url: Url!
+    mimeType: String!
+}
+
+union VisualizationRoomResult = Room | NotFound | Forbidden | ServerError
+
+type Room {
+    id: String!
+    name: String!
+    square: Float
+    level: Int
+}
