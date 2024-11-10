@@ -1,0 +1,1 @@
+export { GenerateFile } from "./GenerateFile";

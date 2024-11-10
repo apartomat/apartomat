@@ -181,6 +181,7 @@ input ProjectFilesListFilter {
 enum FileType {
     NONE
     VISUALIZATION
+    ALBUM
 }
 
 union ProjectFilesListResult = ProjectFilesList | Forbidden | ServerError

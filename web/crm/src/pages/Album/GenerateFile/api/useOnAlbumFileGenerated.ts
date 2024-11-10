@@ -10,5 +10,3 @@ export function useOnAlbumFileGenerated({ albumId }: { albumId: string }) {
         shouldResubscribe: true,
     })
 }
-
-export default useOnAlbumFileGenerated

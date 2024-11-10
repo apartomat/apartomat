@@ -21,7 +21,7 @@ func (r *mutationResolver) UploadFile(
 			Data:     input.Data.File,
 			Size:     input.Data.Size,
 		},
-		toProjectFileType(input.Type),
+		toFileType(input.Type),
 	)
 	if err != nil {
 		if errors.Is(err, crm.ErrForbidden) {

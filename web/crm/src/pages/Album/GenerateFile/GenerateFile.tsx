@@ -1,11 +1,9 @@
-import { useEffect, useState } from "react"
-import { DocumentPdf } from "grommet-icons"
-import { Button, ButtonExtendedProps } from "grommet"
+import {useEffect, useState} from "react"
+import {DocumentPdf} from "grommet-icons"
+import {Button, ButtonExtendedProps} from "grommet"
 
-import { AlbumScreenAlbumFragment } from "api/graphql"
-
-import { useOnAlbumFileGenerated } from "./useOnAlbumFileGenerated"
-import { useGenerateAlbumFile } from "./useGenerateAlbumFile"
+import {AlbumFileStatus, AlbumScreenAlbumFragment} from "api/graphql"
+import {useGenerateAlbumFile, useOnAlbumFileGenerated} from "./api/"
 
 export function GenerateFile({
     album,
@@ -18,12 +16,21 @@ export function GenerateFile({
 
     const [fileVersion, setFileVersion] = useState<number | undefined>()
 
+    const [waitingFile, setWaitingFile] = useState(false)
+
     const [generateAlbumFile, { data: generateAlbumFileResultData }] = useGenerateAlbumFile(album.id)
 
     useEffect(() => {
         if (album.file?.__typename === "AlbumFile") {
-            setVersion(album.version)
-            setFileVersion(album.file.version)
+            switch (album.file.status) {
+                case AlbumFileStatus.GeneratingDone:
+                    setVersion(album.version)
+                    setFileVersion(album.file.version)
+                    setWaitingFile(false)
+                    break;
+                default:
+                    setWaitingFile(true)
+            }
         }
     }, [album])
 
@@ -32,8 +39,6 @@ export function GenerateFile({
             setWaitingFile(true)
         }
     }, [generateAlbumFileResultData])
-
-    const [waitingFile, setWaitingFile] = useState(false)
 
     if (waitingFile) {
         return (
@@ -79,8 +84,6 @@ export function GenerateFile({
     )
 }
 
-export default GenerateFile
-
 function ButtonInProgress({
     albumId,
     onAlbumFileGenerated,
@@ -108,7 +111,6 @@ function ButtonInProgress({
 }
 
 function getFileUrl(album: AlbumScreenAlbumFragment): string {
-    console.log(album)
     if (album?.file?.__typename === "AlbumFile" && album.file.file) {
         return album.file.file.url
     }

@@ -259,7 +259,7 @@ export function Project() {
                             </Box>
                             <Visualizations visualizations={project.visualizations} />
                         </Box>
-                    )}
+                )}
 
                 {project.albums.list.__typename === "ProjectAlbumsList" && project.albums.list.items.length > 0 && (
                     <Box margin={{ bottom: "large" }}>

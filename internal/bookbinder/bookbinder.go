@@ -3,7 +3,9 @@ package bookbinder
 import (
 	"bytes"
 	"crypto/md5"
+	"encoding/json"
 	"fmt"
+	"github.com/apartomat/apartomat/internal/store/albums"
 	"github.com/disintegration/gift"
 	"github.com/jung-kurt/gofpdf"
 	"image"
@@ -89,17 +91,22 @@ func init() {
 	}
 }
 
-func Bind(orientation Orientation, format Format, pages []string, images map[string]io.Reader) (io.Reader, error) {
+func Bind(
+	orientation Orientation,
+	format Format,
+	pages []albums.AlbumPage,
+	images map[albums.AlbumPage]io.Reader,
+) (io.Reader, error) {
 	var (
-		page = defaultSizes[format][orientation]
+		pageSize = defaultSizes[format][orientation]
 
-		pdf = gofpdf.New(orientation.String(), page.Units.String(), format.String(), "")
+		pdf = gofpdf.New(orientation.String(), pageSize.Units.String(), format.String(), "")
 
 		res = &bytes.Buffer{}
 	)
 
-	for _, name := range pages {
-		if _, ok := images[name]; !ok {
+	for _, page := range pages {
+		if _, ok := images[page]; !ok {
 			continue
 		}
 
@@ -113,14 +120,19 @@ func Bind(orientation Orientation, format Format, pages []string, images map[str
 
 		pdf.AddPage()
 
-		_, img, err := decode(images[name])
+		_, img, err := decode(images[page])
 		if err != nil {
 			log.Fatalf("can't decode file: %s", err)
 		}
 
-		_, img, _, x, y, w, h := process(img, orientation, page)
+		_, img, _, x, y, w, h := process(img, orientation, pageSize)
 
-		name := fmt.Sprintf("%x", md5.Sum([]byte(name)))
+		b, err := json.Marshal(page)
+		if err != nil {
+			return nil, err
+		}
+
+		name := fmt.Sprintf("%x", md5.Sum(b))
 
 		pdf.RegisterImageOptionsReader(name, opt, img)
 

@@ -2,7 +2,7 @@ import React, { MouseEventHandler, useEffect, useRef, useState } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { InView } from "react-intersection-observer"
 
-import { Box, BoxExtendedProps, Button, Grid, Heading, Header, Image, Text, Drop, Main, RangeInput } from "grommet"
+import { Box, BoxExtendedProps, Button, Grid, Heading, Header, Image, Text, Drop, Main } from "grommet"
 import { Add, Close } from "grommet-icons"
 
 import useAlbum, {
@@ -17,7 +17,7 @@ import useAlbum, {
 
 import { PageSize, PageOrientation } from "./Settings/"
 import AddVisualizations from "pages/Album/AddVisualizations/AddVisualizations"
-import GenerateAlbumFile from "pages/Album/GenerateFile/GenerateFile"
+import { GenerateFile as GenerateAlbumFile } from "pages/Album/GenerateFile"
 
 export function Album() {
     const { id } = useParams<"id">() as { id: string }
@@ -144,12 +144,6 @@ export function Album() {
                         <GenerateAlbumFile album={data.album} onAlbumFileGenerated={() => refetch()} />
                     </Box>
                 )}
-                <RangeInput
-                    value={scale * 100}
-                    onChange={(event) => {
-                        setScale(event.target.value / 100)
-                    }}
-                />
             </Box>
 
             <AddVariants

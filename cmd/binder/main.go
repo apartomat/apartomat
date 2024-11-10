@@ -89,14 +89,6 @@ func main() {
 				slog.Int("pages", len(album.Pages)),
 			)
 
-			var (
-				pages = make([]string, len(album.Pages))
-			)
-
-			for i, p := range album.Pages {
-				pages[i] = p.VisualizationID
-			}
-
 			images, err := download(filesStore)(ctx, album.Pages)
 			if err != nil {
 				slog.Error("can't download images", slog.Any("err", err))
@@ -110,7 +102,7 @@ func main() {
 				filePath     = fmt.Sprintf("pdf/%s/%s", album.ProjectID, fileName)
 			)
 
-			if r, err := bookbinder.Bind(orient, format, pages, images); err != nil {
+			if r, err := bookbinder.Bind(orient, format, album.Pages, images); err != nil {
 				slog.Error("can't bind album", slog.String("id", album.ID), slog.Any("err", err), slog.String("mime", fileMimeType))
 				os.Exit(1)
 			} else {
@@ -169,16 +161,19 @@ func main() {
 	}
 }
 
-func download(filesStore files.Store) func(ctx context.Context, pages []albums.AlbumPageVisualization) (map[string]io.Reader, error) {
-	return func(ctx context.Context, pages []albums.AlbumPageVisualization) (map[string]io.Reader, error) {
+func download(filesStore files.Store) func(ctx context.Context, pages []albums.AlbumPage) (map[albums.AlbumPage]io.Reader, error) {
+	return func(ctx context.Context, pages []albums.AlbumPage) (map[albums.AlbumPage]io.Reader, error) {
 		var (
-			images = make(map[string]io.Reader, len(pages))
+			images = make(map[albums.AlbumPage]io.Reader, len(pages))
 
-			ids = make([]string, len(pages))
+			ids = make([]string, 0, len(pages))
 		)
 
-		for i, p := range pages {
-			ids[i] = p.FileID
+		for _, p := range pages {
+			if vis, ok := p.(albums.AlbumPageVisualization); ok {
+				ids = append(ids, vis.FileID)
+			}
+
 		}
 
 		res, err := filesStore.List(ctx, files.IDIn(ids...), files.SortDefault, len(ids), 0)
@@ -186,7 +181,7 @@ func download(filesStore files.Store) func(ctx context.Context, pages []albums.A
 			return nil, err
 		}
 
-		for i, f := range res {
+		for _, f := range res {
 			resp, err := http.Get(f.URL)
 			if err != nil {
 				return nil, err
@@ -195,7 +190,11 @@ func download(filesStore files.Store) func(ctx context.Context, pages []albums.A
 			if b, err := io.ReadAll(resp.Body); err != nil {
 				return nil, err
 			} else {
-				images[pages[i].VisualizationID] = bytes.NewBuffer(b)
+				for _, p := range pages {
+					if vis, ok := p.(albums.AlbumPageVisualization); ok && vis.FileID == f.ID {
+						images[p] = bytes.NewBuffer(b)
+					}
+				}
 			}
 
 			resp.Body.Close()

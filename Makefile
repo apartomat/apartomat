@@ -7,6 +7,9 @@ dev:
 dev-project-page:
 	env $(cat .env.project-page | xargs) go run ./cmd/project-page
 
+dev-binder:
+	env $(cat .env | xargs) go run ./cmd/binder
+
 gen:
 	make gen-crm-api
 	make project-page-api

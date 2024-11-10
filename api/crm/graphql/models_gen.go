@@ -1386,16 +1386,18 @@ type FileType string
 const (
 	FileTypeNone          FileType = "NONE"
 	FileTypeVisualization FileType = "VISUALIZATION"
+	FileTypeAlbum         FileType = "ALBUM"
 )
 
 var AllFileType = []FileType{
 	FileTypeNone,
 	FileTypeVisualization,
+	FileTypeAlbum,
 }
 
 func (e FileType) IsValid() bool {
 	switch e {
-	case FileTypeNone, FileTypeVisualization:
+	case FileTypeNone, FileTypeVisualization, FileTypeAlbum:
 		return true
 	}
 	return false

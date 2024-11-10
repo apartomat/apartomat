@@ -10,5 +10,3 @@ export function useGenerateAlbumFile(
 
     return [() => gen({ variables: { albumId } }), result]
 }
-
-export default useGenerateAlbumFile

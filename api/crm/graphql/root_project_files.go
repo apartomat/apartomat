@@ -33,7 +33,7 @@ func (r *projectFilesResolver) List(
 		items, err := r.useCases.GetFiles(
 			ctx,
 			project.ID,
-			toProjectFileTypes(filter.Type),
+			toFileTypes(filter.Type),
 			limit,
 			offset,
 		)
@@ -66,7 +66,7 @@ func fileToGraphQL(file *files.File) *File {
 		ID:       file.ID,
 		Name:     file.Name,
 		URL:      file.URL,
-		Type:     projectFileTypeToGraphQL(file.Type),
+		Type:     fileTypeToGraphQL(file.Type),
 		MimeType: file.MimeType,
 	}
 }
@@ -84,7 +84,7 @@ func (r *projectFilesResolver) Total(
 		tot, err := r.useCases.CountFiles(
 			ctx,
 			project.ID,
-			toProjectFileTypes(filter.Type),
+			toFileTypes(filter.Type),
 		)
 		if err != nil {
 			if errors.Is(err, crm.ErrForbidden) {
@@ -100,18 +100,20 @@ func (r *projectFilesResolver) Total(
 	}
 }
 
-func projectFileTypeToGraphQL(t files.FileType) FileType {
+func fileTypeToGraphQL(t files.FileType) FileType {
 	switch t {
-	case files.FileTypeVisualization:
-		return FileTypeVisualization
 	case files.FileTypeNone:
 		return FileTypeNone
+	case files.FileTypeVisualization:
+		return FileTypeVisualization
+	case files.FileTypeAlbum:
+		return FileTypeAlbum
 	default:
 		return FileTypeNone
 	}
 }
 
-func toProjectFileType(t FileType) files.FileType {
+func toFileType(t FileType) files.FileType {
 	switch t {
 	case FileTypeVisualization:
 		return files.FileTypeVisualization
@@ -122,11 +124,11 @@ func toProjectFileType(t FileType) files.FileType {
 	}
 }
 
-func toProjectFileTypes(l []FileType) []files.FileType {
+func toFileTypes(l []FileType) []files.FileType {
 	res := make([]files.FileType, len(l))
 
 	for i, t := range l {
-		res[i] = toProjectFileType(t)
+		res[i] = toFileType(t)
 	}
 
 	return res
