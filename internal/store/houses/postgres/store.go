@@ -4,10 +4,11 @@ import (
 	"context"
 	"time"
 
-	gopghook "github.com/apartomat/apartomat/internal/pkg/go-pg"
+	bunhook "github.com/apartomat/apartomat/internal/pkg/bun"
 	. "github.com/apartomat/apartomat/internal/store/houses"
 	"github.com/doug-martin/goqu/v9"
-	"github.com/go-pg/pg/v10"
+	"github.com/doug-martin/goqu/v9/exp"
+	"github.com/uptrace/bun"
 )
 
 const (
@@ -15,10 +16,10 @@ const (
 )
 
 type store struct {
-	db *pg.DB
+	db *bun.DB
 }
 
-func NewStore(db *pg.DB) *store {
+func NewStore(db *bun.DB) *store {
 	return &store{db}
 }
 
@@ -27,36 +28,21 @@ var (
 )
 
 func (s *store) List(ctx context.Context, spec Spec, sort Sort, limit, offset int) ([]*House, error) {
-	qs, err := toSpecQuery(spec)
+	sql, args, err := selectBySpec(housesTableName, spec, sort, limit, offset)
 	if err != nil {
 		return nil, err
 	}
 
-	expr, err := qs.Expression()
-	if err != nil {
+	var (
+		recs = make([]*record, 0)
+	)
+
+	if err := s.db.NewRaw(sql, args...).
+		Scan(bunhook.WithQueryContext(ctx, "Houses.List"), &recs); err != nil {
 		return nil, err
 	}
 
-	orderExpr := goqu.I("created_at").Asc()
-
-	sql, args, err := goqu.From(housesTableName).
-		Where(expr).
-		Order(orderExpr).
-		Limit(uint(limit)).
-		Offset(uint(offset)).
-		ToSQL()
-	if err != nil {
-		return nil, err
-	}
-
-	houses := make([]*record, 0)
-
-	_, err = s.db.QueryContext(gopghook.WithQueryContext(ctx, "houses.List"), &houses, sql, args...)
-	if err != nil {
-		return nil, err
-	}
-
-	return fromRecords(houses), nil
+	return fromRecords(recs), nil
 }
 
 func (s *store) Get(ctx context.Context, spec Spec) (*House, error) {
@@ -75,23 +61,24 @@ func (s *store) Get(ctx context.Context, spec Spec) (*House, error) {
 func (s *store) Save(ctx context.Context, houses ...*House) error {
 	recs := toRecords(houses)
 
-	_, err := s.db.ModelContext(gopghook.WithQueryContext(ctx, "houses.Save"), &recs).
+	_, err := s.db.NewInsert().Model(&recs).
 		Returning("NULL").
-		OnConflict("(id) DO UPDATE").
-		Insert()
+		On("CONFLICT (id) DO UPDATE").
+		Exec(bunhook.WithQueryContext(ctx, "Houses.Save"))
 
 	return err
 }
 
 type record struct {
-	tableName      struct{}  `pg:"apartomat.houses"`
-	ID             string    `pg:"id,pk"`
-	City           string    `pg:"city,use_zero"`
-	Address        string    `pg:"address,use_zero"`
-	HousingComplex string    `pg:"housing_complex,use_zero"`
-	CreatedAt      time.Time `pg:"created_at"`
-	ModifiedAt     time.Time `pg:"modified_at"`
-	ProjectID      string    `pg:"project_id"`
+	bun.BaseModel `bun:"table:apartomat.files,alias:f"`
+
+	ID             string    `bun:"id,pk"`
+	City           string    `bun:"city"`
+	Address        string    `bun:"address"`
+	HousingComplex string    `bun:"housing_complex"`
+	CreatedAt      time.Time `bun:"created_at"`
+	ModifiedAt     time.Time `bun:"modified_at"`
+	ProjectID      string    `bun:"project_id"`
 }
 
 func toRecord(house *House) *record {
@@ -134,4 +121,35 @@ func fromRecords(records []*record) []*House {
 	}
 
 	return houses
+}
+
+func selectBySpec(tableName string, spec Spec, sort Sort, limit, offset int) (string, []interface{}, error) {
+	qs, err := toSpecQuery(spec)
+	if err != nil {
+		return "", nil, err
+	}
+
+	expr, err := qs.Expression()
+	if err != nil {
+		return "", nil, err
+	}
+
+	var (
+		order = make([]exp.OrderedExpression, 0)
+	)
+
+	switch sort {
+	case SortDefault:
+		//
+	}
+
+	var (
+		q = goqu.From(tableName).Where(expr).Limit(uint(limit)).Offset(uint(offset))
+	)
+
+	if len(order) > 0 {
+		q = q.Order(order...)
+	}
+
+	return q.ToSQL()
 }
