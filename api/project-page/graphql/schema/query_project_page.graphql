@@ -6,7 +6,20 @@ union ProjectPageResult = ProjectPage | NotFound | Forbidden | ServerError
 
 type ProjectPage {
     id: String!
+    title: String!
+    description: String!
+    house: ProjectPageHouseResult! @goField(forceResolver: true)
     visualizations: ProjectPageVisualizations! @goField(forceResolver: true)
+    album: ProjectPageAlbumResult! @goField(forceResolver: true)
+}
+
+union ProjectPageHouseResult = House | NotFound | Forbidden | ServerError
+
+type House {
+    id: String!
+    city: String!
+    address: String!
+    housingComplex: String!
 }
 
 type ProjectPageVisualizations {
@@ -15,18 +28,18 @@ type ProjectPageVisualizations {
 }
 
 input ProjectPageVisualizationsFilter {
-    roomID: StringFilter
+    roomId: StringFilter
 }
 
-union ProjectPageVisualizationsListResult = ProjectPageVisualizationsList | Forbidden | ServerError
+union ProjectPageVisualizationsListResult = VisualizationsList | Forbidden | ServerError
 
-type ProjectPageVisualizationsList {
+type VisualizationsList {
     items: [Visualization!]!
 }
 
-union ProjectPageVisualizationsTotalResult = ProjectPageVisualizationsTotal | Forbidden | ServerError
+union ProjectPageVisualizationsTotalResult = VisualizationsTotal | Forbidden | ServerError
 
-type ProjectPageVisualizationsTotal {
+type VisualizationsTotal {
     total: Int!
 }
 
@@ -53,4 +66,12 @@ type Room {
     name: String!
     square: Float
     level: Int
+}
+
+union ProjectPageAlbumResult = Album | Forbidden | NotFound | ServerError
+
+type Album {
+    id: String!
+    name: String!
+    url: String!
 }

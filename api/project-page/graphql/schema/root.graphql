@@ -2,7 +2,6 @@ schema {
     query: Query
 }
 
-
 interface Error {
     message: String!
 }

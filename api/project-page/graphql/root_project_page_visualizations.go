@@ -32,7 +32,7 @@ func (r *projectPageVisualizationsResolver) List(
 		return nil, err
 	}
 
-	return ProjectPageVisualizationsList{Items: visualizationsToGraphQL(res)}, nil
+	return VisualizationsList{Items: visualizationsToGraphQL(res)}, nil
 }
 
 func visualizationsToGraphQL(visualizations []*visualizations.Visualization) []*Visualization {

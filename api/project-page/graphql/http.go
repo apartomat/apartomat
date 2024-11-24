@@ -5,12 +5,6 @@ import (
 	"net/http"
 )
 
-func Handler(
-	resolver ResolverRoot,
-) http.Handler {
-	var (
-		gh = handler.NewDefaultServer(NewExecutableSchema(Config{Resolvers: resolver}))
-	)
-
-	return gh
+func Handler(resolver ResolverRoot) http.Handler {
+	return handler.NewDefaultServer(NewExecutableSchema(Config{Resolvers: resolver}))
 }

@@ -30,6 +30,8 @@ func (r *queryResolver) ProjectPage(ctx context.Context, id string) (ProjectPage
 
 func projectPageToGraphQL(site *public_sites.PublicSite) ProjectPage {
 	return ProjectPage{
-		ID: site.ID,
+		ID:          site.ID,
+		Title:       site.Title,
+		Description: site.Description,
 	}
 }

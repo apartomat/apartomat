@@ -7,6 +7,14 @@ type Error interface {
 	GetMessage() string
 }
 
+type ProjectPageAlbumResult interface {
+	IsProjectPageAlbumResult()
+}
+
+type ProjectPageHouseResult interface {
+	IsProjectPageHouseResult()
+}
+
 type ProjectPageResult interface {
 	IsProjectPageResult()
 }
@@ -27,11 +35,21 @@ type VisualizationRoomResult interface {
 	IsVisualizationRoomResult()
 }
 
+type Album struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+	URL  string `json:"url"`
+}
+
+func (Album) IsProjectPageAlbumResult() {}
+
 type Forbidden struct {
 	Message string `json:"message"`
 }
 
 func (Forbidden) IsProjectPageResult() {}
+
+func (Forbidden) IsProjectPageHouseResult() {}
 
 func (Forbidden) IsProjectPageVisualizationsListResult() {}
 
@@ -41,8 +59,19 @@ func (Forbidden) IsVisualizationFileResult() {}
 
 func (Forbidden) IsVisualizationRoomResult() {}
 
+func (Forbidden) IsProjectPageAlbumResult() {}
+
 func (Forbidden) IsError()                {}
 func (this Forbidden) GetMessage() string { return this.Message }
+
+type House struct {
+	ID             string `json:"id"`
+	City           string `json:"city"`
+	Address        string `json:"address"`
+	HousingComplex string `json:"housingComplex"`
+}
+
+func (House) IsProjectPageHouseResult() {}
 
 type NotFound struct {
 	Message string `json:"message"`
@@ -50,16 +79,24 @@ type NotFound struct {
 
 func (NotFound) IsProjectPageResult() {}
 
+func (NotFound) IsProjectPageHouseResult() {}
+
 func (NotFound) IsVisualizationFileResult() {}
 
 func (NotFound) IsVisualizationRoomResult() {}
+
+func (NotFound) IsProjectPageAlbumResult() {}
 
 func (NotFound) IsError()                {}
 func (this NotFound) GetMessage() string { return this.Message }
 
 type ProjectPage struct {
 	ID             string                     `json:"id"`
+	Title          string                     `json:"title"`
+	Description    string                     `json:"description"`
+	House          ProjectPageHouseResult     `json:"house"`
 	Visualizations *ProjectPageVisualizations `json:"visualizations"`
+	Album          ProjectPageAlbumResult     `json:"album"`
 }
 
 func (ProjectPage) IsProjectPageResult() {}
@@ -70,20 +107,8 @@ type ProjectPageVisualizations struct {
 }
 
 type ProjectPageVisualizationsFilter struct {
-	RoomID *StringFilter `json:"roomID,omitempty"`
+	RoomID *StringFilter `json:"roomId,omitempty"`
 }
-
-type ProjectPageVisualizationsList struct {
-	Items []*Visualization `json:"items"`
-}
-
-func (ProjectPageVisualizationsList) IsProjectPageVisualizationsListResult() {}
-
-type ProjectPageVisualizationsTotal struct {
-	Total int `json:"total"`
-}
-
-func (ProjectPageVisualizationsTotal) IsProjectPageVisualizationsTotalResult() {}
 
 type Query struct {
 }
@@ -103,6 +128,8 @@ type ServerError struct {
 
 func (ServerError) IsProjectPageResult() {}
 
+func (ServerError) IsProjectPageHouseResult() {}
+
 func (ServerError) IsProjectPageVisualizationsListResult() {}
 
 func (ServerError) IsProjectPageVisualizationsTotalResult() {}
@@ -110,6 +137,8 @@ func (ServerError) IsProjectPageVisualizationsTotalResult() {}
 func (ServerError) IsVisualizationFileResult() {}
 
 func (ServerError) IsVisualizationRoomResult() {}
+
+func (ServerError) IsProjectPageAlbumResult() {}
 
 func (ServerError) IsError()                {}
 func (this ServerError) GetMessage() string { return this.Message }
@@ -140,3 +169,15 @@ type VisualizationFile struct {
 }
 
 func (VisualizationFile) IsVisualizationFileResult() {}
+
+type VisualizationsList struct {
+	Items []*Visualization `json:"items"`
+}
+
+func (VisualizationsList) IsProjectPageVisualizationsListResult() {}
+
+type VisualizationsTotal struct {
+	Total int `json:"total"`
+}
+
+func (VisualizationsTotal) IsProjectPageVisualizationsTotalResult() {}

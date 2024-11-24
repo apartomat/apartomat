@@ -4,11 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/99designs/gqlgen/graphql/playground"
-	"github.com/apartomat/apartomat/api/project-page/graphql"
-	"github.com/apartomat/apartomat/internal/project-page"
-	"github.com/go-chi/chi/v5"
-	"github.com/prometheus/common/log"
+	project_page "github.com/apartomat/apartomat/internal/project-page"
+	"github.com/go-chi/cors"
 	"log/slog"
 	"net"
 	"net/http"
@@ -17,6 +14,9 @@ import (
 	"strings"
 	"syscall"
 	"time"
+
+	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/apartomat/apartomat/api/project-page/graphql"
 )
 
 const defaultAddr = ":80"
@@ -38,9 +38,14 @@ func NewServer(service *project_page.Service) *Server {
 }
 
 func (server *Server) Run(opts ...ServerOption) {
-	mux := chi.NewRouter()
+	var (
+		mux = http.NewServeMux()
+	)
 
-	mux.Handle("/graphql", graphql.Handler(graphql.NewRootResolver(server.publicSiteService)))
+	mux.Handle(
+		"/graphql",
+		cors.AllowAll().Handler(graphql.Handler(graphql.NewRootResolver(server.publicSiteService))),
+	)
 
 	mux.Handle("/pg", playground.Handler("GraphQL playground", "/graphql"))
 
@@ -55,8 +60,10 @@ func (server *Server) Run(opts ...ServerOption) {
 		opt(&s)
 	}
 
-	done := make(chan bool)
-	quit := make(chan os.Signal, 1)
+	var (
+		done = make(chan bool)
+		quit = make(chan os.Signal, 1)
+	)
 
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 
@@ -85,11 +92,11 @@ func (server *Server) Run(opts ...ServerOption) {
 		}
 	}()
 
-	log.Info(fmt.Sprintf("Visit http://%s/pg for playground", serverHttpAddr(s.Addr)))
+	slog.Info(fmt.Sprintf("Visit http://%s/pg for playground", serverHttpAddr(s.Addr)))
 
 	<-done
 
-	log.Info("Buy")
+	slog.Info("Buy")
 }
 
 func serverHttpAddr(addr string) string {

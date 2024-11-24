@@ -5,7 +5,10 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/apartomat/apartomat/internal/project-page"
+	albumFiles "github.com/apartomat/apartomat/internal/store/album_files/postgres"
+	albums "github.com/apartomat/apartomat/internal/store/albums/postgres"
 	files "github.com/apartomat/apartomat/internal/store/files/postgres"
+	houses "github.com/apartomat/apartomat/internal/store/houses/postgres"
 	sites "github.com/apartomat/apartomat/internal/store/public_sites/postgres"
 	visualizations "github.com/apartomat/apartomat/internal/store/visualizations/postgres"
 	"github.com/jackc/pgx/v5"
@@ -47,12 +50,18 @@ func main() {
 		filesStore          = files.NewStore(bundb)
 		publicSitesStore    = sites.NewStore(bundb)
 		visualizationsStore = visualizations.NewStore(bundb)
+		albumsStore         = albums.NewStore(bundb)
+		albumsFilesStore    = albumFiles.NewStore(bundb)
+		housesStore         = houses.NewStore(bundb)
 	)
 
 	publicSitesService := project_page.NewService(
 		filesStore,
 		publicSitesStore,
 		visualizationsStore,
+		albumsStore,
+		albumsFilesStore,
+		housesStore,
 	)
 
 	NewServer(publicSitesService).Run(addr)
