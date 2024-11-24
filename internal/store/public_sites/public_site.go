@@ -11,13 +11,15 @@ var (
 )
 
 type PublicSite struct {
-	ID         string
-	Status     Status
-	URL        string
-	Settings   PublicSiteSettings
-	CreatedAt  time.Time
-	ModifiedAt time.Time
-	ProjectID  string
+	ID          string
+	Status      Status
+	URL         string
+	Settings    PublicSiteSettings
+	Title       string
+	Description string
+	CreatedAt   time.Time
+	ModifiedAt  time.Time
+	ProjectID   string
 }
 
 type Status string
@@ -32,17 +34,19 @@ type PublicSiteSettings struct {
 	AllowAlbums         bool
 }
 
-func NewPublicSite(id, url string, status Status, settings PublicSiteSettings, ProjectID string) PublicSite {
+func NewPublicSite(id, title, description, url string, status Status, settings PublicSiteSettings, ProjectID string) PublicSite {
 	now := time.Now()
 
 	return PublicSite{
-		ID:         id,
-		Status:     status,
-		URL:        url,
-		Settings:   settings,
-		CreatedAt:  now,
-		ModifiedAt: now,
-		ProjectID:  ProjectID,
+		ID:          id,
+		Status:      status,
+		URL:         url,
+		Settings:    settings,
+		Title:       title,
+		Description: description,
+		CreatedAt:   now,
+		ModifiedAt:  now,
+		ProjectID:   ProjectID,
 	}
 }
 

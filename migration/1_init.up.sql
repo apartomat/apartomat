@@ -129,6 +129,8 @@ create table apartomat.public_sites (
     status text not null,
     url text not null,
     settings jsonb not null default '{}',
+    title text not null default '',
+    description text not null default '',
     created_at timestamp with time zone not null default now(),
     modified_at timestamp with time zone not null default now(),
     project_id char(21) not null,

@@ -54,6 +54,8 @@ func (u *CRM) CreateProject(
 
 	site := sites.NewPublicSite(
 		siteID,
+		name,
+		"",
 		fmt.Sprintf("https://p.apartomat.ru/%s", siteID),
 		sites.StatusNotPublic,
 		sites.PublicSiteSettings{
@@ -140,6 +142,8 @@ func (u *CRM) MakeProjectPublic(ctx context.Context, projectId string) (*sites.P
 
 		s := sites.NewPublicSite(
 			siteID,
+			proj.Name,
+			"",
 			fmt.Sprintf("https://p.apartomat.ru/%s", siteID),
 			sites.StatusNotPublic,
 			sites.PublicSiteSettings{
@@ -184,6 +188,8 @@ func (u *CRM) MakeProjectNotPublic(ctx context.Context, projectId string) (*site
 
 		s := sites.NewPublicSite(
 			siteID,
+			proj.Name,
+			"",
 			fmt.Sprintf("https://p.apartomat.ru/%s", siteID),
 			sites.StatusPublic,
 			sites.PublicSiteSettings{
