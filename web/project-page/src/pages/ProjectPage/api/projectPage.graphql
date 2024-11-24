@@ -1,0 +1,68 @@
+query projectPageScreen($id: String!) {
+    projectPage(id: $id) {
+        __typename
+        ... on ProjectPage {
+            ...ProjectPageScreenProject
+        }
+        ... on Error {
+            message
+        }
+    }
+}
+
+fragment ProjectPageScreenProject on ProjectPage {
+    id
+    title
+    description
+    house {
+        ... on House {
+            ...ProjectPageScreenHouse
+        }
+        ... on Error {
+            message
+        }
+    }
+    visualizations {
+        list(limit: 100 offset: 0) {
+            __typename
+            ... on VisualizationsList {
+                items {
+                    id
+                    file {
+                        ... on VisualizationFile {
+                            url
+                        }
+                        ... on Error {
+                            message
+                        }
+                    }
+                }
+            }
+        }
+        total {
+            ... on VisualizationsTotal {
+                total
+            }
+        }
+    }
+    album {
+        ... on Album {
+            ...ProjectPageScreenAlbum
+        }
+        ... on Error {
+            message
+        }
+    }
+}
+
+fragment ProjectPageScreenAlbum on Album {
+    id
+    name
+    url
+}
+
+fragment ProjectPageScreenHouse on House {
+    city
+    address
+    housingComplex
+}
