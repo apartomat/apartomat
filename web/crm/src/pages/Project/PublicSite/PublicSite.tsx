@@ -202,7 +202,11 @@ function EditForm({
 
                     {publicSite.__typename === "PublicSite" && (
                         <FormField label="Ссылка" margin={{ top: "small" }}>
-                            <TextInput value={publicSite.url} width="medium" />
+                            <TextInput
+                                readOnlyCopy
+                                value={publicSite.url}
+                                width="medium"
+                            />
                         </FormField>
                     )}
                 </Form>

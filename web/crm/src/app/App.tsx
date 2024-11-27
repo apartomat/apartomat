@@ -72,9 +72,18 @@ const defaultOptions: DefaultOptions = {
 
 const apolloClient = new ApolloClient({ cache, link, defaultOptions })
 
+const messages = {
+    "input": {
+        "readOnlyCopy": {
+            "prompt": "В буфер обмена",
+            "validation": "️Скопировано"
+        }
+    },
+}
+
 function App() {
     return (
-        <Grommet theme={theme}>
+        <Grommet theme={theme} messages={{messages}}>
             <ApolloProvider client={apolloClient}>
                 <AuthProvider>
                     <NotificationsProvider>
