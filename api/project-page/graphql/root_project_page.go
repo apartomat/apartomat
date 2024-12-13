@@ -60,5 +60,6 @@ func (r *projectPageResolver) Album(ctx context.Context, obj *ProjectPage) (Proj
 		ID:   album.ID,
 		Name: album.Name,
 		URL:  file.URL,
+		Size: int(file.Size),
 	}, nil
 }

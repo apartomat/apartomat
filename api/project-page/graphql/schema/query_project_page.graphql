@@ -74,4 +74,5 @@ type Album {
     id: String!
     name: String!
     url: String!
+    size: Int!
 }

@@ -51,6 +51,7 @@ type ComplexityRoot struct {
 	Album struct {
 		ID   func(childComplexity int) int
 		Name func(childComplexity int) int
+		Size func(childComplexity int) int
 		URL  func(childComplexity int) int
 	}
 
@@ -176,6 +177,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Album.Name(childComplexity), true
+
+	case "Album.size":
+		if e.complexity.Album.Size == nil {
+			break
+		}
+
+		return e.complexity.Album.Size(childComplexity), true
 
 	case "Album.url":
 		if e.complexity.Album.URL == nil {
@@ -779,6 +787,50 @@ func (ec *executionContext) fieldContext_Album_url(_ context.Context, field grap
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Album_size(ctx context.Context, field graphql.CollectedField, obj *Album) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Album_size(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Size, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Album_size(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Album",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
@@ -4506,6 +4558,11 @@ func (ec *executionContext) _Album(ctx context.Context, sel ast.SelectionSet, ob
 			}
 		case "url":
 			out.Values[i] = ec._Album_url(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "size":
+			out.Values[i] = ec._Album_size(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
