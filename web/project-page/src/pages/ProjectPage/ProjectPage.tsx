@@ -1,31 +1,23 @@
-import {
-    Box,
-    Button,
-    Grid,
-    Heading,
-    Image,
-    Main,
-    Text,
-    Header
-} from "grommet"
+import { Box, Button, Grid, Heading, Image, Main, Text, Header } from "grommet"
 import { DocumentPdf } from "grommet-icons"
-import {memo, useEffect, useState} from "react"
+import { memo, useEffect, useState } from "react"
 import Lightbox from "yet-another-react-lightbox"
 import "yet-another-react-lightbox/styles.css"
-import {useProjectPage, ProjectPage as ProjectPageType, House } from "./api"
+import { useProjectPage, ProjectPage as ProjectPageType, House, Album } from "./api"
+import { filesize } from "filesize"
 
-export function ProjectPage({id}: {id: string}) {
-    const { data, loading} =  useProjectPage(id)
+export function ProjectPage({ id }: { id: string }) {
+    const { data, loading } = useProjectPage(id)
 
-    const [ projectPage, setProjectPage ] = useState<ProjectPageType>()
+    const [projectPage, setProjectPage] = useState<ProjectPageType>()
 
-    const [ error, setError ]= useState<string | undefined>()
+    const [error, setError] = useState<string | undefined>()
 
-    const [ house, setHouse ] = useState<House | undefined>()
+    const [house, setHouse] = useState<House | undefined>()
 
-    const [ visualizations, setVisualizations ] = useState([])
+    const [visualizations, setVisualizations] = useState([])
 
-    const [ album, setAlbum ] = useState<string | undefined>()
+    const [album, setAlbum] = useState<Album | undefined>()
 
     useEffect(() => {
         const res = data?.projectPage
@@ -47,23 +39,23 @@ export function ProjectPage({id}: {id: string}) {
                 }
 
                 if (res.album.__typename === "Album") {
-                    setAlbum(res.album.url)
+                    setAlbum(res.album)
                 }
 
-                break;
+                break
             case "NotFound":
                 setError("Проект не найден")
-                break;
+                break
             case "Forbidden":
                 setError("Доступ запрещен")
-                break;
+                break
             default:
                 setError("Ошибка сервера")
-                break;
+                break
         }
-    }, [ data ])
+    }, [data])
 
-    const [ showAlbumFullscreen, setShowAlbumFullscreen ] = useState<number | undefined>()
+    const [showAlbumFullscreen, setShowAlbumFullscreen] = useState<number | undefined>()
 
     if (loading) {
         return (
@@ -94,7 +86,9 @@ export function ProjectPage({id}: {id: string}) {
         <Box pad={{ vertical: "medium", horizontal: "large" }}>
             <Header margin={{ vertical: "medium" }}>
                 <Box gap="small">
-                    <Heading level={2} margin="none" color="brand">{projectPage.title}</Heading>
+                    <Heading level={2} margin="none" color="brand">
+                        {projectPage.title}
+                    </Heading>
                     <Box>
                         <Text size="small">{projectPage.description}</Text>
                     </Box>
@@ -102,11 +96,13 @@ export function ProjectPage({id}: {id: string}) {
             </Header>
 
             <Main>
-                {house && <Box pad={{ horizontal:"xxsmall", vertical: "small" }}>
-                    <Box direction="row" gap="small">
-                        <Address house={house}/>
+                {house && (
+                    <Box pad={{ horizontal: "xxsmall", vertical: "small" }}>
+                        <Box direction="row" gap="small">
+                            <Address house={house} />
+                        </Box>
                     </Box>
-                </Box>}
+                )}
 
                 {visualizations.length > 0 && (
                     <Box margin={{ bottom: "large" }}>
@@ -116,11 +112,7 @@ export function ProjectPage({id}: {id: string}) {
                         <Box overflow="auto">
                             <Grid columns="small" style={{ gridAutoFlow: "column", overflowX: "scroll" }} gap="xsmall">
                                 {visualizations.map((vis, index) => (
-                                    <Box
-                                        width="small"
-                                        height="small"
-                                        background="light-2"
-                                    >
+                                    <Box width="small" height="small" background="light-2">
                                         <Image
                                             src={vis.file.url}
                                             fit="contain"
@@ -134,24 +126,29 @@ export function ProjectPage({id}: {id: string}) {
                 )}
 
                 {album && (
-                        <Box margin={{ bottom: "large" }}>
-                            <Box direction="row" justify="between">
-                                <Heading level={3}>Файлы</Heading>
-                            </Box>
-                            {album && (
-                                <Box direction="row" gap="small" align="center">
-                                    <Heading level="5" margin="none">Альбом визуализаций</Heading>
-                                    <Button label={"Скачать"} icon={<DocumentPdf/>} href={album}/>
-                                </Box>
-                            )}
+                    <Box margin={{ bottom: "large" }}>
+                        <Box direction="row" justify="between">
+                            <Heading level={3}>Файлы</Heading>
                         </Box>
+                        {album && (
+                            <Box direction="row" gap="small" align="center">
+                                <Heading level="5" margin="none">
+                                    Альбом визуализаций
+                                </Heading>
+                                <Button label={"Скачать"} icon={<DocumentPdf />} href={album.url} />
+                                <Box>
+                                    <Text size="small">{albumFilesize(album)}</Text>
+                                </Box>
+                            </Box>
+                        )}
+                    </Box>
                 )}
 
                 <Lightbox
                     open={showAlbumFullscreen !== undefined}
                     close={() => setShowAlbumFullscreen(undefined)}
-                    slides={visualizations.map((vis) =>  {
-                        return { src: vis.file.url };
+                    slides={visualizations.map((vis) => {
+                        return { src: vis.file.url }
                     })}
                     index={showAlbumFullscreen || 0}
                 ></Lightbox>
@@ -160,9 +157,9 @@ export function ProjectPage({id}: {id: string}) {
     )
 }
 
-const Address = memo(function Address({ house: {city, housingComplex, address }}: { house: House}) {
-    const short = [];
-    const full = [];
+const Address = memo(function Address({ house: { city, housingComplex, address } }: { house: House }) {
+    const short = []
+    const full = []
 
     const sep = ", "
 
@@ -180,7 +177,9 @@ const Address = memo(function Address({ house: {city, housingComplex, address }}
         full.push(address)
     }
 
-    return (
-        <Button primary color="light-2" label={short.join(sep)} title={full.join(sep)}/>
-    )
+    return <Button primary color="light-2" label={short.join(sep)} title={full.join(sep)} />
 })
+
+function albumFilesize(album: Album) {
+    return filesize(album.size, { locale: "ru" })
+}

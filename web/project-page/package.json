@@ -13,6 +13,7 @@
   "dependencies": {
     "@apollo/client": "^3.11.8",
     "@types/node": "^20.12.10",
+    "filesize": "^10.1.6",
     "grommet": "^2.37.0",
     "grommet-icons": "^4.11.0",
     "react": "^18.2.0",
