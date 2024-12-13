@@ -199,6 +199,7 @@ fragment AlbumScreenFile on AlbumFile {
         url
         type
         mimeType
+        size
     }
     generatingStartedAt
     generatingDoneAt

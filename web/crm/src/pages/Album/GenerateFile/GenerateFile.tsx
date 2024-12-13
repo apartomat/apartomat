@@ -1,9 +1,11 @@
-import {useEffect, useState} from "react"
-import {DocumentPdf} from "grommet-icons"
-import {Button, ButtonExtendedProps} from "grommet"
+import { useEffect, useState } from "react"
+import { filesize } from "filesize"
 
-import {AlbumFileStatus, AlbumScreenAlbumFragment} from "api/graphql"
-import {useGenerateAlbumFile, useOnAlbumFileGenerated} from "./api/"
+import { DocumentPdf } from "grommet-icons"
+import { Box, Button, ButtonExtendedProps, Text } from "grommet"
+
+import { AlbumFileStatus, AlbumScreenAlbumFragment } from "api/graphql"
+import { useGenerateAlbumFile, useOnAlbumFileGenerated } from "./api/"
 
 export function GenerateFile({
     album,
@@ -27,7 +29,7 @@ export function GenerateFile({
                     setVersion(album.version)
                     setFileVersion(album.file.version)
                     setWaitingFile(false)
-                    break;
+                    break
                 default:
                     setWaitingFile(true)
             }
@@ -65,10 +67,26 @@ export function GenerateFile({
                 color="brand"
                 label="Скачать"
                 icon={<DocumentPdf />}
-                download={"test"}
+                download={true}
                 target="_blank"
                 href={getFileUrl(album)}
                 as="a"
+                tip={{
+                    content: (
+                        <Box
+                            pad={{ vertical: "xxsmall", horizontal: "small" }}
+                            background="light-1"
+                            round="medium"
+                            margin="xsmall"
+                            elevation="xsmall"
+                            alignSelf="start"
+                        >
+                            <Text size="small">Файл {getFileSize(album)}</Text>
+                        </Box>
+                    ),
+                    plain: true,
+                    dropProps: { align: { top: "bottom" } },
+                }}
             />
         )
     }
@@ -116,4 +134,12 @@ function getFileUrl(album: AlbumScreenAlbumFragment): string {
     }
 
     return ""
+}
+
+function getFileSize(album: AlbumScreenAlbumFragment): number {
+    if (album?.file?.__typename === "AlbumFile" && album.file.file?.size) {
+        return filesize(album.file.file.size)
+    }
+
+    return 0
 }
