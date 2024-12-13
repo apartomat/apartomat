@@ -54,6 +54,7 @@ create table apartomat.files (
     type text not null,
     mime_type text not null,
     url text not null,
+    size int not null default 0,
     created_at timestamp with time zone not null default now(),
     modified_at timestamp with time zone not null default now(),
     project_id char(21) not null,

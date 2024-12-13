@@ -105,14 +105,15 @@ func (s *store) Delete(ctx context.Context, files ...*File) error {
 type record struct {
 	bun.BaseModel `bun:"table:apartomat.files,alias:f"`
 
-	ID         string    `pg:"id,pk"`
-	Name       string    `pg:"name"`
-	URL        string    `pg:"url"`
-	Type       string    `pg:"type"`
-	MimeType   string    `pg:"mime_type"`
-	CreatedAt  time.Time `pg:"created_at"`
-	ModifiedAt time.Time `pg:"modified_at"`
-	ProjectID  string    `pg:"project_id"`
+	ID         string    `bun:"id,pk"`
+	Name       string    `bun:"name"`
+	URL        string    `bun:"url"`
+	Type       string    `bun:"type"`
+	MimeType   string    `bun:"mime_type"`
+	Size       int64     `bun:"size"`
+	CreatedAt  time.Time `bun:"created_at"`
+	ModifiedAt time.Time `bun:"modified_at"`
+	ProjectID  string    `bun:"project_id"`
 }
 
 func toRecord(file *File) *record {
@@ -122,6 +123,7 @@ func toRecord(file *File) *record {
 		URL:        file.URL,
 		Type:       string(file.Type),
 		MimeType:   file.MimeType,
+		Size:       file.Size,
 		CreatedAt:  file.CreatedAt,
 		ModifiedAt: file.ModifiedAt,
 		ProjectID:  file.ProjectID,
@@ -150,6 +152,7 @@ func fromRecords(records []record) []*File {
 			URL:        r.URL,
 			Type:       FileType(r.Type),
 			MimeType:   r.MimeType,
+			Size:       r.Size,
 			CreatedAt:  r.CreatedAt,
 			ModifiedAt: r.ModifiedAt,
 			ProjectID:  r.ProjectID,

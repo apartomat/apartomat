@@ -182,6 +182,7 @@ type ComplexityRoot struct {
 		ID       func(childComplexity int) int
 		MimeType func(childComplexity int) int
 		Name     func(childComplexity int) int
+		Size     func(childComplexity int) int
 		Type     func(childComplexity int) int
 		URL      func(childComplexity int) int
 	}
@@ -1070,6 +1071,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.File.Name(childComplexity), true
+
+	case "File.size":
+		if e.complexity.File.Size == nil {
+			break
+		}
+
+		return e.complexity.File.Size(childComplexity), true
 
 	case "File.type":
 		if e.complexity.File.Type == nil {
@@ -4434,6 +4442,8 @@ func (ec *executionContext) fieldContext_AlbumFile_file(_ context.Context, field
 				return ec.fieldContext_File_type(ctx, field)
 			case "mimeType":
 				return ec.fieldContext_File_mimeType(ctx, field)
+			case "size":
+				return ec.fieldContext_File_size(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type File", field.Name)
 		},
@@ -6205,6 +6215,50 @@ func (ec *executionContext) fieldContext_File_mimeType(_ context.Context, field 
 	return fc, nil
 }
 
+func (ec *executionContext) _File_size(ctx context.Context, field graphql.CollectedField, obj *File) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_File_size(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Size, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_File_size(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "File",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _FileUploaded_file(ctx context.Context, field graphql.CollectedField, obj *FileUploaded) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_FileUploaded_file(ctx, field)
 	if err != nil {
@@ -6254,6 +6308,8 @@ func (ec *executionContext) fieldContext_FileUploaded_file(_ context.Context, fi
 				return ec.fieldContext_File_type(ctx, field)
 			case "mimeType":
 				return ec.fieldContext_File_mimeType(ctx, field)
+			case "size":
+				return ec.fieldContext_File_size(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type File", field.Name)
 		},
@@ -10389,6 +10445,8 @@ func (ec *executionContext) fieldContext_ProjectFilesList_items(_ context.Contex
 				return ec.fieldContext_File_type(ctx, field)
 			case "mimeType":
 				return ec.fieldContext_File_mimeType(ctx, field)
+			case "size":
+				return ec.fieldContext_File_size(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type File", field.Name)
 		},
@@ -13485,6 +13543,8 @@ func (ec *executionContext) fieldContext_Visualization_file(_ context.Context, f
 				return ec.fieldContext_File_type(ctx, field)
 			case "mimeType":
 				return ec.fieldContext_File_mimeType(ctx, field)
+			case "size":
+				return ec.fieldContext_File_size(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type File", field.Name)
 		},
@@ -20679,6 +20739,11 @@ func (ec *executionContext) _File(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "mimeType":
 			out.Values[i] = ec._File_mimeType(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "size":
+			out.Values[i] = ec._File_size(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}

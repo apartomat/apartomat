@@ -90,7 +90,7 @@ func (u *CRM) UploadFile(
 		return nil, err
 	}
 
-	f := NewFile(id, upload.Name, url, fileType, upload.MimeType, projectID)
+	f := NewFile(id, upload.Name, url, fileType, upload.MimeType, upload.Size, projectID)
 
 	if err := u.Files.Save(ctx, f); err != nil {
 		return nil, err

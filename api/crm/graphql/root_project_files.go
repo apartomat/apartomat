@@ -68,6 +68,7 @@ func fileToGraphQL(file *files.File) *File {
 		URL:      file.URL,
 		Type:     fileTypeToGraphQL(file.Type),
 		MimeType: file.MimeType,
+		Size:     int(file.Size),
 	}
 }
 

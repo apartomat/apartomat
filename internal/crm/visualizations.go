@@ -86,7 +86,7 @@ func (u *CRM) UploadVisualizations(
 			return nil, err
 		}
 
-		f := files.NewFile(fileID, file.Name, url, files.FileTypeVisualization, file.MimeType, projectID)
+		f := files.NewFile(fileID, file.Name, url, files.FileTypeVisualization, file.MimeType, file.Size, projectID)
 
 		if err := u.Files.Save(ctx, f); err != nil {
 			return nil, err

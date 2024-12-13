@@ -1,6 +1,8 @@
 package files
 
-import "time"
+import (
+	"time"
+)
 
 type File struct {
 	ID         string
@@ -8,6 +10,7 @@ type File struct {
 	URL        string
 	Type       FileType
 	MimeType   string
+	Size       int64
 	CreatedAt  time.Time
 	ModifiedAt time.Time
 	ProjectID  string
@@ -21,8 +24,17 @@ const (
 	FileTypeAlbum         FileType = "ALBUM"
 )
 
-func NewFile(id, name, url string, fileType FileType, mimeType, projectID string) *File {
-	now := time.Now()
+func NewFile(
+	id, name,
+	url string,
+	fileType FileType,
+	mimeType string,
+	size int64,
+	projectID string,
+) *File {
+	var (
+		now = time.Now()
+	)
 
 	return &File{
 		ID:         id,
@@ -30,6 +42,7 @@ func NewFile(id, name, url string, fileType FileType, mimeType, projectID string
 		URL:        url,
 		Type:       fileType,
 		MimeType:   mimeType,
+		Size:       size,
 		CreatedAt:  now,
 		ModifiedAt: now,
 		ProjectID:  projectID,

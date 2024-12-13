@@ -469,6 +469,7 @@ type File struct {
 	URL      string   `json:"url"`
 	Type     FileType `json:"type"`
 	MimeType string   `json:"mimeType"`
+	Size     int      `json:"size"`
 }
 
 func (File) IsCoverFileResult() {}

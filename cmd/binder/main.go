@@ -117,9 +117,10 @@ func main() {
 				} else {
 					var (
 						fileUrl = ""
+						size    = int64(len(b))
 					)
 
-					if u, err := uploader.Upload(ctx, buf, int64(len(b)), filePath, mime.TypeByExtension(fileExt)); err != nil {
+					if u, err := uploader.Upload(ctx, buf, size, filePath, mime.TypeByExtension(fileExt)); err != nil {
 						slog.Error("can't upload file", slog.Any("err", err), slog.String("filePath", filePath))
 						os.Exit(1)
 					} else {
@@ -139,7 +140,7 @@ func main() {
 					}
 
 					var (
-						file = files.NewFile(id, fileName, fileUrl, files.FileTypeAlbum, fileMimeType, album.ProjectID)
+						file = files.NewFile(id, fileName, fileUrl, files.FileTypeAlbum, fileMimeType, size, album.ProjectID)
 					)
 
 					f.FileID = &file.ID
