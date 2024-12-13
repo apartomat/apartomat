@@ -3,9 +3,10 @@ package minio
 import (
 	"context"
 	"fmt"
+	"io"
+
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
-	"io"
 )
 
 type Uploader struct {
@@ -31,8 +32,6 @@ func (m *Uploader) Upload(ctx context.Context, r io.Reader, size int64, path, co
 	if err != nil {
 		return "", fmt.Errorf("can't upload to minio: %w", err)
 	}
-
-	fmt.Printf("%#v", inf)
 
 	return fmt.Sprintf("http://localhost:9000/apartomat/%s", inf.Key), nil
 }
