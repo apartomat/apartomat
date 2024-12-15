@@ -1,14 +1,14 @@
-package public_sites
+package projectpage
 
 type Spec interface {
-	Is(*PublicSite) bool
+	Is(*ProjectPage) bool
 }
 
 type IDInSpec struct {
 	ID []string
 }
 
-func (s IDInSpec) Is(c *PublicSite) bool {
+func (s IDInSpec) Is(c *ProjectPage) bool {
 	for _, val := range s.ID {
 		if c.ID == val {
 			return true
@@ -26,7 +26,7 @@ type ProjectIDInSpec struct {
 	ProjectID []string
 }
 
-func (s ProjectIDInSpec) Is(c *PublicSite) bool {
+func (s ProjectIDInSpec) Is(c *ProjectPage) bool {
 	for _, val := range s.ProjectID {
 		if c.ProjectID == val {
 			return true
@@ -44,7 +44,7 @@ type StatusIsSpec struct {
 	Status Status
 }
 
-func (s StatusIsSpec) Is(c *PublicSite) bool {
+func (s StatusIsSpec) Is(c *ProjectPage) bool {
 	return c.Status == s.Status
 }
 
@@ -60,7 +60,7 @@ type AndSpec struct {
 	Specs []Spec
 }
 
-func (s AndSpec) Is(c *PublicSite) bool {
+func (s AndSpec) Is(c *ProjectPage) bool {
 	for _, spec := range s.Specs {
 		if !spec.Is(c) {
 			return false
@@ -78,7 +78,7 @@ type OrSpec struct {
 	Specs []Spec
 }
 
-func (s OrSpec) Is(c *PublicSite) bool {
+func (s OrSpec) Is(c *ProjectPage) bool {
 	for _, spec := range s.Specs {
 		if spec.Is(c) {
 			return true

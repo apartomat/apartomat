@@ -34,7 +34,7 @@ import Visualizations from "./Visualizations/Visualizations"
 import { UploadVisualizations, Rooms as RoomsForUpload } from "features/upload-visualizations"
 import CreateAlbumOnClick from "./CreateAlbum/CreateAlbum"
 import { Albums } from "./Albums"
-import PublicSite from "./PublicSite/PublicSite"
+import { Page } from "./Page"
 import { Spinner } from "shared/ui/Spinner"
 import { Notifications } from "features/notification"
 import { useNotifications } from "shared/context/notifications/context"
@@ -176,9 +176,9 @@ export function Project() {
                         />
                     </Box>
                     <Box direction="row" gap="small">
-                        <PublicSite
+                        <Page
                             projectId={id}
-                            site={project.publicSite}
+                            page={project.page}
                             onClose={(changed: boolean) => {
                                 if (changed) {
                                     refetch()
@@ -259,7 +259,7 @@ export function Project() {
                             </Box>
                             <Visualizations visualizations={project.visualizations} />
                         </Box>
-                )}
+                    )}
 
                 {project.albums.list.__typename === "ProjectAlbumsList" && project.albums.list.items.length > 0 && (
                     <Box margin={{ bottom: "large" }}>

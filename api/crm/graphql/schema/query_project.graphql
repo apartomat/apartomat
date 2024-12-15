@@ -16,7 +16,7 @@ type Project {
     visualizations: ProjectVisualizations! @goField(forceResolver: true)
     files: ProjectFiles! @goField(forceResolver: true)
     albums: ProjectAlbums! @goField(forceResolver: true)
-    publicSite: ProjectPublicSite! @goField(forceResolver: true)
+    page: ProjectPageResult! @goField(forceResolver: true)
     statuses: ProjectStatusDictionary! @goField(forceResolver: true)
 }
 
@@ -231,21 +231,21 @@ type ProjectStatusDictionaryItem {
     value: String!
 }
 
-union ProjectPublicSite = PublicSite | NotFound | ServerError
+union ProjectPageResult = ProjectPage | NotFound | ServerError
 
-type PublicSite {
+type ProjectPage {
     id: String!
-    status: PublicSiteStatus!
+    status: ProjectPageStatus!
     url: String!
-    settings: PublicSiteSettings!
+    settings: ProjectPageSettings!
 }
 
-enum PublicSiteStatus {
+enum ProjectPageStatus {
     PUBLIC
     NOT_PUBLIC
 }
 
-type PublicSiteSettings {
+type ProjectPageSettings {
     visualizations: Boolean!
     albums: Boolean!
 }

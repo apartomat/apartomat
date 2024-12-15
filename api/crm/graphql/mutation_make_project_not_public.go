@@ -6,7 +6,7 @@ import (
 	"log/slog"
 
 	"github.com/apartomat/apartomat/internal/crm"
-	"github.com/apartomat/apartomat/internal/store/public_sites"
+	"github.com/apartomat/apartomat/internal/store/projectpage"
 )
 
 func (r *mutationResolver) MakeProjectNotPublic(
@@ -19,11 +19,11 @@ func (r *mutationResolver) MakeProjectNotPublic(
 			return forbidden()
 		}
 
-		if errors.Is(err, public_sites.ErrPublicSiteNotFound) {
+		if errors.Is(err, projectpage.ErrProjectPageNotFound) {
 			return notFound()
 		}
 
-		if errors.Is(err, public_sites.ErrPublicSiteIsNotPublic) {
+		if errors.Is(err, projectpage.ErrProjectPageIsNotPublic) {
 			return ProjectIsAlreadyNotPublic{}, nil
 		}
 
@@ -32,5 +32,5 @@ func (r *mutationResolver) MakeProjectNotPublic(
 		return serverError()
 	}
 
-	return ProjectMadeNotPublic{PublicSite: publicSiteToGraphQL(ps)}, nil
+	return ProjectMadeNotPublic{ProjectPage: projectPageToGraphQL(ps)}, nil
 }

@@ -5,7 +5,7 @@ import (
 	"errors"
 	"github.com/apartomat/apartomat/internal/project-page"
 	"github.com/apartomat/apartomat/internal/store"
-	"github.com/apartomat/apartomat/internal/store/public_sites"
+	"github.com/apartomat/apartomat/internal/store/projectpage"
 	"log/slog"
 )
 
@@ -20,7 +20,7 @@ func (r *queryResolver) ProjectPage(ctx context.Context, id string) (ProjectPage
 			return notFound()
 		}
 
-		slog.Error("failed to resolve project-page site", err)
+		slog.Error("failed to resolve project page", err)
 
 		return serverError()
 	}
@@ -28,10 +28,10 @@ func (r *queryResolver) ProjectPage(ctx context.Context, id string) (ProjectPage
 	return projectPageToGraphQL(ps), nil
 }
 
-func projectPageToGraphQL(site *public_sites.PublicSite) ProjectPage {
+func projectPageToGraphQL(p *projectpage.ProjectPage) ProjectPage {
 	return ProjectPage{
-		ID:          site.ID,
-		Title:       site.Title,
-		Description: site.Description,
+		ID:          p.ID,
+		Title:       p.Title,
+		Description: p.Description,
 	}
 }

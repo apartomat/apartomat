@@ -7,11 +7,11 @@ import (
 	. "github.com/apartomat/apartomat/internal/store/album_files"
 	"github.com/apartomat/apartomat/internal/store/albums"
 	"github.com/apartomat/apartomat/internal/store/files"
-	"github.com/apartomat/apartomat/internal/store/public_sites"
+	"github.com/apartomat/apartomat/internal/store/projectpage"
 )
 
 func (u *Service) GetAlbumAndFile(ctx context.Context, projectPageID string) (*albums.Album, *files.File, error) {
-	page, err := u.PublicSites.Get(ctx, public_sites.IDIn(projectPageID))
+	page, err := u.ProjectPages.Get(ctx, projectpage.IDIn(projectPageID))
 	if err != nil {
 		return nil, nil, err
 	}

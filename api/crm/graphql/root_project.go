@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/apartomat/apartomat/internal/store"
+	"github.com/apartomat/apartomat/internal/store/projectpage"
 	"github.com/apartomat/apartomat/internal/store/projects"
-	sites "github.com/apartomat/apartomat/internal/store/public_sites"
 )
 
 func (r *rootResolver) Project() ProjectResolver { return &projectResolver{r} }
@@ -42,8 +42,8 @@ func (r *projectResolver) Albums(ctx context.Context, obj *Project) (*ProjectAlb
 	return &ProjectAlbums{}, nil
 }
 
-func (r *projectResolver) PublicSite(ctx context.Context, obj *Project) (ProjectPublicSite, error) {
-	site, err := r.useCases.GetProjectPublicSite(ctx, obj.ID)
+func (r *projectResolver) Page(ctx context.Context, obj *Project) (ProjectPageResult, error) {
+	page, err := r.useCases.GetProjectPage(ctx, obj.ID)
 	if err != nil {
 		if errors.Is(err, store.ErrNotFound) {
 			return notFound()
@@ -51,7 +51,7 @@ func (r *projectResolver) PublicSite(ctx context.Context, obj *Project) (Project
 
 		slog.ErrorContext(
 			ctx,
-			"can't resolve project public site: %s",
+			"can't resolve project page: %s",
 			slog.String("projectId", obj.ID),
 			slog.Any("err", err),
 		)
@@ -59,7 +59,7 @@ func (r *projectResolver) PublicSite(ctx context.Context, obj *Project) (Project
 		return serverError()
 	}
 
-	return publicSiteToGraphQL(site), nil
+	return projectPageToGraphQL(page), nil
 }
 
 func (r *projectResolver) Statuses(ctx context.Context, obj *Project) (*ProjectStatusDictionary, error) {
@@ -188,28 +188,28 @@ func newof[T any](val T) *T {
 	return &val
 }
 
-func publicSiteToGraphQL(s *sites.PublicSite) *PublicSite {
+func projectPageToGraphQL(s *projectpage.ProjectPage) *ProjectPage {
 	if s == nil {
 		return nil
 	}
 
-	return &PublicSite{
+	return &ProjectPage{
 		ID:     s.ID,
-		Status: publicSiteStatusToGraphQL(s.Status),
+		Status: projectPageStatusToGraphQL(s.Status),
 		URL:    s.URL,
-		Settings: &PublicSiteSettings{
+		Settings: &ProjectPageSettings{
 			Visualizations: s.Settings.AllowVisualizations,
 			Albums:         s.Settings.AllowAlbums,
 		},
 	}
 }
 
-func publicSiteStatusToGraphQL(st sites.Status) PublicSiteStatus {
-	switch st {
-	case sites.StatusPublic:
-		return PublicSiteStatusPublic
-	case sites.StatusNotPublic:
-		return PublicSiteStatusNotPublic
+func projectPageStatusToGraphQL(status projectpage.Status) ProjectPageStatus {
+	switch status {
+	case projectpage.StatusPublic:
+		return ProjectPageStatusPublic
+	case projectpage.StatusNotPublic:
+		return ProjectPageStatusNotPublic
 	}
 
 	return ""

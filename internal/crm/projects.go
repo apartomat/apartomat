@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/apartomat/apartomat/internal/crm/auth"
+	"github.com/apartomat/apartomat/internal/store/projectpage"
 	. "github.com/apartomat/apartomat/internal/store/projects"
-	sites "github.com/apartomat/apartomat/internal/store/public_sites"
 	"github.com/apartomat/apartomat/internal/store/workspaces"
 )
 
@@ -50,22 +50,22 @@ func (u *CRM) CreateProject(
 		return nil, err
 	}
 
-	siteID := MustGenerateNanoID()
+	pageID := MustGenerateNanoID()
 
-	site := sites.NewPublicSite(
-		siteID,
+	page := projectpage.NewProjectPage(
+		pageID,
 		name,
 		"",
-		fmt.Sprintf("https://p.apartomat.ru/%s", siteID),
-		sites.StatusNotPublic,
-		sites.PublicSiteSettings{
-			AllowVisualizations: false,
-			AllowAlbums:         false,
+		u.ProjectPageURL(pageID),
+		projectpage.StatusNotPublic,
+		projectpage.Settings{
+			AllowVisualizations: true,
+			AllowAlbums:         true,
 		},
 		project.ID,
 	)
 
-	if err := u.PublicSites.Save(ctx, site); err != nil {
+	if err := u.ProjectPages.Save(ctx, page); err != nil {
 		return nil, err
 	}
 
@@ -114,17 +114,17 @@ func (u *CRM) ChangeProjectDates(ctx context.Context, projectID string, startAt,
 	return project, nil
 }
 
-func (u *CRM) GetProjectPublicSite(ctx context.Context, projectId string) (*sites.PublicSite, error) {
+func (u *CRM) GetProjectPage(ctx context.Context, projectId string) (*projectpage.ProjectPage, error) {
 	if ok, err := u.Acl.CanGetPublicSiteOfProjectID(ctx, auth.UserFromCtx(ctx), projectId); err != nil {
 		return nil, err
 	} else if !ok {
-		return nil, fmt.Errorf("can't get project (id=%s) public site: %w", projectId, ErrForbidden)
+		return nil, fmt.Errorf("can't get project (id=%s) page: %w", projectId, ErrForbidden)
 	}
 
-	return u.PublicSites.Get(ctx, sites.ProjectIDIn(projectId))
+	return u.ProjectPages.Get(ctx, projectpage.ProjectIDIn(projectId))
 }
 
-func (u *CRM) MakeProjectPublic(ctx context.Context, projectId string) (*sites.PublicSite, error) {
+func (u *CRM) MakeProjectPublic(ctx context.Context, projectId string) (*projectpage.ProjectPage, error) {
 	proj, err := u.Projects.Get(ctx, IDIn(projectId))
 	if err != nil {
 		return nil, err
@@ -136,41 +136,41 @@ func (u *CRM) MakeProjectPublic(ctx context.Context, projectId string) (*sites.P
 		return nil, fmt.Errorf("can't make project (id=%s) public: %w", proj.ID, ErrForbidden)
 	}
 
-	site, err := u.PublicSites.Get(ctx, sites.ProjectIDIn(proj.ID))
-	if errors.Is(err, sites.ErrPublicSiteNotFound) {
-		siteID := MustGenerateNanoID()
+	page, err := u.ProjectPages.Get(ctx, projectpage.ProjectIDIn(proj.ID))
+	if errors.Is(err, projectpage.ErrProjectPageNotFound) {
+		pageID := MustGenerateNanoID()
 
-		s := sites.NewPublicSite(
-			siteID,
+		p := projectpage.NewProjectPage(
+			pageID,
 			proj.Name,
 			"",
-			fmt.Sprintf("https://p.apartomat.ru/%s", siteID),
-			sites.StatusNotPublic,
-			sites.PublicSiteSettings{
+			u.ProjectPageURL(pageID),
+			projectpage.StatusNotPublic,
+			projectpage.Settings{
 				AllowVisualizations: true,
 				AllowAlbums:         true,
 			},
 			proj.ID,
 		)
 
-		site = &s
+		page = &p
 
 	} else if err != nil {
 		return nil, err
 	}
 
-	if err := site.ToPublic(); err != nil {
+	if err := page.ToPublic(); err != nil {
 		return nil, fmt.Errorf("can't make project public: %w", err)
 	}
 
-	if err := u.PublicSites.Save(ctx, *site); err != nil {
+	if err := u.ProjectPages.Save(ctx, *page); err != nil {
 		return nil, err
 	}
 
-	return site, nil
+	return page, nil
 }
 
-func (u *CRM) MakeProjectNotPublic(ctx context.Context, projectId string) (*sites.PublicSite, error) {
+func (u *CRM) MakeProjectNotPublic(ctx context.Context, projectId string) (*projectpage.ProjectPage, error) {
 	proj, err := u.Projects.Get(ctx, IDIn(projectId))
 	if err != nil {
 		return nil, err
@@ -182,36 +182,40 @@ func (u *CRM) MakeProjectNotPublic(ctx context.Context, projectId string) (*site
 		return nil, fmt.Errorf("can't make project (id=%s) not public: %w", proj.ID, ErrForbidden)
 	}
 
-	site, err := u.PublicSites.Get(ctx, sites.ProjectIDIn(proj.ID))
-	if errors.Is(err, sites.ErrPublicSiteNotFound) {
-		siteID := MustGenerateNanoID()
+	page, err := u.ProjectPages.Get(ctx, projectpage.ProjectIDIn(proj.ID))
+	if errors.Is(err, projectpage.ErrProjectPageNotFound) {
+		pageID := MustGenerateNanoID()
 
-		s := sites.NewPublicSite(
-			siteID,
+		p := projectpage.NewProjectPage(
+			pageID,
 			proj.Name,
 			"",
-			fmt.Sprintf("https://p.apartomat.ru/%s", siteID),
-			sites.StatusPublic,
-			sites.PublicSiteSettings{
+			u.ProjectPageURL(pageID),
+			projectpage.StatusPublic,
+			projectpage.Settings{
 				AllowVisualizations: true,
 				AllowAlbums:         true,
 			},
 			proj.ID,
 		)
 
-		site = &s
+		page = &p
 
 	} else if err != nil {
 		return nil, err
 	}
 
-	if err := site.ToNotPublic(); err != nil {
+	if err := page.ToNotPublic(); err != nil {
 		return nil, fmt.Errorf("can't make project not public: %w", err)
 	}
 
-	if err := u.PublicSites.Save(ctx, *site); err != nil {
+	if err := u.ProjectPages.Save(ctx, *page); err != nil {
 		return nil, err
 	}
 
-	return site, nil
+	return page, nil
+}
+
+func (u *CRM) ProjectPageURL(pageID string) string {
+	return fmt.Sprintf("https://p.apartomat.ru/%s", pageID)
 }

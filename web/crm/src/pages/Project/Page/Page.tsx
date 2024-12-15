@@ -15,19 +15,19 @@ import {
 } from "grommet"
 import { FormClose, Link } from "grommet-icons"
 
-import { ProjectScreenPublicSiteFragment, PublicSiteStatus } from "api/graphql"
+import { ProjectScreenProjectPageFragment, ProjectPageStatus } from "api/graphql"
 import React, { useEffect, useState } from "react"
-import { useMakeProjectNotPublic, useMakeProjectPublic } from "pages/Project/PublicSite/useMakeProjectPublic"
+import { useMakeProjectNotPublic, useMakeProjectPublic } from "pages/Project/Page/useMakeProjectPublic"
 
-export default function PublicSite({
+export function Page({
     projectId,
-    site,
+    page,
     onChange,
     onClose,
     ...props
 }: {
     projectId: string
-    site: ProjectScreenPublicSiteFragment
+    page: ProjectScreenProjectPageFragment
     onChange?: () => void
     onClose?: (changed: boolean) => void
 } & BoxExtendedProps) {
@@ -38,7 +38,7 @@ export default function PublicSite({
             <Box>
                 <Button
                     label="Ссылка"
-                    icon={<Link color={siteIsPublic(site) ? "status-ok" : "status-unknown"} />}
+                    icon={<Link color={pageIsPublic(page) ? "status-ok" : "status-unknown"} />}
                     onClick={() => setShowForm(!showForm)}
                     title="Ссылка"
                 />
@@ -47,7 +47,7 @@ export default function PublicSite({
             {showForm && (
                 <EditForm
                     projectId={projectId}
-                    publicSite={site}
+                    projectPage={page}
                     onEsc={() => setShowForm(false)}
                     onClickClose={(changed: boolean) => {
                         setShowForm(false)
@@ -60,21 +60,21 @@ export default function PublicSite({
     )
 }
 
-function siteIsPublic(site: ProjectScreenPublicSiteFragment): boolean {
-    return site.__typename === "PublicSite" && site.status === PublicSiteStatus.Public
+function pageIsPublic(page: ProjectScreenProjectPageFragment): boolean {
+    return page.__typename === "ProjectPage" && page.status === ProjectPageStatus.Public
 }
 
-function isVisualizationsAllowed(site: ProjectScreenPublicSiteFragment): boolean {
-    if (site.__typename === "PublicSite") {
-        return site.settings.visualizations
+function isVisualizationsAllowed(page: ProjectScreenProjectPageFragment): boolean {
+    if (page.__typename === "ProjectPage") {
+        return page.settings.visualizations
     }
 
     return true
 }
 
-function isAlbumsAllowed(site: ProjectScreenPublicSiteFragment): boolean {
-    if (site.__typename === "PublicSite") {
-        return site.settings.albums
+function isAlbumsAllowed(page: ProjectScreenProjectPageFragment): boolean {
+    if (page.__typename === "ProjectPage") {
+        return page.settings.albums
     }
 
     return true
@@ -82,19 +82,19 @@ function isAlbumsAllowed(site: ProjectScreenPublicSiteFragment): boolean {
 
 function EditForm({
     projectId,
-    publicSite,
+    projectPage,
     onChange,
     onClickClose,
     ...props
 }: {
     projectId: string
-    publicSite: ProjectScreenPublicSiteFragment
+    projectPage: ProjectScreenProjectPageFragment
     onChange?: () => void
     onClickClose?: (changed: boolean) => void
 } & LayerExtendedProps) {
     const [changed, setChanged] = useState(false)
 
-    const [isPublic, setIsPublic] = useState(siteIsPublic(publicSite))
+    const [isPublic, setIsPublic] = useState(pageIsPublic(projectPage))
 
     const [makeProjectPublic, { data: makeProjectPublicResult }] = useMakeProjectPublic(projectId)
 
@@ -105,10 +105,10 @@ function EditForm({
                 setChanged(true)
                 break
             case "ProjectIsAlreadyPublic":
-                setChanged(!siteIsPublic(publicSite))
+                setChanged(!pageIsPublic(projectPage))
                 break
             case "Forbidden":
-                setIsPublic(siteIsPublic(publicSite))
+                setIsPublic(pageIsPublic(projectPage))
                 setErrorMessage("Доступ запрещен")
                 break
         }
@@ -123,10 +123,10 @@ function EditForm({
                 setChanged(true)
                 break
             case "ProjectIsAlreadyNotPublic":
-                setChanged(!siteIsPublic(publicSite))
+                setChanged(!pageIsPublic(projectPage))
                 break
             case "Forbidden":
-                setIsPublic(siteIsPublic(publicSite))
+                setIsPublic(pageIsPublic(projectPage))
                 setErrorMessage("Доступ запрещен")
                 break
         }
@@ -189,24 +189,20 @@ function EditForm({
                                 <Box direction="row" gap="medium">
                                     <CheckBox
                                         label="Визуализации"
-                                        checked={isVisualizationsAllowed(publicSite)}
+                                        checked={isVisualizationsAllowed(projectPage)}
                                         disabled
                                     />
                                 </Box>
                                 <Box direction="row" gap="medium">
-                                    <CheckBox label="Альбом" checked={isAlbumsAllowed(publicSite)} disabled />
+                                    <CheckBox label="Альбом" checked={isAlbumsAllowed(projectPage)} disabled />
                                 </Box>
                             </Box>
                         </AccordionPanel>
                     </Accordion>
 
-                    {publicSite.__typename === "PublicSite" && (
+                    {projectPage.__typename === "ProjectPage" && (
                         <FormField label="Ссылка" margin={{ top: "small" }}>
-                            <TextInput
-                                readOnlyCopy
-                                value={publicSite.url}
-                                width="medium"
-                            />
+                            <TextInput readOnlyCopy value={projectPage.url} width="medium" />
                         </FormField>
                     )}
                 </Form>

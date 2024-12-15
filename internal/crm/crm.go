@@ -2,17 +2,16 @@ package crm
 
 import (
 	"errors"
-
 	"github.com/apartomat/apartomat/internal/crm/auth"
 	"github.com/apartomat/apartomat/internal/crm/image"
 	"github.com/apartomat/apartomat/internal/crm/mail"
-	albumFiles "github.com/apartomat/apartomat/internal/store/album_files"
+	"github.com/apartomat/apartomat/internal/store/album_files"
 	"github.com/apartomat/apartomat/internal/store/albums"
 	"github.com/apartomat/apartomat/internal/store/contacts"
 	"github.com/apartomat/apartomat/internal/store/files"
 	"github.com/apartomat/apartomat/internal/store/houses"
+	"github.com/apartomat/apartomat/internal/store/projectpage"
 	"github.com/apartomat/apartomat/internal/store/projects"
-	sites "github.com/apartomat/apartomat/internal/store/public_sites"
 	"github.com/apartomat/apartomat/internal/store/rooms"
 	"github.com/apartomat/apartomat/internal/store/users"
 	"github.com/apartomat/apartomat/internal/store/visualizations"
@@ -48,11 +47,11 @@ type CRM struct {
 	Acl *Acl
 
 	Albums         albums.Store
-	AlbumFiles     albumFiles.Store
+	AlbumFiles     album_files.Store
 	Contacts       contacts.Store
 	Houses         houses.Store
 	Projects       projects.Store
-	PublicSites    sites.Store
+	ProjectPages   projectpage.Store
 	Files          files.Store
 	Rooms          rooms.Store
 	Users          users.Store

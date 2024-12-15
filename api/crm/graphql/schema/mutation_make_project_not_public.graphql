@@ -5,7 +5,7 @@ extend type Mutation {
 union MakeProjectNotPublicResult = ProjectMadeNotPublic | ProjectIsAlreadyNotPublic | NotFound | Forbidden | ServerError
 
 type ProjectMadeNotPublic {
-    publicSite: PublicSite!
+    projectPage: ProjectPage!
 }
 
 type ProjectIsAlreadyNotPublic implements Error {

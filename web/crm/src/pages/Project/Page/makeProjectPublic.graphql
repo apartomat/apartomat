@@ -2,7 +2,7 @@ mutation makeProjectPublic($projectId: String!) {
     makeProjectPublic(projectId: $projectId) {
         __typename
         ... on ProjectMadePublic {
-            publicSite {
+            projectPage {
                 status
             }
         }
@@ -22,7 +22,7 @@ mutation makeProjectNotPublic($projectId: String!) {
     makeProjectNotPublic(projectId: $projectId) {
         __typename
         ... on ProjectMadeNotPublic {
-            publicSite {
+            projectPage {
                 status
             }
         }

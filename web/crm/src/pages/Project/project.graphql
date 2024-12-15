@@ -56,8 +56,8 @@ fragment ProjectScreenProject on Project {
     albums {
         ...ProjectScreenAlbums
     }
-    publicSite {
-        ...ProjectScreenPublicSite
+    page {
+        ...ProjectScreenProjectPage
     }
 }
 
@@ -180,9 +180,9 @@ fragment ProjectScreenAlbum on Album {
     }
 }
 
-fragment ProjectScreenPublicSite on ProjectPublicSite {
+fragment ProjectScreenProjectPage on ProjectPageResult {
     __typename
-    ... on PublicSite {
+    ... on ProjectPage {
         id
         status
         url

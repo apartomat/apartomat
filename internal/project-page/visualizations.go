@@ -3,17 +3,17 @@ package project_page
 import (
 	"context"
 	"github.com/apartomat/apartomat/internal/store/files"
-	"github.com/apartomat/apartomat/internal/store/public_sites"
+	"github.com/apartomat/apartomat/internal/store/projectpage"
 	. "github.com/apartomat/apartomat/internal/store/visualizations"
 )
 
-func (u *Service) GetVisualizations(ctx context.Context, publicSiteID string, limit, offset int) ([]*Visualization, error) {
-	site, err := u.PublicSites.Get(ctx, public_sites.IDIn(publicSiteID))
+func (u *Service) GetVisualizations(ctx context.Context, projectPageID string, limit, offset int) ([]*Visualization, error) {
+	page, err := u.ProjectPages.Get(ctx, projectpage.IDIn(projectPageID))
 	if err != nil {
 		return nil, err
 	}
 
-	res, err := u.Visualizations.List(ctx, ProjectIDIn(site.ProjectID), SortRoomAscPositionAsc, limit, offset)
+	res, err := u.Visualizations.List(ctx, ProjectIDIn(page.ProjectID), SortRoomAscPositionAsc, limit, offset)
 	if err != nil {
 		return nil, err
 	}

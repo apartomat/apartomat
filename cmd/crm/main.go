@@ -28,8 +28,8 @@ import (
 	contacts "github.com/apartomat/apartomat/internal/store/contacts/postgres"
 	files "github.com/apartomat/apartomat/internal/store/files/postgres"
 	houses "github.com/apartomat/apartomat/internal/store/houses/postgres"
+	projectpage "github.com/apartomat/apartomat/internal/store/projectpage/postgres"
 	projects "github.com/apartomat/apartomat/internal/store/projects/postgres"
-	sites "github.com/apartomat/apartomat/internal/store/public_sites/postgres"
 	rooms "github.com/apartomat/apartomat/internal/store/rooms/postgres"
 	users "github.com/apartomat/apartomat/internal/store/users/postgres"
 	visualizations "github.com/apartomat/apartomat/internal/store/visualizations/postgres"
@@ -122,7 +122,7 @@ func main() {
 		filesStore := files.NewStore(bundb)
 		housesStore := houses.NewStore(bundb)
 		projectsStore := projects.NewStore(bundb)
-		publicSitesStore := sites.NewStore(bundb)
+		projectPageStore := projectpage.NewStore(bundb)
 		roomsStore := rooms.NewStore(bundb)
 		usersStore := users.NewStore(pgdb)
 		visualizationsStore := visualizations.NewStore(bundb)
@@ -165,7 +165,7 @@ func main() {
 			Contacts:       contactsStore,
 			Houses:         housesStore,
 			Projects:       projectsStore,
-			PublicSites:    publicSitesStore,
+			ProjectPages:   projectPageStore,
 			Files:          filesStore,
 			Rooms:          roomsStore,
 			Users:          usersStore,

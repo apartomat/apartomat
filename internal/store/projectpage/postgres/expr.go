@@ -2,7 +2,7 @@ package postgres
 
 import (
 	"errors"
-	. "github.com/apartomat/apartomat/internal/store/public_sites"
+	. "github.com/apartomat/apartomat/internal/store/projectpage"
 	"github.com/doug-martin/goqu/v9"
 )
 
@@ -26,7 +26,7 @@ func toSpecQuery(spec Spec) (specQuery, error) {
 		return orSpecQuery{spec: s}, nil
 	}
 
-	return nil, errors.New("unknown public sites spec")
+	return nil, errors.New("unknown project page spec")
 }
 
 type andSpecQuery struct {
