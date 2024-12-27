@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/url"
 	"time"
 
 	"github.com/apartomat/apartomat/internal/crm/auth"
@@ -121,7 +122,29 @@ func (u *CRM) GetProjectPage(ctx context.Context, projectId string) (*projectpag
 		return nil, fmt.Errorf("can't get project (id=%s) page: %w", projectId, ErrForbidden)
 	}
 
-	return u.ProjectPages.Get(ctx, projectpage.ProjectIDIn(projectId))
+	page, err := u.ProjectPages.Get(ctx, projectpage.ProjectIDIn(projectId))
+	if err != nil {
+		return nil, err
+	}
+
+	{
+		baseURL := u.Params.ProjectPageBaseURL
+
+		pageURL, err := url.Parse(page.URL)
+		if err != nil {
+			return nil, err
+		}
+
+		fixedPageURL := &url.URL{
+			Scheme: baseURL.Scheme,
+			Host:   baseURL.Host,
+			Path:   pageURL.RequestURI(),
+		}
+
+		page.URL = fixedPageURL.String()
+	}
+
+	return page, nil
 }
 
 func (u *CRM) MakeProjectPublic(ctx context.Context, projectId string) (*projectpage.ProjectPage, error) {
@@ -217,5 +240,13 @@ func (u *CRM) MakeProjectNotPublic(ctx context.Context, projectId string) (*proj
 }
 
 func (u *CRM) ProjectPageURL(pageID string) string {
-	return fmt.Sprintf("https://p.apartomat.ru/%s", pageID)
+	baseURL := u.Params.ProjectPageBaseURL
+
+	pageURL := &url.URL{
+		Scheme: baseURL.Scheme,
+		Host:   baseURL.Host,
+		Path:   pageID,
+	}
+
+	return pageURL.String()
 }

@@ -143,9 +143,7 @@ func main() {
 		uploader := minio.NewUploader("apartomat")
 
 		usecases := &crm.CRM{
-			Params: crm.Params{
-				SendPinByEmail: getBoolEnv("SEND_PIN_BY_EMAIL"),
-			},
+			Params:                       ParamsFromEnv(),
 			AuthTokenIssuer:              authIssuerVerifier,
 			AuthTokenVerifier:            authIssuerVerifier,
 			ConfirmTokenByEmailIssuer:    confirmLoginIssuerVerifier,
@@ -216,10 +214,9 @@ func main() {
 	}
 }
 
-func getBoolEnv(key string) bool {
-	if val, err := strconv.ParseBool(os.Getenv(key)); err != nil {
-		return val
+func ParamsFromEnv() crm.Params {
+	return crm.Params{
+		SendPinByEmail:     GetEnvBool(EnvKeySendPinByEmail),
+		ProjectPageBaseURL: GetEnvProjectPageBaseURL(),
 	}
-
-	return false
 }

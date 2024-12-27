@@ -18,10 +18,12 @@ import (
 	"github.com/apartomat/apartomat/internal/store/workspace_users"
 	"github.com/apartomat/apartomat/internal/store/workspaces"
 	nanoid "github.com/matoous/go-nanoid/v2"
+	"net/url"
 )
 
 type Params struct {
-	SendPinByEmail bool
+	SendPinByEmail     bool
+	ProjectPageBaseURL url.URL
 }
 
 type CRM struct {
