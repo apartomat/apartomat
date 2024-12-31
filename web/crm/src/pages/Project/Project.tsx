@@ -257,7 +257,7 @@ export function Project() {
                                     />
                                 </Box>
                             </Box>
-                            <Visualizations visualizations={project.visualizations} />
+                            <Visualizations projectId={project.id} visualizations={project.visualizations} />
                         </Box>
                     )}
 

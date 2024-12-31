@@ -1,14 +1,17 @@
-import React, { useRef, useEffect, useState } from "react"
+import { useRef, useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
 
 import { ProjectScreenVisualizationsFragment as ProjectScreenVisualizations } from "api/graphql"
 
-import { Box, BoxExtendedProps, Grid, Image, Text } from "grommet"
+import { Box, BoxExtendedProps, Grid, Image, Button } from "grommet"
 import { Next, Previous } from "grommet-icons"
 
 export default function Visualizations({
+    projectId,
     visualizations,
     ...boxProps
 }: {
+    projectId: string
     visualizations: ProjectScreenVisualizations
 } & BoxExtendedProps) {
     const gridRef = useRef<HTMLDivElement>(null)
@@ -17,22 +20,28 @@ export default function Visualizations({
 
     const [right, setRight] = useState<boolean>(false)
 
+    const navigate = useNavigate()
+
     useEffect(() => {
         const grid = gridRef.current
 
-        const handle = () => {
+        const handleScroll = () => {
             if (grid) {
                 setLeft(grid.scrollLeft === 0)
                 setRight(grid.scrollLeft + grid.offsetWidth === grid.scrollWidth)
             }
         }
 
-        grid?.addEventListener("scroll", handle)
+        grid?.addEventListener("scroll", handleScroll)
 
         return () => {
-            grid?.removeEventListener("scroll", handle)
+            grid?.removeEventListener("scroll", handleScroll)
         }
     })
+
+    const handleClickMore = () => {
+        navigate(`/vis/${projectId}`)
+    }
 
     switch (visualizations.list.__typename) {
         case "ProjectVisualizationsList":
@@ -76,22 +85,28 @@ export default function Visualizations({
                                     />
                                 </Box>
                             ))}
-                        </Grid>
 
-                        {visualizations.total.__typename === "ProjectVisualizationsTotal" &&
-                        visualizations.total.total > visualizations.list.items.length ? (
-                            <Box
-                                key={0}
-                                height="small"
-                                width="small"
-                                margin={{ bottom: "small" }}
-                                flex={{ shrink: 0 }}
-                                align="center"
-                                justify="center"
-                            >
-                                <Text>ещё {visualizations.total.total - visualizations.list.items.length}</Text>
-                            </Box>
-                        ) : null}
+                            {needMore(visualizations) && (
+                                <Box
+                                    key={0}
+                                    height="small"
+                                    width="xsmall"
+                                    flex={{ shrink: 0 }}
+                                    align="center"
+                                    justify="center"
+                                >
+                                    <Button
+                                        label={`ещё ${more(visualizations)}`}
+                                        size="small"
+                                        primary
+                                        color="light-2"
+                                        // icon={<Next size="small"/>}
+                                        reverse
+                                        onClick={handleClickMore}
+                                    />
+                                </Box>
+                            )}
+                        </Grid>
                     </Box>
                     {!right && (
                         <Box
@@ -109,4 +124,28 @@ export default function Visualizations({
         default:
             return null
     }
+}
+
+function needMore(vis: ProjectScreenVisualizations): boolean {
+    if (vis.list.__typename !== "ProjectVisualizationsList") {
+        return false
+    }
+
+    if (vis.total.__typename !== "ProjectVisualizationsTotal") {
+        return false
+    }
+
+    return vis.total.total > vis.list.items.length
+}
+
+function more(vis: ProjectScreenVisualizations): number {
+    if (vis.list.__typename !== "ProjectVisualizationsList") {
+        return 0
+    }
+
+    if (vis.total.__typename !== "ProjectVisualizationsTotal") {
+        return 0
+    }
+
+    return vis.total.total - vis.list.items.length
 }
