@@ -69,6 +69,23 @@ func (s *store) GetMaxSortingPosition(ctx context.Context, spec Spec) (int, erro
 	return num, err
 }
 
+func (s *store) Count(ctx context.Context, spec Spec) (int, error) {
+	sql, args, err := countBySpec(spec)
+	if err != nil {
+		return 0, err
+	}
+
+	var (
+		c int
+	)
+
+	if err = s.db.NewRaw(sql, args).Scan(bunhook.WithQueryContext(ctx, "Visualizations.Count"), &c); err != nil {
+		return 0, err
+	}
+
+	return c, nil
+}
+
 func (s *store) Save(ctx context.Context, visualizations ...*Visualization) error {
 	var (
 		recs = toRecords(visualizations)

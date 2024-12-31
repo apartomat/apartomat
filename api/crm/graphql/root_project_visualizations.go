@@ -100,5 +100,34 @@ func (r *projectVisualizationsResolver) Total(
 	obj *ProjectVisualizations,
 	filter ProjectVisualizationsListFilter,
 ) (ProjectVisualizationsTotalResult, error) {
-	return notImplementedYetError()
+	if project, ok := graphql.GetFieldContext(ctx).Parent.Parent.Result.(*Project); !ok {
+		slog.ErrorContext(
+			ctx,
+			"can't resolve project visualizations total",
+			slog.Any("err", errors.New("unknown project")),
+		)
+
+		return serverError()
+	} else {
+		tot, err := r.useCases.CountVisualizations(
+			ctx,
+			project.ID,
+		)
+		if err != nil {
+			if errors.Is(err, crm.ErrForbidden) {
+				return forbidden()
+			}
+
+			slog.ErrorContext(
+				ctx,
+				"can't resolve project visualizations total",
+				slog.String("project", project.ID),
+				slog.Any("err", err),
+			)
+
+			return serverError()
+		}
+
+		return ProjectVisualizationsTotal{Total: tot}, nil
+	}
 }

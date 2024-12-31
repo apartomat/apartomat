@@ -124,6 +124,23 @@ func (u *CRM) GetVisualizations(
 	return u.Visualizations.List(ctx, And(spec, ProjectIDIn(projectID)), SortRoomAscPositionAsc, limit, offset)
 }
 
+func (u *CRM) CountVisualizations(
+	ctx context.Context,
+	projectID string,
+) (int, error) {
+	if ok, err := u.Acl.CanCountVisualizationsOfProjectID(ctx, auth.UserFromCtx(ctx), projectID); err != nil {
+		return 0, err
+	} else if !ok {
+		return 0, fmt.Errorf("can't count project (id=%s) visualizations: %w", projectID, ErrForbidden)
+	}
+
+	var (
+		spec = ProjectIDIn(projectID)
+	)
+
+	return u.Visualizations.Count(ctx, spec)
+}
+
 func (u *CRM) DeleteVisualizations(
 	ctx context.Context,
 	id []string,

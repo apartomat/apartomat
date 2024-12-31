@@ -8,6 +8,11 @@ import (
 	"github.com/doug-martin/goqu/v9/exp"
 )
 
+var (
+	tableVisualizations = goqu.T("visualizations").Schema("apartomat").As("v")
+	tableRooms          = goqu.T("rooms").Schema("apartomat").As("r")
+)
+
 type specQuery interface {
 	Expression() (goqu.Expression, error)
 }
@@ -170,7 +175,7 @@ func selectBySpec(spec Spec, sort Sort, limit, offset int) (string, []interface{
 		order = append(order, goqu.I("v.sorting_position").Desc())
 	case SortRoomAscPositionAsc:
 		join = &LeftJoin{
-			Table: goqu.T("rooms").Schema("apartomat").As("r"),
+			Table: tableRooms,
 			Cond:  goqu.On(goqu.Ex{"r.id": goqu.I("v.room_id")}),
 		}
 
@@ -178,7 +183,7 @@ func selectBySpec(spec Spec, sort Sort, limit, offset int) (string, []interface{
 	}
 
 	var (
-		q = goqu.From(goqu.T("visualizations").Schema("apartomat").As("v")).Select("v.*")
+		q = goqu.From(tableVisualizations).Select("v.*")
 	)
 
 	if join != nil {
@@ -203,9 +208,22 @@ func selectMaxSoringPosition(spec Spec) (string, []interface{}, error) {
 	}
 
 	var (
-		q = goqu.From(goqu.T("visualizations").Schema("apartomat").As("v")).
-			Select(goqu.MAX("sorting_position"))
+		q = goqu.From(tableVisualizations).Select(goqu.MAX("sorting_position"))
 	)
 
 	return q.Where(expr).ToSQL()
+}
+
+func countBySpec(spec Spec) (string, []interface{}, error) {
+	qs, err := toSpecQuery(spec)
+	if err != nil {
+		return "", nil, err
+	}
+
+	expr, err := qs.Expression()
+	if err != nil {
+		return "", nil, err
+	}
+
+	return goqu.Select(goqu.COUNT(goqu.Star())).From(tableVisualizations).Where(expr).ToSQL()
 }

@@ -25,6 +25,7 @@ type Store interface {
 	List(ctx context.Context, spec Spec, sort Sort, limit, offset int) ([]*Visualization, error)
 	Get(ctx context.Context, spec Spec) (*Visualization, error)
 	GetMaxSortingPosition(ctx context.Context, spec Spec) (int, error)
+	Count(context.Context, Spec) (int, error)
 	Save(context.Context, ...*Visualization) error
 	Delete(context.Context, ...*Visualization) error
 }

@@ -287,6 +287,15 @@ func (acl *Acl) CanGetVisualizationsOfProjectID(ctx context.Context, subj *auth.
 	return acl.CanGetVisualizations(ctx, subj, prj)
 }
 
+func (acl *Acl) CanCountVisualizationsOfProjectID(ctx context.Context, subj *auth.UserCtx, projectID string) (bool, error) {
+	prj, err := acl.getProject(ctx, projectID)
+	if err != nil {
+		return false, err
+	}
+
+	return acl.CanGetVisualizations(ctx, subj, prj)
+}
+
 func (acl *Acl) CanGetVisualization(ctx context.Context, subj *auth.UserCtx, obj *visualizations.Visualization) (bool, error) {
 	prj, err := acl.getProject(ctx, obj.ProjectID)
 	if err != nil {
