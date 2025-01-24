@@ -22,6 +22,7 @@ const (
 	FileTypeNone          FileType = "NONE"
 	FileTypeVisualization FileType = "VISUALIZATION"
 	FileTypeAlbum         FileType = "ALBUM"
+	FileTypeAlbumCover    FileType = "ALBUM_COVER"
 )
 
 func NewFile(

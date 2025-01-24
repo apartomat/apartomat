@@ -219,6 +219,10 @@ type UpdateRoomResult interface {
 	IsUpdateRoomResult()
 }
 
+type UploadAlbumCoverResult interface {
+	IsUploadAlbumCoverResult()
+}
+
 type UploadFileResult interface {
 	IsUploadFileResult()
 }
@@ -284,6 +288,12 @@ type Album struct {
 }
 
 func (Album) IsAlbumResult() {}
+
+type AlbumCoverUploaded struct {
+	Cover *CoverUploaded `json:"cover"`
+}
+
+func (AlbumCoverUploaded) IsUploadAlbumCoverResult() {}
 
 type AlbumCreated struct {
 	Album *Album `json:"album"`
@@ -529,6 +539,8 @@ func (Forbidden) IsUpdateContactResult() {}
 func (Forbidden) IsUpdateHouseResult() {}
 
 func (Forbidden) IsUpdateRoomResult() {}
+
+func (Forbidden) IsUploadAlbumCoverResult() {}
 
 func (Forbidden) IsUploadFileResult() {}
 
@@ -1051,6 +1063,8 @@ func (ServerError) IsMoveRoomToPositionResult() {}
 func (ServerError) IsUpdateContactResult() {}
 
 func (ServerError) IsUpdateHouseResult() {}
+
+func (ServerError) IsUploadAlbumCoverResult() {}
 
 func (ServerError) IsUploadFileResult() {}
 

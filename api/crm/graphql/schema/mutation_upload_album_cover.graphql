@@ -1,0 +1,9 @@
+extend type Mutation {
+    uploadAlbumCover(albumId: String! file: Upload!): UploadAlbumCoverResult!
+}
+
+union UploadAlbumCoverResult = AlbumCoverUploaded | Forbidden | ServerError
+
+type AlbumCoverUploaded {
+    cover: CoverUploaded!
+}
