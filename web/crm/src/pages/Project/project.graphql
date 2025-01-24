@@ -78,6 +78,9 @@ fragment ProjectScreenVisualizations on ProjectVisualizations {
         ... on ProjectVisualizationsTotal {
             total
         }
+        ... on Error {
+            message
+        }
     }
 }
 
@@ -163,6 +166,9 @@ fragment ProjectScreenAlbums on ProjectAlbums {
         __typename
         ... on ProjectAlbumsTotal {
             total
+        }
+        ... on Error {
+            message
         }
     }
 }

@@ -59,6 +59,11 @@ export type Album = {
 
 export type AlbumCoverResult = File | Forbidden | NotFound | ServerError;
 
+export type AlbumCoverUploaded = {
+  __typename?: 'AlbumCoverUploaded';
+  cover: CoverUploaded;
+};
+
 export type AlbumCreated = {
   __typename?: 'AlbumCreated';
   album: Album;
@@ -420,6 +425,7 @@ export type Mutation = {
   updateContact: UpdateContactResult;
   updateHouse: UpdateHouseResult;
   updateRoom: UpdateRoomResult;
+  uploadAlbumCover: UploadAlbumCoverResult;
   uploadFile: UploadFileResult;
   uploadVisualization: UploadVisualizationResult;
   uploadVisualizations: UploadVisualizationsResult;
@@ -571,6 +577,12 @@ export type MutationUpdateHouseArgs = {
 export type MutationUpdateRoomArgs = {
   data: UpdateRoomInput;
   roomId: Scalars['String'];
+};
+
+
+export type MutationUploadAlbumCoverArgs = {
+  albumId: Scalars['String'];
+  file: Scalars['Upload'];
 };
 
 
@@ -1004,6 +1016,8 @@ export type UpdateRoomInput = {
 
 export type UpdateRoomResult = Forbidden | NotFound | RoomUpdated;
 
+export type UploadAlbumCoverResult = AlbumCoverUploaded | Forbidden | ServerError;
+
 export type UploadFileInput = {
   data: Scalars['Upload'];
   projectId: Scalars['String'];
@@ -1231,6 +1245,14 @@ export type ChangeAlbumPageSizeMutationVariables = Exact<{
 
 
 export type ChangeAlbumPageSizeMutation = { __typename?: 'Mutation', changeAlbumPageSize: { __typename: 'AlbumPageSizeChanged', album: { __typename?: 'Album', settings: { __typename?: 'AlbumSettings', pageSize: PageSize } } } | { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'ServerError', message: string } };
+
+export type UploadAlbumCoverMutationVariables = Exact<{
+  albumId: Scalars['String'];
+  file: Scalars['Upload'];
+}>;
+
+
+export type UploadAlbumCoverMutation = { __typename?: 'Mutation', uploadAlbumCover: { __typename: 'AlbumCoverUploaded' } | { __typename: 'Forbidden', message: string } | { __typename: 'ServerError', message: string } };
 
 export type AlbumScreenQueryVariables = Exact<{
   id: Scalars['String'];
@@ -2449,6 +2471,43 @@ export function useChangeAlbumPageSizeMutation(baseOptions?: Apollo.MutationHook
 export type ChangeAlbumPageSizeMutationHookResult = ReturnType<typeof useChangeAlbumPageSizeMutation>;
 export type ChangeAlbumPageSizeMutationResult = Apollo.MutationResult<ChangeAlbumPageSizeMutation>;
 export type ChangeAlbumPageSizeMutationOptions = Apollo.BaseMutationOptions<ChangeAlbumPageSizeMutation, ChangeAlbumPageSizeMutationVariables>;
+export const UploadAlbumCoverDocument = gql`
+    mutation uploadAlbumCover($albumId: String!, $file: Upload!) {
+  uploadAlbumCover(albumId: $albumId, file: $file) {
+    __typename
+    ... on Error {
+      message
+    }
+  }
+}
+    `;
+export type UploadAlbumCoverMutationFn = Apollo.MutationFunction<UploadAlbumCoverMutation, UploadAlbumCoverMutationVariables>;
+
+/**
+ * __useUploadAlbumCoverMutation__
+ *
+ * To run a mutation, you first call `useUploadAlbumCoverMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUploadAlbumCoverMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [uploadAlbumCoverMutation, { data, loading, error }] = useUploadAlbumCoverMutation({
+ *   variables: {
+ *      albumId: // value for 'albumId'
+ *      file: // value for 'file'
+ *   },
+ * });
+ */
+export function useUploadAlbumCoverMutation(baseOptions?: Apollo.MutationHookOptions<UploadAlbumCoverMutation, UploadAlbumCoverMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UploadAlbumCoverMutation, UploadAlbumCoverMutationVariables>(UploadAlbumCoverDocument, options);
+      }
+export type UploadAlbumCoverMutationHookResult = ReturnType<typeof useUploadAlbumCoverMutation>;
+export type UploadAlbumCoverMutationResult = Apollo.MutationResult<UploadAlbumCoverMutation>;
+export type UploadAlbumCoverMutationOptions = Apollo.BaseMutationOptions<UploadAlbumCoverMutation, UploadAlbumCoverMutationVariables>;
 export const AlbumScreenDocument = gql`
     query albumScreen($id: String!, $filter: ProjectVisualizationsListFilter!) {
   album: album(id: $id) {

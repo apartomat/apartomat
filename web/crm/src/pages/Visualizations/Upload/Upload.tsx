@@ -1,6 +1,6 @@
 import { Button } from "grommet"
 import { useState } from "react"
-import { Room, UploadVisualizations } from "features/upload-visualizations"
+import { UploadVisualizations } from "features/upload-visualizations"
 
 export function Upload({
     projectId,

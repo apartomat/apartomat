@@ -1,0 +1,8 @@
+mutation uploadAlbumCover($albumId: String!, $file: Upload!) {
+    uploadAlbumCover(albumId: $albumId, file: $file) {
+        __typename
+        ... on Error {
+            message
+        }
+    }
+}

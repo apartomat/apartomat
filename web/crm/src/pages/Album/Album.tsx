@@ -18,6 +18,7 @@ import useAlbum, {
 import { PageSize, PageOrientation } from "./Settings/"
 import AddVisualizations from "pages/Album/AddVisualizations/AddVisualizations"
 import { GenerateFile as GenerateAlbumFile } from "pages/Album/GenerateFile"
+import { UploadCover } from "pages/Album/UploadCover"
 
 export function Album() {
     const { id } = useParams<"id">() as { id: string }
@@ -38,7 +39,9 @@ export function Album() {
 
     const [showAddVisualizations, setShowAddVisualizations] = useState(false)
 
-    const [ scale, setScale ] = useState(0.5)
+    const [showUploadCover, setShowUploadCover] = useState(false)
+
+    const [scale, setScale] = useState(0.5)
 
     useEffect(() => {
         if (data?.album?.__typename === "Album") {
@@ -119,7 +122,7 @@ export function Album() {
                     position: "fixed",
                     top: "84px",
                     right: "60px",
-                    zIndex: 1
+                    zIndex: 1,
                 }}
                 background="background-back"
                 pad="medium"
@@ -147,17 +150,18 @@ export function Album() {
             </Box>
 
             <AddVariants
+                onClickAddVisualizations={() => setShowAddVisualizations(true)}
+                onClickUploadCover={() => setShowUploadCover(true)}
                 style={{
                     position: "fixed",
                     bottom: 0,
                     left: 0,
                     right: 0,
-                    zIndex: 1
+                    zIndex: 1,
                 }}
                 direction="row"
                 justify="center"
                 pad="small"
-                onClickAddVisualizations={() => setShowAddVisualizations(true)}
             />
 
             {pages.length > 0 && (
@@ -188,11 +192,14 @@ export function Album() {
                                                         case "Visualization":
                                                             return (
                                                                 <Box
-                                                                    style={{transform: `scale(${scale})`, transformOrigin: "left top"}}
+                                                                    style={{
+                                                                        transform: `scale(${scale})`,
+                                                                        transformOrigin: "left top",
+                                                                    }}
                                                                 >
-                                                                    {p.svg.__typename === "Svg" &&
-                                                                        <div dangerouslySetInnerHTML={svg(p.svg.svg)}/>
-                                                                    }
+                                                                    {p.svg.__typename === "Svg" && (
+                                                                        <div dangerouslySetInnerHTML={svg(p.svg.svg)} />
+                                                                    )}
                                                                 </Box>
                                                             )
                                                         default:
@@ -203,11 +210,14 @@ export function Album() {
                                                         case "CoverUploaded":
                                                             return (
                                                                 <Box
-                                                                    style={{transform: `scale(${scale})`, transformOrigin: "left top"}}
+                                                                    style={{
+                                                                        transform: `scale(${scale})`,
+                                                                        transformOrigin: "left top",
+                                                                    }}
                                                                 >
-                                                                    {p.svg.__typename === "Svg" &&
-                                                                        <div dangerouslySetInnerHTML={svg(p.svg.svg)}/>
-                                                                    }
+                                                                    {p.svg.__typename === "Svg" && (
+                                                                        <div dangerouslySetInnerHTML={svg(p.svg.svg)} />
+                                                                    )}
                                                                 </Box>
                                                             )
                                                         default:
@@ -240,19 +250,30 @@ export function Album() {
                     onClickClose={() => setShowAddVisualizations(false)}
                 />
             )}
+
+            {showUploadCover && (
+                <UploadCover
+                    albumId={id}
+                    onClickClose={() => setShowUploadCover(false)}
+                    onAlbumCoverUploaded={async () => {
+                        setShowUploadCover(false)
+                        await refetch()
+                    }}
+                />
+            )}
         </Main>
     )
 }
 
 function AddVisualizationsCircleButton({
-                                           onClick,
-                                           ...boxProps
-                                       }: {
+    onClick,
+    ...boxProps
+}: {
     onClick?: MouseEventHandler | undefined
 } & BoxExtendedProps) {
     return (
         <Box {...boxProps} round="full" overflow="hidden" background="brand">
-            <Button icon={<Add/>} hoverIndicator onClick={onClick}/>
+            <Button icon={<Add />} hoverIndicator onClick={onClick} />
         </Box>
     )
 }
@@ -271,25 +292,33 @@ function orientationToAspectRation(orientation?: PageOrientationEnum): string {
     return port
 }
 
-function orientationWidth(orientation: PageOrientationEnum = PageOrientationEnum.Landscape, scale: Number = 1.0): string {
-    const landscapeWidth = 420, portraitWidth = 297
+function orientationWidth(
+    orientation: PageOrientationEnum = PageOrientationEnum.Landscape,
+    scale: Number = 1.0
+): string {
+    const landscapeWidth = 420,
+        portraitWidth = 297
 
     switch (orientation) {
         case PageOrientationEnum.Landscape:
-            return `${landscapeWidth  * scale}mm`
+            return `${landscapeWidth * scale}mm`
         case PageOrientationEnum.Portrait:
-            return `${portraitWidth  * scale}mm`
+            return `${portraitWidth * scale}mm`
     }
 }
 
-function orientationHeight(orientation: PageOrientationEnum = PageOrientationEnum.Landscape, scale: Number = 1.0): string {
-    const landscapeHeight = 297, portraitHeight = 420
+function orientationHeight(
+    orientation: PageOrientationEnum = PageOrientationEnum.Landscape,
+    scale: Number = 1.0
+): string {
+    const landscapeHeight = 297,
+        portraitHeight = 420
 
     switch (orientation) {
         case PageOrientationEnum.Landscape:
-            return `${landscapeHeight  * scale}mm`
+            return `${landscapeHeight * scale}mm`
         case PageOrientationEnum.Portrait:
-            return `${portraitHeight  * scale}mm`
+            return `${portraitHeight * scale}mm`
     }
 }
 
@@ -304,8 +333,12 @@ function ids(pages: (AlbumScreenAlbumPageCoverFragment | AlbumScreenAlbumPageVis
 
 function AddVariants({
     onClickAddVisualizations,
+    onClickUploadCover,
     ...boxProps
-}: { onClickAddVisualizations?: () => void } & {boxProps: BoxExtendedProps}) {
+}: {
+    onClickAddVisualizations?: () => void
+    onClickUploadCover?: () => void
+} & { boxProps: BoxExtendedProps }) {
     const [open, setOpen] = useState(false)
 
     const targetRef = useRef<HTMLDivElement>(null)
@@ -326,7 +359,14 @@ function AddVariants({
                     round="large"
                 >
                     <Box gap="small" border={{ color: "background-front", size: "medium" }} direction="row">
-                        <Button primary label="Обложку" />
+                        <Button
+                            primary
+                            label="Обложку"
+                            onClick={() => {
+                                setOpen(false)
+                                onClickUploadCover && onClickUploadCover()
+                            }}
+                        />
                         <Button
                             primary
                             label="Визуализации"
@@ -345,5 +385,5 @@ function AddVariants({
 }
 
 function svg(html: string) {
-    return {__html: html}
+    return { __html: html }
 }

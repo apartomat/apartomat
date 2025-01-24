@@ -1,0 +1,1 @@
+export { UploadCover } from "./UploadCover"

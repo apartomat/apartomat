@@ -8,8 +8,8 @@ import { Notifications } from "features/notification"
 
 export function MainLayout({
     loading,
-    error,
     notification,
+    error,
     children,
     header,
     headerMenu,

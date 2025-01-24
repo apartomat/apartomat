@@ -7,14 +7,12 @@ import { AnchorLink } from "shared/ui/AnchorLink"
 
 import { ProjectScreenAlbum } from "pages/Project/useProject"
 
-export function Album({
-    album: { id, cover },
-    onClickDelete,
-    ...props
-}: {
+interface AlbumProps extends BoxExtendedProps {
     album: ProjectScreenAlbum
     onClickDelete?: (id: string) => void
-} & BoxExtendedProps) {
+}
+
+export function Album({ album: { id, cover }, onClickDelete, ...props }: AlbumProps) {
     const [showDeleteButton, setShowDeleteButton] = useState(false)
 
     const handleClickDeleteButton = (event: React.MouseEvent) => {
