@@ -1,0 +1,64 @@
+name: Build images for Docker Compose
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+env:
+  CR_REGISTRY: ${{ secrets.YC_CR_REGISTRY }}
+  CR_REPOSITORY: apartomat
+
+jobs:
+  build-crm-api:
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME: apartomat-crm-api
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: "1.22.5"
+
+    #    - name: Vet
+    #      run: go vet ./...
+
+    - name: Test
+      run: go test -v ./internal/... -tags="test unit"
+
+    - name: Build
+      env:
+        APARTOMAT_VERSION: ${{ github.run_number }}
+      run: GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o bin/apartomat-lunux-amd64 -ldflags "-X github.com/apartomat/apartomat/api/crm/graphql.Version=$APARTOMAT_VERSION" ./cmd/crm
+
+    - name: Login to Yandex Cloud Container Registry
+      uses: yc-actions/yc-cr-login@v1
+      with:
+        yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
+
+    - name: Push image to Yandex Cloud Container Registry
+      env:
+        APARTOMAT_PRIV_KEY: ${{ secrets.APARTOMAT_PRIV_KEY }}
+        IMAGE_TAG: ${{ github.run_number }}
+      run: |
+        echo $APARTOMAT_PRIV_KEY | base64 --decode > apartomat.key
+        docker build -f ./deploy/yandex/apartomat/Dockerfile -t cr.yandex/$CR_REGISTRY/$IMAGE_NAME:$IMAGE_TAG .
+        docker push cr.yandex/$CR_REGISTRY/$IMAGE_NAME:$IMAGE_TAG
+
+  build-crm-web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - run: npm ci
+        working-directory: ./web/crm/
+      - run: npm run build
+        working-directory: ./web/crm/
+      - run: ls ./web/crm
