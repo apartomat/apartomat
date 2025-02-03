@@ -1,0 +1,13 @@
+mutation deleteAlbumPage($albumId: String!, $pageNumber: Int!) {
+    deleteAlbumPage(albumId: $albumId, pageNumber: $pageNumber) {
+        __typename
+        ... on AlbumPageDeleted {
+            page {
+                number
+            }
+        }
+        ... on Error {
+            message
+        }
+    }
+}

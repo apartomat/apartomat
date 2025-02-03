@@ -127,6 +127,7 @@ const (
 )
 
 type pageRecord struct {
+	ID              string `json:"id,omitempty"`
 	Type            pageRecordType
 	Rotate          float64
 	CoverID         string `json:"cover_id,omitempty"`
@@ -199,6 +200,7 @@ func toPageRecords(pages []AlbumPage) []pageRecord {
 				page = (p).(AlbumPageCover)
 			)
 			res[i] = pageRecord{
+				ID:      page.ID,
 				Type:    pageRecordTypeCover,
 				CoverID: page.CoverID,
 				FileID:  page.FileID,
@@ -209,6 +211,7 @@ func toPageRecords(pages []AlbumPage) []pageRecord {
 				page = (p).(AlbumPageCoverUploaded)
 			)
 			res[i] = pageRecord{
+				ID:     page.ID,
 				Type:   pageRecordTypeCoverUploaded,
 				FileID: page.FileID,
 				Rotate: page.Rotate,
@@ -219,6 +222,7 @@ func toPageRecords(pages []AlbumPage) []pageRecord {
 			)
 
 			res[i] = pageRecord{
+				ID:              page.ID,
 				Type:            pageRecordTypeVisualization,
 				VisualizationID: page.VisualizationID,
 				FileID:          page.FileID,
@@ -246,17 +250,20 @@ func fromPageRecords(recs []pageRecord) []AlbumPage {
 		switch rec.Type {
 		case pageRecordTypeCover:
 			res[i] = AlbumPageCover{
+				ID:      rec.ID,
 				CoverID: rec.CoverID,
 				FileID:  rec.FileID,
 				Rotate:  rec.Rotate,
 			}
 		case pageRecordTypeCoverUploaded:
 			res[i] = AlbumPageCoverUploaded{
+				ID:     rec.ID,
 				FileID: rec.FileID,
 				Rotate: rec.Rotate,
 			}
 		case pageRecordTypeVisualization:
 			res[i] = AlbumPageVisualization{
+				ID:              rec.ID,
 				VisualizationID: rec.VisualizationID,
 				FileID:          rec.FileID,
 				Rotate:          rec.Rotate,
@@ -264,6 +271,7 @@ func fromPageRecords(recs []pageRecord) []AlbumPage {
 		default:
 			// for backward compatibility
 			res[i] = AlbumPageVisualization{
+				ID:              rec.ID,
 				VisualizationID: rec.VisualizationID,
 				FileID:          rec.FileID,
 				Rotate:          rec.Rotate,

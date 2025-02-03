@@ -54,6 +54,7 @@ type AlbumPage interface {
 }
 
 type AlbumPageCover struct {
+	ID      string
 	CoverID string
 	FileID  string
 	Rotate  float64
@@ -64,6 +65,7 @@ func (AlbumPageCover) IsAlbumPage() bool {
 }
 
 type AlbumPageCoverUploaded struct {
+	ID     string
 	FileID string
 	Rotate float64
 }
@@ -73,6 +75,7 @@ func (AlbumPageCoverUploaded) IsAlbumPage() bool {
 }
 
 type AlbumPageVisualization struct {
+	ID              string
 	VisualizationID string
 	FileID          string
 	Rotate          float64
@@ -82,9 +85,13 @@ func (AlbumPageVisualization) IsAlbumPage() bool {
 	return true
 }
 
-func (album *Album) AddPageWithVisualization(vis *visualizations.Visualization) (AlbumPageVisualization, int) {
+func (album *Album) AddVisualizationPageWithID(
+	vis *visualizations.Visualization,
+	pageID string,
+) (AlbumPageVisualization, int) {
 	var (
 		page = AlbumPageVisualization{
+			ID:              pageID,
 			VisualizationID: vis.ID,
 			FileID:          vis.FileID,
 		}
@@ -93,6 +100,24 @@ func (album *Album) AddPageWithVisualization(vis *visualizations.Visualization) 
 	album.Pages = append(album.Pages, page)
 
 	return page, len(album.Pages) - 1
+}
+
+func (album *Album) AddUploadedCoverPageWithID(
+	fileID string,
+	pageID string,
+) (AlbumPageCoverUploaded, int) {
+	var (
+		page = AlbumPageCoverUploaded{ID: pageID, FileID: fileID}
+	)
+
+	album.Pages = append(album.Pages, page)
+
+	album.Pages = append(
+		[]AlbumPage{page},
+		album.Pages...,
+	)
+
+	return page, 0
 }
 
 func (album *Album) ChangePageSize(size PageSize) {

@@ -117,11 +117,6 @@ func (u *CRM) DeleteAlbum(ctx context.Context, id string) (*Album, error) {
 	return album, err
 }
 
-type VisualizationWithPosition struct {
-	Position      int
-	Visualization *visualizations.Visualization
-}
-
 func (u *CRM) AddVisualizationsToAlbum(
 	ctx context.Context,
 	albumID string,
@@ -162,7 +157,7 @@ visLoop:
 	for i, id := range visualizationID {
 		for _, vis := range list {
 			if vis.ID == id {
-				page, n := album.AddPageWithVisualization(vis)
+				page, n := album.AddVisualizationPageWithID(vis, MustGenerateNanoID())
 				if num == nil {
 					num = &n
 				}
@@ -185,6 +180,30 @@ visLoop:
 	}
 
 	return res, *num, nil
+}
+
+func (u *CRM) UploadAlbumCover(
+	ctx context.Context,
+	albumID string,
+	upload Upload,
+) (*files.File, error) {
+	album, err := u.Albums.Get(ctx, IDIn(albumID))
+	if err != nil {
+		return nil, err
+	}
+
+	file, err := u.UploadFile(ctx, album.ProjectID, upload, files.FileTypeAlbumCover)
+	if err != nil {
+		return nil, err
+	}
+
+	album.AddUploadedCoverPageWithID(file.ID, MustGenerateNanoID())
+
+	if err := u.Albums.Save(ctx, album); err != nil {
+		return nil, err
+	}
+
+	return file, nil
 }
 
 func (u *CRM) ChangeAlbumPageSize(
@@ -307,33 +326,6 @@ func (u *CRM) StartGenerateAlbumFile(ctx context.Context, albumID string) (*albu
 	}
 
 	return af, nil, err
-}
-
-func (u *CRM) UploadAlbumCover(
-	ctx context.Context,
-	albumID string,
-	upload Upload,
-) (*files.File, error) {
-	album, err := u.Albums.Get(ctx, IDIn(albumID))
-	if err != nil {
-		return nil, err
-	}
-
-	file, err := u.UploadFile(ctx, album.ProjectID, upload, files.FileTypeAlbumCover)
-	if err != nil {
-		return nil, err
-	}
-
-	album.Pages = append(
-		[]AlbumPage{AlbumPageCoverUploaded{FileID: file.ID}},
-		album.Pages...,
-	)
-
-	if err := u.Albums.Save(ctx, album); err != nil {
-		return nil, err
-	}
-
-	return file, nil
 }
 
 func (u *CRM) DeleteAlbumPage(

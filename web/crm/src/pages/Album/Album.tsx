@@ -2,8 +2,8 @@ import React, { MouseEventHandler, useEffect, useRef, useState } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { InView } from "react-intersection-observer"
 
-import { Box, BoxExtendedProps, Button, Grid, Heading, Header, Image, Text, Drop, Main } from "grommet"
-import { Add, Close } from "grommet-icons"
+import { Box, BoxExtendedProps, Button, Grid, Heading, Header, Image, Text, Drop, Main, Stack } from "grommet"
+import {Add, Close} from "grommet-icons"
 
 import useAlbum, {
     AlbumScreenVisualizationFragment,
@@ -19,6 +19,8 @@ import { PageSize, PageOrientation } from "./Settings/"
 import AddVisualizations from "pages/Album/AddVisualizations/AddVisualizations"
 import { GenerateFile as GenerateAlbumFile } from "pages/Album/GenerateFile"
 import { UploadCover } from "pages/Album/UploadCover"
+import { DeletePage } from "pages/Album/DeletePage/";
+import {Confirm} from "widgets/confirm";
 
 export function Album() {
     const { id } = useParams<"id">() as { id: string }
@@ -75,6 +77,16 @@ export function Album() {
     const navigate = useNavigate()
 
     const [inView, setInView] = useState(0)
+
+    const [ hoverPage, setHoverPage ] = useState<number | undefined>()
+
+    const handlePageMouseEnter = (n: number) => {
+        setHoverPage(n)
+    }
+
+    const handlePageMouseLeave = (n: number) => {
+        setHoverPage(undefined)
+    }
 
     return (
         <Main overflow="scroll" style={{ position: "fixed", inset: 0 }}>
@@ -166,24 +178,48 @@ export function Album() {
 
             {pages.length > 0 && (
                 <Box align="center" pad={{ top: "84px", bottom: "68px" }}>
-                    <Grid>
+                    <Grid width="100%">
                         {pages.map((p, key) => {
                             return (
-                                <InView
+                                <Box
                                     key={key}
-                                    onChange={(inView) => {
-                                        if (inView) {
-                                            setInView(key)
-                                        }
+                                    direction="row"
+                                    justify="center"
+                                    onMouseOver={(e) => {
+                                        handlePageMouseEnter(key)
+
                                     }}
-                                    threshold={1.0}
+                                    onMouseOut={(e) => {
+                                        handlePageMouseLeave(key)
+
+                                    }}
                                 >
+                                    <Box direction="column" justify="center">
+                                        <Box
+                                            pad="xsmall"
+                                            style={{ visibility: hoverPage === key ? "visible": "hidden" }}
+                                            background="background-contrast"
+                                            round="small"
+                                            direction="column"
+                                            gap="small"
+                                            margin={{right: "xsmall"}}
+                                            pad={{vertical:"xsmall", horizontal: "xsmall"}}
+                                        >
+                                            <DeletePage
+                                                albumId={id}
+                                                pageNumber={key}
+                                                onPageDeleted={() => {
+                                                    refetch()
+                                                }}
+                                            />
+                                        </Box>
+                                    </Box>
                                     <Box
                                         background="background-contrast"
-                                        // round="small"
                                         margin={{ vertical: "xxsmall" }}
                                         width={orientationWidth(settings?.pageOrientation, scale)}
                                         height={orientationHeight(settings?.pageOrientation, scale)}
+
                                     >
                                         {(() => {
                                             switch (p.__typename) {
@@ -228,7 +264,10 @@ export function Album() {
                                             }
                                         })()}
                                     </Box>
-                                </InView>
+                                    <Box width="xxsmall"></Box>
+                                </Box>
+
+
                             )
                         })}
                     </Grid>

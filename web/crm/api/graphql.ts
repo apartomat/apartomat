@@ -113,6 +113,11 @@ export type AlbumPageCover = AlbumPage & {
 
 export type AlbumPageCoverResult = Cover | CoverUploaded | Forbidden | NotFound | ServerError;
 
+export type AlbumPageDeleted = {
+  __typename?: 'AlbumPageDeleted';
+  page: AlbumPage;
+};
+
 export type AlbumPageOrientationChanged = {
   __typename?: 'AlbumPageOrientationChanged';
   album: Album;
@@ -254,6 +259,8 @@ export type CreateProjectInput = {
 };
 
 export type CreateProjectResult = Forbidden | ProjectCreated | ServerError;
+
+export type DeleteAlbumPageResult = AlbumPageDeleted | Forbidden | NotFound | ServerError;
 
 export type DeleteAlbumResult = AlbumDeleted | Forbidden | NotFound | ServerError;
 
@@ -412,6 +419,7 @@ export type Mutation = {
   createAlbum: CreateAlbumResult;
   createProject: CreateProjectResult;
   deleteAlbum: DeleteAlbumResult;
+  deleteAlbumPage: DeleteAlbumPageResult;
   deleteContact: DeleteContactResult;
   deleteRoom: DeleteRoomResult;
   deleteVisualizations: DeleteVisualizationsResult;
@@ -510,6 +518,12 @@ export type MutationCreateProjectArgs = {
 
 export type MutationDeleteAlbumArgs = {
   id: Scalars['String'];
+};
+
+
+export type MutationDeleteAlbumPageArgs = {
+  albumId: Scalars['String'];
+  pageNumber: Scalars['Int'];
 };
 
 
@@ -1215,6 +1229,14 @@ export type AddVisualizationsToAlbumMutationVariables = Exact<{
 
 
 export type AddVisualizationsToAlbumMutation = { __typename?: 'Mutation', addVisualizationsToAlbum: { __typename: 'Forbidden', message: string } | { __typename: 'ServerError', message: string } | { __typename: 'VisualizationsAddedToAlbum', pages: Array<{ __typename?: 'AlbumPageVisualization', number: number, rotate: number, visualization: { __typename?: 'NotFound' } | { __typename?: 'ServerError' } | { __typename?: 'Visualization', id: string, file: { __typename?: 'File', url: any } } }> } };
+
+export type DeleteAlbumPageMutationVariables = Exact<{
+  albumId: Scalars['String'];
+  pageNumber: Scalars['Int'];
+}>;
+
+
+export type DeleteAlbumPageMutation = { __typename?: 'Mutation', deleteAlbumPage: { __typename: 'AlbumPageDeleted', page: { __typename?: 'AlbumPageCover', number: number } | { __typename?: 'AlbumPageVisualization', number: number } } | { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'ServerError', message: string } };
 
 export type GenerateAlbumFileMutationVariables = Exact<{
   albumId: Scalars['String'];
@@ -2294,6 +2316,48 @@ export function useAddVisualizationsToAlbumMutation(baseOptions?: Apollo.Mutatio
 export type AddVisualizationsToAlbumMutationHookResult = ReturnType<typeof useAddVisualizationsToAlbumMutation>;
 export type AddVisualizationsToAlbumMutationResult = Apollo.MutationResult<AddVisualizationsToAlbumMutation>;
 export type AddVisualizationsToAlbumMutationOptions = Apollo.BaseMutationOptions<AddVisualizationsToAlbumMutation, AddVisualizationsToAlbumMutationVariables>;
+export const DeleteAlbumPageDocument = gql`
+    mutation deleteAlbumPage($albumId: String!, $pageNumber: Int!) {
+  deleteAlbumPage(albumId: $albumId, pageNumber: $pageNumber) {
+    __typename
+    ... on AlbumPageDeleted {
+      page {
+        number
+      }
+    }
+    ... on Error {
+      message
+    }
+  }
+}
+    `;
+export type DeleteAlbumPageMutationFn = Apollo.MutationFunction<DeleteAlbumPageMutation, DeleteAlbumPageMutationVariables>;
+
+/**
+ * __useDeleteAlbumPageMutation__
+ *
+ * To run a mutation, you first call `useDeleteAlbumPageMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteAlbumPageMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteAlbumPageMutation, { data, loading, error }] = useDeleteAlbumPageMutation({
+ *   variables: {
+ *      albumId: // value for 'albumId'
+ *      pageNumber: // value for 'pageNumber'
+ *   },
+ * });
+ */
+export function useDeleteAlbumPageMutation(baseOptions?: Apollo.MutationHookOptions<DeleteAlbumPageMutation, DeleteAlbumPageMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteAlbumPageMutation, DeleteAlbumPageMutationVariables>(DeleteAlbumPageDocument, options);
+      }
+export type DeleteAlbumPageMutationHookResult = ReturnType<typeof useDeleteAlbumPageMutation>;
+export type DeleteAlbumPageMutationResult = Apollo.MutationResult<DeleteAlbumPageMutation>;
+export type DeleteAlbumPageMutationOptions = Apollo.BaseMutationOptions<DeleteAlbumPageMutation, DeleteAlbumPageMutationVariables>;
 export const GenerateAlbumFileDocument = gql`
     mutation generateAlbumFile($albumId: String!) {
   generateAlbumFile(albumId: $albumId) {

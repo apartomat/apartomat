@@ -39,6 +39,7 @@ type AlbumPages {
 }
 
 interface AlbumPage {
+    id: String!
     number: Int!
     rotate: Float!
     svg: AlbumPageSvgResult!
@@ -51,6 +52,7 @@ type Svg {
 }
 
 type AlbumPageCover implements AlbumPage {
+    id: String!
     number: Int!
     rotate: Float!
     svg: AlbumPageSvgResult! @goField(forceResolver: true)
@@ -71,6 +73,7 @@ type CoverUploaded {
 union CoverFileResult = File | NotFound | Forbidden | ServerError
 
 type AlbumPageVisualization implements AlbumPage {
+    id: String!
     number: Int!
     rotate: Float!
     svg: AlbumPageSvgResult! @goField(forceResolver: true)

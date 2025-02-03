@@ -6,7 +6,6 @@ import (
 	"log/slog"
 
 	"github.com/apartomat/apartomat/internal/crm"
-	"github.com/apartomat/apartomat/internal/store/albums"
 )
 
 func (r *mutationResolver) CreateAlbum(
@@ -30,99 +29,4 @@ func (r *mutationResolver) CreateAlbum(
 	}
 
 	return AlbumCreated{Album: albumToGraphQL(album)}, nil
-}
-
-func albumToGraphQL(album *albums.Album) *Album {
-	return &Album{
-		ID:      album.ID,
-		Name:    album.Name,
-		Version: album.Version,
-		Project: Project{
-			ID: album.ProjectID,
-		},
-		Settings: albumSettingsToGraphQL(album.Settings),
-		Pages: &AlbumPages{
-			Items: albumPagesToGraphQL(album.Pages),
-		},
-	}
-}
-
-func albumPagesToGraphQL(pages []albums.AlbumPage) []AlbumPage {
-	var (
-		res = make([]AlbumPage, len(pages))
-	)
-
-	for i, p := range pages {
-		res[i] = albumPageToGraphQL(p, i)
-	}
-
-	return res
-}
-
-func albumPageToGraphQL(p albums.AlbumPage, pageNumber int) AlbumPage {
-	switch p.(type) {
-	case albums.AlbumPageCover:
-		var (
-			page = p.(albums.AlbumPageCover)
-		)
-		return &AlbumPageCover{
-			Number: pageNumber,
-			Rotate: page.Rotate,
-			Cover: &CoverUploaded{
-				File: File{
-					ID: page.FileID,
-				},
-			},
-		}
-	case albums.AlbumPageCoverUploaded:
-		var (
-			page = p.(albums.AlbumPageCoverUploaded)
-		)
-
-		return &AlbumPageCover{
-			Number: pageNumber,
-			Rotate: page.Rotate,
-			Cover: &CoverUploaded{
-				File: File{
-					ID: page.FileID,
-				},
-			},
-		}
-	case albums.AlbumPageVisualization:
-		var (
-			page = p.(albums.AlbumPageVisualization)
-		)
-
-		return &AlbumPageVisualization{
-			Number: pageNumber,
-			Rotate: page.Rotate,
-			Visualization: &Visualization{
-				ID: page.VisualizationID,
-			},
-		}
-	}
-
-	return nil
-}
-
-func albumSettingsToGraphQL(settings albums.Settings) *AlbumSettings {
-	var (
-		res = &AlbumSettings{}
-	)
-
-	switch settings.PageSize {
-	case albums.A4:
-		res.PageSize = PageSizeA4
-	case albums.A3:
-		res.PageSize = PageSizeA3
-	}
-
-	switch settings.PageOrientation {
-	case albums.Portrait:
-		res.PageOrientation = PageOrientationPortrait
-	case albums.Landscape:
-		res.PageOrientation = PageOrientationLandscape
-	}
-
-	return res
 }

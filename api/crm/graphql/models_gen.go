@@ -41,6 +41,7 @@ type AlbumFileGenerated interface {
 
 type AlbumPage interface {
 	IsAlbumPage()
+	GetID() string
 	GetNumber() int
 	GetRotate() float64
 	GetSVG() AlbumPageSVGResult
@@ -331,6 +332,7 @@ type AlbumFileGenerationStarted struct {
 func (AlbumFileGenerationStarted) IsGenerateAlbumFileResult() {}
 
 type AlbumPageCover struct {
+	ID     string               `json:"id"`
 	Number int                  `json:"number"`
 	Rotate float64              `json:"rotate"`
 	SVG    AlbumPageSVGResult   `json:"svg"`
@@ -338,6 +340,7 @@ type AlbumPageCover struct {
 }
 
 func (AlbumPageCover) IsAlbumPage()                    {}
+func (this AlbumPageCover) GetID() string              { return this.ID }
 func (this AlbumPageCover) GetNumber() int             { return this.Number }
 func (this AlbumPageCover) GetRotate() float64         { return this.Rotate }
 func (this AlbumPageCover) GetSVG() AlbumPageSVGResult { return this.SVG }
@@ -361,6 +364,7 @@ type AlbumPageSizeChanged struct {
 func (AlbumPageSizeChanged) IsChangeAlbumPageSizeResult() {}
 
 type AlbumPageVisualization struct {
+	ID            string                       `json:"id"`
 	Number        int                          `json:"number"`
 	Rotate        float64                      `json:"rotate"`
 	SVG           AlbumPageSVGResult           `json:"svg"`
@@ -368,6 +372,7 @@ type AlbumPageVisualization struct {
 }
 
 func (AlbumPageVisualization) IsAlbumPage()                    {}
+func (this AlbumPageVisualization) GetID() string              { return this.ID }
 func (this AlbumPageVisualization) GetNumber() int             { return this.Number }
 func (this AlbumPageVisualization) GetRotate() float64         { return this.Rotate }
 func (this AlbumPageVisualization) GetSVG() AlbumPageSVGResult { return this.SVG }

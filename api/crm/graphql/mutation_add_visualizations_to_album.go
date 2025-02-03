@@ -38,13 +38,7 @@ func (r *mutationResolver) AddVisualizationsToAlbum(
 	)
 
 	for i, p := range pages {
-		res.Pages[i] = &AlbumPageVisualization{
-			Number: num,
-			Rotate: p.Rotate,
-			Visualization: Visualization{
-				ID: p.VisualizationID,
-			},
-		}
+		res.Pages[i] = albumPageVisualizationToGraphQL(p, num)
 		num++
 	}
 

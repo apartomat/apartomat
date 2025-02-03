@@ -106,6 +106,7 @@ type ComplexityRoot struct {
 
 	AlbumPageCover struct {
 		Cover  func(childComplexity int) int
+		ID     func(childComplexity int) int
 		Number func(childComplexity int) int
 		Rotate func(childComplexity int) int
 		SVG    func(childComplexity int) int
@@ -124,6 +125,7 @@ type ComplexityRoot struct {
 	}
 
 	AlbumPageVisualization struct {
+		ID            func(childComplexity int) int
 		Number        func(childComplexity int) int
 		Rotate        func(childComplexity int) int
 		SVG           func(childComplexity int) int
@@ -867,6 +869,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.AlbumPageCover.Cover(childComplexity), true
 
+	case "AlbumPageCover.id":
+		if e.complexity.AlbumPageCover.ID == nil {
+			break
+		}
+
+		return e.complexity.AlbumPageCover.ID(childComplexity), true
+
 	case "AlbumPageCover.number":
 		if e.complexity.AlbumPageCover.Number == nil {
 			break
@@ -908,6 +917,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.AlbumPageSizeChanged.Album(childComplexity), true
+
+	case "AlbumPageVisualization.id":
+		if e.complexity.AlbumPageVisualization.ID == nil {
+			break
+		}
+
+		return e.complexity.AlbumPageVisualization.ID(childComplexity), true
 
 	case "AlbumPageVisualization.number":
 		if e.complexity.AlbumPageVisualization.Number == nil {
@@ -4739,6 +4755,50 @@ func (ec *executionContext) fieldContext_AlbumFileGenerationStarted_file(_ conte
 	return fc, nil
 }
 
+func (ec *executionContext) _AlbumPageCover_id(ctx context.Context, field graphql.CollectedField, obj *AlbumPageCover) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AlbumPageCover_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AlbumPageCover_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AlbumPageCover",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _AlbumPageCover_number(ctx context.Context, field graphql.CollectedField, obj *AlbumPageCover) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_AlbumPageCover_number(ctx, field)
 	if err != nil {
@@ -5078,6 +5138,50 @@ func (ec *executionContext) fieldContext_AlbumPageSizeChanged_album(_ context.Co
 				return ec.fieldContext_Album_cover(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Album", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AlbumPageVisualization_id(ctx context.Context, field graphql.CollectedField, obj *AlbumPageVisualization) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AlbumPageVisualization_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AlbumPageVisualization_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AlbumPageVisualization",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -14074,6 +14178,8 @@ func (ec *executionContext) fieldContext_VisualizationsAddedToAlbum_pages(_ cont
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
+			case "id":
+				return ec.fieldContext_AlbumPageVisualization_id(ctx, field)
 			case "number":
 				return ec.fieldContext_AlbumPageVisualization_number(ctx, field)
 			case "rotate":
@@ -20245,6 +20351,11 @@ func (ec *executionContext) _AlbumPageCover(ctx context.Context, sel ast.Selecti
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AlbumPageCover")
+		case "id":
+			out.Values[i] = ec._AlbumPageCover_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
 		case "number":
 			out.Values[i] = ec._AlbumPageCover_number(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -20478,6 +20589,11 @@ func (ec *executionContext) _AlbumPageVisualization(ctx context.Context, sel ast
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("AlbumPageVisualization")
+		case "id":
+			out.Values[i] = ec._AlbumPageVisualization_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
 		case "number":
 			out.Values[i] = ec._AlbumPageVisualization_number(ctx, field, obj)
 			if out.Values[i] == graphql.Null {

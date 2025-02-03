@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"log/slog"
-	"time"
 
 	"github.com/apartomat/apartomat/internal/crm"
 )
@@ -14,7 +13,6 @@ func (r *mutationResolver) DeleteAlbumPage(
 	albumID string,
 	pageNumber int,
 ) (DeleteAlbumPageResult, error) {
-	time.Sleep(3 * time.Second)
 	page, err := r.useCases.DeleteAlbumPage(ctx, albumID, pageNumber)
 	if err != nil {
 		if errors.Is(err, crm.ErrForbidden) {
