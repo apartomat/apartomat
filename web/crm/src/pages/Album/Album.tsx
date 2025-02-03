@@ -203,9 +203,9 @@ export function Album() {
                                             direction="column"
                                             gap="small"
                                             margin={{right: "xsmall"}}
-                                            pad={{vertical:"xsmall", horizontal: "xsmall"}}
                                         >
                                             <DeletePage
+                                                key={p.id}
                                                 albumId={id}
                                                 pageNumber={key}
                                                 onPageDeleted={() => {

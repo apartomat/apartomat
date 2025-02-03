@@ -9,6 +9,7 @@ export function DeletePage({
     pageNumber,
     onPageDeleted,
 }: {
+    key: React.Key,
     albumId: string
     pageNumber
     onPageDeleted?: (pageNumber: number) => void
