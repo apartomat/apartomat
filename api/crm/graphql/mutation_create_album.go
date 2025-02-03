@@ -53,50 +53,56 @@ func albumPagesToGraphQL(pages []albums.AlbumPage) []AlbumPage {
 	)
 
 	for i, p := range pages {
-		switch p.(type) {
-		case albums.AlbumPageCover:
-			var (
-				page = p.(albums.AlbumPageCover)
-			)
-			res[i] = &AlbumPageCover{
-				Number: i,
-				Rotate: page.Rotate,
-				Cover: &CoverUploaded{
-					File: File{
-						ID: page.FileID,
-					},
-				},
-			}
-		case albums.AlbumPageCoverUploaded:
-			var (
-				page = p.(albums.AlbumPageCoverUploaded)
-			)
-			res[i] = &AlbumPageCover{
-				Number: i,
-				Rotate: page.Rotate,
-				Cover: &CoverUploaded{
-					File: File{
-						ID: page.FileID,
-					},
-				},
-			}
-		case albums.AlbumPageVisualization:
-			var (
-				page = p.(albums.AlbumPageVisualization)
-			)
-
-			res[i] = &AlbumPageVisualization{
-				Number: i,
-				Rotate: page.Rotate,
-				Visualization: &Visualization{
-					ID: page.VisualizationID,
-				},
-			}
-		}
-
+		res[i] = albumPageToGraphQL(p, i)
 	}
 
 	return res
+}
+
+func albumPageToGraphQL(p albums.AlbumPage, pageNumber int) AlbumPage {
+	switch p.(type) {
+	case albums.AlbumPageCover:
+		var (
+			page = p.(albums.AlbumPageCover)
+		)
+		return &AlbumPageCover{
+			Number: pageNumber,
+			Rotate: page.Rotate,
+			Cover: &CoverUploaded{
+				File: File{
+					ID: page.FileID,
+				},
+			},
+		}
+	case albums.AlbumPageCoverUploaded:
+		var (
+			page = p.(albums.AlbumPageCoverUploaded)
+		)
+
+		return &AlbumPageCover{
+			Number: pageNumber,
+			Rotate: page.Rotate,
+			Cover: &CoverUploaded{
+				File: File{
+					ID: page.FileID,
+				},
+			},
+		}
+	case albums.AlbumPageVisualization:
+		var (
+			page = p.(albums.AlbumPageVisualization)
+		)
+
+		return &AlbumPageVisualization{
+			Number: pageNumber,
+			Rotate: page.Rotate,
+			Visualization: &Visualization{
+				ID: page.VisualizationID,
+			},
+		}
+	}
+
+	return nil
 }
 
 func albumSettingsToGraphQL(settings albums.Settings) *AlbumSettings {

@@ -1,0 +1,9 @@
+extend type Mutation {
+    deleteAlbumPage(albumId: String!, pageNumber: Int!): DeleteAlbumPageResult!
+}
+
+union DeleteAlbumPageResult = AlbumPageDeleted | Forbidden | NotFound | ServerError
+
+type AlbumPageDeleted {
+    page: AlbumPage!
+}

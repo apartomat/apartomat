@@ -335,3 +335,30 @@ func (u *CRM) UploadAlbumCover(
 
 	return file, nil
 }
+
+func (u *CRM) DeleteAlbumPage(
+	ctx context.Context,
+	albumID string,
+	pageNumber int,
+) (*AlbumPage, error) {
+	album, err := u.Albums.Get(ctx, IDIn(albumID))
+	if err != nil {
+		return nil, err
+	}
+
+	if len(album.Pages) < pageNumber+1 {
+		return nil, fmt.Errorf("there is no page (number=%d) in album (id=%s) : %w", pageNumber, album.ID, ErrForbidden)
+	}
+
+	var (
+		deleted = album.Pages[pageNumber]
+	)
+
+	album.Pages = append(album.Pages[:pageNumber], album.Pages[pageNumber+1:]...)
+
+	if err := u.Albums.Save(ctx, album); err != nil {
+		return nil, err
+	}
+
+	return &deleted, nil
+}

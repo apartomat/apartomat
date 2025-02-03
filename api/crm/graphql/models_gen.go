@@ -110,6 +110,10 @@ type CreateProjectResult interface {
 	IsCreateProjectResult()
 }
 
+type DeleteAlbumPageResult interface {
+	IsDeleteAlbumPageResult()
+}
+
 type DeleteAlbumResult interface {
 	IsDeleteAlbumResult()
 }
@@ -338,6 +342,12 @@ func (this AlbumPageCover) GetNumber() int             { return this.Number }
 func (this AlbumPageCover) GetRotate() float64         { return this.Rotate }
 func (this AlbumPageCover) GetSVG() AlbumPageSVGResult { return this.SVG }
 
+type AlbumPageDeleted struct {
+	Page AlbumPage `json:"page"`
+}
+
+func (AlbumPageDeleted) IsDeleteAlbumPageResult() {}
+
 type AlbumPageOrientationChanged struct {
 	Album *Album `json:"album"`
 }
@@ -517,6 +527,8 @@ func (Forbidden) IsCreateAlbumResult() {}
 func (Forbidden) IsCreateProjectResult() {}
 
 func (Forbidden) IsDeleteAlbumResult() {}
+
+func (Forbidden) IsDeleteAlbumPageResult() {}
 
 func (Forbidden) IsDeleteContactResult() {}
 
@@ -720,6 +732,8 @@ func (NotFound) IsChangeProjectDatesResult() {}
 func (NotFound) IsChangeProjectStatusResult() {}
 
 func (NotFound) IsDeleteAlbumResult() {}
+
+func (NotFound) IsDeleteAlbumPageResult() {}
 
 func (NotFound) IsDeleteContactResult() {}
 
@@ -1043,6 +1057,8 @@ func (ServerError) IsCreateAlbumResult() {}
 func (ServerError) IsCreateProjectResult() {}
 
 func (ServerError) IsDeleteAlbumResult() {}
+
+func (ServerError) IsDeleteAlbumPageResult() {}
 
 func (ServerError) IsDeleteContactResult() {}
 
