@@ -110,8 +110,6 @@ func (album *Album) AddUploadedCoverPageWithID(
 		page = AlbumPageCoverUploaded{ID: pageID, FileID: fileID}
 	)
 
-	album.Pages = append(album.Pages, page)
-
 	album.Pages = append(
 		[]AlbumPage{page},
 		album.Pages...,
