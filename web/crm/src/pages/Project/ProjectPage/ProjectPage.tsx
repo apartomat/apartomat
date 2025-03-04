@@ -17,9 +17,9 @@ import { FormClose, Link } from "grommet-icons"
 
 import { ProjectScreenProjectPageFragment, ProjectPageStatus } from "api/graphql"
 import React, { useEffect, useState } from "react"
-import { useMakeProjectNotPublic, useMakeProjectPublic } from "pages/Project/Page/useMakeProjectPublic"
+import { useMakeProjectNotPublic, useMakeProjectPublic } from "pages/Project/ProjectPage/useMakeProjectPublic"
 
-export function Page({
+export function ProjectPage({
     projectId,
     page,
     onChange,

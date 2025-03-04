@@ -34,7 +34,7 @@ import Visualizations from "./Visualizations/Visualizations"
 import { UploadVisualizations, Rooms as RoomsForUpload } from "features/upload-visualizations"
 import CreateAlbumOnClick from "./CreateAlbum/CreateAlbum"
 import { Albums } from "./Albums"
-import { Page } from "./Page"
+import { ProjectPage } from "./ProjectPage"
 import { Spinner } from "shared/ui/Spinner"
 import { Notifications } from "features/notification"
 import { useNotifications } from "shared/context/notifications/context"
@@ -155,8 +155,13 @@ export function Project() {
             </Header>
 
             <Box>
-                <Box direction="row" justify="between" margin={{ vertical: "medium" }}>
-                    <Box direction="row" justify="center">
+                <Box
+                    direction={ respSize=== "small" ? "column" : "row" }
+                    margin={{ vertical: "medium" }}
+                    justify="between"
+                    gap="large"
+                >
+                    <Box direction="row">
                         <Heading level={2} margin="none">
                             {project.name}
                         </Heading>
@@ -176,7 +181,7 @@ export function Project() {
                         />
                     </Box>
                     <Box direction="row" gap="small">
-                        <Page
+                        <ProjectPage
                             projectId={id}
                             page={project.page}
                             onClose={(changed: boolean) => {

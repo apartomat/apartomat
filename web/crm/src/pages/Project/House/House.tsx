@@ -27,7 +27,13 @@ export default function House({
     return (
         <Box {...boxProps}>
             <Box direction="row">
-                <Button primary color="light-2" label={address(house) || "не указан"} onClick={() => setShow(!show)} />
+                <Button
+                    primary
+                    color="light-2"
+                    label={address(house) || "не указан"}
+                    onClick={() => setShow(!show)}
+                    style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
+                />
             </Box>
 
             {show && house && (
