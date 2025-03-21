@@ -70,7 +70,7 @@ func (s *store) Save(ctx context.Context, houses ...*House) error {
 }
 
 type record struct {
-	bun.BaseModel `bun:"table:apartomat.files,alias:f"`
+	bun.BaseModel `bun:"table:apartomat.houses,alias:h"`
 
 	ID             string    `bun:"id,pk"`
 	City           string    `bun:"city"`
