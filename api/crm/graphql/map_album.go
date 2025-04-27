@@ -38,3 +38,25 @@ func albumSettingsToGraphQL(settings albums.Settings) *AlbumSettings {
 
 	return res
 }
+
+func graphQLToPageSize(size PageSize) albums.PageSize {
+	switch size {
+	case PageSizeA3:
+		return albums.A3
+	case PageSizeA4:
+		return albums.A4
+	}
+
+	return albums.A4
+}
+
+func graphQLToPageOrientation(orientation PageOrientation) albums.PageOrientation {
+	switch orientation {
+	case PageOrientationPortrait:
+		return albums.Portrait
+	case PageOrientationLandscape:
+		return albums.Landscape
+	}
+
+	return albums.Portrait
+}

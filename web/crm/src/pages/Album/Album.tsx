@@ -2,7 +2,7 @@ import React, { MouseEventHandler, useEffect, useRef, useState } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { InView } from "react-intersection-observer"
 
-import { Box, BoxExtendedProps, Button, Grid, Heading, Header, Image, Text, Drop, Main, Stack } from "grommet"
+import { Box, BoxExtendedProps, Button, Grid, Heading, Header, Text, Drop, Main } from "grommet"
 import {Add, Close} from "grommet-icons"
 
 import useAlbum, {
@@ -11,6 +11,7 @@ import useAlbum, {
     AlbumScreenAlbumPageCoverFragment,
     AlbumScreenAlbumPageVisualizationFragment,
     AlbumScreenSettingsFragment,
+    PageSize as PageSizeEnum,
     PageOrientation as PageOrientationEnum,
     AlbumScreenHouseRoomFragment,
 } from "./useAlbum"
@@ -43,7 +44,7 @@ export function Album() {
 
     const [showUploadCover, setShowUploadCover] = useState(false)
 
-    const [scale, setScale] = useState(0.5)
+    const [scale, setScale] = useState(0.75)
 
     useEffect(() => {
         if (data?.album?.__typename === "Album") {
@@ -71,6 +72,15 @@ export function Album() {
             }
 
             setSettings(data.album.settings)
+
+            switch (data.album.settings.pageSize) {
+                case PageSizeEnum.A3:
+                    setScale(0.5)
+                    break
+                case PageSizeEnum.A4:
+                    setScale(0.707)
+                    break
+            }
         }
     }, [data])
 
@@ -146,7 +156,11 @@ export function Album() {
                         <Heading level={5} margin={{ top: "none" }}>
                             Настройки для печати
                         </Heading>
-                        <PageSize albumId={id} size={settings.pageSize} onAlbumPageSizeChanged={() => refetch()} />
+                        <PageSize
+                            albumId={id}
+                            size={settings.pageSize}
+                            onAlbumPageSizeChanged={() => refetch()}
+                        />
                         <PageOrientation
                             albumId={id}
                             orientation={settings.pageOrientation}
@@ -176,7 +190,7 @@ export function Album() {
                 pad="small"
             />
 
-            {pages.length > 0 && (
+            {pages.length > 0 && settings && (
                 <Box align="center" pad={{ top: "84px", bottom: "68px" }}>
                     <Grid width="100%">
                         {pages.map((p, key) => {
@@ -185,13 +199,12 @@ export function Album() {
                                     key={key}
                                     direction="row"
                                     justify="center"
-                                    onMouseOver={(e) => {
+                                    onMouseOver={() => {
                                         handlePageMouseEnter(key)
 
                                     }}
-                                    onMouseOut={(e) => {
+                                    onMouseOut={() => {
                                         handlePageMouseLeave(key)
-
                                     }}
                                 >
                                     <Box direction="column" justify="center">
@@ -217,8 +230,8 @@ export function Album() {
                                     <Box
                                         background="background-contrast"
                                         margin={{ vertical: "xxsmall" }}
-                                        width={orientationWidth(settings?.pageOrientation, scale)}
-                                        height={orientationHeight(settings?.pageOrientation, scale)}
+                                        width={orientationWidth(settings.pageSize, settings.pageOrientation, scale)}
+                                        height={orientationHeight(settings.pageSize, settings.pageOrientation, scale)}
 
                                     >
                                         {(() => {
@@ -304,61 +317,44 @@ export function Album() {
     )
 }
 
-function AddVisualizationsCircleButton({
-    onClick,
-    ...boxProps
-}: {
-    onClick?: MouseEventHandler | undefined
-} & BoxExtendedProps) {
-    return (
-        <Box {...boxProps} round="full" overflow="hidden" background="brand">
-            <Button icon={<Add />} hoverIndicator onClick={onClick} />
-        </Box>
-    )
-}
-
-function orientationToAspectRation(orientation?: PageOrientationEnum): string {
-    const land = "1.41/1",
-        port = "1/1.41"
-
-    switch (orientation) {
-        case PageOrientationEnum.Landscape:
-            return land
-        case PageOrientationEnum.Portrait:
-            return port
-    }
-
-    return port
-}
-
 function orientationWidth(
-    orientation: PageOrientationEnum = PageOrientationEnum.Landscape,
-    scale: Number = 1.0
+    size: PageSizeEnum,
+    orientation: PageOrientationEnum,
+    scale: number = 1.0
 ): string {
-    const landscapeWidth = 420,
-        portraitWidth = 297
+    const width = {
+        [PageSizeEnum.A3]: {
+            [PageOrientationEnum.Portrait]: 297,
+            [PageOrientationEnum.Landscape]: 420,
 
-    switch (orientation) {
-        case PageOrientationEnum.Landscape:
-            return `${landscapeWidth * scale}mm`
-        case PageOrientationEnum.Portrait:
-            return `${portraitWidth * scale}mm`
+        },
+        [PageSizeEnum.A4]: {
+            [PageOrientationEnum.Portrait]: 210,
+            [PageOrientationEnum.Landscape]: 297,
+        }
     }
+
+    return `${width[size][orientation] * scale}mm`;
 }
 
 function orientationHeight(
+    size: PageSizeEnum,
     orientation: PageOrientationEnum = PageOrientationEnum.Landscape,
-    scale: Number = 1.0
+    scale: number = 1.0
 ): string {
-    const landscapeHeight = 297,
-        portraitHeight = 420
+    const height = {
+        [PageSizeEnum.A3]: {
+            [PageOrientationEnum.Portrait]: 420,
+            [PageOrientationEnum.Landscape]: 297,
 
-    switch (orientation) {
-        case PageOrientationEnum.Landscape:
-            return `${landscapeHeight * scale}mm`
-        case PageOrientationEnum.Portrait:
-            return `${portraitHeight * scale}mm`
+        },
+        [PageSizeEnum.A4]: {
+            [PageOrientationEnum.Portrait]: 297,
+            [PageOrientationEnum.Landscape]: 210,
+        }
     }
+
+    return `${height[size][orientation] * scale}mm`;
 }
 
 /* eslint-disable  @typescript-eslint/no-explicit-any */

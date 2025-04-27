@@ -3,10 +3,11 @@ package graphql
 import (
 	"context"
 	"errors"
+	"github.com/99designs/gqlgen/graphql"
 	"log/slog"
 
 	"github.com/apartomat/apartomat/internal/crm"
-	"github.com/apartomat/apartomat/internal/crm/svg"
+	svg "github.com/apartomat/apartomat/internal/crm/album"
 )
 
 func (r *rootResolver) AlbumPageCover() AlbumPageCoverResolver {
@@ -18,6 +19,18 @@ type albumPageCoverResolver struct {
 }
 
 func (r *albumPageCoverResolver) SVG(ctx context.Context, obj *AlbumPageCover) (AlbumPageSVGResult, error) {
+	var (
+		album *Album
+	)
+
+	if a, ok := graphql.GetFieldContext(ctx).Parent.Parent.Parent.Parent.Result.(*Album); ok {
+		album = a
+	} else {
+		slog.ErrorContext(ctx, "can't get album for cover")
+
+		return serverError()
+	}
+
 	switch c := obj.Cover.(type) {
 	case *CoverUploaded:
 		if f, ok := c.File.(File); ok {
@@ -32,7 +45,10 @@ func (r *albumPageCoverResolver) SVG(ctx context.Context, obj *AlbumPageCover) (
 				return serverError()
 			}
 
-			res, err := svg.UploadedCover(obj.Number, file.URL)
+			res, err := svg.UploadedCover(
+				graphQLToPageSize(album.Settings.PageSize),
+				graphQLToPageOrientation(album.Settings.PageOrientation),
+			)(obj.Number, file.URL)
 			if err != nil {
 				slog.ErrorContext(ctx, "can't get svg for uploaded cover", slog.Any("err", err))
 

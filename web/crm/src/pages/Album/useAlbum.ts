@@ -10,7 +10,7 @@ export type {
     AlbumScreenHouseRoomFragment,
 } from "api/graphql"
 
-export { PageOrientation } from "api/graphql"
+export { PageSize, PageOrientation } from "api/graphql"
 
 export function useAlbum({ id }: { id: string }) {
     return useAlbumScreenQuery({

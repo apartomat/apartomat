@@ -24,11 +24,15 @@ export function PageSize({
 }: {
     albumId: string
     size: PageSizeEnum
-    onAlbumPageSizeChanged?: () => void
+    onAlbumPageSizeChanged?: (size: PageSizeEnum) => void
 } & BoxExtendedProps) {
     const options = [PageSizeEnum.A3, PageSizeEnum.A4]
 
     const [pageSize, setPageSize] = useState<string>(size)
+
+    useEffect(() => {
+        setPageSize(size)
+    }, [size]);
 
     const [change, { data, error }] = useChangeAlbumPageSize(albumId)
 
@@ -43,7 +47,7 @@ export function PageSize({
                     changeAlbumPageSize: { album },
                 } = data
                 setPageSize(album.settings.pageSize)
-                onAlbumPageSizeChanged && onAlbumPageSizeChanged()
+                onAlbumPageSizeChanged && onAlbumPageSizeChanged(album.settings.pageSize)
                 break
             }
             default:

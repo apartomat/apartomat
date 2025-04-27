@@ -23,6 +23,10 @@ export function PageOrientation({
 
     const [pageOrientation, setPageOrientation] = useState<string>(orientation)
 
+    useEffect(() => {
+        setPageOrientation(orientation)
+    }, [orientation]);
+
     const [change, { data, error }] = useChangeAlbumPageOrientation(albumId)
 
     useEffect(() => {

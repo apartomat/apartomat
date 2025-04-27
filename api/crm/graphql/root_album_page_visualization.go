@@ -5,8 +5,9 @@ import (
 	"errors"
 	"log/slog"
 
+	"github.com/99designs/gqlgen/graphql"
 	"github.com/apartomat/apartomat/internal/crm"
-	"github.com/apartomat/apartomat/internal/crm/svg"
+	svg "github.com/apartomat/apartomat/internal/crm/album"
 )
 
 func (r *rootResolver) AlbumPageVisualization() AlbumPageVisualizationResolver {
@@ -18,6 +19,18 @@ type albumPageVisualizationResolver struct {
 }
 
 func (r *albumPageVisualizationResolver) SVG(ctx context.Context, obj *AlbumPageVisualization) (AlbumPageSVGResult, error) {
+	var (
+		album *Album
+	)
+
+	if a, ok := graphql.GetFieldContext(ctx).Parent.Parent.Parent.Parent.Result.(*Album); ok {
+		album = a
+	} else {
+		slog.ErrorContext(ctx, "can't get album for visualization page")
+
+		return serverError()
+	}
+
 	if v, ok := obj.Visualization.(*Visualization); ok && v != nil {
 		vis, err := r.useCases.GetVisualization(ctx, v.ID)
 		if err != nil {
@@ -41,8 +54,13 @@ func (r *albumPageVisualizationResolver) SVG(ctx context.Context, obj *AlbumPage
 			return serverError()
 		}
 
-		res, err := svg.Visualization(obj.Number, f.URL)
+		res, err := svg.Visualization(
+			graphQLToPageSize(album.Settings.PageSize),
+			graphQLToPageOrientation(album.Settings.PageOrientation),
+		)(obj.Number, f.URL)
 		if err != nil {
+			slog.ErrorContext(ctx, "can't get album page visualization svg", slog.Any("err", err))
+
 			return serverError()
 		}
 
