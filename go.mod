@@ -1,8 +1,6 @@
 module github.com/apartomat/apartomat
 
-go 1.22.5
-
-toolchain go1.22.7
+go 1.24.3
 
 require (
 	github.com/99designs/gqlgen v0.17.49
