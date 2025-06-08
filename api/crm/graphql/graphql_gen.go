@@ -731,7 +731,7 @@ func (e *executableSchema) Schema() *ast.Schema {
 	return parsedSchema
 }
 
-func (e *executableSchema) Complexity(typeName, field string, childComplexity int, rawArgs map[string]interface{}) (int, bool) {
+func (e *executableSchema) Complexity(ctx context.Context, typeName, field string, childComplexity int, rawArgs map[string]any) (int, bool) {
 	ec := executionContext{nil, e, 0, 0, nil}
 	_ = ec
 	switch typeName + "." + field {
@@ -1217,7 +1217,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_HouseRooms_list_args(context.TODO(), rawArgs)
+		args, err := ec.field_HouseRooms_list_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1306,7 +1306,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Mutation_acceptInvite_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_acceptInvite_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1318,7 +1318,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Mutation_addContact_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_addContact_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1330,7 +1330,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Mutation_addHouse_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_addHouse_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1342,7 +1342,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Mutation_addRoom_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_addRoom_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1354,7 +1354,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Mutation_addVisualizationsToAlbum_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_addVisualizationsToAlbum_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1366,7 +1366,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Mutation_changeAlbumPageOrientation_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_changeAlbumPageOrientation_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1378,7 +1378,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Mutation_changeAlbumPageSize_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_changeAlbumPageSize_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1390,7 +1390,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Mutation_changeProjectDates_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_changeProjectDates_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1402,7 +1402,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Mutation_changeProjectStatus_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_changeProjectStatus_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1414,7 +1414,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Mutation_confirmLoginLink_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_confirmLoginLink_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1426,7 +1426,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Mutation_confirmLoginPin_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_confirmLoginPin_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1438,7 +1438,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Mutation_createAlbum_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_createAlbum_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1450,7 +1450,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Mutation_createProject_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_createProject_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1462,7 +1462,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Mutation_deleteAlbum_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_deleteAlbum_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1474,7 +1474,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Mutation_deleteAlbumPage_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_deleteAlbumPage_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1486,7 +1486,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Mutation_deleteContact_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_deleteContact_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1498,7 +1498,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Mutation_deleteRoom_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_deleteRoom_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1510,7 +1510,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Mutation_deleteVisualizations_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_deleteVisualizations_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1522,7 +1522,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Mutation_generateAlbumFile_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_generateAlbumFile_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1534,7 +1534,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Mutation_inviteUser_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_inviteUser_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1546,7 +1546,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Mutation_loginByEmail_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_loginByEmail_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1558,7 +1558,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Mutation_makeProjectNotPublic_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_makeProjectNotPublic_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1570,7 +1570,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Mutation_makeProjectPublic_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_makeProjectPublic_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1582,7 +1582,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Mutation_moveRoomToPosition_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_moveRoomToPosition_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1601,7 +1601,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Mutation_updateContact_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_updateContact_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1613,7 +1613,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Mutation_updateHouse_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_updateHouse_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1625,7 +1625,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Mutation_updateRoom_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_updateRoom_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1637,7 +1637,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Mutation_uploadAlbumCover_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_uploadAlbumCover_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1649,7 +1649,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Mutation_uploadFile_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_uploadFile_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1661,7 +1661,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Mutation_uploadVisualization_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_uploadVisualization_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1673,7 +1673,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Mutation_uploadVisualizations_args(context.TODO(), rawArgs)
+		args, err := ec.field_Mutation_uploadVisualizations_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1762,7 +1762,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Project_period_args(context.TODO(), rawArgs)
+		args, err := ec.field_Project_period_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1802,7 +1802,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_ProjectAlbums_list_args(context.TODO(), rawArgs)
+		args, err := ec.field_ProjectAlbums_list_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1835,7 +1835,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_ProjectContacts_list_args(context.TODO(), rawArgs)
+		args, err := ec.field_ProjectContacts_list_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1847,7 +1847,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_ProjectContacts_total_args(context.TODO(), rawArgs)
+		args, err := ec.field_ProjectContacts_total_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1887,7 +1887,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_ProjectFiles_list_args(context.TODO(), rawArgs)
+		args, err := ec.field_ProjectFiles_list_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1899,7 +1899,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_ProjectFiles_total_args(context.TODO(), rawArgs)
+		args, err := ec.field_ProjectFiles_total_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1925,7 +1925,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_ProjectHouses_list_args(context.TODO(), rawArgs)
+		args, err := ec.field_ProjectHouses_list_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -1937,7 +1937,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_ProjectHouses_total_args(context.TODO(), rawArgs)
+		args, err := ec.field_ProjectHouses_total_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -2061,7 +2061,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_ProjectVisualizations_list_args(context.TODO(), rawArgs)
+		args, err := ec.field_ProjectVisualizations_list_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -2073,7 +2073,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_ProjectVisualizations_total_args(context.TODO(), rawArgs)
+		args, err := ec.field_ProjectVisualizations_total_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -2099,7 +2099,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Query_album_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_album_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -2125,7 +2125,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Query_project_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_project_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -2144,7 +2144,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Query_workspace_args(context.TODO(), rawArgs)
+		args, err := ec.field_Query_workspace_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -2247,7 +2247,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Subscription_albumFileGenerated_args(context.TODO(), rawArgs)
+		args, err := ec.field_Subscription_albumFileGenerated_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -2455,7 +2455,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_WorkspaceProjects_list_args(context.TODO(), rawArgs)
+		args, err := ec.field_WorkspaceProjects_list_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -2467,7 +2467,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_WorkspaceProjects_total_args(context.TODO(), rawArgs)
+		args, err := ec.field_WorkspaceProjects_total_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -2542,7 +2542,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_WorkspaceUsers_list_args(context.TODO(), rawArgs)
+		args, err := ec.field_WorkspaceUsers_list_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -2554,7 +2554,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_WorkspaceUsers_total_args(context.TODO(), rawArgs)
+		args, err := ec.field_WorkspaceUsers_total_args(ctx, rawArgs)
 		if err != nil {
 			return 0, false
 		}
@@ -2580,8 +2580,8 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 }
 
 func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
-	rc := graphql.GetOperationContext(ctx)
-	ec := executionContext{rc, e, 0, 0, make(chan graphql.DeferredResult)}
+	opCtx := graphql.GetOperationContext(ctx)
+	ec := executionContext{opCtx, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputAddContactInput,
 		ec.unmarshalInputAddHouseInput,
@@ -2605,7 +2605,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	)
 	first := true
 
-	switch rc.Operation.Operation {
+	switch opCtx.Operation.Operation {
 	case ast.Query:
 		return func(ctx context.Context) *graphql.Response {
 			var response graphql.Response
@@ -2613,7 +2613,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 			if first {
 				first = false
 				ctx = graphql.WithUnmarshalerMap(ctx, inputUnmarshalMap)
-				data = ec._Query(ctx, rc.Operation.SelectionSet)
+				data = ec._Query(ctx, opCtx.Operation.SelectionSet)
 			} else {
 				if atomic.LoadInt32(&ec.pendingDeferred) > 0 {
 					result := <-ec.deferredResults
@@ -2643,7 +2643,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 			}
 			first = false
 			ctx = graphql.WithUnmarshalerMap(ctx, inputUnmarshalMap)
-			data := ec._Mutation(ctx, rc.Operation.SelectionSet)
+			data := ec._Mutation(ctx, opCtx.Operation.SelectionSet)
 			var buf bytes.Buffer
 			data.MarshalGQL(&buf)
 
@@ -2652,7 +2652,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 			}
 		}
 	case ast.Subscription:
-		next := ec._Subscription(ctx, rc.Operation.SelectionSet)
+		next := ec._Subscription(ctx, opCtx.Operation.SelectionSet)
 
 		var buf bytes.Buffer
 		return func(ctx context.Context) *graphql.Response {
@@ -2774,1123 +2774,2372 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
 // region    ***************************** args.gotpl *****************************
 
-func (ec *executionContext) field_HouseRooms_list_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+func (ec *executionContext) field_HouseRooms_list_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
-	var arg0 int
-	if tmp, ok := rawArgs["limit"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
-		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	args := map[string]any{}
+	arg0, err := ec.field_HouseRooms_list_argsLimit(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["limit"] = arg0
-	var arg1 int
-	if tmp, ok := rawArgs["offset"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
-		arg1, err = ec.unmarshalNInt2int(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg1, err := ec.field_HouseRooms_list_argsOffset(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["offset"] = arg1
 	return args, nil
 }
+func (ec *executionContext) field_HouseRooms_list_argsLimit(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (int, error) {
+	if _, ok := rawArgs["limit"]; !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
 
-func (ec *executionContext) field_Mutation_acceptInvite_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+	if tmp, ok := rawArgs["limit"]; ok {
+		return ec.unmarshalNInt2int(ctx, tmp)
+	}
+
+	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_HouseRooms_list_argsOffset(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (int, error) {
+	if _, ok := rawArgs["offset"]; !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+	if tmp, ok := rawArgs["offset"]; ok {
+		return ec.unmarshalNInt2int(ctx, tmp)
+	}
+
+	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_acceptInvite_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["token"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("token"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_acceptInvite_argsToken(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["token"] = arg0
 	return args, nil
 }
+func (ec *executionContext) field_Mutation_acceptInvite_argsToken(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	if _, ok := rawArgs["token"]; !ok {
+		var zeroVal string
+		return zeroVal, nil
+	}
 
-func (ec *executionContext) field_Mutation_addContact_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("token"))
+	if tmp, ok := rawArgs["token"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_addContact_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["projectId"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("projectId"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_addContact_argsProjectID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["projectId"] = arg0
-	var arg1 AddContactInput
-	if tmp, ok := rawArgs["contact"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contact"))
-		arg1, err = ec.unmarshalNAddContactInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAddContactInput(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg1, err := ec.field_Mutation_addContact_argsContact(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["contact"] = arg1
 	return args, nil
 }
+func (ec *executionContext) field_Mutation_addContact_argsProjectID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	if _, ok := rawArgs["projectId"]; !ok {
+		var zeroVal string
+		return zeroVal, nil
+	}
 
-func (ec *executionContext) field_Mutation_addHouse_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("projectId"))
 	if tmp, ok := rawArgs["projectId"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("projectId"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_addContact_argsContact(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (AddContactInput, error) {
+	if _, ok := rawArgs["contact"]; !ok {
+		var zeroVal AddContactInput
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("contact"))
+	if tmp, ok := rawArgs["contact"]; ok {
+		return ec.unmarshalNAddContactInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAddContactInput(ctx, tmp)
+	}
+
+	var zeroVal AddContactInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_addHouse_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_addHouse_argsProjectID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["projectId"] = arg0
-	var arg1 AddHouseInput
-	if tmp, ok := rawArgs["house"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("house"))
-		arg1, err = ec.unmarshalNAddHouseInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAddHouseInput(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg1, err := ec.field_Mutation_addHouse_argsHouse(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["house"] = arg1
 	return args, nil
 }
+func (ec *executionContext) field_Mutation_addHouse_argsProjectID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	if _, ok := rawArgs["projectId"]; !ok {
+		var zeroVal string
+		return zeroVal, nil
+	}
 
-func (ec *executionContext) field_Mutation_addRoom_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("projectId"))
+	if tmp, ok := rawArgs["projectId"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_addHouse_argsHouse(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (AddHouseInput, error) {
+	if _, ok := rawArgs["house"]; !ok {
+		var zeroVal AddHouseInput
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("house"))
+	if tmp, ok := rawArgs["house"]; ok {
+		return ec.unmarshalNAddHouseInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAddHouseInput(ctx, tmp)
+	}
+
+	var zeroVal AddHouseInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_addRoom_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["houseId"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("houseId"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_addRoom_argsHouseID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["houseId"] = arg0
-	var arg1 AddRoomInput
-	if tmp, ok := rawArgs["room"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("room"))
-		arg1, err = ec.unmarshalNAddRoomInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAddRoomInput(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg1, err := ec.field_Mutation_addRoom_argsRoom(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["room"] = arg1
 	return args, nil
 }
+func (ec *executionContext) field_Mutation_addRoom_argsHouseID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	if _, ok := rawArgs["houseId"]; !ok {
+		var zeroVal string
+		return zeroVal, nil
+	}
 
-func (ec *executionContext) field_Mutation_addVisualizationsToAlbum_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("houseId"))
+	if tmp, ok := rawArgs["houseId"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_addRoom_argsRoom(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (AddRoomInput, error) {
+	if _, ok := rawArgs["room"]; !ok {
+		var zeroVal AddRoomInput
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("room"))
+	if tmp, ok := rawArgs["room"]; ok {
+		return ec.unmarshalNAddRoomInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAddRoomInput(ctx, tmp)
+	}
+
+	var zeroVal AddRoomInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_addVisualizationsToAlbum_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["albumId"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("albumId"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_addVisualizationsToAlbum_argsAlbumID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["albumId"] = arg0
-	var arg1 []string
-	if tmp, ok := rawArgs["visualizations"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("visualizations"))
-		arg1, err = ec.unmarshalNString2ᚕstringᚄ(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg1, err := ec.field_Mutation_addVisualizationsToAlbum_argsVisualizations(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["visualizations"] = arg1
 	return args, nil
 }
+func (ec *executionContext) field_Mutation_addVisualizationsToAlbum_argsAlbumID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	if _, ok := rawArgs["albumId"]; !ok {
+		var zeroVal string
+		return zeroVal, nil
+	}
 
-func (ec *executionContext) field_Mutation_changeAlbumPageOrientation_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("albumId"))
 	if tmp, ok := rawArgs["albumId"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("albumId"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_addVisualizationsToAlbum_argsVisualizations(
+	ctx context.Context,
+	rawArgs map[string]any,
+) ([]string, error) {
+	if _, ok := rawArgs["visualizations"]; !ok {
+		var zeroVal []string
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("visualizations"))
+	if tmp, ok := rawArgs["visualizations"]; ok {
+		return ec.unmarshalNString2ᚕstringᚄ(ctx, tmp)
+	}
+
+	var zeroVal []string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_changeAlbumPageOrientation_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_changeAlbumPageOrientation_argsAlbumID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["albumId"] = arg0
-	var arg1 PageOrientation
-	if tmp, ok := rawArgs["orientation"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orientation"))
-		arg1, err = ec.unmarshalNPageOrientation2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐPageOrientation(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg1, err := ec.field_Mutation_changeAlbumPageOrientation_argsOrientation(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["orientation"] = arg1
 	return args, nil
 }
+func (ec *executionContext) field_Mutation_changeAlbumPageOrientation_argsAlbumID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	if _, ok := rawArgs["albumId"]; !ok {
+		var zeroVal string
+		return zeroVal, nil
+	}
 
-func (ec *executionContext) field_Mutation_changeAlbumPageSize_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("albumId"))
 	if tmp, ok := rawArgs["albumId"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("albumId"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_changeAlbumPageOrientation_argsOrientation(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (PageOrientation, error) {
+	if _, ok := rawArgs["orientation"]; !ok {
+		var zeroVal PageOrientation
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("orientation"))
+	if tmp, ok := rawArgs["orientation"]; ok {
+		return ec.unmarshalNPageOrientation2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐPageOrientation(ctx, tmp)
+	}
+
+	var zeroVal PageOrientation
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_changeAlbumPageSize_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_changeAlbumPageSize_argsAlbumID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["albumId"] = arg0
-	var arg1 PageSize
-	if tmp, ok := rawArgs["size"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("size"))
-		arg1, err = ec.unmarshalNPageSize2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐPageSize(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg1, err := ec.field_Mutation_changeAlbumPageSize_argsSize(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["size"] = arg1
 	return args, nil
 }
+func (ec *executionContext) field_Mutation_changeAlbumPageSize_argsAlbumID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	if _, ok := rawArgs["albumId"]; !ok {
+		var zeroVal string
+		return zeroVal, nil
+	}
 
-func (ec *executionContext) field_Mutation_changeProjectDates_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("albumId"))
+	if tmp, ok := rawArgs["albumId"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_changeAlbumPageSize_argsSize(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (PageSize, error) {
+	if _, ok := rawArgs["size"]; !ok {
+		var zeroVal PageSize
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("size"))
+	if tmp, ok := rawArgs["size"]; ok {
+		return ec.unmarshalNPageSize2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐPageSize(ctx, tmp)
+	}
+
+	var zeroVal PageSize
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_changeProjectDates_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["projectId"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("projectId"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_changeProjectDates_argsProjectID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["projectId"] = arg0
-	var arg1 ChangeProjectDatesInput
-	if tmp, ok := rawArgs["dates"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("dates"))
-		arg1, err = ec.unmarshalNChangeProjectDatesInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐChangeProjectDatesInput(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg1, err := ec.field_Mutation_changeProjectDates_argsDates(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["dates"] = arg1
 	return args, nil
 }
+func (ec *executionContext) field_Mutation_changeProjectDates_argsProjectID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	if _, ok := rawArgs["projectId"]; !ok {
+		var zeroVal string
+		return zeroVal, nil
+	}
 
-func (ec *executionContext) field_Mutation_changeProjectStatus_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("projectId"))
 	if tmp, ok := rawArgs["projectId"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("projectId"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_changeProjectDates_argsDates(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (ChangeProjectDatesInput, error) {
+	if _, ok := rawArgs["dates"]; !ok {
+		var zeroVal ChangeProjectDatesInput
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("dates"))
+	if tmp, ok := rawArgs["dates"]; ok {
+		return ec.unmarshalNChangeProjectDatesInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐChangeProjectDatesInput(ctx, tmp)
+	}
+
+	var zeroVal ChangeProjectDatesInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_changeProjectStatus_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_changeProjectStatus_argsProjectID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["projectId"] = arg0
-	var arg1 ProjectStatus
-	if tmp, ok := rawArgs["status"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-		arg1, err = ec.unmarshalNProjectStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectStatus(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg1, err := ec.field_Mutation_changeProjectStatus_argsStatus(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["status"] = arg1
 	return args, nil
 }
+func (ec *executionContext) field_Mutation_changeProjectStatus_argsProjectID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	if _, ok := rawArgs["projectId"]; !ok {
+		var zeroVal string
+		return zeroVal, nil
+	}
 
-func (ec *executionContext) field_Mutation_confirmLoginLink_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("projectId"))
+	if tmp, ok := rawArgs["projectId"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_changeProjectStatus_argsStatus(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (ProjectStatus, error) {
+	if _, ok := rawArgs["status"]; !ok {
+		var zeroVal ProjectStatus
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
+	if tmp, ok := rawArgs["status"]; ok {
+		return ec.unmarshalNProjectStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectStatus(ctx, tmp)
+	}
+
+	var zeroVal ProjectStatus
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_confirmLoginLink_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["token"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("token"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_confirmLoginLink_argsToken(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["token"] = arg0
 	return args, nil
 }
+func (ec *executionContext) field_Mutation_confirmLoginLink_argsToken(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	if _, ok := rawArgs["token"]; !ok {
+		var zeroVal string
+		return zeroVal, nil
+	}
 
-func (ec *executionContext) field_Mutation_confirmLoginPin_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("token"))
 	if tmp, ok := rawArgs["token"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("token"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_confirmLoginPin_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_confirmLoginPin_argsToken(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["token"] = arg0
-	var arg1 string
-	if tmp, ok := rawArgs["pin"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pin"))
-		arg1, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg1, err := ec.field_Mutation_confirmLoginPin_argsPin(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["pin"] = arg1
 	return args, nil
 }
+func (ec *executionContext) field_Mutation_confirmLoginPin_argsToken(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	if _, ok := rawArgs["token"]; !ok {
+		var zeroVal string
+		return zeroVal, nil
+	}
 
-func (ec *executionContext) field_Mutation_createAlbum_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("token"))
+	if tmp, ok := rawArgs["token"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_confirmLoginPin_argsPin(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	if _, ok := rawArgs["pin"]; !ok {
+		var zeroVal string
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("pin"))
+	if tmp, ok := rawArgs["pin"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_createAlbum_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["projectId"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("projectId"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_createAlbum_argsProjectID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["projectId"] = arg0
-	var arg1 string
-	if tmp, ok := rawArgs["name"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-		arg1, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg1, err := ec.field_Mutation_createAlbum_argsName(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["name"] = arg1
-	var arg2 CreateAlbumSettingsInput
-	if tmp, ok := rawArgs["settings"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("settings"))
-		arg2, err = ec.unmarshalNCreateAlbumSettingsInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐCreateAlbumSettingsInput(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg2, err := ec.field_Mutation_createAlbum_argsSettings(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["settings"] = arg2
 	return args, nil
 }
+func (ec *executionContext) field_Mutation_createAlbum_argsProjectID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	if _, ok := rawArgs["projectId"]; !ok {
+		var zeroVal string
+		return zeroVal, nil
+	}
 
-func (ec *executionContext) field_Mutation_createProject_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("projectId"))
+	if tmp, ok := rawArgs["projectId"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_createAlbum_argsName(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	if _, ok := rawArgs["name"]; !ok {
+		var zeroVal string
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+	if tmp, ok := rawArgs["name"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_createAlbum_argsSettings(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (CreateAlbumSettingsInput, error) {
+	if _, ok := rawArgs["settings"]; !ok {
+		var zeroVal CreateAlbumSettingsInput
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("settings"))
+	if tmp, ok := rawArgs["settings"]; ok {
+		return ec.unmarshalNCreateAlbumSettingsInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐCreateAlbumSettingsInput(ctx, tmp)
+	}
+
+	var zeroVal CreateAlbumSettingsInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_createProject_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
-	var arg0 CreateProjectInput
-	if tmp, ok := rawArgs["input"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNCreateProjectInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐCreateProjectInput(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_createProject_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["input"] = arg0
 	return args, nil
 }
+func (ec *executionContext) field_Mutation_createProject_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (CreateProjectInput, error) {
+	if _, ok := rawArgs["input"]; !ok {
+		var zeroVal CreateProjectInput
+		return zeroVal, nil
+	}
 
-func (ec *executionContext) field_Mutation_deleteAlbumPage_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNCreateProjectInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐCreateProjectInput(ctx, tmp)
+	}
+
+	var zeroVal CreateProjectInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteAlbumPage_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["albumId"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("albumId"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_deleteAlbumPage_argsAlbumID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["albumId"] = arg0
-	var arg1 int
-	if tmp, ok := rawArgs["pageNumber"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("pageNumber"))
-		arg1, err = ec.unmarshalNInt2int(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg1, err := ec.field_Mutation_deleteAlbumPage_argsPageNumber(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["pageNumber"] = arg1
 	return args, nil
 }
-
-func (ec *executionContext) field_Mutation_deleteAlbum_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["id"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+func (ec *executionContext) field_Mutation_deleteAlbumPage_argsAlbumID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	if _, ok := rawArgs["albumId"]; !ok {
+		var zeroVal string
+		return zeroVal, nil
 	}
-	args["id"] = arg0
-	return args, nil
-}
 
-func (ec *executionContext) field_Mutation_deleteContact_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["id"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["id"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_deleteRoom_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["id"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["id"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_deleteVisualizations_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 []string
-	if tmp, ok := rawArgs["id"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalNString2ᚕstringᚄ(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["id"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Mutation_generateAlbumFile_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("albumId"))
 	if tmp, ok := rawArgs["albumId"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("albumId"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteAlbumPage_argsPageNumber(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (int, error) {
+	if _, ok := rawArgs["pageNumber"]; !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("pageNumber"))
+	if tmp, ok := rawArgs["pageNumber"]; ok {
+		return ec.unmarshalNInt2int(ctx, tmp)
+	}
+
+	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteAlbum_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_deleteAlbum_argsID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_deleteAlbum_argsID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	if _, ok := rawArgs["id"]; !ok {
+		var zeroVal string
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+	if tmp, ok := rawArgs["id"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteContact_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_deleteContact_argsID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_deleteContact_argsID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	if _, ok := rawArgs["id"]; !ok {
+		var zeroVal string
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+	if tmp, ok := rawArgs["id"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteRoom_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_deleteRoom_argsID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_deleteRoom_argsID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	if _, ok := rawArgs["id"]; !ok {
+		var zeroVal string
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+	if tmp, ok := rawArgs["id"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteVisualizations_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_deleteVisualizations_argsID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_deleteVisualizations_argsID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) ([]string, error) {
+	if _, ok := rawArgs["id"]; !ok {
+		var zeroVal []string
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+	if tmp, ok := rawArgs["id"]; ok {
+		return ec.unmarshalNString2ᚕstringᚄ(ctx, tmp)
+	}
+
+	var zeroVal []string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_generateAlbumFile_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_generateAlbumFile_argsAlbumID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["albumId"] = arg0
 	return args, nil
 }
+func (ec *executionContext) field_Mutation_generateAlbumFile_argsAlbumID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	if _, ok := rawArgs["albumId"]; !ok {
+		var zeroVal string
+		return zeroVal, nil
+	}
 
-func (ec *executionContext) field_Mutation_inviteUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("albumId"))
+	if tmp, ok := rawArgs["albumId"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_inviteUser_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["workspaceId"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("workspaceId"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_inviteUser_argsWorkspaceID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["workspaceId"] = arg0
-	var arg1 string
-	if tmp, ok := rawArgs["email"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
-		arg1, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg1, err := ec.field_Mutation_inviteUser_argsEmail(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["email"] = arg1
-	var arg2 WorkspaceUserRole
-	if tmp, ok := rawArgs["role"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role"))
-		arg2, err = ec.unmarshalNWorkspaceUserRole2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceUserRole(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg2, err := ec.field_Mutation_inviteUser_argsRole(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["role"] = arg2
 	return args, nil
 }
+func (ec *executionContext) field_Mutation_inviteUser_argsWorkspaceID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	if _, ok := rawArgs["workspaceId"]; !ok {
+		var zeroVal string
+		return zeroVal, nil
+	}
 
-func (ec *executionContext) field_Mutation_loginByEmail_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("workspaceId"))
+	if tmp, ok := rawArgs["workspaceId"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_inviteUser_argsEmail(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	if _, ok := rawArgs["email"]; !ok {
+		var zeroVal string
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
 	if tmp, ok := rawArgs["email"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_inviteUser_argsRole(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (WorkspaceUserRole, error) {
+	if _, ok := rawArgs["role"]; !ok {
+		var zeroVal WorkspaceUserRole
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("role"))
+	if tmp, ok := rawArgs["role"]; ok {
+		return ec.unmarshalNWorkspaceUserRole2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceUserRole(ctx, tmp)
+	}
+
+	var zeroVal WorkspaceUserRole
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_loginByEmail_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_loginByEmail_argsEmail(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["email"] = arg0
-	var arg1 string
-	if tmp, ok := rawArgs["workspaceName"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("workspaceName"))
-		arg1, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg1, err := ec.field_Mutation_loginByEmail_argsWorkspaceName(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["workspaceName"] = arg1
 	return args, nil
 }
+func (ec *executionContext) field_Mutation_loginByEmail_argsEmail(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	if _, ok := rawArgs["email"]; !ok {
+		var zeroVal string
+		return zeroVal, nil
+	}
 
-func (ec *executionContext) field_Mutation_makeProjectNotPublic_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
+	if tmp, ok := rawArgs["email"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_loginByEmail_argsWorkspaceName(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	if _, ok := rawArgs["workspaceName"]; !ok {
+		var zeroVal string
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("workspaceName"))
+	if tmp, ok := rawArgs["workspaceName"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_makeProjectNotPublic_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["projectId"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("projectId"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_makeProjectNotPublic_argsProjectID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["projectId"] = arg0
 	return args, nil
 }
+func (ec *executionContext) field_Mutation_makeProjectNotPublic_argsProjectID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	if _, ok := rawArgs["projectId"]; !ok {
+		var zeroVal string
+		return zeroVal, nil
+	}
 
-func (ec *executionContext) field_Mutation_makeProjectPublic_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("projectId"))
 	if tmp, ok := rawArgs["projectId"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("projectId"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_makeProjectPublic_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_makeProjectPublic_argsProjectID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["projectId"] = arg0
 	return args, nil
 }
+func (ec *executionContext) field_Mutation_makeProjectPublic_argsProjectID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	if _, ok := rawArgs["projectId"]; !ok {
+		var zeroVal string
+		return zeroVal, nil
+	}
 
-func (ec *executionContext) field_Mutation_moveRoomToPosition_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("projectId"))
+	if tmp, ok := rawArgs["projectId"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_moveRoomToPosition_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["roomId"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("roomId"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_moveRoomToPosition_argsRoomID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["roomId"] = arg0
-	var arg1 int
-	if tmp, ok := rawArgs["position"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("position"))
-		arg1, err = ec.unmarshalNInt2int(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg1, err := ec.field_Mutation_moveRoomToPosition_argsPosition(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["position"] = arg1
 	return args, nil
 }
+func (ec *executionContext) field_Mutation_moveRoomToPosition_argsRoomID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	if _, ok := rawArgs["roomId"]; !ok {
+		var zeroVal string
+		return zeroVal, nil
+	}
 
-func (ec *executionContext) field_Mutation_updateContact_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("roomId"))
+	if tmp, ok := rawArgs["roomId"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_moveRoomToPosition_argsPosition(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (int, error) {
+	if _, ok := rawArgs["position"]; !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("position"))
+	if tmp, ok := rawArgs["position"]; ok {
+		return ec.unmarshalNInt2int(ctx, tmp)
+	}
+
+	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_updateContact_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["contactId"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("contactId"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_updateContact_argsContactID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["contactId"] = arg0
-	var arg1 UpdateContactInput
-	if tmp, ok := rawArgs["data"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("data"))
-		arg1, err = ec.unmarshalNUpdateContactInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐUpdateContactInput(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg1, err := ec.field_Mutation_updateContact_argsData(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["data"] = arg1
 	return args, nil
 }
+func (ec *executionContext) field_Mutation_updateContact_argsContactID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	if _, ok := rawArgs["contactId"]; !ok {
+		var zeroVal string
+		return zeroVal, nil
+	}
 
-func (ec *executionContext) field_Mutation_updateHouse_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("contactId"))
+	if tmp, ok := rawArgs["contactId"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_updateContact_argsData(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (UpdateContactInput, error) {
+	if _, ok := rawArgs["data"]; !ok {
+		var zeroVal UpdateContactInput
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("data"))
+	if tmp, ok := rawArgs["data"]; ok {
+		return ec.unmarshalNUpdateContactInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐUpdateContactInput(ctx, tmp)
+	}
+
+	var zeroVal UpdateContactInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_updateHouse_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["houseId"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("houseId"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_updateHouse_argsHouseID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["houseId"] = arg0
-	var arg1 UpdateHouseInput
-	if tmp, ok := rawArgs["data"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("data"))
-		arg1, err = ec.unmarshalNUpdateHouseInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐUpdateHouseInput(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg1, err := ec.field_Mutation_updateHouse_argsData(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["data"] = arg1
 	return args, nil
 }
+func (ec *executionContext) field_Mutation_updateHouse_argsHouseID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	if _, ok := rawArgs["houseId"]; !ok {
+		var zeroVal string
+		return zeroVal, nil
+	}
 
-func (ec *executionContext) field_Mutation_updateRoom_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("houseId"))
+	if tmp, ok := rawArgs["houseId"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_updateHouse_argsData(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (UpdateHouseInput, error) {
+	if _, ok := rawArgs["data"]; !ok {
+		var zeroVal UpdateHouseInput
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("data"))
+	if tmp, ok := rawArgs["data"]; ok {
+		return ec.unmarshalNUpdateHouseInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐUpdateHouseInput(ctx, tmp)
+	}
+
+	var zeroVal UpdateHouseInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_updateRoom_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["roomId"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("roomId"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_updateRoom_argsRoomID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["roomId"] = arg0
-	var arg1 UpdateRoomInput
-	if tmp, ok := rawArgs["data"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("data"))
-		arg1, err = ec.unmarshalNUpdateRoomInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐUpdateRoomInput(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg1, err := ec.field_Mutation_updateRoom_argsData(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["data"] = arg1
 	return args, nil
 }
+func (ec *executionContext) field_Mutation_updateRoom_argsRoomID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	if _, ok := rawArgs["roomId"]; !ok {
+		var zeroVal string
+		return zeroVal, nil
+	}
 
-func (ec *executionContext) field_Mutation_uploadAlbumCover_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("roomId"))
+	if tmp, ok := rawArgs["roomId"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_updateRoom_argsData(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (UpdateRoomInput, error) {
+	if _, ok := rawArgs["data"]; !ok {
+		var zeroVal UpdateRoomInput
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("data"))
+	if tmp, ok := rawArgs["data"]; ok {
+		return ec.unmarshalNUpdateRoomInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐUpdateRoomInput(ctx, tmp)
+	}
+
+	var zeroVal UpdateRoomInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_uploadAlbumCover_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["albumId"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("albumId"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_uploadAlbumCover_argsAlbumID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["albumId"] = arg0
-	var arg1 graphql.Upload
-	if tmp, ok := rawArgs["file"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("file"))
-		arg1, err = ec.unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg1, err := ec.field_Mutation_uploadAlbumCover_argsFile(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["file"] = arg1
 	return args, nil
 }
+func (ec *executionContext) field_Mutation_uploadAlbumCover_argsAlbumID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	if _, ok := rawArgs["albumId"]; !ok {
+		var zeroVal string
+		return zeroVal, nil
+	}
 
-func (ec *executionContext) field_Mutation_uploadFile_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("albumId"))
+	if tmp, ok := rawArgs["albumId"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_uploadAlbumCover_argsFile(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (graphql.Upload, error) {
+	if _, ok := rawArgs["file"]; !ok {
+		var zeroVal graphql.Upload
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("file"))
+	if tmp, ok := rawArgs["file"]; ok {
+		return ec.unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, tmp)
+	}
+
+	var zeroVal graphql.Upload
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_uploadFile_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
-	var arg0 UploadFileInput
-	if tmp, ok := rawArgs["input"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNUploadFileInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐUploadFileInput(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_uploadFile_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["input"] = arg0
 	return args, nil
 }
+func (ec *executionContext) field_Mutation_uploadFile_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (UploadFileInput, error) {
+	if _, ok := rawArgs["input"]; !ok {
+		var zeroVal UploadFileInput
+		return zeroVal, nil
+	}
 
-func (ec *executionContext) field_Mutation_uploadVisualization_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNUploadFileInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐUploadFileInput(ctx, tmp)
+	}
+
+	var zeroVal UploadFileInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_uploadVisualization_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["projectId"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("projectId"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_uploadVisualization_argsProjectID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["projectId"] = arg0
-	var arg1 graphql.Upload
-	if tmp, ok := rawArgs["file"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("file"))
-		arg1, err = ec.unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg1, err := ec.field_Mutation_uploadVisualization_argsFile(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["file"] = arg1
-	var arg2 *string
-	if tmp, ok := rawArgs["roomId"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("roomId"))
-		arg2, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg2, err := ec.field_Mutation_uploadVisualization_argsRoomID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["roomId"] = arg2
 	return args, nil
 }
+func (ec *executionContext) field_Mutation_uploadVisualization_argsProjectID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	if _, ok := rawArgs["projectId"]; !ok {
+		var zeroVal string
+		return zeroVal, nil
+	}
 
-func (ec *executionContext) field_Mutation_uploadVisualizations_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("projectId"))
 	if tmp, ok := rawArgs["projectId"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("projectId"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_uploadVisualization_argsFile(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (graphql.Upload, error) {
+	if _, ok := rawArgs["file"]; !ok {
+		var zeroVal graphql.Upload
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("file"))
+	if tmp, ok := rawArgs["file"]; ok {
+		return ec.unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx, tmp)
+	}
+
+	var zeroVal graphql.Upload
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_uploadVisualization_argsRoomID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*string, error) {
+	if _, ok := rawArgs["roomId"]; !ok {
+		var zeroVal *string
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("roomId"))
+	if tmp, ok := rawArgs["roomId"]; ok {
+		return ec.unmarshalOString2ᚖstring(ctx, tmp)
+	}
+
+	var zeroVal *string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_uploadVisualizations_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_uploadVisualizations_argsProjectID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["projectId"] = arg0
-	var arg1 []*graphql.Upload
-	if tmp, ok := rawArgs["files"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("files"))
-		arg1, err = ec.unmarshalNUpload2ᚕᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUploadᚄ(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg1, err := ec.field_Mutation_uploadVisualizations_argsFiles(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["files"] = arg1
-	var arg2 *string
-	if tmp, ok := rawArgs["roomId"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("roomId"))
-		arg2, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg2, err := ec.field_Mutation_uploadVisualizations_argsRoomID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["roomId"] = arg2
 	return args, nil
 }
+func (ec *executionContext) field_Mutation_uploadVisualizations_argsProjectID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	if _, ok := rawArgs["projectId"]; !ok {
+		var zeroVal string
+		return zeroVal, nil
+	}
 
-func (ec *executionContext) field_ProjectAlbums_list_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("projectId"))
+	if tmp, ok := rawArgs["projectId"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_uploadVisualizations_argsFiles(
+	ctx context.Context,
+	rawArgs map[string]any,
+) ([]*graphql.Upload, error) {
+	if _, ok := rawArgs["files"]; !ok {
+		var zeroVal []*graphql.Upload
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("files"))
+	if tmp, ok := rawArgs["files"]; ok {
+		return ec.unmarshalNUpload2ᚕᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUploadᚄ(ctx, tmp)
+	}
+
+	var zeroVal []*graphql.Upload
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_uploadVisualizations_argsRoomID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*string, error) {
+	if _, ok := rawArgs["roomId"]; !ok {
+		var zeroVal *string
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("roomId"))
+	if tmp, ok := rawArgs["roomId"]; ok {
+		return ec.unmarshalOString2ᚖstring(ctx, tmp)
+	}
+
+	var zeroVal *string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_ProjectAlbums_list_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
-	var arg0 int
-	if tmp, ok := rawArgs["limit"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
-		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	args := map[string]any{}
+	arg0, err := ec.field_ProjectAlbums_list_argsLimit(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["limit"] = arg0
-	var arg1 int
-	if tmp, ok := rawArgs["offset"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
-		arg1, err = ec.unmarshalNInt2int(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg1, err := ec.field_ProjectAlbums_list_argsOffset(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["offset"] = arg1
 	return args, nil
 }
+func (ec *executionContext) field_ProjectAlbums_list_argsLimit(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (int, error) {
+	if _, ok := rawArgs["limit"]; !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
 
-func (ec *executionContext) field_ProjectContacts_list_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+	if tmp, ok := rawArgs["limit"]; ok {
+		return ec.unmarshalNInt2int(ctx, tmp)
+	}
+
+	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_ProjectAlbums_list_argsOffset(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (int, error) {
+	if _, ok := rawArgs["offset"]; !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+	if tmp, ok := rawArgs["offset"]; ok {
+		return ec.unmarshalNInt2int(ctx, tmp)
+	}
+
+	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_ProjectContacts_list_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
-	var arg0 ProjectContactsFilter
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalNProjectContactsFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectContactsFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	args := map[string]any{}
+	arg0, err := ec.field_ProjectContacts_list_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["filter"] = arg0
-	var arg1 int
-	if tmp, ok := rawArgs["limit"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
-		arg1, err = ec.unmarshalNInt2int(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg1, err := ec.field_ProjectContacts_list_argsLimit(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["limit"] = arg1
-	var arg2 int
-	if tmp, ok := rawArgs["offset"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
-		arg2, err = ec.unmarshalNInt2int(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg2, err := ec.field_ProjectContacts_list_argsOffset(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["offset"] = arg2
 	return args, nil
 }
+func (ec *executionContext) field_ProjectContacts_list_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (ProjectContactsFilter, error) {
+	if _, ok := rawArgs["filter"]; !ok {
+		var zeroVal ProjectContactsFilter
+		return zeroVal, nil
+	}
 
-func (ec *executionContext) field_ProjectContacts_total_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 ProjectContactsFilter
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
 	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalNProjectContactsFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectContactsFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+		return ec.unmarshalNProjectContactsFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectContactsFilter(ctx, tmp)
+	}
+
+	var zeroVal ProjectContactsFilter
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_ProjectContacts_list_argsLimit(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (int, error) {
+	if _, ok := rawArgs["limit"]; !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+	if tmp, ok := rawArgs["limit"]; ok {
+		return ec.unmarshalNInt2int(ctx, tmp)
+	}
+
+	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_ProjectContacts_list_argsOffset(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (int, error) {
+	if _, ok := rawArgs["offset"]; !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+	if tmp, ok := rawArgs["offset"]; ok {
+		return ec.unmarshalNInt2int(ctx, tmp)
+	}
+
+	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_ProjectContacts_total_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_ProjectContacts_total_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["filter"] = arg0
 	return args, nil
 }
+func (ec *executionContext) field_ProjectContacts_total_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (ProjectContactsFilter, error) {
+	if _, ok := rawArgs["filter"]; !ok {
+		var zeroVal ProjectContactsFilter
+		return zeroVal, nil
+	}
 
-func (ec *executionContext) field_ProjectFiles_list_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 ProjectFilesListFilter
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
 	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalNProjectFilesListFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectFilesListFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+		return ec.unmarshalNProjectContactsFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectContactsFilter(ctx, tmp)
+	}
+
+	var zeroVal ProjectContactsFilter
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_ProjectFiles_list_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_ProjectFiles_list_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["filter"] = arg0
-	var arg1 int
-	if tmp, ok := rawArgs["limit"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
-		arg1, err = ec.unmarshalNInt2int(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg1, err := ec.field_ProjectFiles_list_argsLimit(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["limit"] = arg1
-	var arg2 int
-	if tmp, ok := rawArgs["offset"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
-		arg2, err = ec.unmarshalNInt2int(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg2, err := ec.field_ProjectFiles_list_argsOffset(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["offset"] = arg2
 	return args, nil
 }
+func (ec *executionContext) field_ProjectFiles_list_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (ProjectFilesListFilter, error) {
+	if _, ok := rawArgs["filter"]; !ok {
+		var zeroVal ProjectFilesListFilter
+		return zeroVal, nil
+	}
 
-func (ec *executionContext) field_ProjectFiles_total_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 ProjectFilesListFilter
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
 	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalNProjectFilesListFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectFilesListFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+		return ec.unmarshalNProjectFilesListFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectFilesListFilter(ctx, tmp)
+	}
+
+	var zeroVal ProjectFilesListFilter
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_ProjectFiles_list_argsLimit(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (int, error) {
+	if _, ok := rawArgs["limit"]; !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+	if tmp, ok := rawArgs["limit"]; ok {
+		return ec.unmarshalNInt2int(ctx, tmp)
+	}
+
+	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_ProjectFiles_list_argsOffset(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (int, error) {
+	if _, ok := rawArgs["offset"]; !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+	if tmp, ok := rawArgs["offset"]; ok {
+		return ec.unmarshalNInt2int(ctx, tmp)
+	}
+
+	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_ProjectFiles_total_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_ProjectFiles_total_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["filter"] = arg0
 	return args, nil
 }
+func (ec *executionContext) field_ProjectFiles_total_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (ProjectFilesListFilter, error) {
+	if _, ok := rawArgs["filter"]; !ok {
+		var zeroVal ProjectFilesListFilter
+		return zeroVal, nil
+	}
 
-func (ec *executionContext) field_ProjectHouses_list_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 ProjectHousesFilter
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
 	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalNProjectHousesFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectHousesFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+		return ec.unmarshalNProjectFilesListFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectFilesListFilter(ctx, tmp)
+	}
+
+	var zeroVal ProjectFilesListFilter
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_ProjectHouses_list_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_ProjectHouses_list_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["filter"] = arg0
-	var arg1 int
-	if tmp, ok := rawArgs["limit"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
-		arg1, err = ec.unmarshalNInt2int(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg1, err := ec.field_ProjectHouses_list_argsLimit(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["limit"] = arg1
-	var arg2 int
-	if tmp, ok := rawArgs["offset"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
-		arg2, err = ec.unmarshalNInt2int(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg2, err := ec.field_ProjectHouses_list_argsOffset(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["offset"] = arg2
 	return args, nil
 }
+func (ec *executionContext) field_ProjectHouses_list_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (ProjectHousesFilter, error) {
+	if _, ok := rawArgs["filter"]; !ok {
+		var zeroVal ProjectHousesFilter
+		return zeroVal, nil
+	}
 
-func (ec *executionContext) field_ProjectHouses_total_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 ProjectHousesFilter
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
 	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalNProjectHousesFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectHousesFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+		return ec.unmarshalNProjectHousesFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectHousesFilter(ctx, tmp)
+	}
+
+	var zeroVal ProjectHousesFilter
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_ProjectHouses_list_argsLimit(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (int, error) {
+	if _, ok := rawArgs["limit"]; !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+	if tmp, ok := rawArgs["limit"]; ok {
+		return ec.unmarshalNInt2int(ctx, tmp)
+	}
+
+	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_ProjectHouses_list_argsOffset(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (int, error) {
+	if _, ok := rawArgs["offset"]; !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+	if tmp, ok := rawArgs["offset"]; ok {
+		return ec.unmarshalNInt2int(ctx, tmp)
+	}
+
+	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_ProjectHouses_total_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_ProjectHouses_total_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["filter"] = arg0
 	return args, nil
 }
+func (ec *executionContext) field_ProjectHouses_total_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (ProjectHousesFilter, error) {
+	if _, ok := rawArgs["filter"]; !ok {
+		var zeroVal ProjectHousesFilter
+		return zeroVal, nil
+	}
 
-func (ec *executionContext) field_ProjectVisualizations_list_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 ProjectVisualizationsListFilter
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
 	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalNProjectVisualizationsListFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectVisualizationsListFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+		return ec.unmarshalNProjectHousesFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectHousesFilter(ctx, tmp)
+	}
+
+	var zeroVal ProjectHousesFilter
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_ProjectVisualizations_list_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_ProjectVisualizations_list_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["filter"] = arg0
-	var arg1 int
-	if tmp, ok := rawArgs["limit"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
-		arg1, err = ec.unmarshalNInt2int(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg1, err := ec.field_ProjectVisualizations_list_argsLimit(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["limit"] = arg1
-	var arg2 int
-	if tmp, ok := rawArgs["offset"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
-		arg2, err = ec.unmarshalNInt2int(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg2, err := ec.field_ProjectVisualizations_list_argsOffset(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["offset"] = arg2
 	return args, nil
 }
+func (ec *executionContext) field_ProjectVisualizations_list_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (ProjectVisualizationsListFilter, error) {
+	if _, ok := rawArgs["filter"]; !ok {
+		var zeroVal ProjectVisualizationsListFilter
+		return zeroVal, nil
+	}
 
-func (ec *executionContext) field_ProjectVisualizations_total_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 ProjectVisualizationsListFilter
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
 	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalNProjectVisualizationsListFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectVisualizationsListFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+		return ec.unmarshalNProjectVisualizationsListFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectVisualizationsListFilter(ctx, tmp)
+	}
+
+	var zeroVal ProjectVisualizationsListFilter
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_ProjectVisualizations_list_argsLimit(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (int, error) {
+	if _, ok := rawArgs["limit"]; !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+	if tmp, ok := rawArgs["limit"]; ok {
+		return ec.unmarshalNInt2int(ctx, tmp)
+	}
+
+	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_ProjectVisualizations_list_argsOffset(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (int, error) {
+	if _, ok := rawArgs["offset"]; !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("offset"))
+	if tmp, ok := rawArgs["offset"]; ok {
+		return ec.unmarshalNInt2int(ctx, tmp)
+	}
+
+	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_ProjectVisualizations_total_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_ProjectVisualizations_total_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["filter"] = arg0
 	return args, nil
 }
+func (ec *executionContext) field_ProjectVisualizations_total_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (ProjectVisualizationsListFilter, error) {
+	if _, ok := rawArgs["filter"]; !ok {
+		var zeroVal ProjectVisualizationsListFilter
+		return zeroVal, nil
+	}
 
-func (ec *executionContext) field_Project_period_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		return ec.unmarshalNProjectVisualizationsListFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectVisualizationsListFilter(ctx, tmp)
+	}
+
+	var zeroVal ProjectVisualizationsListFilter
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Project_period_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
-	var arg0 *string
-	if tmp, ok := rawArgs["timezone"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("timezone"))
-		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	args := map[string]any{}
+	arg0, err := ec.field_Project_period_argsTimezone(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["timezone"] = arg0
 	return args, nil
 }
+func (ec *executionContext) field_Project_period_argsTimezone(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*string, error) {
+	if _, ok := rawArgs["timezone"]; !ok {
+		var zeroVal *string
+		return zeroVal, nil
+	}
 
-func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("timezone"))
+	if tmp, ok := rawArgs["timezone"]; ok {
+		return ec.unmarshalOString2ᚖstring(ctx, tmp)
+	}
+
+	var zeroVal *string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["name"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	args := map[string]any{}
+	arg0, err := ec.field_Query___type_argsName(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["name"] = arg0
 	return args, nil
 }
+func (ec *executionContext) field_Query___type_argsName(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	if _, ok := rawArgs["name"]; !ok {
+		var zeroVal string
+		return zeroVal, nil
+	}
 
-func (ec *executionContext) field_Query_album_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+	if tmp, ok := rawArgs["name"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_album_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["id"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	args := map[string]any{}
+	arg0, err := ec.field_Query_album_argsID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["id"] = arg0
 	return args, nil
 }
+func (ec *executionContext) field_Query_album_argsID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	if _, ok := rawArgs["id"]; !ok {
+		var zeroVal string
+		return zeroVal, nil
+	}
 
-func (ec *executionContext) field_Query_project_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
 	if tmp, ok := rawArgs["id"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_project_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Query_project_argsID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["id"] = arg0
 	return args, nil
 }
+func (ec *executionContext) field_Query_project_argsID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	if _, ok := rawArgs["id"]; !ok {
+		var zeroVal string
+		return zeroVal, nil
+	}
 
-func (ec *executionContext) field_Query_workspace_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
 	if tmp, ok := rawArgs["id"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_workspace_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Query_workspace_argsID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["id"] = arg0
 	return args, nil
 }
+func (ec *executionContext) field_Query_workspace_argsID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	if _, ok := rawArgs["id"]; !ok {
+		var zeroVal string
+		return zeroVal, nil
+	}
 
-func (ec *executionContext) field_Subscription_albumFileGenerated_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
 	if tmp, ok := rawArgs["id"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Subscription_albumFileGenerated_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Subscription_albumFileGenerated_argsID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["id"] = arg0
 	return args, nil
 }
+func (ec *executionContext) field_Subscription_albumFileGenerated_argsID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	if _, ok := rawArgs["id"]; !ok {
+		var zeroVal string
+		return zeroVal, nil
+	}
 
-func (ec *executionContext) field_WorkspaceProjects_list_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+	if tmp, ok := rawArgs["id"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_WorkspaceProjects_list_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
-	var arg0 WorkspaceProjectsFilter
-	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalNWorkspaceProjectsFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceProjectsFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	args := map[string]any{}
+	arg0, err := ec.field_WorkspaceProjects_list_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["filter"] = arg0
-	var arg1 int
-	if tmp, ok := rawArgs["limit"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
-		arg1, err = ec.unmarshalNInt2int(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg1, err := ec.field_WorkspaceProjects_list_argsLimit(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["limit"] = arg1
 	return args, nil
 }
+func (ec *executionContext) field_WorkspaceProjects_list_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (WorkspaceProjectsFilter, error) {
+	if _, ok := rawArgs["filter"]; !ok {
+		var zeroVal WorkspaceProjectsFilter
+		return zeroVal, nil
+	}
 
-func (ec *executionContext) field_WorkspaceProjects_total_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 WorkspaceProjectsFilter
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
 	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalNWorkspaceProjectsFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceProjectsFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+		return ec.unmarshalNWorkspaceProjectsFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceProjectsFilter(ctx, tmp)
+	}
+
+	var zeroVal WorkspaceProjectsFilter
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_WorkspaceProjects_list_argsLimit(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (int, error) {
+	if _, ok := rawArgs["limit"]; !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+	if tmp, ok := rawArgs["limit"]; ok {
+		return ec.unmarshalNInt2int(ctx, tmp)
+	}
+
+	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_WorkspaceProjects_total_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_WorkspaceProjects_total_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["filter"] = arg0
 	return args, nil
 }
+func (ec *executionContext) field_WorkspaceProjects_total_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (WorkspaceProjectsFilter, error) {
+	if _, ok := rawArgs["filter"]; !ok {
+		var zeroVal WorkspaceProjectsFilter
+		return zeroVal, nil
+	}
 
-func (ec *executionContext) field_WorkspaceUsers_list_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 WorkspaceUsersFilter
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
 	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalNWorkspaceUsersFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceUsersFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+		return ec.unmarshalNWorkspaceProjectsFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceProjectsFilter(ctx, tmp)
+	}
+
+	var zeroVal WorkspaceProjectsFilter
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_WorkspaceUsers_list_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_WorkspaceUsers_list_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["filter"] = arg0
-	var arg1 int
-	if tmp, ok := rawArgs["limit"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
-		arg1, err = ec.unmarshalNInt2int(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	arg1, err := ec.field_WorkspaceUsers_list_argsLimit(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["limit"] = arg1
 	return args, nil
 }
+func (ec *executionContext) field_WorkspaceUsers_list_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (WorkspaceUsersFilter, error) {
+	if _, ok := rawArgs["filter"]; !ok {
+		var zeroVal WorkspaceUsersFilter
+		return zeroVal, nil
+	}
 
-func (ec *executionContext) field_WorkspaceUsers_total_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 WorkspaceUsersFilter
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
 	if tmp, ok := rawArgs["filter"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
-		arg0, err = ec.unmarshalNWorkspaceUsersFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceUsersFilter(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+		return ec.unmarshalNWorkspaceUsersFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceUsersFilter(ctx, tmp)
+	}
+
+	var zeroVal WorkspaceUsersFilter
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_WorkspaceUsers_list_argsLimit(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (int, error) {
+	if _, ok := rawArgs["limit"]; !ok {
+		var zeroVal int
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("limit"))
+	if tmp, ok := rawArgs["limit"]; ok {
+		return ec.unmarshalNInt2int(ctx, tmp)
+	}
+
+	var zeroVal int
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_WorkspaceUsers_total_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_WorkspaceUsers_total_argsFilter(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["filter"] = arg0
 	return args, nil
 }
+func (ec *executionContext) field_WorkspaceUsers_total_argsFilter(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (WorkspaceUsersFilter, error) {
+	if _, ok := rawArgs["filter"]; !ok {
+		var zeroVal WorkspaceUsersFilter
+		return zeroVal, nil
+	}
 
-func (ec *executionContext) field___Type_enumValues_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("filter"))
+	if tmp, ok := rawArgs["filter"]; ok {
+		return ec.unmarshalNWorkspaceUsersFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceUsersFilter(ctx, tmp)
+	}
+
+	var zeroVal WorkspaceUsersFilter
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field___Directive_args_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
-	args := map[string]interface{}{}
-	var arg0 bool
-	if tmp, ok := rawArgs["includeDeprecated"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("includeDeprecated"))
-		arg0, err = ec.unmarshalOBoolean2bool(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+	args := map[string]any{}
+	arg0, err := ec.field___Directive_args_argsIncludeDeprecated(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["includeDeprecated"] = arg0
 	return args, nil
 }
+func (ec *executionContext) field___Directive_args_argsIncludeDeprecated(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*bool, error) {
+	if _, ok := rawArgs["includeDeprecated"]; !ok {
+		var zeroVal *bool
+		return zeroVal, nil
+	}
 
-func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 bool
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("includeDeprecated"))
 	if tmp, ok := rawArgs["includeDeprecated"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("includeDeprecated"))
-		arg0, err = ec.unmarshalOBoolean2bool(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
+		return ec.unmarshalOBoolean2ᚖbool(ctx, tmp)
+	}
+
+	var zeroVal *bool
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field___Field_args_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field___Field_args_argsIncludeDeprecated(ctx, rawArgs)
+	if err != nil {
+		return nil, err
 	}
 	args["includeDeprecated"] = arg0
 	return args, nil
+}
+func (ec *executionContext) field___Field_args_argsIncludeDeprecated(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (*bool, error) {
+	if _, ok := rawArgs["includeDeprecated"]; !ok {
+		var zeroVal *bool
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("includeDeprecated"))
+	if tmp, ok := rawArgs["includeDeprecated"]; ok {
+		return ec.unmarshalOBoolean2ᚖbool(ctx, tmp)
+	}
+
+	var zeroVal *bool
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field___Type_enumValues_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field___Type_enumValues_argsIncludeDeprecated(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["includeDeprecated"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field___Type_enumValues_argsIncludeDeprecated(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (bool, error) {
+	if _, ok := rawArgs["includeDeprecated"]; !ok {
+		var zeroVal bool
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("includeDeprecated"))
+	if tmp, ok := rawArgs["includeDeprecated"]; ok {
+		return ec.unmarshalOBoolean2bool(ctx, tmp)
+	}
+
+	var zeroVal bool
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field___Type_fields_argsIncludeDeprecated(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["includeDeprecated"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field___Type_fields_argsIncludeDeprecated(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (bool, error) {
+	if _, ok := rawArgs["includeDeprecated"]; !ok {
+		var zeroVal bool
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("includeDeprecated"))
+	if tmp, ok := rawArgs["includeDeprecated"]; ok {
+		return ec.unmarshalOBoolean2bool(ctx, tmp)
+	}
+
+	var zeroVal bool
+	return zeroVal, nil
 }
 
 // endregion ***************************** args.gotpl *****************************
@@ -3913,7 +5162,7 @@ func (ec *executionContext) _Album_id(ctx context.Context, field graphql.Collect
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.ID, nil
 	})
@@ -3957,7 +5206,7 @@ func (ec *executionContext) _Album_name(ctx context.Context, field graphql.Colle
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Name, nil
 	})
@@ -4001,7 +5250,7 @@ func (ec *executionContext) _Album_version(ctx context.Context, field graphql.Co
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Version, nil
 	})
@@ -4045,7 +5294,7 @@ func (ec *executionContext) _Album_project(ctx context.Context, field graphql.Co
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Album().Project(rctx, obj)
 	})
@@ -4089,7 +5338,7 @@ func (ec *executionContext) _Album_settings(ctx context.Context, field graphql.C
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Settings, nil
 	})
@@ -4139,7 +5388,7 @@ func (ec *executionContext) _Album_pages(ctx context.Context, field graphql.Coll
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Album().Pages(rctx, obj)
 	})
@@ -4183,7 +5432,7 @@ func (ec *executionContext) _Album_file(ctx context.Context, field graphql.Colle
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Album().File(rctx, obj)
 	})
@@ -4224,7 +5473,7 @@ func (ec *executionContext) _Album_cover(ctx context.Context, field graphql.Coll
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Album().Cover(rctx, obj)
 	})
@@ -4268,7 +5517,7 @@ func (ec *executionContext) _AlbumCoverUploaded_cover(ctx context.Context, field
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Cover, nil
 	})
@@ -4316,7 +5565,7 @@ func (ec *executionContext) _AlbumCreated_album(ctx context.Context, field graph
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Album, nil
 	})
@@ -4378,7 +5627,7 @@ func (ec *executionContext) _AlbumDeleted_album(ctx context.Context, field graph
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Album, nil
 	})
@@ -4440,7 +5689,7 @@ func (ec *executionContext) _AlbumFile_id(ctx context.Context, field graphql.Col
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.ID, nil
 	})
@@ -4484,7 +5733,7 @@ func (ec *executionContext) _AlbumFile_status(ctx context.Context, field graphql
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Status, nil
 	})
@@ -4528,7 +5777,7 @@ func (ec *executionContext) _AlbumFile_version(ctx context.Context, field graphq
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Version, nil
 	})
@@ -4572,7 +5821,7 @@ func (ec *executionContext) _AlbumFile_file(ctx context.Context, field graphql.C
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.File, nil
 	})
@@ -4627,7 +5876,7 @@ func (ec *executionContext) _AlbumFile_generatingStartedAt(ctx context.Context, 
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.GeneratingStartedAt, nil
 	})
@@ -4668,7 +5917,7 @@ func (ec *executionContext) _AlbumFile_generatingDoneAt(ctx context.Context, fie
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.GeneratingDoneAt, nil
 	})
@@ -4709,7 +5958,7 @@ func (ec *executionContext) _AlbumFileGenerationStarted_file(ctx context.Context
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.File, nil
 	})
@@ -4767,7 +6016,7 @@ func (ec *executionContext) _AlbumPageCover_id(ctx context.Context, field graphq
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.ID, nil
 	})
@@ -4811,7 +6060,7 @@ func (ec *executionContext) _AlbumPageCover_number(ctx context.Context, field gr
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Number, nil
 	})
@@ -4855,7 +6104,7 @@ func (ec *executionContext) _AlbumPageCover_rotate(ctx context.Context, field gr
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Rotate, nil
 	})
@@ -4899,7 +6148,7 @@ func (ec *executionContext) _AlbumPageCover_svg(ctx context.Context, field graph
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.AlbumPageCover().SVG(rctx, obj)
 	})
@@ -4943,7 +6192,7 @@ func (ec *executionContext) _AlbumPageCover_cover(ctx context.Context, field gra
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.AlbumPageCover().Cover(rctx, obj)
 	})
@@ -4987,7 +6236,7 @@ func (ec *executionContext) _AlbumPageDeleted_page(ctx context.Context, field gr
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Page, nil
 	})
@@ -5031,7 +6280,7 @@ func (ec *executionContext) _AlbumPageOrientationChanged_album(ctx context.Conte
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Album, nil
 	})
@@ -5093,7 +6342,7 @@ func (ec *executionContext) _AlbumPageSizeChanged_album(ctx context.Context, fie
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Album, nil
 	})
@@ -5155,7 +6404,7 @@ func (ec *executionContext) _AlbumPageVisualization_id(ctx context.Context, fiel
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.ID, nil
 	})
@@ -5199,7 +6448,7 @@ func (ec *executionContext) _AlbumPageVisualization_number(ctx context.Context, 
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Number, nil
 	})
@@ -5243,7 +6492,7 @@ func (ec *executionContext) _AlbumPageVisualization_rotate(ctx context.Context, 
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Rotate, nil
 	})
@@ -5287,7 +6536,7 @@ func (ec *executionContext) _AlbumPageVisualization_svg(ctx context.Context, fie
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.AlbumPageVisualization().SVG(rctx, obj)
 	})
@@ -5331,7 +6580,7 @@ func (ec *executionContext) _AlbumPageVisualization_visualization(ctx context.Co
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.AlbumPageVisualization().Visualization(rctx, obj)
 	})
@@ -5375,7 +6624,7 @@ func (ec *executionContext) _AlbumPages_items(ctx context.Context, field graphql
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Items, nil
 	})
@@ -5419,7 +6668,7 @@ func (ec *executionContext) _AlbumSettings_pageSize(ctx context.Context, field g
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.PageSize, nil
 	})
@@ -5463,7 +6712,7 @@ func (ec *executionContext) _AlbumSettings_pageOrientation(ctx context.Context, 
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.PageOrientation, nil
 	})
@@ -5507,7 +6756,7 @@ func (ec *executionContext) _AlreadyExists_message(ctx context.Context, field gr
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Message, nil
 	})
@@ -5551,7 +6800,7 @@ func (ec *executionContext) _AlreadyInWorkspace_message(ctx context.Context, fie
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Message, nil
 	})
@@ -5595,7 +6844,7 @@ func (ec *executionContext) _Contact_id(ctx context.Context, field graphql.Colle
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.ID, nil
 	})
@@ -5639,7 +6888,7 @@ func (ec *executionContext) _Contact_fullName(ctx context.Context, field graphql
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.FullName, nil
 	})
@@ -5683,7 +6932,7 @@ func (ec *executionContext) _Contact_photo(ctx context.Context, field graphql.Co
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Photo, nil
 	})
@@ -5727,7 +6976,7 @@ func (ec *executionContext) _Contact_details(ctx context.Context, field graphql.
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Details, nil
 	})
@@ -5777,7 +7026,7 @@ func (ec *executionContext) _Contact_createdAt(ctx context.Context, field graphq
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.CreatedAt, nil
 	})
@@ -5821,7 +7070,7 @@ func (ec *executionContext) _Contact_modifiedAt(ctx context.Context, field graph
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.ModifiedAt, nil
 	})
@@ -5865,7 +7114,7 @@ func (ec *executionContext) _ContactAdded_contact(ctx context.Context, field gra
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Contact, nil
 	})
@@ -5923,7 +7172,7 @@ func (ec *executionContext) _ContactDeleted_contact(ctx context.Context, field g
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Contact, nil
 	})
@@ -5981,7 +7230,7 @@ func (ec *executionContext) _ContactDetails_type(ctx context.Context, field grap
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Type, nil
 	})
@@ -6025,7 +7274,7 @@ func (ec *executionContext) _ContactDetails_value(ctx context.Context, field gra
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Value, nil
 	})
@@ -6069,7 +7318,7 @@ func (ec *executionContext) _ContactUpdated_contact(ctx context.Context, field g
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Contact, nil
 	})
@@ -6127,7 +7376,7 @@ func (ec *executionContext) _Cover_id(ctx context.Context, field graphql.Collect
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.ID, nil
 	})
@@ -6171,7 +7420,7 @@ func (ec *executionContext) _Cover_file(ctx context.Context, field graphql.Colle
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Cover().File(rctx, obj)
 	})
@@ -6215,7 +7464,7 @@ func (ec *executionContext) _CoverUploaded_file(ctx context.Context, field graph
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.CoverUploaded().File(rctx, obj)
 	})
@@ -6259,7 +7508,7 @@ func (ec *executionContext) _ExpiredToken_message(ctx context.Context, field gra
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Message, nil
 	})
@@ -6303,7 +7552,7 @@ func (ec *executionContext) _File_id(ctx context.Context, field graphql.Collecte
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.ID, nil
 	})
@@ -6347,7 +7596,7 @@ func (ec *executionContext) _File_name(ctx context.Context, field graphql.Collec
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Name, nil
 	})
@@ -6391,7 +7640,7 @@ func (ec *executionContext) _File_url(ctx context.Context, field graphql.Collect
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.URL, nil
 	})
@@ -6435,7 +7684,7 @@ func (ec *executionContext) _File_type(ctx context.Context, field graphql.Collec
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Type, nil
 	})
@@ -6479,7 +7728,7 @@ func (ec *executionContext) _File_mimeType(ctx context.Context, field graphql.Co
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.MimeType, nil
 	})
@@ -6523,7 +7772,7 @@ func (ec *executionContext) _File_size(ctx context.Context, field graphql.Collec
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Size, nil
 	})
@@ -6567,7 +7816,7 @@ func (ec *executionContext) _FileUploaded_file(ctx context.Context, field graphq
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.File, nil
 	})
@@ -6625,7 +7874,7 @@ func (ec *executionContext) _Forbidden_message(ctx context.Context, field graphq
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Message, nil
 	})
@@ -6669,7 +7918,7 @@ func (ec *executionContext) _Gravatar_url(ctx context.Context, field graphql.Col
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.URL, nil
 	})
@@ -6713,7 +7962,7 @@ func (ec *executionContext) _House_id(ctx context.Context, field graphql.Collect
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.ID, nil
 	})
@@ -6757,7 +8006,7 @@ func (ec *executionContext) _House_city(ctx context.Context, field graphql.Colle
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.City, nil
 	})
@@ -6801,7 +8050,7 @@ func (ec *executionContext) _House_address(ctx context.Context, field graphql.Co
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Address, nil
 	})
@@ -6845,7 +8094,7 @@ func (ec *executionContext) _House_housingComplex(ctx context.Context, field gra
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.HousingComplex, nil
 	})
@@ -6889,7 +8138,7 @@ func (ec *executionContext) _House_createdAt(ctx context.Context, field graphql.
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.CreatedAt, nil
 	})
@@ -6933,7 +8182,7 @@ func (ec *executionContext) _House_modifiedAt(ctx context.Context, field graphql
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.ModifiedAt, nil
 	})
@@ -6977,7 +8226,7 @@ func (ec *executionContext) _House_rooms(ctx context.Context, field graphql.Coll
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.House().Rooms(rctx, obj)
 	})
@@ -7025,7 +8274,7 @@ func (ec *executionContext) _HouseAdded_house(ctx context.Context, field graphql
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.House, nil
 	})
@@ -7085,7 +8334,7 @@ func (ec *executionContext) _HouseRooms_list(ctx context.Context, field graphql.
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.HouseRooms().List(rctx, obj, fc.Args["limit"].(int), fc.Args["offset"].(int))
 	})
@@ -7140,7 +8389,7 @@ func (ec *executionContext) _HouseRoomsList_items(ctx context.Context, field gra
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Items, nil
 	})
@@ -7198,7 +8447,7 @@ func (ec *executionContext) _HouseUpdated_house(ctx context.Context, field graph
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.House, nil
 	})
@@ -7258,7 +8507,7 @@ func (ec *executionContext) _Id_id(ctx context.Context, field graphql.CollectedF
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.ID, nil
 	})
@@ -7302,7 +8551,7 @@ func (ec *executionContext) _InvalidEmail_message(ctx context.Context, field gra
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Message, nil
 	})
@@ -7346,7 +8595,7 @@ func (ec *executionContext) _InvalidPin_message(ctx context.Context, field graph
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Message, nil
 	})
@@ -7390,7 +8639,7 @@ func (ec *executionContext) _InvalidToken_message(ctx context.Context, field gra
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Message, nil
 	})
@@ -7434,7 +8683,7 @@ func (ec *executionContext) _InviteAccepted_token(ctx context.Context, field gra
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Token, nil
 	})
@@ -7478,7 +8727,7 @@ func (ec *executionContext) _InviteSent_to(ctx context.Context, field graphql.Co
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.To, nil
 	})
@@ -7522,7 +8771,7 @@ func (ec *executionContext) _InviteSent_tokenExpiration(ctx context.Context, fie
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.TokenExpiration, nil
 	})
@@ -7566,7 +8815,7 @@ func (ec *executionContext) _LinkSentByEmail_email(ctx context.Context, field gr
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Email, nil
 	})
@@ -7610,7 +8859,7 @@ func (ec *executionContext) _LoginConfirmed_token(ctx context.Context, field gra
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Token, nil
 	})
@@ -7654,7 +8903,7 @@ func (ec *executionContext) _Mutation_pass(ctx context.Context, field graphql.Co
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().Pass(rctx)
 	})
@@ -7698,7 +8947,7 @@ func (ec *executionContext) _Mutation_acceptInvite(ctx context.Context, field gr
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().AcceptInvite(rctx, fc.Args["token"].(string))
 	})
@@ -7753,7 +9002,7 @@ func (ec *executionContext) _Mutation_addContact(ctx context.Context, field grap
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().AddContact(rctx, fc.Args["projectId"].(string), fc.Args["contact"].(AddContactInput))
 	})
@@ -7808,7 +9057,7 @@ func (ec *executionContext) _Mutation_addHouse(ctx context.Context, field graphq
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().AddHouse(rctx, fc.Args["projectId"].(string), fc.Args["house"].(AddHouseInput))
 	})
@@ -7863,7 +9112,7 @@ func (ec *executionContext) _Mutation_addRoom(ctx context.Context, field graphql
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().AddRoom(rctx, fc.Args["houseId"].(string), fc.Args["room"].(AddRoomInput))
 	})
@@ -7918,7 +9167,7 @@ func (ec *executionContext) _Mutation_addVisualizationsToAlbum(ctx context.Conte
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().AddVisualizationsToAlbum(rctx, fc.Args["albumId"].(string), fc.Args["visualizations"].([]string))
 	})
@@ -7973,7 +9222,7 @@ func (ec *executionContext) _Mutation_changeAlbumPageOrientation(ctx context.Con
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().ChangeAlbumPageOrientation(rctx, fc.Args["albumId"].(string), fc.Args["orientation"].(PageOrientation))
 	})
@@ -8028,7 +9277,7 @@ func (ec *executionContext) _Mutation_changeAlbumPageSize(ctx context.Context, f
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().ChangeAlbumPageSize(rctx, fc.Args["albumId"].(string), fc.Args["size"].(PageSize))
 	})
@@ -8083,7 +9332,7 @@ func (ec *executionContext) _Mutation_changeProjectDates(ctx context.Context, fi
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().ChangeProjectDates(rctx, fc.Args["projectId"].(string), fc.Args["dates"].(ChangeProjectDatesInput))
 	})
@@ -8138,7 +9387,7 @@ func (ec *executionContext) _Mutation_changeProjectStatus(ctx context.Context, f
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().ChangeProjectStatus(rctx, fc.Args["projectId"].(string), fc.Args["status"].(ProjectStatus))
 	})
@@ -8193,7 +9442,7 @@ func (ec *executionContext) _Mutation_confirmLoginLink(ctx context.Context, fiel
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().ConfirmLoginLink(rctx, fc.Args["token"].(string))
 	})
@@ -8248,7 +9497,7 @@ func (ec *executionContext) _Mutation_confirmLoginPin(ctx context.Context, field
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().ConfirmLoginPin(rctx, fc.Args["token"].(string), fc.Args["pin"].(string))
 	})
@@ -8303,7 +9552,7 @@ func (ec *executionContext) _Mutation_createAlbum(ctx context.Context, field gra
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().CreateAlbum(rctx, fc.Args["projectId"].(string), fc.Args["name"].(string), fc.Args["settings"].(CreateAlbumSettingsInput))
 	})
@@ -8358,7 +9607,7 @@ func (ec *executionContext) _Mutation_createProject(ctx context.Context, field g
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().CreateProject(rctx, fc.Args["input"].(CreateProjectInput))
 	})
@@ -8413,7 +9662,7 @@ func (ec *executionContext) _Mutation_deleteAlbum(ctx context.Context, field gra
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().DeleteAlbum(rctx, fc.Args["id"].(string))
 	})
@@ -8468,7 +9717,7 @@ func (ec *executionContext) _Mutation_deleteAlbumPage(ctx context.Context, field
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().DeleteAlbumPage(rctx, fc.Args["albumId"].(string), fc.Args["pageNumber"].(int))
 	})
@@ -8523,7 +9772,7 @@ func (ec *executionContext) _Mutation_deleteContact(ctx context.Context, field g
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().DeleteContact(rctx, fc.Args["id"].(string))
 	})
@@ -8578,7 +9827,7 @@ func (ec *executionContext) _Mutation_deleteRoom(ctx context.Context, field grap
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().DeleteRoom(rctx, fc.Args["id"].(string))
 	})
@@ -8633,7 +9882,7 @@ func (ec *executionContext) _Mutation_deleteVisualizations(ctx context.Context, 
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().DeleteVisualizations(rctx, fc.Args["id"].([]string))
 	})
@@ -8688,7 +9937,7 @@ func (ec *executionContext) _Mutation_generateAlbumFile(ctx context.Context, fie
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().GenerateAlbumFile(rctx, fc.Args["albumId"].(string))
 	})
@@ -8743,7 +9992,7 @@ func (ec *executionContext) _Mutation_inviteUser(ctx context.Context, field grap
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().InviteUser(rctx, fc.Args["workspaceId"].(string), fc.Args["email"].(string), fc.Args["role"].(WorkspaceUserRole))
 	})
@@ -8798,7 +10047,7 @@ func (ec *executionContext) _Mutation_loginByEmail(ctx context.Context, field gr
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().LoginByEmail(rctx, fc.Args["email"].(string), fc.Args["workspaceName"].(string))
 	})
@@ -8853,7 +10102,7 @@ func (ec *executionContext) _Mutation_makeProjectNotPublic(ctx context.Context, 
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().MakeProjectNotPublic(rctx, fc.Args["projectId"].(string))
 	})
@@ -8908,7 +10157,7 @@ func (ec *executionContext) _Mutation_makeProjectPublic(ctx context.Context, fie
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().MakeProjectPublic(rctx, fc.Args["projectId"].(string))
 	})
@@ -8963,7 +10212,7 @@ func (ec *executionContext) _Mutation_moveRoomToPosition(ctx context.Context, fi
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().MoveRoomToPosition(rctx, fc.Args["roomId"].(string), fc.Args["position"].(int))
 	})
@@ -9018,7 +10267,7 @@ func (ec *executionContext) _Mutation_updateContact(ctx context.Context, field g
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().UpdateContact(rctx, fc.Args["contactId"].(string), fc.Args["data"].(UpdateContactInput))
 	})
@@ -9073,7 +10322,7 @@ func (ec *executionContext) _Mutation_updateHouse(ctx context.Context, field gra
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().UpdateHouse(rctx, fc.Args["houseId"].(string), fc.Args["data"].(UpdateHouseInput))
 	})
@@ -9128,7 +10377,7 @@ func (ec *executionContext) _Mutation_updateRoom(ctx context.Context, field grap
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().UpdateRoom(rctx, fc.Args["roomId"].(string), fc.Args["data"].(UpdateRoomInput))
 	})
@@ -9183,7 +10432,7 @@ func (ec *executionContext) _Mutation_uploadAlbumCover(ctx context.Context, fiel
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().UploadAlbumCover(rctx, fc.Args["albumId"].(string), fc.Args["file"].(graphql.Upload))
 	})
@@ -9238,7 +10487,7 @@ func (ec *executionContext) _Mutation_uploadFile(ctx context.Context, field grap
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().UploadFile(rctx, fc.Args["input"].(UploadFileInput))
 	})
@@ -9293,7 +10542,7 @@ func (ec *executionContext) _Mutation_uploadVisualization(ctx context.Context, f
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().UploadVisualization(rctx, fc.Args["projectId"].(string), fc.Args["file"].(graphql.Upload), fc.Args["roomId"].(*string))
 	})
@@ -9348,7 +10597,7 @@ func (ec *executionContext) _Mutation_uploadVisualizations(ctx context.Context, 
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Mutation().UploadVisualizations(rctx, fc.Args["projectId"].(string), fc.Args["files"].([]*graphql.Upload), fc.Args["roomId"].(*string))
 	})
@@ -9403,7 +10652,7 @@ func (ec *executionContext) _NotFound_message(ctx context.Context, field graphql
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Message, nil
 	})
@@ -9447,7 +10696,7 @@ func (ec *executionContext) _PinSentByEmail_email(ctx context.Context, field gra
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Email, nil
 	})
@@ -9491,7 +10740,7 @@ func (ec *executionContext) _PinSentByEmail_token(ctx context.Context, field gra
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Token, nil
 	})
@@ -9535,7 +10784,7 @@ func (ec *executionContext) _Project_id(ctx context.Context, field graphql.Colle
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.ID, nil
 	})
@@ -9579,7 +10828,7 @@ func (ec *executionContext) _Project_name(ctx context.Context, field graphql.Col
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Name, nil
 	})
@@ -9623,7 +10872,7 @@ func (ec *executionContext) _Project_status(ctx context.Context, field graphql.C
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Status, nil
 	})
@@ -9667,7 +10916,7 @@ func (ec *executionContext) _Project_startAt(ctx context.Context, field graphql.
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.StartAt, nil
 	})
@@ -9708,7 +10957,7 @@ func (ec *executionContext) _Project_endAt(ctx context.Context, field graphql.Co
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.EndAt, nil
 	})
@@ -9749,7 +10998,7 @@ func (ec *executionContext) _Project_period(ctx context.Context, field graphql.C
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Project().Period(rctx, obj, fc.Args["timezone"].(*string))
 	})
@@ -9801,7 +11050,7 @@ func (ec *executionContext) _Project_contacts(ctx context.Context, field graphql
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Project().Contacts(rctx, obj)
 	})
@@ -9851,7 +11100,7 @@ func (ec *executionContext) _Project_houses(ctx context.Context, field graphql.C
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Project().Houses(rctx, obj)
 	})
@@ -9901,7 +11150,7 @@ func (ec *executionContext) _Project_visualizations(ctx context.Context, field g
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Project().Visualizations(rctx, obj)
 	})
@@ -9951,7 +11200,7 @@ func (ec *executionContext) _Project_files(ctx context.Context, field graphql.Co
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Project().Files(rctx, obj)
 	})
@@ -10001,7 +11250,7 @@ func (ec *executionContext) _Project_albums(ctx context.Context, field graphql.C
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Project().Albums(rctx, obj)
 	})
@@ -10051,7 +11300,7 @@ func (ec *executionContext) _Project_page(ctx context.Context, field graphql.Col
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Project().Page(rctx, obj)
 	})
@@ -10095,7 +11344,7 @@ func (ec *executionContext) _Project_statuses(ctx context.Context, field graphql
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Project().Statuses(rctx, obj)
 	})
@@ -10143,7 +11392,7 @@ func (ec *executionContext) _ProjectAlbums_list(ctx context.Context, field graph
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.ProjectAlbums().List(rctx, obj, fc.Args["limit"].(int), fc.Args["offset"].(int))
 	})
@@ -10198,7 +11447,7 @@ func (ec *executionContext) _ProjectAlbums_total(ctx context.Context, field grap
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.ProjectAlbums().Total(rctx, obj)
 	})
@@ -10242,7 +11491,7 @@ func (ec *executionContext) _ProjectAlbumsList_items(ctx context.Context, field 
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Items, nil
 	})
@@ -10304,7 +11553,7 @@ func (ec *executionContext) _ProjectAlbumsTotal_total(ctx context.Context, field
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Total, nil
 	})
@@ -10348,7 +11597,7 @@ func (ec *executionContext) _ProjectContacts_list(ctx context.Context, field gra
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.ProjectContacts().List(rctx, obj, fc.Args["filter"].(ProjectContactsFilter), fc.Args["limit"].(int), fc.Args["offset"].(int))
 	})
@@ -10403,7 +11652,7 @@ func (ec *executionContext) _ProjectContacts_total(ctx context.Context, field gr
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.ProjectContacts().Total(rctx, obj, fc.Args["filter"].(ProjectContactsFilter))
 	})
@@ -10458,7 +11707,7 @@ func (ec *executionContext) _ProjectContactsList_items(ctx context.Context, fiel
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Items, nil
 	})
@@ -10516,7 +11765,7 @@ func (ec *executionContext) _ProjectContactsTotal_total(ctx context.Context, fie
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Total, nil
 	})
@@ -10560,7 +11809,7 @@ func (ec *executionContext) _ProjectCreated_project(ctx context.Context, field g
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Project, nil
 	})
@@ -10632,7 +11881,7 @@ func (ec *executionContext) _ProjectDatesChanged_project(ctx context.Context, fi
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Project, nil
 	})
@@ -10704,7 +11953,7 @@ func (ec *executionContext) _ProjectFiles_list(ctx context.Context, field graphq
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.ProjectFiles().List(rctx, obj, fc.Args["filter"].(ProjectFilesListFilter), fc.Args["limit"].(int), fc.Args["offset"].(int))
 	})
@@ -10759,7 +12008,7 @@ func (ec *executionContext) _ProjectFiles_total(ctx context.Context, field graph
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.ProjectFiles().Total(rctx, obj, fc.Args["filter"].(ProjectFilesListFilter))
 	})
@@ -10814,7 +12063,7 @@ func (ec *executionContext) _ProjectFilesList_items(ctx context.Context, field g
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Items, nil
 	})
@@ -10872,7 +12121,7 @@ func (ec *executionContext) _ProjectFilesTotal_total(ctx context.Context, field 
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Total, nil
 	})
@@ -10916,7 +12165,7 @@ func (ec *executionContext) _ProjectHouses_list(ctx context.Context, field graph
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.ProjectHouses().List(rctx, obj, fc.Args["filter"].(ProjectHousesFilter), fc.Args["limit"].(int), fc.Args["offset"].(int))
 	})
@@ -10971,7 +12220,7 @@ func (ec *executionContext) _ProjectHouses_total(ctx context.Context, field grap
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.ProjectHouses().Total(rctx, obj, fc.Args["filter"].(ProjectHousesFilter))
 	})
@@ -11026,7 +12275,7 @@ func (ec *executionContext) _ProjectHousesList_items(ctx context.Context, field 
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Items, nil
 	})
@@ -11086,7 +12335,7 @@ func (ec *executionContext) _ProjectHousesTotal_total(ctx context.Context, field
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Total, nil
 	})
@@ -11130,7 +12379,7 @@ func (ec *executionContext) _ProjectIsAlreadyNotPublic_message(ctx context.Conte
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Message, nil
 	})
@@ -11174,7 +12423,7 @@ func (ec *executionContext) _ProjectIsAlreadyPublic_message(ctx context.Context,
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Message, nil
 	})
@@ -11218,7 +12467,7 @@ func (ec *executionContext) _ProjectMadeNotPublic_projectPage(ctx context.Contex
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.ProjectPage, nil
 	})
@@ -11272,7 +12521,7 @@ func (ec *executionContext) _ProjectMadePublic_projectPage(ctx context.Context, 
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.ProjectPage, nil
 	})
@@ -11326,7 +12575,7 @@ func (ec *executionContext) _ProjectPage_id(ctx context.Context, field graphql.C
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.ID, nil
 	})
@@ -11370,7 +12619,7 @@ func (ec *executionContext) _ProjectPage_status(ctx context.Context, field graph
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Status, nil
 	})
@@ -11414,7 +12663,7 @@ func (ec *executionContext) _ProjectPage_url(ctx context.Context, field graphql.
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.URL, nil
 	})
@@ -11458,7 +12707,7 @@ func (ec *executionContext) _ProjectPage_settings(ctx context.Context, field gra
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Settings, nil
 	})
@@ -11508,7 +12757,7 @@ func (ec *executionContext) _ProjectPageSettings_visualizations(ctx context.Cont
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Visualizations, nil
 	})
@@ -11552,7 +12801,7 @@ func (ec *executionContext) _ProjectPageSettings_albums(ctx context.Context, fie
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Albums, nil
 	})
@@ -11596,7 +12845,7 @@ func (ec *executionContext) _ProjectStatusChanged_project(ctx context.Context, f
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Project, nil
 	})
@@ -11668,7 +12917,7 @@ func (ec *executionContext) _ProjectStatusDictionary_items(ctx context.Context, 
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Items, nil
 	})
@@ -11718,7 +12967,7 @@ func (ec *executionContext) _ProjectStatusDictionaryItem_key(ctx context.Context
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Key, nil
 	})
@@ -11762,7 +13011,7 @@ func (ec *executionContext) _ProjectStatusDictionaryItem_value(ctx context.Conte
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Value, nil
 	})
@@ -11806,7 +13055,7 @@ func (ec *executionContext) _ProjectVisualizations_list(ctx context.Context, fie
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.ProjectVisualizations().List(rctx, obj, fc.Args["filter"].(ProjectVisualizationsListFilter), fc.Args["limit"].(int), fc.Args["offset"].(int))
 	})
@@ -11861,7 +13110,7 @@ func (ec *executionContext) _ProjectVisualizations_total(ctx context.Context, fi
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.ProjectVisualizations().Total(rctx, obj, fc.Args["filter"].(ProjectVisualizationsListFilter))
 	})
@@ -11916,7 +13165,7 @@ func (ec *executionContext) _ProjectVisualizationsList_items(ctx context.Context
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Items, nil
 	})
@@ -11980,7 +13229,7 @@ func (ec *executionContext) _ProjectVisualizationsTotal_total(ctx context.Contex
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Total, nil
 	})
@@ -12024,7 +13273,7 @@ func (ec *executionContext) _Query_version(ctx context.Context, field graphql.Co
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Query().Version(rctx)
 	})
@@ -12068,7 +13317,7 @@ func (ec *executionContext) _Query_db(ctx context.Context, field graphql.Collect
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Query().Db(rctx)
 	})
@@ -12112,7 +13361,7 @@ func (ec *executionContext) _Query_album(ctx context.Context, field graphql.Coll
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Query().Album(rctx, fc.Args["id"].(string))
 	})
@@ -12167,7 +13416,7 @@ func (ec *executionContext) _Query_profile(ctx context.Context, field graphql.Co
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Query().Profile(rctx)
 	})
@@ -12211,7 +13460,7 @@ func (ec *executionContext) _Query_project(ctx context.Context, field graphql.Co
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Query().Project(rctx, fc.Args["id"].(string))
 	})
@@ -12266,7 +13515,7 @@ func (ec *executionContext) _Query_workspace(ctx context.Context, field graphql.
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Query().Workspace(rctx, fc.Args["id"].(string))
 	})
@@ -12321,7 +13570,7 @@ func (ec *executionContext) _Query___type(ctx context.Context, field graphql.Col
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.introspectType(fc.Args["name"].(string))
 	})
@@ -12351,6 +13600,8 @@ func (ec *executionContext) fieldContext_Query___type(ctx context.Context, field
 				return ec.fieldContext___Type_name(ctx, field)
 			case "description":
 				return ec.fieldContext___Type_description(ctx, field)
+			case "specifiedByURL":
+				return ec.fieldContext___Type_specifiedByURL(ctx, field)
 			case "fields":
 				return ec.fieldContext___Type_fields(ctx, field)
 			case "interfaces":
@@ -12363,8 +13614,8 @@ func (ec *executionContext) fieldContext_Query___type(ctx context.Context, field
 				return ec.fieldContext___Type_inputFields(ctx, field)
 			case "ofType":
 				return ec.fieldContext___Type_ofType(ctx, field)
-			case "specifiedByURL":
-				return ec.fieldContext___Type_specifiedByURL(ctx, field)
+			case "isOneOf":
+				return ec.fieldContext___Type_isOneOf(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type __Type", field.Name)
 		},
@@ -12395,7 +13646,7 @@ func (ec *executionContext) _Query___schema(ctx context.Context, field graphql.C
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.introspectSchema()
 	})
@@ -12450,7 +13701,7 @@ func (ec *executionContext) _Room_id(ctx context.Context, field graphql.Collecte
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.ID, nil
 	})
@@ -12494,7 +13745,7 @@ func (ec *executionContext) _Room_name(ctx context.Context, field graphql.Collec
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Name, nil
 	})
@@ -12538,7 +13789,7 @@ func (ec *executionContext) _Room_square(ctx context.Context, field graphql.Coll
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Square, nil
 	})
@@ -12579,7 +13830,7 @@ func (ec *executionContext) _Room_level(ctx context.Context, field graphql.Colle
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Level, nil
 	})
@@ -12620,7 +13871,7 @@ func (ec *executionContext) _Room_createdAt(ctx context.Context, field graphql.C
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.CreatedAt, nil
 	})
@@ -12664,7 +13915,7 @@ func (ec *executionContext) _Room_modifiedAt(ctx context.Context, field graphql.
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.ModifiedAt, nil
 	})
@@ -12708,7 +13959,7 @@ func (ec *executionContext) _RoomAdded_room(ctx context.Context, field graphql.C
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Room, nil
 	})
@@ -12766,7 +14017,7 @@ func (ec *executionContext) _RoomDeleted_room(ctx context.Context, field graphql
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Room, nil
 	})
@@ -12824,7 +14075,7 @@ func (ec *executionContext) _RoomMovedToPosition_room(ctx context.Context, field
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Room, nil
 	})
@@ -12882,7 +14133,7 @@ func (ec *executionContext) _RoomUpdated_room(ctx context.Context, field graphql
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Room, nil
 	})
@@ -12940,7 +14191,7 @@ func (ec *executionContext) _ServerError_message(ctx context.Context, field grap
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Message, nil
 	})
@@ -12984,7 +14235,7 @@ func (ec *executionContext) _SomeVisualizationsDeleted_visualizations(ctx contex
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Visualizations, nil
 	})
@@ -13048,7 +14299,7 @@ func (ec *executionContext) _SomeVisualizationsUploaded_visualizations(ctx conte
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Visualizations, nil
 	})
@@ -13112,7 +14363,7 @@ func (ec *executionContext) _Subscription_ping(ctx context.Context, field graphq
 			ret = nil
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Subscription().Ping(rctx)
 	})
@@ -13170,7 +14421,7 @@ func (ec *executionContext) _Subscription_albumFileGenerated(ctx context.Context
 			ret = nil
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Subscription().AlbumFileGenerated(rctx, fc.Args["id"].(string))
 	})
@@ -13239,7 +14490,7 @@ func (ec *executionContext) _Svg_svg(ctx context.Context, field graphql.Collecte
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.SVG, nil
 	})
@@ -13283,7 +14534,7 @@ func (ec *executionContext) _Unknown_message(ctx context.Context, field graphql.
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Message, nil
 	})
@@ -13327,7 +14578,7 @@ func (ec *executionContext) _UserProfile_id(ctx context.Context, field graphql.C
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.ID, nil
 	})
@@ -13371,7 +14622,7 @@ func (ec *executionContext) _UserProfile_email(ctx context.Context, field graphq
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Email, nil
 	})
@@ -13415,7 +14666,7 @@ func (ec *executionContext) _UserProfile_fullName(ctx context.Context, field gra
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.FullName, nil
 	})
@@ -13459,7 +14710,7 @@ func (ec *executionContext) _UserProfile_abbr(ctx context.Context, field graphql
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Abbr, nil
 	})
@@ -13503,7 +14754,7 @@ func (ec *executionContext) _UserProfile_gravatar(ctx context.Context, field gra
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Gravatar, nil
 	})
@@ -13548,7 +14799,7 @@ func (ec *executionContext) _UserProfile_defaultWorkspace(ctx context.Context, f
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.UserProfile().DefaultWorkspace(rctx, obj)
 	})
@@ -13604,7 +14855,7 @@ func (ec *executionContext) _Visualization_id(ctx context.Context, field graphql
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.ID, nil
 	})
@@ -13648,7 +14899,7 @@ func (ec *executionContext) _Visualization_name(ctx context.Context, field graph
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Name, nil
 	})
@@ -13692,7 +14943,7 @@ func (ec *executionContext) _Visualization_description(ctx context.Context, fiel
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Description, nil
 	})
@@ -13736,7 +14987,7 @@ func (ec *executionContext) _Visualization_version(ctx context.Context, field gr
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Version, nil
 	})
@@ -13780,7 +15031,7 @@ func (ec *executionContext) _Visualization_status(ctx context.Context, field gra
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Status, nil
 	})
@@ -13824,7 +15075,7 @@ func (ec *executionContext) _Visualization_createdAt(ctx context.Context, field 
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.CreatedAt, nil
 	})
@@ -13868,7 +15119,7 @@ func (ec *executionContext) _Visualization_modifiedAt(ctx context.Context, field
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.ModifiedAt, nil
 	})
@@ -13912,7 +15163,7 @@ func (ec *executionContext) _Visualization_file(ctx context.Context, field graph
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Visualization().File(rctx, obj)
 	})
@@ -13970,7 +15221,7 @@ func (ec *executionContext) _Visualization_room(ctx context.Context, field graph
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Visualization().Room(rctx, obj)
 	})
@@ -14025,7 +15276,7 @@ func (ec *executionContext) _VisualizationUploaded_visualization(ctx context.Con
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Visualization, nil
 	})
@@ -14089,7 +15340,7 @@ func (ec *executionContext) _VisualizationsAddedToAlbum_album(ctx context.Contex
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Album, nil
 	})
@@ -14151,7 +15402,7 @@ func (ec *executionContext) _VisualizationsAddedToAlbum_pages(ctx context.Contex
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Pages, nil
 	})
@@ -14207,7 +15458,7 @@ func (ec *executionContext) _VisualizationsDeleted_visualizations(ctx context.Co
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Visualizations, nil
 	})
@@ -14271,7 +15522,7 @@ func (ec *executionContext) _VisualizationsUploaded_visualizations(ctx context.C
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Visualizations, nil
 	})
@@ -14335,7 +15586,7 @@ func (ec *executionContext) _Workspace_id(ctx context.Context, field graphql.Col
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.ID, nil
 	})
@@ -14379,7 +15630,7 @@ func (ec *executionContext) _Workspace_name(ctx context.Context, field graphql.C
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Name, nil
 	})
@@ -14423,7 +15674,7 @@ func (ec *executionContext) _Workspace_projects(ctx context.Context, field graph
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Workspace().Projects(rctx, obj)
 	})
@@ -14473,7 +15724,7 @@ func (ec *executionContext) _Workspace_users(ctx context.Context, field graphql.
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Workspace().Users(rctx, obj)
 	})
@@ -14523,7 +15774,7 @@ func (ec *executionContext) _Workspace_roles(ctx context.Context, field graphql.
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.Workspace().Roles(rctx, obj)
 	})
@@ -14571,7 +15822,7 @@ func (ec *executionContext) _WorkspaceProjects_list(ctx context.Context, field g
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.WorkspaceProjects().List(rctx, obj, fc.Args["filter"].(WorkspaceProjectsFilter), fc.Args["limit"].(int))
 	})
@@ -14626,7 +15877,7 @@ func (ec *executionContext) _WorkspaceProjects_total(ctx context.Context, field 
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.WorkspaceProjects().Total(rctx, obj, fc.Args["filter"].(WorkspaceProjectsFilter))
 	})
@@ -14681,7 +15932,7 @@ func (ec *executionContext) _WorkspaceProjectsList_items(ctx context.Context, fi
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Items, nil
 	})
@@ -14753,7 +16004,7 @@ func (ec *executionContext) _WorkspaceProjectsTotal_total(ctx context.Context, f
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Total, nil
 	})
@@ -14797,7 +16048,7 @@ func (ec *executionContext) _WorkspaceUser_id(ctx context.Context, field graphql
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.ID, nil
 	})
@@ -14841,7 +16092,7 @@ func (ec *executionContext) _WorkspaceUser_workspace(ctx context.Context, field 
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Workspace, nil
 	})
@@ -14889,7 +16140,7 @@ func (ec *executionContext) _WorkspaceUser_role(ctx context.Context, field graph
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Role, nil
 	})
@@ -14933,7 +16184,7 @@ func (ec *executionContext) _WorkspaceUser_profile(ctx context.Context, field gr
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.WorkspaceUser().Profile(rctx, obj)
 	})
@@ -14991,7 +16242,7 @@ func (ec *executionContext) _WorkspaceUserRoleDictionary_items(ctx context.Conte
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Items, nil
 	})
@@ -15041,7 +16292,7 @@ func (ec *executionContext) _WorkspaceUserRoleDictionaryItem_key(ctx context.Con
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Key, nil
 	})
@@ -15085,7 +16336,7 @@ func (ec *executionContext) _WorkspaceUserRoleDictionaryItem_value(ctx context.C
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Value, nil
 	})
@@ -15129,7 +16380,7 @@ func (ec *executionContext) _WorkspaceUsers_list(ctx context.Context, field grap
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.WorkspaceUsers().List(rctx, obj, fc.Args["filter"].(WorkspaceUsersFilter), fc.Args["limit"].(int))
 	})
@@ -15184,7 +16435,7 @@ func (ec *executionContext) _WorkspaceUsers_total(ctx context.Context, field gra
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return ec.resolvers.WorkspaceUsers().Total(rctx, obj, fc.Args["filter"].(WorkspaceUsersFilter))
 	})
@@ -15239,7 +16490,7 @@ func (ec *executionContext) _WorkspaceUsersList_items(ctx context.Context, field
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Items, nil
 	})
@@ -15293,7 +16544,7 @@ func (ec *executionContext) _WorkspaceUsersTotal_total(ctx context.Context, fiel
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Total, nil
 	})
@@ -15337,7 +16588,7 @@ func (ec *executionContext) ___Directive_name(ctx context.Context, field graphql
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Name, nil
 	})
@@ -15381,7 +16632,7 @@ func (ec *executionContext) ___Directive_description(ctx context.Context, field 
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Description(), nil
 	})
@@ -15410,6 +16661,50 @@ func (ec *executionContext) fieldContext___Directive_description(_ context.Conte
 	return fc, nil
 }
 
+func (ec *executionContext) ___Directive_isRepeatable(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext___Directive_isRepeatable(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IsRepeatable, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext___Directive_isRepeatable(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "__Directive",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) ___Directive_locations(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext___Directive_locations(ctx, field)
 	if err != nil {
@@ -15422,7 +16717,7 @@ func (ec *executionContext) ___Directive_locations(ctx context.Context, field gr
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Locations, nil
 	})
@@ -15466,7 +16761,7 @@ func (ec *executionContext) ___Directive_args(ctx context.Context, field graphql
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Args, nil
 	})
@@ -15485,7 +16780,7 @@ func (ec *executionContext) ___Directive_args(ctx context.Context, field graphql
 	return ec.marshalN__InputValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐInputValueᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext___Directive_args(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext___Directive_args(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "__Directive",
 		Field:      field,
@@ -15501,53 +16796,24 @@ func (ec *executionContext) fieldContext___Directive_args(_ context.Context, fie
 				return ec.fieldContext___InputValue_type(ctx, field)
 			case "defaultValue":
 				return ec.fieldContext___InputValue_defaultValue(ctx, field)
+			case "isDeprecated":
+				return ec.fieldContext___InputValue_isDeprecated(ctx, field)
+			case "deprecationReason":
+				return ec.fieldContext___InputValue_deprecationReason(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type __InputValue", field.Name)
 		},
 	}
-	return fc, nil
-}
-
-func (ec *executionContext) ___Directive_isRepeatable(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext___Directive_isRepeatable(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
 	defer func() {
 		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.IsRepeatable, nil
-	})
-	if err != nil {
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field___Directive_args_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(bool)
-	fc.Result = res
-	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext___Directive_isRepeatable(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "__Directive",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Boolean does not have child fields")
-		},
+		return fc, err
 	}
 	return fc, nil
 }
@@ -15564,7 +16830,7 @@ func (ec *executionContext) ___EnumValue_name(ctx context.Context, field graphql
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Name, nil
 	})
@@ -15608,7 +16874,7 @@ func (ec *executionContext) ___EnumValue_description(ctx context.Context, field 
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Description(), nil
 	})
@@ -15649,7 +16915,7 @@ func (ec *executionContext) ___EnumValue_isDeprecated(ctx context.Context, field
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.IsDeprecated(), nil
 	})
@@ -15693,7 +16959,7 @@ func (ec *executionContext) ___EnumValue_deprecationReason(ctx context.Context, 
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.DeprecationReason(), nil
 	})
@@ -15734,7 +17000,7 @@ func (ec *executionContext) ___Field_name(ctx context.Context, field graphql.Col
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Name, nil
 	})
@@ -15778,7 +17044,7 @@ func (ec *executionContext) ___Field_description(ctx context.Context, field grap
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Description(), nil
 	})
@@ -15819,7 +17085,7 @@ func (ec *executionContext) ___Field_args(ctx context.Context, field graphql.Col
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Args, nil
 	})
@@ -15838,7 +17104,7 @@ func (ec *executionContext) ___Field_args(ctx context.Context, field graphql.Col
 	return ec.marshalN__InputValue2ᚕgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐInputValueᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext___Field_args(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext___Field_args(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "__Field",
 		Field:      field,
@@ -15854,9 +17120,24 @@ func (ec *executionContext) fieldContext___Field_args(_ context.Context, field g
 				return ec.fieldContext___InputValue_type(ctx, field)
 			case "defaultValue":
 				return ec.fieldContext___InputValue_defaultValue(ctx, field)
+			case "isDeprecated":
+				return ec.fieldContext___InputValue_isDeprecated(ctx, field)
+			case "deprecationReason":
+				return ec.fieldContext___InputValue_deprecationReason(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type __InputValue", field.Name)
 		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field___Field_args_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -15873,7 +17154,7 @@ func (ec *executionContext) ___Field_type(ctx context.Context, field graphql.Col
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Type, nil
 	})
@@ -15906,6 +17187,8 @@ func (ec *executionContext) fieldContext___Field_type(_ context.Context, field g
 				return ec.fieldContext___Type_name(ctx, field)
 			case "description":
 				return ec.fieldContext___Type_description(ctx, field)
+			case "specifiedByURL":
+				return ec.fieldContext___Type_specifiedByURL(ctx, field)
 			case "fields":
 				return ec.fieldContext___Type_fields(ctx, field)
 			case "interfaces":
@@ -15918,8 +17201,8 @@ func (ec *executionContext) fieldContext___Field_type(_ context.Context, field g
 				return ec.fieldContext___Type_inputFields(ctx, field)
 			case "ofType":
 				return ec.fieldContext___Type_ofType(ctx, field)
-			case "specifiedByURL":
-				return ec.fieldContext___Type_specifiedByURL(ctx, field)
+			case "isOneOf":
+				return ec.fieldContext___Type_isOneOf(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type __Type", field.Name)
 		},
@@ -15939,7 +17222,7 @@ func (ec *executionContext) ___Field_isDeprecated(ctx context.Context, field gra
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.IsDeprecated(), nil
 	})
@@ -15983,7 +17266,7 @@ func (ec *executionContext) ___Field_deprecationReason(ctx context.Context, fiel
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.DeprecationReason(), nil
 	})
@@ -16024,7 +17307,7 @@ func (ec *executionContext) ___InputValue_name(ctx context.Context, field graphq
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Name, nil
 	})
@@ -16068,7 +17351,7 @@ func (ec *executionContext) ___InputValue_description(ctx context.Context, field
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Description(), nil
 	})
@@ -16109,7 +17392,7 @@ func (ec *executionContext) ___InputValue_type(ctx context.Context, field graphq
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Type, nil
 	})
@@ -16142,6 +17425,8 @@ func (ec *executionContext) fieldContext___InputValue_type(_ context.Context, fi
 				return ec.fieldContext___Type_name(ctx, field)
 			case "description":
 				return ec.fieldContext___Type_description(ctx, field)
+			case "specifiedByURL":
+				return ec.fieldContext___Type_specifiedByURL(ctx, field)
 			case "fields":
 				return ec.fieldContext___Type_fields(ctx, field)
 			case "interfaces":
@@ -16154,8 +17439,8 @@ func (ec *executionContext) fieldContext___InputValue_type(_ context.Context, fi
 				return ec.fieldContext___Type_inputFields(ctx, field)
 			case "ofType":
 				return ec.fieldContext___Type_ofType(ctx, field)
-			case "specifiedByURL":
-				return ec.fieldContext___Type_specifiedByURL(ctx, field)
+			case "isOneOf":
+				return ec.fieldContext___Type_isOneOf(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type __Type", field.Name)
 		},
@@ -16175,7 +17460,7 @@ func (ec *executionContext) ___InputValue_defaultValue(ctx context.Context, fiel
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.DefaultValue, nil
 	})
@@ -16204,6 +17489,91 @@ func (ec *executionContext) fieldContext___InputValue_defaultValue(_ context.Con
 	return fc, nil
 }
 
+func (ec *executionContext) ___InputValue_isDeprecated(ctx context.Context, field graphql.CollectedField, obj *introspection.InputValue) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext___InputValue_isDeprecated(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.IsDeprecated(), nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext___InputValue_isDeprecated(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "__InputValue",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) ___InputValue_deprecationReason(ctx context.Context, field graphql.CollectedField, obj *introspection.InputValue) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext___InputValue_deprecationReason(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.DeprecationReason(), nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext___InputValue_deprecationReason(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "__InputValue",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) ___Schema_description(ctx context.Context, field graphql.CollectedField, obj *introspection.Schema) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext___Schema_description(ctx, field)
 	if err != nil {
@@ -16216,7 +17586,7 @@ func (ec *executionContext) ___Schema_description(ctx context.Context, field gra
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Description(), nil
 	})
@@ -16257,7 +17627,7 @@ func (ec *executionContext) ___Schema_types(ctx context.Context, field graphql.C
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Types(), nil
 	})
@@ -16290,6 +17660,8 @@ func (ec *executionContext) fieldContext___Schema_types(_ context.Context, field
 				return ec.fieldContext___Type_name(ctx, field)
 			case "description":
 				return ec.fieldContext___Type_description(ctx, field)
+			case "specifiedByURL":
+				return ec.fieldContext___Type_specifiedByURL(ctx, field)
 			case "fields":
 				return ec.fieldContext___Type_fields(ctx, field)
 			case "interfaces":
@@ -16302,8 +17674,8 @@ func (ec *executionContext) fieldContext___Schema_types(_ context.Context, field
 				return ec.fieldContext___Type_inputFields(ctx, field)
 			case "ofType":
 				return ec.fieldContext___Type_ofType(ctx, field)
-			case "specifiedByURL":
-				return ec.fieldContext___Type_specifiedByURL(ctx, field)
+			case "isOneOf":
+				return ec.fieldContext___Type_isOneOf(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type __Type", field.Name)
 		},
@@ -16323,7 +17695,7 @@ func (ec *executionContext) ___Schema_queryType(ctx context.Context, field graph
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.QueryType(), nil
 	})
@@ -16356,6 +17728,8 @@ func (ec *executionContext) fieldContext___Schema_queryType(_ context.Context, f
 				return ec.fieldContext___Type_name(ctx, field)
 			case "description":
 				return ec.fieldContext___Type_description(ctx, field)
+			case "specifiedByURL":
+				return ec.fieldContext___Type_specifiedByURL(ctx, field)
 			case "fields":
 				return ec.fieldContext___Type_fields(ctx, field)
 			case "interfaces":
@@ -16368,8 +17742,8 @@ func (ec *executionContext) fieldContext___Schema_queryType(_ context.Context, f
 				return ec.fieldContext___Type_inputFields(ctx, field)
 			case "ofType":
 				return ec.fieldContext___Type_ofType(ctx, field)
-			case "specifiedByURL":
-				return ec.fieldContext___Type_specifiedByURL(ctx, field)
+			case "isOneOf":
+				return ec.fieldContext___Type_isOneOf(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type __Type", field.Name)
 		},
@@ -16389,7 +17763,7 @@ func (ec *executionContext) ___Schema_mutationType(ctx context.Context, field gr
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.MutationType(), nil
 	})
@@ -16419,6 +17793,8 @@ func (ec *executionContext) fieldContext___Schema_mutationType(_ context.Context
 				return ec.fieldContext___Type_name(ctx, field)
 			case "description":
 				return ec.fieldContext___Type_description(ctx, field)
+			case "specifiedByURL":
+				return ec.fieldContext___Type_specifiedByURL(ctx, field)
 			case "fields":
 				return ec.fieldContext___Type_fields(ctx, field)
 			case "interfaces":
@@ -16431,8 +17807,8 @@ func (ec *executionContext) fieldContext___Schema_mutationType(_ context.Context
 				return ec.fieldContext___Type_inputFields(ctx, field)
 			case "ofType":
 				return ec.fieldContext___Type_ofType(ctx, field)
-			case "specifiedByURL":
-				return ec.fieldContext___Type_specifiedByURL(ctx, field)
+			case "isOneOf":
+				return ec.fieldContext___Type_isOneOf(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type __Type", field.Name)
 		},
@@ -16452,7 +17828,7 @@ func (ec *executionContext) ___Schema_subscriptionType(ctx context.Context, fiel
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.SubscriptionType(), nil
 	})
@@ -16482,6 +17858,8 @@ func (ec *executionContext) fieldContext___Schema_subscriptionType(_ context.Con
 				return ec.fieldContext___Type_name(ctx, field)
 			case "description":
 				return ec.fieldContext___Type_description(ctx, field)
+			case "specifiedByURL":
+				return ec.fieldContext___Type_specifiedByURL(ctx, field)
 			case "fields":
 				return ec.fieldContext___Type_fields(ctx, field)
 			case "interfaces":
@@ -16494,8 +17872,8 @@ func (ec *executionContext) fieldContext___Schema_subscriptionType(_ context.Con
 				return ec.fieldContext___Type_inputFields(ctx, field)
 			case "ofType":
 				return ec.fieldContext___Type_ofType(ctx, field)
-			case "specifiedByURL":
-				return ec.fieldContext___Type_specifiedByURL(ctx, field)
+			case "isOneOf":
+				return ec.fieldContext___Type_isOneOf(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type __Type", field.Name)
 		},
@@ -16515,7 +17893,7 @@ func (ec *executionContext) ___Schema_directives(ctx context.Context, field grap
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Directives(), nil
 	})
@@ -16546,12 +17924,12 @@ func (ec *executionContext) fieldContext___Schema_directives(_ context.Context, 
 				return ec.fieldContext___Directive_name(ctx, field)
 			case "description":
 				return ec.fieldContext___Directive_description(ctx, field)
+			case "isRepeatable":
+				return ec.fieldContext___Directive_isRepeatable(ctx, field)
 			case "locations":
 				return ec.fieldContext___Directive_locations(ctx, field)
 			case "args":
 				return ec.fieldContext___Directive_args(ctx, field)
-			case "isRepeatable":
-				return ec.fieldContext___Directive_isRepeatable(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type __Directive", field.Name)
 		},
@@ -16571,7 +17949,7 @@ func (ec *executionContext) ___Type_kind(ctx context.Context, field graphql.Coll
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Kind(), nil
 	})
@@ -16615,7 +17993,7 @@ func (ec *executionContext) ___Type_name(ctx context.Context, field graphql.Coll
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Name(), nil
 	})
@@ -16656,7 +18034,7 @@ func (ec *executionContext) ___Type_description(ctx context.Context, field graph
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Description(), nil
 	})
@@ -16685,6 +18063,47 @@ func (ec *executionContext) fieldContext___Type_description(_ context.Context, f
 	return fc, nil
 }
 
+func (ec *executionContext) ___Type_specifiedByURL(ctx context.Context, field graphql.CollectedField, obj *introspection.Type) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext___Type_specifiedByURL(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SpecifiedByURL(), nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext___Type_specifiedByURL(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "__Type",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) ___Type_fields(ctx context.Context, field graphql.CollectedField, obj *introspection.Type) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext___Type_fields(ctx, field)
 	if err != nil {
@@ -16697,7 +18116,7 @@ func (ec *executionContext) ___Type_fields(ctx context.Context, field graphql.Co
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Fields(fc.Args["includeDeprecated"].(bool)), nil
 	})
@@ -16763,7 +18182,7 @@ func (ec *executionContext) ___Type_interfaces(ctx context.Context, field graphq
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.Interfaces(), nil
 	})
@@ -16793,6 +18212,8 @@ func (ec *executionContext) fieldContext___Type_interfaces(_ context.Context, fi
 				return ec.fieldContext___Type_name(ctx, field)
 			case "description":
 				return ec.fieldContext___Type_description(ctx, field)
+			case "specifiedByURL":
+				return ec.fieldContext___Type_specifiedByURL(ctx, field)
 			case "fields":
 				return ec.fieldContext___Type_fields(ctx, field)
 			case "interfaces":
@@ -16805,8 +18226,8 @@ func (ec *executionContext) fieldContext___Type_interfaces(_ context.Context, fi
 				return ec.fieldContext___Type_inputFields(ctx, field)
 			case "ofType":
 				return ec.fieldContext___Type_ofType(ctx, field)
-			case "specifiedByURL":
-				return ec.fieldContext___Type_specifiedByURL(ctx, field)
+			case "isOneOf":
+				return ec.fieldContext___Type_isOneOf(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type __Type", field.Name)
 		},
@@ -16826,7 +18247,7 @@ func (ec *executionContext) ___Type_possibleTypes(ctx context.Context, field gra
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.PossibleTypes(), nil
 	})
@@ -16856,6 +18277,8 @@ func (ec *executionContext) fieldContext___Type_possibleTypes(_ context.Context,
 				return ec.fieldContext___Type_name(ctx, field)
 			case "description":
 				return ec.fieldContext___Type_description(ctx, field)
+			case "specifiedByURL":
+				return ec.fieldContext___Type_specifiedByURL(ctx, field)
 			case "fields":
 				return ec.fieldContext___Type_fields(ctx, field)
 			case "interfaces":
@@ -16868,8 +18291,8 @@ func (ec *executionContext) fieldContext___Type_possibleTypes(_ context.Context,
 				return ec.fieldContext___Type_inputFields(ctx, field)
 			case "ofType":
 				return ec.fieldContext___Type_ofType(ctx, field)
-			case "specifiedByURL":
-				return ec.fieldContext___Type_specifiedByURL(ctx, field)
+			case "isOneOf":
+				return ec.fieldContext___Type_isOneOf(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type __Type", field.Name)
 		},
@@ -16889,7 +18312,7 @@ func (ec *executionContext) ___Type_enumValues(ctx context.Context, field graphq
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.EnumValues(fc.Args["includeDeprecated"].(bool)), nil
 	})
@@ -16951,7 +18374,7 @@ func (ec *executionContext) ___Type_inputFields(ctx context.Context, field graph
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.InputFields(), nil
 	})
@@ -16983,6 +18406,10 @@ func (ec *executionContext) fieldContext___Type_inputFields(_ context.Context, f
 				return ec.fieldContext___InputValue_type(ctx, field)
 			case "defaultValue":
 				return ec.fieldContext___InputValue_defaultValue(ctx, field)
+			case "isDeprecated":
+				return ec.fieldContext___InputValue_isDeprecated(ctx, field)
+			case "deprecationReason":
+				return ec.fieldContext___InputValue_deprecationReason(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type __InputValue", field.Name)
 		},
@@ -17002,7 +18429,7 @@ func (ec *executionContext) ___Type_ofType(ctx context.Context, field graphql.Co
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
 		return obj.OfType(), nil
 	})
@@ -17032,6 +18459,8 @@ func (ec *executionContext) fieldContext___Type_ofType(_ context.Context, field 
 				return ec.fieldContext___Type_name(ctx, field)
 			case "description":
 				return ec.fieldContext___Type_description(ctx, field)
+			case "specifiedByURL":
+				return ec.fieldContext___Type_specifiedByURL(ctx, field)
 			case "fields":
 				return ec.fieldContext___Type_fields(ctx, field)
 			case "interfaces":
@@ -17044,8 +18473,8 @@ func (ec *executionContext) fieldContext___Type_ofType(_ context.Context, field 
 				return ec.fieldContext___Type_inputFields(ctx, field)
 			case "ofType":
 				return ec.fieldContext___Type_ofType(ctx, field)
-			case "specifiedByURL":
-				return ec.fieldContext___Type_specifiedByURL(ctx, field)
+			case "isOneOf":
+				return ec.fieldContext___Type_isOneOf(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type __Type", field.Name)
 		},
@@ -17053,8 +18482,8 @@ func (ec *executionContext) fieldContext___Type_ofType(_ context.Context, field 
 	return fc, nil
 }
 
-func (ec *executionContext) ___Type_specifiedByURL(ctx context.Context, field graphql.CollectedField, obj *introspection.Type) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext___Type_specifiedByURL(ctx, field)
+func (ec *executionContext) ___Type_isOneOf(ctx context.Context, field graphql.CollectedField, obj *introspection.Type) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext___Type_isOneOf(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -17065,9 +18494,9 @@ func (ec *executionContext) ___Type_specifiedByURL(ctx context.Context, field gr
 			ret = graphql.Null
 		}
 	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.SpecifiedByURL(), nil
+		return obj.IsOneOf(), nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -17076,19 +18505,19 @@ func (ec *executionContext) ___Type_specifiedByURL(ctx context.Context, field gr
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*string)
+	res := resTmp.(bool)
 	fc.Result = res
-	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+	return ec.marshalOBoolean2bool(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext___Type_specifiedByURL(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext___Type_isOneOf(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "__Type",
 		Field:      field,
 		IsMethod:   true,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
+			return nil, errors.New("field of type Boolean does not have child fields")
 		},
 	}
 	return fc, nil
@@ -17098,10 +18527,10 @@ func (ec *executionContext) fieldContext___Type_specifiedByURL(_ context.Context
 
 // region    **************************** input.gotpl *****************************
 
-func (ec *executionContext) unmarshalInputAddContactInput(ctx context.Context, obj interface{}) (AddContactInput, error) {
+func (ec *executionContext) unmarshalInputAddContactInput(ctx context.Context, obj any) (AddContactInput, error) {
 	var it AddContactInput
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
 		asMap[k] = v
 	}
 
@@ -17132,10 +18561,10 @@ func (ec *executionContext) unmarshalInputAddContactInput(ctx context.Context, o
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputAddHouseInput(ctx context.Context, obj interface{}) (AddHouseInput, error) {
+func (ec *executionContext) unmarshalInputAddHouseInput(ctx context.Context, obj any) (AddHouseInput, error) {
 	var it AddHouseInput
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
 		asMap[k] = v
 	}
 
@@ -17173,10 +18602,10 @@ func (ec *executionContext) unmarshalInputAddHouseInput(ctx context.Context, obj
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputAddRoomInput(ctx context.Context, obj interface{}) (AddRoomInput, error) {
+func (ec *executionContext) unmarshalInputAddRoomInput(ctx context.Context, obj any) (AddRoomInput, error) {
 	var it AddRoomInput
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
 		asMap[k] = v
 	}
 
@@ -17214,10 +18643,10 @@ func (ec *executionContext) unmarshalInputAddRoomInput(ctx context.Context, obj 
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputChangeProjectDatesInput(ctx context.Context, obj interface{}) (ChangeProjectDatesInput, error) {
+func (ec *executionContext) unmarshalInputChangeProjectDatesInput(ctx context.Context, obj any) (ChangeProjectDatesInput, error) {
 	var it ChangeProjectDatesInput
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
 		asMap[k] = v
 	}
 
@@ -17248,10 +18677,10 @@ func (ec *executionContext) unmarshalInputChangeProjectDatesInput(ctx context.Co
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputContactDetailsInput(ctx context.Context, obj interface{}) (ContactDetailsInput, error) {
+func (ec *executionContext) unmarshalInputContactDetailsInput(ctx context.Context, obj any) (ContactDetailsInput, error) {
 	var it ContactDetailsInput
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
 		asMap[k] = v
 	}
 
@@ -17282,10 +18711,10 @@ func (ec *executionContext) unmarshalInputContactDetailsInput(ctx context.Contex
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputCreateAlbumSettingsInput(ctx context.Context, obj interface{}) (CreateAlbumSettingsInput, error) {
+func (ec *executionContext) unmarshalInputCreateAlbumSettingsInput(ctx context.Context, obj any) (CreateAlbumSettingsInput, error) {
 	var it CreateAlbumSettingsInput
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
 		asMap[k] = v
 	}
 
@@ -17316,10 +18745,10 @@ func (ec *executionContext) unmarshalInputCreateAlbumSettingsInput(ctx context.C
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputCreateProjectInput(ctx context.Context, obj interface{}) (CreateProjectInput, error) {
+func (ec *executionContext) unmarshalInputCreateProjectInput(ctx context.Context, obj any) (CreateProjectInput, error) {
 	var it CreateProjectInput
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
 		asMap[k] = v
 	}
 
@@ -17364,10 +18793,10 @@ func (ec *executionContext) unmarshalInputCreateProjectInput(ctx context.Context
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputProjectContactsFilter(ctx context.Context, obj interface{}) (ProjectContactsFilter, error) {
+func (ec *executionContext) unmarshalInputProjectContactsFilter(ctx context.Context, obj any) (ProjectContactsFilter, error) {
 	var it ProjectContactsFilter
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
 		asMap[k] = v
 	}
 
@@ -17391,10 +18820,10 @@ func (ec *executionContext) unmarshalInputProjectContactsFilter(ctx context.Cont
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputProjectFilesListFilter(ctx context.Context, obj interface{}) (ProjectFilesListFilter, error) {
+func (ec *executionContext) unmarshalInputProjectFilesListFilter(ctx context.Context, obj any) (ProjectFilesListFilter, error) {
 	var it ProjectFilesListFilter
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
 		asMap[k] = v
 	}
 
@@ -17418,10 +18847,10 @@ func (ec *executionContext) unmarshalInputProjectFilesListFilter(ctx context.Con
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputProjectHousesFilter(ctx context.Context, obj interface{}) (ProjectHousesFilter, error) {
+func (ec *executionContext) unmarshalInputProjectHousesFilter(ctx context.Context, obj any) (ProjectHousesFilter, error) {
 	var it ProjectHousesFilter
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
 		asMap[k] = v
 	}
 
@@ -17445,10 +18874,10 @@ func (ec *executionContext) unmarshalInputProjectHousesFilter(ctx context.Contex
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputProjectVisualizationRoomIdFilter(ctx context.Context, obj interface{}) (ProjectVisualizationRoomIDFilter, error) {
+func (ec *executionContext) unmarshalInputProjectVisualizationRoomIdFilter(ctx context.Context, obj any) (ProjectVisualizationRoomIDFilter, error) {
 	var it ProjectVisualizationRoomIDFilter
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
 		asMap[k] = v
 	}
 
@@ -17472,10 +18901,10 @@ func (ec *executionContext) unmarshalInputProjectVisualizationRoomIdFilter(ctx c
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputProjectVisualizationsListFilter(ctx context.Context, obj interface{}) (ProjectVisualizationsListFilter, error) {
+func (ec *executionContext) unmarshalInputProjectVisualizationsListFilter(ctx context.Context, obj any) (ProjectVisualizationsListFilter, error) {
 	var it ProjectVisualizationsListFilter
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
 		asMap[k] = v
 	}
 
@@ -17506,10 +18935,10 @@ func (ec *executionContext) unmarshalInputProjectVisualizationsListFilter(ctx co
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputProjectVisualizationsStatusFilter(ctx context.Context, obj interface{}) (ProjectVisualizationsStatusFilter, error) {
+func (ec *executionContext) unmarshalInputProjectVisualizationsStatusFilter(ctx context.Context, obj any) (ProjectVisualizationsStatusFilter, error) {
 	var it ProjectVisualizationsStatusFilter
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
 		asMap[k] = v
 	}
 
@@ -17533,10 +18962,10 @@ func (ec *executionContext) unmarshalInputProjectVisualizationsStatusFilter(ctx 
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputUpdateContactInput(ctx context.Context, obj interface{}) (UpdateContactInput, error) {
+func (ec *executionContext) unmarshalInputUpdateContactInput(ctx context.Context, obj any) (UpdateContactInput, error) {
 	var it UpdateContactInput
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
 		asMap[k] = v
 	}
 
@@ -17567,10 +18996,10 @@ func (ec *executionContext) unmarshalInputUpdateContactInput(ctx context.Context
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputUpdateHouseInput(ctx context.Context, obj interface{}) (UpdateHouseInput, error) {
+func (ec *executionContext) unmarshalInputUpdateHouseInput(ctx context.Context, obj any) (UpdateHouseInput, error) {
 	var it UpdateHouseInput
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
 		asMap[k] = v
 	}
 
@@ -17608,10 +19037,10 @@ func (ec *executionContext) unmarshalInputUpdateHouseInput(ctx context.Context, 
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputUpdateRoomInput(ctx context.Context, obj interface{}) (UpdateRoomInput, error) {
+func (ec *executionContext) unmarshalInputUpdateRoomInput(ctx context.Context, obj any) (UpdateRoomInput, error) {
 	var it UpdateRoomInput
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
 		asMap[k] = v
 	}
 
@@ -17649,10 +19078,10 @@ func (ec *executionContext) unmarshalInputUpdateRoomInput(ctx context.Context, o
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputUploadFileInput(ctx context.Context, obj interface{}) (UploadFileInput, error) {
+func (ec *executionContext) unmarshalInputUploadFileInput(ctx context.Context, obj any) (UploadFileInput, error) {
 	var it UploadFileInput
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
 		asMap[k] = v
 	}
 
@@ -17690,10 +19119,10 @@ func (ec *executionContext) unmarshalInputUploadFileInput(ctx context.Context, o
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputWorkspaceProjectsFilter(ctx context.Context, obj interface{}) (WorkspaceProjectsFilter, error) {
+func (ec *executionContext) unmarshalInputWorkspaceProjectsFilter(ctx context.Context, obj any) (WorkspaceProjectsFilter, error) {
 	var it WorkspaceProjectsFilter
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
 		asMap[k] = v
 	}
 
@@ -17717,10 +19146,10 @@ func (ec *executionContext) unmarshalInputWorkspaceProjectsFilter(ctx context.Co
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputWorkspaceUsersFilter(ctx context.Context, obj interface{}) (WorkspaceUsersFilter, error) {
+func (ec *executionContext) unmarshalInputWorkspaceUsersFilter(ctx context.Context, obj any) (WorkspaceUsersFilter, error) {
 	var it WorkspaceUsersFilter
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
 		asMap[k] = v
 	}
 
@@ -17752,13 +19181,13 @@ func (ec *executionContext) _AcceptInviteResult(ctx context.Context, sel ast.Sel
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
-	case AlreadyInWorkspace:
-		return ec._AlreadyInWorkspace(ctx, sel, &obj)
-	case *AlreadyInWorkspace:
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
 		if obj == nil {
 			return graphql.Null
 		}
-		return ec._AlreadyInWorkspace(ctx, sel, obj)
+		return ec._ServerError(ctx, sel, obj)
 	case InvalidToken:
 		return ec._InvalidToken(ctx, sel, &obj)
 	case *InvalidToken:
@@ -17773,13 +19202,13 @@ func (ec *executionContext) _AcceptInviteResult(ctx context.Context, sel ast.Sel
 			return graphql.Null
 		}
 		return ec._ExpiredToken(ctx, sel, obj)
-	case ServerError:
-		return ec._ServerError(ctx, sel, &obj)
-	case *ServerError:
+	case AlreadyInWorkspace:
+		return ec._AlreadyInWorkspace(ctx, sel, &obj)
+	case *AlreadyInWorkspace:
 		if obj == nil {
 			return graphql.Null
 		}
-		return ec._ServerError(ctx, sel, obj)
+		return ec._AlreadyInWorkspace(ctx, sel, obj)
 	case InviteAccepted:
 		return ec._InviteAccepted(ctx, sel, &obj)
 	case *InviteAccepted:
@@ -17796,13 +19225,6 @@ func (ec *executionContext) _AddContactResult(ctx context.Context, sel ast.Selec
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
-	case Forbidden:
-		return ec._Forbidden(ctx, sel, &obj)
-	case *Forbidden:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._Forbidden(ctx, sel, obj)
 	case ServerError:
 		return ec._ServerError(ctx, sel, &obj)
 	case *ServerError:
@@ -17810,6 +19232,13 @@ func (ec *executionContext) _AddContactResult(ctx context.Context, sel ast.Selec
 			return graphql.Null
 		}
 		return ec._ServerError(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
 	case ContactAdded:
 		return ec._ContactAdded(ctx, sel, &obj)
 	case *ContactAdded:
@@ -17826,6 +19255,13 @@ func (ec *executionContext) _AddHouseResult(ctx context.Context, sel ast.Selecti
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
 	case NotFound:
 		return ec._NotFound(ctx, sel, &obj)
 	case *NotFound:
@@ -17840,13 +19276,6 @@ func (ec *executionContext) _AddHouseResult(ctx context.Context, sel ast.Selecti
 			return graphql.Null
 		}
 		return ec._Forbidden(ctx, sel, obj)
-	case ServerError:
-		return ec._ServerError(ctx, sel, &obj)
-	case *ServerError:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._ServerError(ctx, sel, obj)
 	case HouseAdded:
 		return ec._HouseAdded(ctx, sel, &obj)
 	case *HouseAdded:
@@ -17893,13 +19322,6 @@ func (ec *executionContext) _AddVisualizationsToAlbumResult(ctx context.Context,
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
-	case Forbidden:
-		return ec._Forbidden(ctx, sel, &obj)
-	case *Forbidden:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._Forbidden(ctx, sel, obj)
 	case ServerError:
 		return ec._ServerError(ctx, sel, &obj)
 	case *ServerError:
@@ -17907,6 +19329,13 @@ func (ec *executionContext) _AddVisualizationsToAlbumResult(ctx context.Context,
 			return graphql.Null
 		}
 		return ec._ServerError(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
 	case VisualizationsAddedToAlbum:
 		return ec._VisualizationsAddedToAlbum(ctx, sel, &obj)
 	case *VisualizationsAddedToAlbum:
@@ -17923,6 +19352,13 @@ func (ec *executionContext) _AlbumCoverResult(ctx context.Context, sel ast.Selec
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
 	case NotFound:
 		return ec._NotFound(ctx, sel, &obj)
 	case *NotFound:
@@ -17937,13 +19373,6 @@ func (ec *executionContext) _AlbumCoverResult(ctx context.Context, sel ast.Selec
 			return graphql.Null
 		}
 		return ec._Forbidden(ctx, sel, obj)
-	case ServerError:
-		return ec._ServerError(ctx, sel, &obj)
-	case *ServerError:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._ServerError(ctx, sel, obj)
 	case File:
 		return ec._File(ctx, sel, &obj)
 	case *File:
@@ -17960,20 +19389,6 @@ func (ec *executionContext) _AlbumFileGenerated(ctx context.Context, sel ast.Sel
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
-	case Forbidden:
-		return ec._Forbidden(ctx, sel, &obj)
-	case *Forbidden:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._Forbidden(ctx, sel, obj)
-	case NotFound:
-		return ec._NotFound(ctx, sel, &obj)
-	case *NotFound:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._NotFound(ctx, sel, obj)
 	case Unknown:
 		return ec._Unknown(ctx, sel, &obj)
 	case *Unknown:
@@ -17988,6 +19403,20 @@ func (ec *executionContext) _AlbumFileGenerated(ctx context.Context, sel ast.Sel
 			return graphql.Null
 		}
 		return ec._ServerError(ctx, sel, obj)
+	case NotFound:
+		return ec._NotFound(ctx, sel, &obj)
+	case *NotFound:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._NotFound(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
 	case AlbumFile:
 		return ec._AlbumFile(ctx, sel, &obj)
 	case *AlbumFile:
@@ -18004,13 +19433,6 @@ func (ec *executionContext) _AlbumPage(ctx context.Context, sel ast.SelectionSet
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
-	case AlbumPageCover:
-		return ec._AlbumPageCover(ctx, sel, &obj)
-	case *AlbumPageCover:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._AlbumPageCover(ctx, sel, obj)
 	case AlbumPageVisualization:
 		return ec._AlbumPageVisualization(ctx, sel, &obj)
 	case *AlbumPageVisualization:
@@ -18018,6 +19440,13 @@ func (ec *executionContext) _AlbumPage(ctx context.Context, sel ast.SelectionSet
 			return graphql.Null
 		}
 		return ec._AlbumPageVisualization(ctx, sel, obj)
+	case AlbumPageCover:
+		return ec._AlbumPageCover(ctx, sel, &obj)
+	case *AlbumPageCover:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._AlbumPageCover(ctx, sel, obj)
 	default:
 		panic(fmt.Errorf("unexpected type %T", obj))
 	}
@@ -18027,20 +19456,6 @@ func (ec *executionContext) _AlbumPageCoverResult(ctx context.Context, sel ast.S
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
-	case Forbidden:
-		return ec._Forbidden(ctx, sel, &obj)
-	case *Forbidden:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._Forbidden(ctx, sel, obj)
-	case NotFound:
-		return ec._NotFound(ctx, sel, &obj)
-	case *NotFound:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._NotFound(ctx, sel, obj)
 	case ServerError:
 		return ec._ServerError(ctx, sel, &obj)
 	case *ServerError:
@@ -18048,13 +19463,20 @@ func (ec *executionContext) _AlbumPageCoverResult(ctx context.Context, sel ast.S
 			return graphql.Null
 		}
 		return ec._ServerError(ctx, sel, obj)
-	case Cover:
-		return ec._Cover(ctx, sel, &obj)
-	case *Cover:
+	case NotFound:
+		return ec._NotFound(ctx, sel, &obj)
+	case *NotFound:
 		if obj == nil {
 			return graphql.Null
 		}
-		return ec._Cover(ctx, sel, obj)
+		return ec._NotFound(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
 	case CoverUploaded:
 		return ec._CoverUploaded(ctx, sel, &obj)
 	case *CoverUploaded:
@@ -18062,6 +19484,13 @@ func (ec *executionContext) _AlbumPageCoverResult(ctx context.Context, sel ast.S
 			return graphql.Null
 		}
 		return ec._CoverUploaded(ctx, sel, obj)
+	case Cover:
+		return ec._Cover(ctx, sel, &obj)
+	case *Cover:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Cover(ctx, sel, obj)
 	default:
 		panic(fmt.Errorf("unexpected type %T", obj))
 	}
@@ -18071,13 +19500,6 @@ func (ec *executionContext) _AlbumPageSvgResult(ctx context.Context, sel ast.Sel
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
-	case NotFound:
-		return ec._NotFound(ctx, sel, &obj)
-	case *NotFound:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._NotFound(ctx, sel, obj)
 	case ServerError:
 		return ec._ServerError(ctx, sel, &obj)
 	case *ServerError:
@@ -18085,6 +19507,13 @@ func (ec *executionContext) _AlbumPageSvgResult(ctx context.Context, sel ast.Sel
 			return graphql.Null
 		}
 		return ec._ServerError(ctx, sel, obj)
+	case NotFound:
+		return ec._NotFound(ctx, sel, &obj)
+	case *NotFound:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._NotFound(ctx, sel, obj)
 	case SVG:
 		return ec._Svg(ctx, sel, &obj)
 	case *SVG:
@@ -18101,13 +19530,6 @@ func (ec *executionContext) _AlbumPageVisualizationResult(ctx context.Context, s
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
-	case NotFound:
-		return ec._NotFound(ctx, sel, &obj)
-	case *NotFound:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._NotFound(ctx, sel, obj)
 	case ServerError:
 		return ec._ServerError(ctx, sel, &obj)
 	case *ServerError:
@@ -18115,6 +19537,13 @@ func (ec *executionContext) _AlbumPageVisualizationResult(ctx context.Context, s
 			return graphql.Null
 		}
 		return ec._ServerError(ctx, sel, obj)
+	case NotFound:
+		return ec._NotFound(ctx, sel, &obj)
+	case *NotFound:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._NotFound(ctx, sel, obj)
 	case Visualization:
 		return ec._Visualization(ctx, sel, &obj)
 	case *Visualization:
@@ -18154,20 +19583,6 @@ func (ec *executionContext) _AlbumProjectResult(ctx context.Context, sel ast.Sel
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
-	case Forbidden:
-		return ec._Forbidden(ctx, sel, &obj)
-	case *Forbidden:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._Forbidden(ctx, sel, obj)
-	case NotFound:
-		return ec._NotFound(ctx, sel, &obj)
-	case *NotFound:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._NotFound(ctx, sel, obj)
 	case ServerError:
 		return ec._ServerError(ctx, sel, &obj)
 	case *ServerError:
@@ -18175,6 +19590,20 @@ func (ec *executionContext) _AlbumProjectResult(ctx context.Context, sel ast.Sel
 			return graphql.Null
 		}
 		return ec._ServerError(ctx, sel, obj)
+	case NotFound:
+		return ec._NotFound(ctx, sel, &obj)
+	case *NotFound:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._NotFound(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
 	case Project:
 		return ec._Project(ctx, sel, &obj)
 	case *Project:
@@ -18191,6 +19620,13 @@ func (ec *executionContext) _AlbumRecentFileResult(ctx context.Context, sel ast.
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
 	case NotFound:
 		return ec._NotFound(ctx, sel, &obj)
 	case *NotFound:
@@ -18205,13 +19641,6 @@ func (ec *executionContext) _AlbumRecentFileResult(ctx context.Context, sel ast.
 			return graphql.Null
 		}
 		return ec._Forbidden(ctx, sel, obj)
-	case ServerError:
-		return ec._ServerError(ctx, sel, &obj)
-	case *ServerError:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._ServerError(ctx, sel, obj)
 	case AlbumFile:
 		return ec._AlbumFile(ctx, sel, &obj)
 	case *AlbumFile:
@@ -18228,20 +19657,6 @@ func (ec *executionContext) _AlbumResult(ctx context.Context, sel ast.SelectionS
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
-	case Forbidden:
-		return ec._Forbidden(ctx, sel, &obj)
-	case *Forbidden:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._Forbidden(ctx, sel, obj)
-	case NotFound:
-		return ec._NotFound(ctx, sel, &obj)
-	case *NotFound:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._NotFound(ctx, sel, obj)
 	case ServerError:
 		return ec._ServerError(ctx, sel, &obj)
 	case *ServerError:
@@ -18249,6 +19664,20 @@ func (ec *executionContext) _AlbumResult(ctx context.Context, sel ast.SelectionS
 			return graphql.Null
 		}
 		return ec._ServerError(ctx, sel, obj)
+	case NotFound:
+		return ec._NotFound(ctx, sel, &obj)
+	case *NotFound:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._NotFound(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
 	case Album:
 		return ec._Album(ctx, sel, &obj)
 	case *Album:
@@ -18265,6 +19694,13 @@ func (ec *executionContext) _ChangeAlbumPageOrientationResult(ctx context.Contex
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
 	case NotFound:
 		return ec._NotFound(ctx, sel, &obj)
 	case *NotFound:
@@ -18279,13 +19715,6 @@ func (ec *executionContext) _ChangeAlbumPageOrientationResult(ctx context.Contex
 			return graphql.Null
 		}
 		return ec._Forbidden(ctx, sel, obj)
-	case ServerError:
-		return ec._ServerError(ctx, sel, &obj)
-	case *ServerError:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._ServerError(ctx, sel, obj)
 	case AlbumPageOrientationChanged:
 		return ec._AlbumPageOrientationChanged(ctx, sel, &obj)
 	case *AlbumPageOrientationChanged:
@@ -18302,6 +19731,13 @@ func (ec *executionContext) _ChangeAlbumPageSizeResult(ctx context.Context, sel 
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
 	case NotFound:
 		return ec._NotFound(ctx, sel, &obj)
 	case *NotFound:
@@ -18316,13 +19752,6 @@ func (ec *executionContext) _ChangeAlbumPageSizeResult(ctx context.Context, sel 
 			return graphql.Null
 		}
 		return ec._Forbidden(ctx, sel, obj)
-	case ServerError:
-		return ec._ServerError(ctx, sel, &obj)
-	case *ServerError:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._ServerError(ctx, sel, obj)
 	case AlbumPageSizeChanged:
 		return ec._AlbumPageSizeChanged(ctx, sel, &obj)
 	case *AlbumPageSizeChanged:
@@ -18339,6 +19768,13 @@ func (ec *executionContext) _ChangeProjectDatesResult(ctx context.Context, sel a
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
 	case NotFound:
 		return ec._NotFound(ctx, sel, &obj)
 	case *NotFound:
@@ -18353,13 +19789,6 @@ func (ec *executionContext) _ChangeProjectDatesResult(ctx context.Context, sel a
 			return graphql.Null
 		}
 		return ec._Forbidden(ctx, sel, obj)
-	case ServerError:
-		return ec._ServerError(ctx, sel, &obj)
-	case *ServerError:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._ServerError(ctx, sel, obj)
 	case ProjectDatesChanged:
 		return ec._ProjectDatesChanged(ctx, sel, &obj)
 	case *ProjectDatesChanged:
@@ -18376,6 +19805,13 @@ func (ec *executionContext) _ChangeProjectStatusResult(ctx context.Context, sel 
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
 	case NotFound:
 		return ec._NotFound(ctx, sel, &obj)
 	case *NotFound:
@@ -18390,13 +19826,6 @@ func (ec *executionContext) _ChangeProjectStatusResult(ctx context.Context, sel 
 			return graphql.Null
 		}
 		return ec._Forbidden(ctx, sel, obj)
-	case ServerError:
-		return ec._ServerError(ctx, sel, &obj)
-	case *ServerError:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._ServerError(ctx, sel, obj)
 	case ProjectStatusChanged:
 		return ec._ProjectStatusChanged(ctx, sel, &obj)
 	case *ProjectStatusChanged:
@@ -18413,6 +19842,13 @@ func (ec *executionContext) _ConfirmLoginLinkResult(ctx context.Context, sel ast
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
 	case InvalidToken:
 		return ec._InvalidToken(ctx, sel, &obj)
 	case *InvalidToken:
@@ -18427,13 +19863,6 @@ func (ec *executionContext) _ConfirmLoginLinkResult(ctx context.Context, sel ast
 			return graphql.Null
 		}
 		return ec._ExpiredToken(ctx, sel, obj)
-	case ServerError:
-		return ec._ServerError(ctx, sel, &obj)
-	case *ServerError:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._ServerError(ctx, sel, obj)
 	case LoginConfirmed:
 		return ec._LoginConfirmed(ctx, sel, &obj)
 	case *LoginConfirmed:
@@ -18450,27 +19879,6 @@ func (ec *executionContext) _ConfirmLoginPinResult(ctx context.Context, sel ast.
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
-	case InvalidPin:
-		return ec._InvalidPin(ctx, sel, &obj)
-	case *InvalidPin:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._InvalidPin(ctx, sel, obj)
-	case InvalidToken:
-		return ec._InvalidToken(ctx, sel, &obj)
-	case *InvalidToken:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._InvalidToken(ctx, sel, obj)
-	case ExpiredToken:
-		return ec._ExpiredToken(ctx, sel, &obj)
-	case *ExpiredToken:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._ExpiredToken(ctx, sel, obj)
 	case ServerError:
 		return ec._ServerError(ctx, sel, &obj)
 	case *ServerError:
@@ -18478,6 +19886,27 @@ func (ec *executionContext) _ConfirmLoginPinResult(ctx context.Context, sel ast.
 			return graphql.Null
 		}
 		return ec._ServerError(ctx, sel, obj)
+	case InvalidToken:
+		return ec._InvalidToken(ctx, sel, &obj)
+	case *InvalidToken:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._InvalidToken(ctx, sel, obj)
+	case InvalidPin:
+		return ec._InvalidPin(ctx, sel, &obj)
+	case *InvalidPin:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._InvalidPin(ctx, sel, obj)
+	case ExpiredToken:
+		return ec._ExpiredToken(ctx, sel, &obj)
+	case *ExpiredToken:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ExpiredToken(ctx, sel, obj)
 	case LoginConfirmed:
 		return ec._LoginConfirmed(ctx, sel, &obj)
 	case *LoginConfirmed:
@@ -18494,6 +19923,13 @@ func (ec *executionContext) _CoverFileResult(ctx context.Context, sel ast.Select
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
 	case NotFound:
 		return ec._NotFound(ctx, sel, &obj)
 	case *NotFound:
@@ -18508,13 +19944,6 @@ func (ec *executionContext) _CoverFileResult(ctx context.Context, sel ast.Select
 			return graphql.Null
 		}
 		return ec._Forbidden(ctx, sel, obj)
-	case ServerError:
-		return ec._ServerError(ctx, sel, &obj)
-	case *ServerError:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._ServerError(ctx, sel, obj)
 	case File:
 		return ec._File(ctx, sel, &obj)
 	case *File:
@@ -18531,13 +19960,6 @@ func (ec *executionContext) _CreateAlbumResult(ctx context.Context, sel ast.Sele
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
-	case Forbidden:
-		return ec._Forbidden(ctx, sel, &obj)
-	case *Forbidden:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._Forbidden(ctx, sel, obj)
 	case ServerError:
 		return ec._ServerError(ctx, sel, &obj)
 	case *ServerError:
@@ -18545,6 +19967,13 @@ func (ec *executionContext) _CreateAlbumResult(ctx context.Context, sel ast.Sele
 			return graphql.Null
 		}
 		return ec._ServerError(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
 	case AlbumCreated:
 		return ec._AlbumCreated(ctx, sel, &obj)
 	case *AlbumCreated:
@@ -18561,13 +19990,6 @@ func (ec *executionContext) _CreateProjectResult(ctx context.Context, sel ast.Se
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
-	case Forbidden:
-		return ec._Forbidden(ctx, sel, &obj)
-	case *Forbidden:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._Forbidden(ctx, sel, obj)
 	case ServerError:
 		return ec._ServerError(ctx, sel, &obj)
 	case *ServerError:
@@ -18575,6 +19997,13 @@ func (ec *executionContext) _CreateProjectResult(ctx context.Context, sel ast.Se
 			return graphql.Null
 		}
 		return ec._ServerError(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
 	case ProjectCreated:
 		return ec._ProjectCreated(ctx, sel, &obj)
 	case *ProjectCreated:
@@ -18591,20 +20020,6 @@ func (ec *executionContext) _DeleteAlbumPageResult(ctx context.Context, sel ast.
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
-	case Forbidden:
-		return ec._Forbidden(ctx, sel, &obj)
-	case *Forbidden:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._Forbidden(ctx, sel, obj)
-	case NotFound:
-		return ec._NotFound(ctx, sel, &obj)
-	case *NotFound:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._NotFound(ctx, sel, obj)
 	case ServerError:
 		return ec._ServerError(ctx, sel, &obj)
 	case *ServerError:
@@ -18612,6 +20027,20 @@ func (ec *executionContext) _DeleteAlbumPageResult(ctx context.Context, sel ast.
 			return graphql.Null
 		}
 		return ec._ServerError(ctx, sel, obj)
+	case NotFound:
+		return ec._NotFound(ctx, sel, &obj)
+	case *NotFound:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._NotFound(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
 	case AlbumPageDeleted:
 		return ec._AlbumPageDeleted(ctx, sel, &obj)
 	case *AlbumPageDeleted:
@@ -18628,20 +20057,6 @@ func (ec *executionContext) _DeleteAlbumResult(ctx context.Context, sel ast.Sele
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
-	case Forbidden:
-		return ec._Forbidden(ctx, sel, &obj)
-	case *Forbidden:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._Forbidden(ctx, sel, obj)
-	case NotFound:
-		return ec._NotFound(ctx, sel, &obj)
-	case *NotFound:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._NotFound(ctx, sel, obj)
 	case ServerError:
 		return ec._ServerError(ctx, sel, &obj)
 	case *ServerError:
@@ -18649,6 +20064,20 @@ func (ec *executionContext) _DeleteAlbumResult(ctx context.Context, sel ast.Sele
 			return graphql.Null
 		}
 		return ec._ServerError(ctx, sel, obj)
+	case NotFound:
+		return ec._NotFound(ctx, sel, &obj)
+	case *NotFound:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._NotFound(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
 	case AlbumDeleted:
 		return ec._AlbumDeleted(ctx, sel, &obj)
 	case *AlbumDeleted:
@@ -18665,20 +20094,6 @@ func (ec *executionContext) _DeleteContactResult(ctx context.Context, sel ast.Se
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
-	case Forbidden:
-		return ec._Forbidden(ctx, sel, &obj)
-	case *Forbidden:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._Forbidden(ctx, sel, obj)
-	case NotFound:
-		return ec._NotFound(ctx, sel, &obj)
-	case *NotFound:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._NotFound(ctx, sel, obj)
 	case ServerError:
 		return ec._ServerError(ctx, sel, &obj)
 	case *ServerError:
@@ -18686,6 +20101,20 @@ func (ec *executionContext) _DeleteContactResult(ctx context.Context, sel ast.Se
 			return graphql.Null
 		}
 		return ec._ServerError(ctx, sel, obj)
+	case NotFound:
+		return ec._NotFound(ctx, sel, &obj)
+	case *NotFound:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._NotFound(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
 	case ContactDeleted:
 		return ec._ContactDeleted(ctx, sel, &obj)
 	case *ContactDeleted:
@@ -18732,6 +20161,13 @@ func (ec *executionContext) _DeleteVisualizationsResult(ctx context.Context, sel
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
 	case NotFound:
 		return ec._NotFound(ctx, sel, &obj)
 	case *NotFound:
@@ -18746,13 +20182,6 @@ func (ec *executionContext) _DeleteVisualizationsResult(ctx context.Context, sel
 			return graphql.Null
 		}
 		return ec._Forbidden(ctx, sel, obj)
-	case ServerError:
-		return ec._ServerError(ctx, sel, &obj)
-	case *ServerError:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._ServerError(ctx, sel, obj)
 	case VisualizationsDeleted:
 		return ec._VisualizationsDeleted(ctx, sel, &obj)
 	case *VisualizationsDeleted:
@@ -18776,83 +20205,6 @@ func (ec *executionContext) _Error(ctx context.Context, sel ast.SelectionSet, ob
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
-	case InvalidToken:
-		return ec._InvalidToken(ctx, sel, &obj)
-	case *InvalidToken:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._InvalidToken(ctx, sel, obj)
-	case ExpiredToken:
-		return ec._ExpiredToken(ctx, sel, &obj)
-	case *ExpiredToken:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._ExpiredToken(ctx, sel, obj)
-	case InvalidPin:
-		return ec._InvalidPin(ctx, sel, &obj)
-	case *InvalidPin:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._InvalidPin(ctx, sel, obj)
-	case AlreadyInWorkspace:
-		return ec._AlreadyInWorkspace(ctx, sel, &obj)
-	case *AlreadyInWorkspace:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._AlreadyInWorkspace(ctx, sel, obj)
-	case InvalidEmail:
-		return ec._InvalidEmail(ctx, sel, &obj)
-	case *InvalidEmail:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._InvalidEmail(ctx, sel, obj)
-	case ProjectIsAlreadyNotPublic:
-		return ec._ProjectIsAlreadyNotPublic(ctx, sel, &obj)
-	case *ProjectIsAlreadyNotPublic:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._ProjectIsAlreadyNotPublic(ctx, sel, obj)
-	case ProjectIsAlreadyPublic:
-		return ec._ProjectIsAlreadyPublic(ctx, sel, &obj)
-	case *ProjectIsAlreadyPublic:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._ProjectIsAlreadyPublic(ctx, sel, obj)
-	case ServerError:
-		return ec._ServerError(ctx, sel, &obj)
-	case *ServerError:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._ServerError(ctx, sel, obj)
-	case Forbidden:
-		return ec._Forbidden(ctx, sel, &obj)
-	case *Forbidden:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._Forbidden(ctx, sel, obj)
-	case NotFound:
-		return ec._NotFound(ctx, sel, &obj)
-	case *NotFound:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._NotFound(ctx, sel, obj)
-	case AlreadyExists:
-		return ec._AlreadyExists(ctx, sel, &obj)
-	case *AlreadyExists:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._AlreadyExists(ctx, sel, obj)
 	case Unknown:
 		return ec._Unknown(ctx, sel, &obj)
 	case *Unknown:
@@ -18860,6 +20212,83 @@ func (ec *executionContext) _Error(ctx context.Context, sel ast.SelectionSet, ob
 			return graphql.Null
 		}
 		return ec._Unknown(ctx, sel, obj)
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
+	case ProjectIsAlreadyPublic:
+		return ec._ProjectIsAlreadyPublic(ctx, sel, &obj)
+	case *ProjectIsAlreadyPublic:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ProjectIsAlreadyPublic(ctx, sel, obj)
+	case ProjectIsAlreadyNotPublic:
+		return ec._ProjectIsAlreadyNotPublic(ctx, sel, &obj)
+	case *ProjectIsAlreadyNotPublic:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ProjectIsAlreadyNotPublic(ctx, sel, obj)
+	case NotFound:
+		return ec._NotFound(ctx, sel, &obj)
+	case *NotFound:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._NotFound(ctx, sel, obj)
+	case InvalidToken:
+		return ec._InvalidToken(ctx, sel, &obj)
+	case *InvalidToken:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._InvalidToken(ctx, sel, obj)
+	case InvalidPin:
+		return ec._InvalidPin(ctx, sel, &obj)
+	case *InvalidPin:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._InvalidPin(ctx, sel, obj)
+	case InvalidEmail:
+		return ec._InvalidEmail(ctx, sel, &obj)
+	case *InvalidEmail:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._InvalidEmail(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
+	case ExpiredToken:
+		return ec._ExpiredToken(ctx, sel, &obj)
+	case *ExpiredToken:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ExpiredToken(ctx, sel, obj)
+	case AlreadyInWorkspace:
+		return ec._AlreadyInWorkspace(ctx, sel, &obj)
+	case *AlreadyInWorkspace:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._AlreadyInWorkspace(ctx, sel, obj)
+	case AlreadyExists:
+		return ec._AlreadyExists(ctx, sel, &obj)
+	case *AlreadyExists:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._AlreadyExists(ctx, sel, obj)
 	default:
 		panic(fmt.Errorf("unexpected type %T", obj))
 	}
@@ -18869,20 +20298,6 @@ func (ec *executionContext) _GenerateAlbumFileResult(ctx context.Context, sel as
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
-	case Forbidden:
-		return ec._Forbidden(ctx, sel, &obj)
-	case *Forbidden:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._Forbidden(ctx, sel, obj)
-	case NotFound:
-		return ec._NotFound(ctx, sel, &obj)
-	case *NotFound:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._NotFound(ctx, sel, obj)
 	case ServerError:
 		return ec._ServerError(ctx, sel, &obj)
 	case *ServerError:
@@ -18890,6 +20305,20 @@ func (ec *executionContext) _GenerateAlbumFileResult(ctx context.Context, sel as
 			return graphql.Null
 		}
 		return ec._ServerError(ctx, sel, obj)
+	case NotFound:
+		return ec._NotFound(ctx, sel, &obj)
+	case *NotFound:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._NotFound(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
 	case AlbumFileGenerationStarted:
 		return ec._AlbumFileGenerationStarted(ctx, sel, &obj)
 	case *AlbumFileGenerationStarted:
@@ -18906,13 +20335,6 @@ func (ec *executionContext) _HouseRoomsListResult(ctx context.Context, sel ast.S
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
-	case Forbidden:
-		return ec._Forbidden(ctx, sel, &obj)
-	case *Forbidden:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._Forbidden(ctx, sel, obj)
 	case ServerError:
 		return ec._ServerError(ctx, sel, &obj)
 	case *ServerError:
@@ -18920,6 +20342,13 @@ func (ec *executionContext) _HouseRoomsListResult(ctx context.Context, sel ast.S
 			return graphql.Null
 		}
 		return ec._ServerError(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
 	case HouseRoomsList:
 		return ec._HouseRoomsList(ctx, sel, &obj)
 	case *HouseRoomsList:
@@ -18936,27 +20365,6 @@ func (ec *executionContext) _InviteUserToWorkspaceResult(ctx context.Context, se
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
-	case AlreadyInWorkspace:
-		return ec._AlreadyInWorkspace(ctx, sel, &obj)
-	case *AlreadyInWorkspace:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._AlreadyInWorkspace(ctx, sel, obj)
-	case Forbidden:
-		return ec._Forbidden(ctx, sel, &obj)
-	case *Forbidden:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._Forbidden(ctx, sel, obj)
-	case NotFound:
-		return ec._NotFound(ctx, sel, &obj)
-	case *NotFound:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._NotFound(ctx, sel, obj)
 	case ServerError:
 		return ec._ServerError(ctx, sel, &obj)
 	case *ServerError:
@@ -18964,6 +20372,27 @@ func (ec *executionContext) _InviteUserToWorkspaceResult(ctx context.Context, se
 			return graphql.Null
 		}
 		return ec._ServerError(ctx, sel, obj)
+	case NotFound:
+		return ec._NotFound(ctx, sel, &obj)
+	case *NotFound:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._NotFound(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
+	case AlreadyInWorkspace:
+		return ec._AlreadyInWorkspace(ctx, sel, &obj)
+	case *AlreadyInWorkspace:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._AlreadyInWorkspace(ctx, sel, obj)
 	case InviteSent:
 		return ec._InviteSent(ctx, sel, &obj)
 	case *InviteSent:
@@ -18980,13 +20409,6 @@ func (ec *executionContext) _LoginByEmailResult(ctx context.Context, sel ast.Sel
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
-	case InvalidEmail:
-		return ec._InvalidEmail(ctx, sel, &obj)
-	case *InvalidEmail:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._InvalidEmail(ctx, sel, obj)
 	case ServerError:
 		return ec._ServerError(ctx, sel, &obj)
 	case *ServerError:
@@ -18994,13 +20416,13 @@ func (ec *executionContext) _LoginByEmailResult(ctx context.Context, sel ast.Sel
 			return graphql.Null
 		}
 		return ec._ServerError(ctx, sel, obj)
-	case LinkSentByEmail:
-		return ec._LinkSentByEmail(ctx, sel, &obj)
-	case *LinkSentByEmail:
+	case InvalidEmail:
+		return ec._InvalidEmail(ctx, sel, &obj)
+	case *InvalidEmail:
 		if obj == nil {
 			return graphql.Null
 		}
-		return ec._LinkSentByEmail(ctx, sel, obj)
+		return ec._InvalidEmail(ctx, sel, obj)
 	case PinSentByEmail:
 		return ec._PinSentByEmail(ctx, sel, &obj)
 	case *PinSentByEmail:
@@ -19008,6 +20430,13 @@ func (ec *executionContext) _LoginByEmailResult(ctx context.Context, sel ast.Sel
 			return graphql.Null
 		}
 		return ec._PinSentByEmail(ctx, sel, obj)
+	case LinkSentByEmail:
+		return ec._LinkSentByEmail(ctx, sel, &obj)
+	case *LinkSentByEmail:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._LinkSentByEmail(ctx, sel, obj)
 	default:
 		panic(fmt.Errorf("unexpected type %T", obj))
 	}
@@ -19017,6 +20446,13 @@ func (ec *executionContext) _MakeProjectNotPublicResult(ctx context.Context, sel
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
 	case ProjectIsAlreadyNotPublic:
 		return ec._ProjectIsAlreadyNotPublic(ctx, sel, &obj)
 	case *ProjectIsAlreadyNotPublic:
@@ -19038,13 +20474,6 @@ func (ec *executionContext) _MakeProjectNotPublicResult(ctx context.Context, sel
 			return graphql.Null
 		}
 		return ec._Forbidden(ctx, sel, obj)
-	case ServerError:
-		return ec._ServerError(ctx, sel, &obj)
-	case *ServerError:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._ServerError(ctx, sel, obj)
 	case ProjectMadeNotPublic:
 		return ec._ProjectMadeNotPublic(ctx, sel, &obj)
 	case *ProjectMadeNotPublic:
@@ -19061,6 +20490,13 @@ func (ec *executionContext) _MakeProjectPublicResult(ctx context.Context, sel as
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
 	case ProjectIsAlreadyPublic:
 		return ec._ProjectIsAlreadyPublic(ctx, sel, &obj)
 	case *ProjectIsAlreadyPublic:
@@ -19082,13 +20518,6 @@ func (ec *executionContext) _MakeProjectPublicResult(ctx context.Context, sel as
 			return graphql.Null
 		}
 		return ec._Forbidden(ctx, sel, obj)
-	case ServerError:
-		return ec._ServerError(ctx, sel, &obj)
-	case *ServerError:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._ServerError(ctx, sel, obj)
 	case ProjectMadePublic:
 		return ec._ProjectMadePublic(ctx, sel, &obj)
 	case *ProjectMadePublic:
@@ -19105,6 +20534,13 @@ func (ec *executionContext) _MoveRoomToPositionResult(ctx context.Context, sel a
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
 	case NotFound:
 		return ec._NotFound(ctx, sel, &obj)
 	case *NotFound:
@@ -19119,13 +20555,6 @@ func (ec *executionContext) _MoveRoomToPositionResult(ctx context.Context, sel a
 			return graphql.Null
 		}
 		return ec._Forbidden(ctx, sel, obj)
-	case ServerError:
-		return ec._ServerError(ctx, sel, &obj)
-	case *ServerError:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._ServerError(ctx, sel, obj)
 	case RoomMovedToPosition:
 		return ec._RoomMovedToPosition(ctx, sel, &obj)
 	case *RoomMovedToPosition:
@@ -19142,13 +20571,6 @@ func (ec *executionContext) _ProjectAlbumsListResult(ctx context.Context, sel as
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
-	case Forbidden:
-		return ec._Forbidden(ctx, sel, &obj)
-	case *Forbidden:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._Forbidden(ctx, sel, obj)
 	case ServerError:
 		return ec._ServerError(ctx, sel, &obj)
 	case *ServerError:
@@ -19156,6 +20578,13 @@ func (ec *executionContext) _ProjectAlbumsListResult(ctx context.Context, sel as
 			return graphql.Null
 		}
 		return ec._ServerError(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
 	case ProjectAlbumsList:
 		return ec._ProjectAlbumsList(ctx, sel, &obj)
 	case *ProjectAlbumsList:
@@ -19172,13 +20601,6 @@ func (ec *executionContext) _ProjectAlbumsTotalResult(ctx context.Context, sel a
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
-	case Forbidden:
-		return ec._Forbidden(ctx, sel, &obj)
-	case *Forbidden:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._Forbidden(ctx, sel, obj)
 	case ServerError:
 		return ec._ServerError(ctx, sel, &obj)
 	case *ServerError:
@@ -19186,6 +20608,13 @@ func (ec *executionContext) _ProjectAlbumsTotalResult(ctx context.Context, sel a
 			return graphql.Null
 		}
 		return ec._ServerError(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
 	case ProjectAlbumsTotal:
 		return ec._ProjectAlbumsTotal(ctx, sel, &obj)
 	case *ProjectAlbumsTotal:
@@ -19202,13 +20631,6 @@ func (ec *executionContext) _ProjectContactsListResult(ctx context.Context, sel 
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
-	case Forbidden:
-		return ec._Forbidden(ctx, sel, &obj)
-	case *Forbidden:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._Forbidden(ctx, sel, obj)
 	case ServerError:
 		return ec._ServerError(ctx, sel, &obj)
 	case *ServerError:
@@ -19216,6 +20638,13 @@ func (ec *executionContext) _ProjectContactsListResult(ctx context.Context, sel 
 			return graphql.Null
 		}
 		return ec._ServerError(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
 	case ProjectContactsList:
 		return ec._ProjectContactsList(ctx, sel, &obj)
 	case *ProjectContactsList:
@@ -19232,13 +20661,6 @@ func (ec *executionContext) _ProjectContactsTotalResult(ctx context.Context, sel
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
-	case Forbidden:
-		return ec._Forbidden(ctx, sel, &obj)
-	case *Forbidden:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._Forbidden(ctx, sel, obj)
 	case ServerError:
 		return ec._ServerError(ctx, sel, &obj)
 	case *ServerError:
@@ -19246,6 +20668,13 @@ func (ec *executionContext) _ProjectContactsTotalResult(ctx context.Context, sel
 			return graphql.Null
 		}
 		return ec._ServerError(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
 	case ProjectContactsTotal:
 		return ec._ProjectContactsTotal(ctx, sel, &obj)
 	case *ProjectContactsTotal:
@@ -19262,13 +20691,6 @@ func (ec *executionContext) _ProjectFilesListResult(ctx context.Context, sel ast
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
-	case Forbidden:
-		return ec._Forbidden(ctx, sel, &obj)
-	case *Forbidden:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._Forbidden(ctx, sel, obj)
 	case ServerError:
 		return ec._ServerError(ctx, sel, &obj)
 	case *ServerError:
@@ -19276,6 +20698,13 @@ func (ec *executionContext) _ProjectFilesListResult(ctx context.Context, sel ast
 			return graphql.Null
 		}
 		return ec._ServerError(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
 	case ProjectFilesList:
 		return ec._ProjectFilesList(ctx, sel, &obj)
 	case *ProjectFilesList:
@@ -19292,13 +20721,6 @@ func (ec *executionContext) _ProjectFilesTotalResult(ctx context.Context, sel as
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
-	case Forbidden:
-		return ec._Forbidden(ctx, sel, &obj)
-	case *Forbidden:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._Forbidden(ctx, sel, obj)
 	case ServerError:
 		return ec._ServerError(ctx, sel, &obj)
 	case *ServerError:
@@ -19306,6 +20728,13 @@ func (ec *executionContext) _ProjectFilesTotalResult(ctx context.Context, sel as
 			return graphql.Null
 		}
 		return ec._ServerError(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
 	case ProjectFilesTotal:
 		return ec._ProjectFilesTotal(ctx, sel, &obj)
 	case *ProjectFilesTotal:
@@ -19322,13 +20751,6 @@ func (ec *executionContext) _ProjectHousesListResult(ctx context.Context, sel as
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
-	case Forbidden:
-		return ec._Forbidden(ctx, sel, &obj)
-	case *Forbidden:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._Forbidden(ctx, sel, obj)
 	case ServerError:
 		return ec._ServerError(ctx, sel, &obj)
 	case *ServerError:
@@ -19336,6 +20758,13 @@ func (ec *executionContext) _ProjectHousesListResult(ctx context.Context, sel as
 			return graphql.Null
 		}
 		return ec._ServerError(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
 	case ProjectHousesList:
 		return ec._ProjectHousesList(ctx, sel, &obj)
 	case *ProjectHousesList:
@@ -19352,13 +20781,6 @@ func (ec *executionContext) _ProjectHousesTotalResult(ctx context.Context, sel a
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
-	case Forbidden:
-		return ec._Forbidden(ctx, sel, &obj)
-	case *Forbidden:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._Forbidden(ctx, sel, obj)
 	case ServerError:
 		return ec._ServerError(ctx, sel, &obj)
 	case *ServerError:
@@ -19366,6 +20788,13 @@ func (ec *executionContext) _ProjectHousesTotalResult(ctx context.Context, sel a
 			return graphql.Null
 		}
 		return ec._ServerError(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
 	case ProjectHousesTotal:
 		return ec._ProjectHousesTotal(ctx, sel, &obj)
 	case *ProjectHousesTotal:
@@ -19382,13 +20811,6 @@ func (ec *executionContext) _ProjectPageResult(ctx context.Context, sel ast.Sele
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
-	case NotFound:
-		return ec._NotFound(ctx, sel, &obj)
-	case *NotFound:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._NotFound(ctx, sel, obj)
 	case ServerError:
 		return ec._ServerError(ctx, sel, &obj)
 	case *ServerError:
@@ -19396,6 +20818,13 @@ func (ec *executionContext) _ProjectPageResult(ctx context.Context, sel ast.Sele
 			return graphql.Null
 		}
 		return ec._ServerError(ctx, sel, obj)
+	case NotFound:
+		return ec._NotFound(ctx, sel, &obj)
+	case *NotFound:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._NotFound(ctx, sel, obj)
 	case ProjectPage:
 		return ec._ProjectPage(ctx, sel, &obj)
 	case *ProjectPage:
@@ -19412,6 +20841,13 @@ func (ec *executionContext) _ProjectResult(ctx context.Context, sel ast.Selectio
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
 	case NotFound:
 		return ec._NotFound(ctx, sel, &obj)
 	case *NotFound:
@@ -19426,13 +20862,6 @@ func (ec *executionContext) _ProjectResult(ctx context.Context, sel ast.Selectio
 			return graphql.Null
 		}
 		return ec._Forbidden(ctx, sel, obj)
-	case ServerError:
-		return ec._ServerError(ctx, sel, &obj)
-	case *ServerError:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._ServerError(ctx, sel, obj)
 	case Project:
 		return ec._Project(ctx, sel, &obj)
 	case *Project:
@@ -19449,13 +20878,6 @@ func (ec *executionContext) _ProjectVisualizationsListResult(ctx context.Context
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
-	case Forbidden:
-		return ec._Forbidden(ctx, sel, &obj)
-	case *Forbidden:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._Forbidden(ctx, sel, obj)
 	case ServerError:
 		return ec._ServerError(ctx, sel, &obj)
 	case *ServerError:
@@ -19463,6 +20885,13 @@ func (ec *executionContext) _ProjectVisualizationsListResult(ctx context.Context
 			return graphql.Null
 		}
 		return ec._ServerError(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
 	case ProjectVisualizationsList:
 		return ec._ProjectVisualizationsList(ctx, sel, &obj)
 	case *ProjectVisualizationsList:
@@ -19479,13 +20908,6 @@ func (ec *executionContext) _ProjectVisualizationsTotalResult(ctx context.Contex
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
-	case Forbidden:
-		return ec._Forbidden(ctx, sel, &obj)
-	case *Forbidden:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._Forbidden(ctx, sel, obj)
 	case ServerError:
 		return ec._ServerError(ctx, sel, &obj)
 	case *ServerError:
@@ -19493,6 +20915,13 @@ func (ec *executionContext) _ProjectVisualizationsTotalResult(ctx context.Contex
 			return graphql.Null
 		}
 		return ec._ServerError(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
 	case ProjectVisualizationsTotal:
 		return ec._ProjectVisualizationsTotal(ctx, sel, &obj)
 	case *ProjectVisualizationsTotal:
@@ -19509,6 +20938,13 @@ func (ec *executionContext) _UpdateContactResult(ctx context.Context, sel ast.Se
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
 	case NotFound:
 		return ec._NotFound(ctx, sel, &obj)
 	case *NotFound:
@@ -19523,13 +20959,6 @@ func (ec *executionContext) _UpdateContactResult(ctx context.Context, sel ast.Se
 			return graphql.Null
 		}
 		return ec._Forbidden(ctx, sel, obj)
-	case ServerError:
-		return ec._ServerError(ctx, sel, &obj)
-	case *ServerError:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._ServerError(ctx, sel, obj)
 	case ContactUpdated:
 		return ec._ContactUpdated(ctx, sel, &obj)
 	case *ContactUpdated:
@@ -19546,6 +20975,13 @@ func (ec *executionContext) _UpdateHouseResult(ctx context.Context, sel ast.Sele
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
 	case NotFound:
 		return ec._NotFound(ctx, sel, &obj)
 	case *NotFound:
@@ -19560,13 +20996,6 @@ func (ec *executionContext) _UpdateHouseResult(ctx context.Context, sel ast.Sele
 			return graphql.Null
 		}
 		return ec._Forbidden(ctx, sel, obj)
-	case ServerError:
-		return ec._ServerError(ctx, sel, &obj)
-	case *ServerError:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._ServerError(ctx, sel, obj)
 	case HouseUpdated:
 		return ec._HouseUpdated(ctx, sel, &obj)
 	case *HouseUpdated:
@@ -19613,13 +21042,6 @@ func (ec *executionContext) _UploadAlbumCoverResult(ctx context.Context, sel ast
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
-	case Forbidden:
-		return ec._Forbidden(ctx, sel, &obj)
-	case *Forbidden:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._Forbidden(ctx, sel, obj)
 	case ServerError:
 		return ec._ServerError(ctx, sel, &obj)
 	case *ServerError:
@@ -19627,6 +21049,13 @@ func (ec *executionContext) _UploadAlbumCoverResult(ctx context.Context, sel ast
 			return graphql.Null
 		}
 		return ec._ServerError(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
 	case AlbumCoverUploaded:
 		return ec._AlbumCoverUploaded(ctx, sel, &obj)
 	case *AlbumCoverUploaded:
@@ -19643,6 +21072,13 @@ func (ec *executionContext) _UploadFileResult(ctx context.Context, sel ast.Selec
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
 	case Forbidden:
 		return ec._Forbidden(ctx, sel, &obj)
 	case *Forbidden:
@@ -19657,13 +21093,6 @@ func (ec *executionContext) _UploadFileResult(ctx context.Context, sel ast.Selec
 			return graphql.Null
 		}
 		return ec._AlreadyExists(ctx, sel, obj)
-	case ServerError:
-		return ec._ServerError(ctx, sel, &obj)
-	case *ServerError:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._ServerError(ctx, sel, obj)
 	case FileUploaded:
 		return ec._FileUploaded(ctx, sel, &obj)
 	case *FileUploaded:
@@ -19680,13 +21109,6 @@ func (ec *executionContext) _UploadVisualizationResult(ctx context.Context, sel 
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
-	case Forbidden:
-		return ec._Forbidden(ctx, sel, &obj)
-	case *Forbidden:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._Forbidden(ctx, sel, obj)
 	case ServerError:
 		return ec._ServerError(ctx, sel, &obj)
 	case *ServerError:
@@ -19694,6 +21116,13 @@ func (ec *executionContext) _UploadVisualizationResult(ctx context.Context, sel 
 			return graphql.Null
 		}
 		return ec._ServerError(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
 	case VisualizationUploaded:
 		return ec._VisualizationUploaded(ctx, sel, &obj)
 	case *VisualizationUploaded:
@@ -19710,13 +21139,6 @@ func (ec *executionContext) _UploadVisualizationsResult(ctx context.Context, sel
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
-	case Forbidden:
-		return ec._Forbidden(ctx, sel, &obj)
-	case *Forbidden:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._Forbidden(ctx, sel, obj)
 	case ServerError:
 		return ec._ServerError(ctx, sel, &obj)
 	case *ServerError:
@@ -19724,6 +21146,13 @@ func (ec *executionContext) _UploadVisualizationsResult(ctx context.Context, sel
 			return graphql.Null
 		}
 		return ec._ServerError(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
 	case VisualizationsUploaded:
 		return ec._VisualizationsUploaded(ctx, sel, &obj)
 	case *VisualizationsUploaded:
@@ -19747,13 +21176,6 @@ func (ec *executionContext) _UserProfileResult(ctx context.Context, sel ast.Sele
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
-	case Forbidden:
-		return ec._Forbidden(ctx, sel, &obj)
-	case *Forbidden:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._Forbidden(ctx, sel, obj)
 	case ServerError:
 		return ec._ServerError(ctx, sel, &obj)
 	case *ServerError:
@@ -19761,6 +21183,13 @@ func (ec *executionContext) _UserProfileResult(ctx context.Context, sel ast.Sele
 			return graphql.Null
 		}
 		return ec._ServerError(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
 	case UserProfile:
 		return ec._UserProfile(ctx, sel, &obj)
 	case *UserProfile:
@@ -19777,13 +21206,6 @@ func (ec *executionContext) _WorkspaceProjectsListResult(ctx context.Context, se
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
-	case Forbidden:
-		return ec._Forbidden(ctx, sel, &obj)
-	case *Forbidden:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._Forbidden(ctx, sel, obj)
 	case ServerError:
 		return ec._ServerError(ctx, sel, &obj)
 	case *ServerError:
@@ -19791,6 +21213,13 @@ func (ec *executionContext) _WorkspaceProjectsListResult(ctx context.Context, se
 			return graphql.Null
 		}
 		return ec._ServerError(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
 	case WorkspaceProjectsList:
 		return ec._WorkspaceProjectsList(ctx, sel, &obj)
 	case *WorkspaceProjectsList:
@@ -19807,13 +21236,6 @@ func (ec *executionContext) _WorkspaceProjectsTotalResult(ctx context.Context, s
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
-	case Forbidden:
-		return ec._Forbidden(ctx, sel, &obj)
-	case *Forbidden:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._Forbidden(ctx, sel, obj)
 	case ServerError:
 		return ec._ServerError(ctx, sel, &obj)
 	case *ServerError:
@@ -19821,6 +21243,13 @@ func (ec *executionContext) _WorkspaceProjectsTotalResult(ctx context.Context, s
 			return graphql.Null
 		}
 		return ec._ServerError(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
 	case WorkspaceProjectsTotal:
 		return ec._WorkspaceProjectsTotal(ctx, sel, &obj)
 	case *WorkspaceProjectsTotal:
@@ -19837,6 +21266,13 @@ func (ec *executionContext) _WorkspaceResult(ctx context.Context, sel ast.Select
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
 	case NotFound:
 		return ec._NotFound(ctx, sel, &obj)
 	case *NotFound:
@@ -19851,13 +21287,6 @@ func (ec *executionContext) _WorkspaceResult(ctx context.Context, sel ast.Select
 			return graphql.Null
 		}
 		return ec._Forbidden(ctx, sel, obj)
-	case ServerError:
-		return ec._ServerError(ctx, sel, &obj)
-	case *ServerError:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._ServerError(ctx, sel, obj)
 	case Workspace:
 		return ec._Workspace(ctx, sel, &obj)
 	case *Workspace:
@@ -19874,13 +21303,6 @@ func (ec *executionContext) _WorkspaceUsersListResult(ctx context.Context, sel a
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
-	case Forbidden:
-		return ec._Forbidden(ctx, sel, &obj)
-	case *Forbidden:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._Forbidden(ctx, sel, obj)
 	case ServerError:
 		return ec._ServerError(ctx, sel, &obj)
 	case *ServerError:
@@ -19888,6 +21310,13 @@ func (ec *executionContext) _WorkspaceUsersListResult(ctx context.Context, sel a
 			return graphql.Null
 		}
 		return ec._ServerError(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
 	case WorkspaceUsersList:
 		return ec._WorkspaceUsersList(ctx, sel, &obj)
 	case *WorkspaceUsersList:
@@ -19904,13 +21333,6 @@ func (ec *executionContext) _WorkspaceUsersTotalResult(ctx context.Context, sel 
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
-	case Forbidden:
-		return ec._Forbidden(ctx, sel, &obj)
-	case *Forbidden:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._Forbidden(ctx, sel, obj)
 	case ServerError:
 		return ec._ServerError(ctx, sel, &obj)
 	case *ServerError:
@@ -19918,6 +21340,13 @@ func (ec *executionContext) _WorkspaceUsersTotalResult(ctx context.Context, sel 
 			return graphql.Null
 		}
 		return ec._ServerError(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
 	case WorkspaceUsersTotal:
 		return ec._WorkspaceUsersTotal(ctx, sel, &obj)
 	case *WorkspaceUsersTotal:
@@ -25825,6 +27254,11 @@ func (ec *executionContext) ___Directive(ctx context.Context, sel ast.SelectionS
 			}
 		case "description":
 			out.Values[i] = ec.___Directive_description(ctx, field, obj)
+		case "isRepeatable":
+			out.Values[i] = ec.___Directive_isRepeatable(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "locations":
 			out.Values[i] = ec.___Directive_locations(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -25832,11 +27266,6 @@ func (ec *executionContext) ___Directive(ctx context.Context, sel ast.SelectionS
 			}
 		case "args":
 			out.Values[i] = ec.___Directive_args(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "isRepeatable":
-			out.Values[i] = ec.___Directive_isRepeatable(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -25994,6 +27423,13 @@ func (ec *executionContext) ___InputValue(ctx context.Context, sel ast.Selection
 			}
 		case "defaultValue":
 			out.Values[i] = ec.___InputValue_defaultValue(ctx, field, obj)
+		case "isDeprecated":
+			out.Values[i] = ec.___InputValue_isDeprecated(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deprecationReason":
+			out.Values[i] = ec.___InputValue_deprecationReason(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -26092,6 +27528,8 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 			out.Values[i] = ec.___Type_name(ctx, field, obj)
 		case "description":
 			out.Values[i] = ec.___Type_description(ctx, field, obj)
+		case "specifiedByURL":
+			out.Values[i] = ec.___Type_specifiedByURL(ctx, field, obj)
 		case "fields":
 			out.Values[i] = ec.___Type_fields(ctx, field, obj)
 		case "interfaces":
@@ -26104,8 +27542,8 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 			out.Values[i] = ec.___Type_inputFields(ctx, field, obj)
 		case "ofType":
 			out.Values[i] = ec.___Type_ofType(ctx, field, obj)
-		case "specifiedByURL":
-			out.Values[i] = ec.___Type_specifiedByURL(ctx, field, obj)
+		case "isOneOf":
+			out.Values[i] = ec.___Type_isOneOf(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -26143,7 +27581,7 @@ func (ec *executionContext) marshalNAcceptInviteResult2githubᚗcomᚋapartomat�
 	return ec._AcceptInviteResult(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNAddContactInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAddContactInput(ctx context.Context, v interface{}) (AddContactInput, error) {
+func (ec *executionContext) unmarshalNAddContactInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAddContactInput(ctx context.Context, v any) (AddContactInput, error) {
 	res, err := ec.unmarshalInputAddContactInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -26158,7 +27596,7 @@ func (ec *executionContext) marshalNAddContactResult2githubᚗcomᚋapartomatᚋ
 	return ec._AddContactResult(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNAddHouseInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAddHouseInput(ctx context.Context, v interface{}) (AddHouseInput, error) {
+func (ec *executionContext) unmarshalNAddHouseInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAddHouseInput(ctx context.Context, v any) (AddHouseInput, error) {
 	res, err := ec.unmarshalInputAddHouseInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -26173,7 +27611,7 @@ func (ec *executionContext) marshalNAddHouseResult2githubᚗcomᚋapartomatᚋap
 	return ec._AddHouseResult(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNAddRoomInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAddRoomInput(ctx context.Context, v interface{}) (AddRoomInput, error) {
+func (ec *executionContext) unmarshalNAddRoomInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAddRoomInput(ctx context.Context, v any) (AddRoomInput, error) {
 	res, err := ec.unmarshalInputAddRoomInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -26282,7 +27720,7 @@ func (ec *executionContext) marshalNAlbumFileGenerated2githubᚗcomᚋapartomat�
 	return ec._AlbumFileGenerated(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNAlbumFileStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAlbumFileStatus(ctx context.Context, v interface{}) (AlbumFileStatus, error) {
+func (ec *executionContext) unmarshalNAlbumFileStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAlbumFileStatus(ctx context.Context, v any) (AlbumFileStatus, error) {
 	var res AlbumFileStatus
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -26470,12 +27908,13 @@ func (ec *executionContext) marshalNAlbumSettings2ᚖgithubᚗcomᚋapartomatᚋ
 	return ec._AlbumSettings(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
+func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v any) (bool, error) {
 	res, err := graphql.UnmarshalBoolean(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.SelectionSet, v bool) graphql.Marshaler {
+	_ = sel
 	res := graphql.MarshalBoolean(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -26505,7 +27944,7 @@ func (ec *executionContext) marshalNChangeAlbumPageSizeResult2githubᚗcomᚋapa
 	return ec._ChangeAlbumPageSizeResult(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNChangeProjectDatesInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐChangeProjectDatesInput(ctx context.Context, v interface{}) (ChangeProjectDatesInput, error) {
+func (ec *executionContext) unmarshalNChangeProjectDatesInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐChangeProjectDatesInput(ctx context.Context, v any) (ChangeProjectDatesInput, error) {
 	res, err := ec.unmarshalInputChangeProjectDatesInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -26658,11 +28097,9 @@ func (ec *executionContext) marshalNContactDetails2ᚖgithubᚗcomᚋapartomat�
 	return ec._ContactDetails(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNContactDetailsInput2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐContactDetailsInputᚄ(ctx context.Context, v interface{}) ([]*ContactDetailsInput, error) {
-	var vSlice []interface{}
-	if v != nil {
-		vSlice = graphql.CoerceList(v)
-	}
+func (ec *executionContext) unmarshalNContactDetailsInput2ᚕᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐContactDetailsInputᚄ(ctx context.Context, v any) ([]*ContactDetailsInput, error) {
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
 	var err error
 	res := make([]*ContactDetailsInput, len(vSlice))
 	for i := range vSlice {
@@ -26675,12 +28112,12 @@ func (ec *executionContext) unmarshalNContactDetailsInput2ᚕᚖgithubᚗcomᚋa
 	return res, nil
 }
 
-func (ec *executionContext) unmarshalNContactDetailsInput2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐContactDetailsInput(ctx context.Context, v interface{}) (*ContactDetailsInput, error) {
+func (ec *executionContext) unmarshalNContactDetailsInput2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐContactDetailsInput(ctx context.Context, v any) (*ContactDetailsInput, error) {
 	res, err := ec.unmarshalInputContactDetailsInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNContactType2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐContactType(ctx context.Context, v interface{}) (ContactType, error) {
+func (ec *executionContext) unmarshalNContactType2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐContactType(ctx context.Context, v any) (ContactType, error) {
 	var res ContactType
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -26720,12 +28157,12 @@ func (ec *executionContext) marshalNCreateAlbumResult2githubᚗcomᚋapartomat�
 	return ec._CreateAlbumResult(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNCreateAlbumSettingsInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐCreateAlbumSettingsInput(ctx context.Context, v interface{}) (CreateAlbumSettingsInput, error) {
+func (ec *executionContext) unmarshalNCreateAlbumSettingsInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐCreateAlbumSettingsInput(ctx context.Context, v any) (CreateAlbumSettingsInput, error) {
 	res, err := ec.unmarshalInputCreateAlbumSettingsInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNCreateProjectInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐCreateProjectInput(ctx context.Context, v interface{}) (CreateProjectInput, error) {
+func (ec *executionContext) unmarshalNCreateProjectInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐCreateProjectInput(ctx context.Context, v any) (CreateProjectInput, error) {
 	res, err := ec.unmarshalInputCreateProjectInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -26848,7 +28285,7 @@ func (ec *executionContext) marshalNFile2ᚖgithubᚗcomᚋapartomatᚋapartomat
 	return ec._File(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNFileType2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐFileType(ctx context.Context, v interface{}) (FileType, error) {
+func (ec *executionContext) unmarshalNFileType2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐFileType(ctx context.Context, v any) (FileType, error) {
 	var res FileType
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -26858,12 +28295,13 @@ func (ec *executionContext) marshalNFileType2githubᚗcomᚋapartomatᚋapartoma
 	return v
 }
 
-func (ec *executionContext) unmarshalNFloat2float64(ctx context.Context, v interface{}) (float64, error) {
+func (ec *executionContext) unmarshalNFloat2float64(ctx context.Context, v any) (float64, error) {
 	res, err := graphql.UnmarshalFloatContext(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNFloat2float64(ctx context.Context, sel ast.SelectionSet, v float64) graphql.Marshaler {
+	_ = sel
 	res := graphql.MarshalFloatContext(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -26971,12 +28409,13 @@ func (ec *executionContext) marshalNId2ᚖgithubᚗcomᚋapartomatᚋapartomat�
 	return ec._Id(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}) (int, error) {
+func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v any) (int, error) {
 	res, err := graphql.UnmarshalInt(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.SelectionSet, v int) graphql.Marshaler {
+	_ = sel
 	res := graphql.MarshalInt(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -27036,7 +28475,7 @@ func (ec *executionContext) marshalNMoveRoomToPositionResult2githubᚗcomᚋapar
 	return ec._MoveRoomToPositionResult(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNPageOrientation2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐPageOrientation(ctx context.Context, v interface{}) (PageOrientation, error) {
+func (ec *executionContext) unmarshalNPageOrientation2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐPageOrientation(ctx context.Context, v any) (PageOrientation, error) {
 	var res PageOrientation
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -27046,7 +28485,7 @@ func (ec *executionContext) marshalNPageOrientation2githubᚗcomᚋapartomatᚋa
 	return v
 }
 
-func (ec *executionContext) unmarshalNPageSize2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐPageSize(ctx context.Context, v interface{}) (PageSize, error) {
+func (ec *executionContext) unmarshalNPageSize2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐPageSize(ctx context.Context, v any) (PageSize, error) {
 	var res PageSize
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -27158,7 +28597,7 @@ func (ec *executionContext) marshalNProjectContacts2ᚖgithubᚗcomᚋapartomat�
 	return ec._ProjectContacts(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNProjectContactsFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectContactsFilter(ctx context.Context, v interface{}) (ProjectContactsFilter, error) {
+func (ec *executionContext) unmarshalNProjectContactsFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectContactsFilter(ctx context.Context, v any) (ProjectContactsFilter, error) {
 	res, err := ec.unmarshalInputProjectContactsFilter(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -27197,7 +28636,7 @@ func (ec *executionContext) marshalNProjectFiles2ᚖgithubᚗcomᚋapartomatᚋa
 	return ec._ProjectFiles(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNProjectFilesListFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectFilesListFilter(ctx context.Context, v interface{}) (ProjectFilesListFilter, error) {
+func (ec *executionContext) unmarshalNProjectFilesListFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectFilesListFilter(ctx context.Context, v any) (ProjectFilesListFilter, error) {
 	res, err := ec.unmarshalInputProjectFilesListFilter(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -27236,7 +28675,7 @@ func (ec *executionContext) marshalNProjectHouses2ᚖgithubᚗcomᚋapartomatᚋ
 	return ec._ProjectHouses(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNProjectHousesFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectHousesFilter(ctx context.Context, v interface{}) (ProjectHousesFilter, error) {
+func (ec *executionContext) unmarshalNProjectHousesFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectHousesFilter(ctx context.Context, v any) (ProjectHousesFilter, error) {
 	res, err := ec.unmarshalInputProjectHousesFilter(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -27291,7 +28730,7 @@ func (ec *executionContext) marshalNProjectPageSettings2ᚖgithubᚗcomᚋaparto
 	return ec._ProjectPageSettings(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNProjectPageStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectPageStatus(ctx context.Context, v interface{}) (ProjectPageStatus, error) {
+func (ec *executionContext) unmarshalNProjectPageStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectPageStatus(ctx context.Context, v any) (ProjectPageStatus, error) {
 	var res ProjectPageStatus
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -27311,7 +28750,7 @@ func (ec *executionContext) marshalNProjectResult2githubᚗcomᚋapartomatᚋapa
 	return ec._ProjectResult(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNProjectStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectStatus(ctx context.Context, v interface{}) (ProjectStatus, error) {
+func (ec *executionContext) unmarshalNProjectStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectStatus(ctx context.Context, v any) (ProjectStatus, error) {
 	var res ProjectStatus
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -27403,7 +28842,7 @@ func (ec *executionContext) marshalNProjectVisualizations2ᚖgithubᚗcomᚋapar
 	return ec._ProjectVisualizations(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNProjectVisualizationsListFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectVisualizationsListFilter(ctx context.Context, v interface{}) (ProjectVisualizationsListFilter, error) {
+func (ec *executionContext) unmarshalNProjectVisualizationsListFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectVisualizationsListFilter(ctx context.Context, v any) (ProjectVisualizationsListFilter, error) {
 	res, err := ec.unmarshalInputProjectVisualizationsListFilter(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -27482,12 +28921,13 @@ func (ec *executionContext) marshalNRoom2ᚖgithubᚗcomᚋapartomatᚋapartomat
 	return ec._Room(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
+func (ec *executionContext) unmarshalNString2string(ctx context.Context, v any) (string, error) {
 	res, err := graphql.UnmarshalString(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
+	_ = sel
 	res := graphql.MarshalString(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -27497,11 +28937,9 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 	return res
 }
 
-func (ec *executionContext) unmarshalNString2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
-	var vSlice []interface{}
-	if v != nil {
-		vSlice = graphql.CoerceList(v)
-	}
+func (ec *executionContext) unmarshalNString2ᚕstringᚄ(ctx context.Context, v any) ([]string, error) {
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
 	var err error
 	res := make([]string, len(vSlice))
 	for i := range vSlice {
@@ -27529,12 +28967,13 @@ func (ec *executionContext) marshalNString2ᚕstringᚄ(ctx context.Context, sel
 	return ret
 }
 
-func (ec *executionContext) unmarshalNTime2timeᚐTime(ctx context.Context, v interface{}) (time.Time, error) {
+func (ec *executionContext) unmarshalNTime2timeᚐTime(ctx context.Context, v any) (time.Time, error) {
 	res, err := graphql.UnmarshalTime(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNTime2timeᚐTime(ctx context.Context, sel ast.SelectionSet, v time.Time) graphql.Marshaler {
+	_ = sel
 	res := graphql.MarshalTime(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -27544,7 +28983,7 @@ func (ec *executionContext) marshalNTime2timeᚐTime(ctx context.Context, sel as
 	return res
 }
 
-func (ec *executionContext) unmarshalNUpdateContactInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐUpdateContactInput(ctx context.Context, v interface{}) (UpdateContactInput, error) {
+func (ec *executionContext) unmarshalNUpdateContactInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐUpdateContactInput(ctx context.Context, v any) (UpdateContactInput, error) {
 	res, err := ec.unmarshalInputUpdateContactInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -27559,7 +28998,7 @@ func (ec *executionContext) marshalNUpdateContactResult2githubᚗcomᚋapartomat
 	return ec._UpdateContactResult(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNUpdateHouseInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐUpdateHouseInput(ctx context.Context, v interface{}) (UpdateHouseInput, error) {
+func (ec *executionContext) unmarshalNUpdateHouseInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐUpdateHouseInput(ctx context.Context, v any) (UpdateHouseInput, error) {
 	res, err := ec.unmarshalInputUpdateHouseInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -27574,7 +29013,7 @@ func (ec *executionContext) marshalNUpdateHouseResult2githubᚗcomᚋapartomat�
 	return ec._UpdateHouseResult(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNUpdateRoomInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐUpdateRoomInput(ctx context.Context, v interface{}) (UpdateRoomInput, error) {
+func (ec *executionContext) unmarshalNUpdateRoomInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐUpdateRoomInput(ctx context.Context, v any) (UpdateRoomInput, error) {
 	res, err := ec.unmarshalInputUpdateRoomInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -27589,12 +29028,13 @@ func (ec *executionContext) marshalNUpdateRoomResult2githubᚗcomᚋapartomatᚋ
 	return ec._UpdateRoomResult(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx context.Context, v interface{}) (graphql.Upload, error) {
+func (ec *executionContext) unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx context.Context, v any) (graphql.Upload, error) {
 	res, err := graphql.UnmarshalUpload(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx context.Context, sel ast.SelectionSet, v graphql.Upload) graphql.Marshaler {
+	_ = sel
 	res := graphql.MarshalUpload(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -27604,11 +29044,9 @@ func (ec *executionContext) marshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋg
 	return res
 }
 
-func (ec *executionContext) unmarshalNUpload2ᚕᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUploadᚄ(ctx context.Context, v interface{}) ([]*graphql.Upload, error) {
-	var vSlice []interface{}
-	if v != nil {
-		vSlice = graphql.CoerceList(v)
-	}
+func (ec *executionContext) unmarshalNUpload2ᚕᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUploadᚄ(ctx context.Context, v any) ([]*graphql.Upload, error) {
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
 	var err error
 	res := make([]*graphql.Upload, len(vSlice))
 	for i := range vSlice {
@@ -27636,7 +29074,7 @@ func (ec *executionContext) marshalNUpload2ᚕᚖgithubᚗcomᚋ99designsᚋgqlg
 	return ret
 }
 
-func (ec *executionContext) unmarshalNUpload2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx context.Context, v interface{}) (*graphql.Upload, error) {
+func (ec *executionContext) unmarshalNUpload2ᚖgithubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx context.Context, v any) (*graphql.Upload, error) {
 	res, err := graphql.UnmarshalUpload(v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
@@ -27648,6 +29086,7 @@ func (ec *executionContext) marshalNUpload2ᚖgithubᚗcomᚋ99designsᚋgqlgen�
 		}
 		return graphql.Null
 	}
+	_ = sel
 	res := graphql.MarshalUpload(*v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -27667,7 +29106,7 @@ func (ec *executionContext) marshalNUploadAlbumCoverResult2githubᚗcomᚋaparto
 	return ec._UploadAlbumCoverResult(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNUploadFileInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐUploadFileInput(ctx context.Context, v interface{}) (UploadFileInput, error) {
+func (ec *executionContext) unmarshalNUploadFileInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐUploadFileInput(ctx context.Context, v any) (UploadFileInput, error) {
 	res, err := ec.unmarshalInputUploadFileInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -27702,12 +29141,13 @@ func (ec *executionContext) marshalNUploadVisualizationsResult2githubᚗcomᚋap
 	return ec._UploadVisualizationsResult(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNUrl2string(ctx context.Context, v interface{}) (string, error) {
+func (ec *executionContext) unmarshalNUrl2string(ctx context.Context, v any) (string, error) {
 	res, err := graphql.UnmarshalString(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNUrl2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
+	_ = sel
 	res := graphql.MarshalString(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -27795,7 +29235,7 @@ func (ec *executionContext) marshalNVisualization2ᚖgithubᚗcomᚋapartomatᚋ
 	return ec._Visualization(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNVisualizationStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐVisualizationStatus(ctx context.Context, v interface{}) (VisualizationStatus, error) {
+func (ec *executionContext) unmarshalNVisualizationStatus2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐVisualizationStatus(ctx context.Context, v any) (VisualizationStatus, error) {
 	var res VisualizationStatus
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -27833,7 +29273,7 @@ func (ec *executionContext) marshalNWorkspaceProjects2ᚖgithubᚗcomᚋapartoma
 	return ec._WorkspaceProjects(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNWorkspaceProjectsFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceProjectsFilter(ctx context.Context, v interface{}) (WorkspaceProjectsFilter, error) {
+func (ec *executionContext) unmarshalNWorkspaceProjectsFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceProjectsFilter(ctx context.Context, v any) (WorkspaceProjectsFilter, error) {
 	res, err := ec.unmarshalInputWorkspaceProjectsFilter(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -27922,7 +29362,7 @@ func (ec *executionContext) marshalNWorkspaceUser2ᚖgithubᚗcomᚋapartomatᚋ
 	return ec._WorkspaceUser(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNWorkspaceUserRole2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceUserRole(ctx context.Context, v interface{}) (WorkspaceUserRole, error) {
+func (ec *executionContext) unmarshalNWorkspaceUserRole2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceUserRole(ctx context.Context, v any) (WorkspaceUserRole, error) {
 	var res WorkspaceUserRole
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -28014,7 +29454,7 @@ func (ec *executionContext) marshalNWorkspaceUsers2ᚖgithubᚗcomᚋapartomat�
 	return ec._WorkspaceUsers(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNWorkspaceUsersFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceUsersFilter(ctx context.Context, v interface{}) (WorkspaceUsersFilter, error) {
+func (ec *executionContext) unmarshalNWorkspaceUsersFilter2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceUsersFilter(ctx context.Context, v any) (WorkspaceUsersFilter, error) {
 	res, err := ec.unmarshalInputWorkspaceUsersFilter(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
@@ -28087,12 +29527,13 @@ func (ec *executionContext) marshalN__Directive2ᚕgithubᚗcomᚋ99designsᚋgq
 	return ret
 }
 
-func (ec *executionContext) unmarshalN__DirectiveLocation2string(ctx context.Context, v interface{}) (string, error) {
+func (ec *executionContext) unmarshalN__DirectiveLocation2string(ctx context.Context, v any) (string, error) {
 	res, err := graphql.UnmarshalString(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalN__DirectiveLocation2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
+	_ = sel
 	res := graphql.MarshalString(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -28102,11 +29543,9 @@ func (ec *executionContext) marshalN__DirectiveLocation2string(ctx context.Conte
 	return res
 }
 
-func (ec *executionContext) unmarshalN__DirectiveLocation2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
-	var vSlice []interface{}
-	if v != nil {
-		vSlice = graphql.CoerceList(v)
-	}
+func (ec *executionContext) unmarshalN__DirectiveLocation2ᚕstringᚄ(ctx context.Context, v any) ([]string, error) {
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
 	var err error
 	res := make([]string, len(vSlice))
 	for i := range vSlice {
@@ -28277,12 +29716,13 @@ func (ec *executionContext) marshalN__Type2ᚖgithubᚗcomᚋ99designsᚋgqlgen�
 	return ec.___Type(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalN__TypeKind2string(ctx context.Context, v interface{}) (string, error) {
+func (ec *executionContext) unmarshalN__TypeKind2string(ctx context.Context, v any) (string, error) {
 	res, err := graphql.UnmarshalString(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalN__TypeKind2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
+	_ = sel
 	res := graphql.MarshalString(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -28299,17 +29739,19 @@ func (ec *executionContext) marshalOAlbumRecentFileResult2githubᚗcomᚋapartom
 	return ec._AlbumRecentFileResult(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalOBoolean2bool(ctx context.Context, v interface{}) (bool, error) {
+func (ec *executionContext) unmarshalOBoolean2bool(ctx context.Context, v any) (bool, error) {
 	res, err := graphql.UnmarshalBoolean(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalOBoolean2bool(ctx context.Context, sel ast.SelectionSet, v bool) graphql.Marshaler {
+	_ = sel
+	_ = ctx
 	res := graphql.MarshalBoolean(v)
 	return res
 }
 
-func (ec *executionContext) unmarshalOBoolean2ᚖbool(ctx context.Context, v interface{}) (*bool, error) {
+func (ec *executionContext) unmarshalOBoolean2ᚖbool(ctx context.Context, v any) (*bool, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -28321,18 +29763,18 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	if v == nil {
 		return graphql.Null
 	}
+	_ = sel
+	_ = ctx
 	res := graphql.MarshalBoolean(*v)
 	return res
 }
 
-func (ec *executionContext) unmarshalOContactType2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐContactTypeᚄ(ctx context.Context, v interface{}) ([]ContactType, error) {
+func (ec *executionContext) unmarshalOContactType2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐContactTypeᚄ(ctx context.Context, v any) ([]ContactType, error) {
 	if v == nil {
 		return nil, nil
 	}
-	var vSlice []interface{}
-	if v != nil {
-		vSlice = graphql.CoerceList(v)
-	}
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
 	var err error
 	res := make([]ContactType, len(vSlice))
 	for i := range vSlice {
@@ -28399,14 +29841,12 @@ func (ec *executionContext) marshalOFile2ᚖgithubᚗcomᚋapartomatᚋapartomat
 	return ec._File(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalOFileType2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐFileTypeᚄ(ctx context.Context, v interface{}) ([]FileType, error) {
+func (ec *executionContext) unmarshalOFileType2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐFileTypeᚄ(ctx context.Context, v any) ([]FileType, error) {
 	if v == nil {
 		return nil, nil
 	}
-	var vSlice []interface{}
-	if v != nil {
-		vSlice = graphql.CoerceList(v)
-	}
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
 	var err error
 	res := make([]FileType, len(vSlice))
 	for i := range vSlice {
@@ -28466,7 +29906,7 @@ func (ec *executionContext) marshalOFileType2ᚕgithubᚗcomᚋapartomatᚋapart
 	return ret
 }
 
-func (ec *executionContext) unmarshalOFloat2ᚖfloat64(ctx context.Context, v interface{}) (*float64, error) {
+func (ec *executionContext) unmarshalOFloat2ᚖfloat64(ctx context.Context, v any) (*float64, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -28478,6 +29918,7 @@ func (ec *executionContext) marshalOFloat2ᚖfloat64(ctx context.Context, sel as
 	if v == nil {
 		return graphql.Null
 	}
+	_ = sel
 	res := graphql.MarshalFloatContext(*v)
 	return graphql.WrapContextMarshaler(ctx, res)
 }
@@ -28489,7 +29930,7 @@ func (ec *executionContext) marshalOGravatar2ᚖgithubᚗcomᚋapartomatᚋapart
 	return ec._Gravatar(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v interface{}) (*int, error) {
+func (ec *executionContext) unmarshalOInt2ᚖint(ctx context.Context, v any) (*int, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -28501,18 +29942,18 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 	if v == nil {
 		return graphql.Null
 	}
+	_ = sel
+	_ = ctx
 	res := graphql.MarshalInt(*v)
 	return res
 }
 
-func (ec *executionContext) unmarshalOProjectStatus2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectStatusᚄ(ctx context.Context, v interface{}) ([]ProjectStatus, error) {
+func (ec *executionContext) unmarshalOProjectStatus2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectStatusᚄ(ctx context.Context, v any) ([]ProjectStatus, error) {
 	if v == nil {
 		return nil, nil
 	}
-	var vSlice []interface{}
-	if v != nil {
-		vSlice = graphql.CoerceList(v)
-	}
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
 	var err error
 	res := make([]ProjectStatus, len(vSlice))
 	for i := range vSlice {
@@ -28572,7 +30013,7 @@ func (ec *executionContext) marshalOProjectStatus2ᚕgithubᚗcomᚋapartomatᚋ
 	return ret
 }
 
-func (ec *executionContext) unmarshalOProjectVisualizationRoomIdFilter2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectVisualizationRoomIDFilter(ctx context.Context, v interface{}) (*ProjectVisualizationRoomIDFilter, error) {
+func (ec *executionContext) unmarshalOProjectVisualizationRoomIdFilter2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectVisualizationRoomIDFilter(ctx context.Context, v any) (*ProjectVisualizationRoomIDFilter, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -28580,7 +30021,7 @@ func (ec *executionContext) unmarshalOProjectVisualizationRoomIdFilter2ᚖgithub
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalOProjectVisualizationsStatusFilter2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectVisualizationsStatusFilter(ctx context.Context, v interface{}) (*ProjectVisualizationsStatusFilter, error) {
+func (ec *executionContext) unmarshalOProjectVisualizationsStatusFilter2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐProjectVisualizationsStatusFilter(ctx context.Context, v any) (*ProjectVisualizationsStatusFilter, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -28595,14 +30036,12 @@ func (ec *executionContext) marshalORoom2ᚖgithubᚗcomᚋapartomatᚋapartomat
 	return ec._Room(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalOString2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
+func (ec *executionContext) unmarshalOString2ᚕstringᚄ(ctx context.Context, v any) ([]string, error) {
 	if v == nil {
 		return nil, nil
 	}
-	var vSlice []interface{}
-	if v != nil {
-		vSlice = graphql.CoerceList(v)
-	}
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
 	var err error
 	res := make([]string, len(vSlice))
 	for i := range vSlice {
@@ -28633,7 +30072,7 @@ func (ec *executionContext) marshalOString2ᚕstringᚄ(ctx context.Context, sel
 	return ret
 }
 
-func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
+func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v any) (*string, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -28645,11 +30084,13 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	if v == nil {
 		return graphql.Null
 	}
+	_ = sel
+	_ = ctx
 	res := graphql.MarshalString(*v)
 	return res
 }
 
-func (ec *executionContext) unmarshalOTime2ᚖtimeᚐTime(ctx context.Context, v interface{}) (*time.Time, error) {
+func (ec *executionContext) unmarshalOTime2ᚖtimeᚐTime(ctx context.Context, v any) (*time.Time, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -28661,18 +30102,18 @@ func (ec *executionContext) marshalOTime2ᚖtimeᚐTime(ctx context.Context, sel
 	if v == nil {
 		return graphql.Null
 	}
+	_ = sel
+	_ = ctx
 	res := graphql.MarshalTime(*v)
 	return res
 }
 
-func (ec *executionContext) unmarshalOVisualizationStatus2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐVisualizationStatusᚄ(ctx context.Context, v interface{}) ([]VisualizationStatus, error) {
+func (ec *executionContext) unmarshalOVisualizationStatus2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐVisualizationStatusᚄ(ctx context.Context, v any) ([]VisualizationStatus, error) {
 	if v == nil {
 		return nil, nil
 	}
-	var vSlice []interface{}
-	if v != nil {
-		vSlice = graphql.CoerceList(v)
-	}
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
 	var err error
 	res := make([]VisualizationStatus, len(vSlice))
 	for i := range vSlice {
@@ -28732,14 +30173,12 @@ func (ec *executionContext) marshalOVisualizationStatus2ᚕgithubᚗcomᚋaparto
 	return ret
 }
 
-func (ec *executionContext) unmarshalOWorkspaceUserRole2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceUserRoleᚄ(ctx context.Context, v interface{}) ([]WorkspaceUserRole, error) {
+func (ec *executionContext) unmarshalOWorkspaceUserRole2ᚕgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐWorkspaceUserRoleᚄ(ctx context.Context, v any) ([]WorkspaceUserRole, error) {
 	if v == nil {
 		return nil, nil
 	}
-	var vSlice []interface{}
-	if v != nil {
-		vSlice = graphql.CoerceList(v)
-	}
+	var vSlice []any
+	vSlice = graphql.CoerceList(v)
 	var err error
 	res := make([]WorkspaceUserRole, len(vSlice))
 	for i := range vSlice {

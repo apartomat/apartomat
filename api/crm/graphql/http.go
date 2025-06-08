@@ -9,7 +9,6 @@ import (
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
-	"github.com/99designs/gqlgen/graphql/handler/lru"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/apartomat/apartomat/api/crm/graphql/dataloaders"
 	"github.com/apartomat/apartomat/internal/crm/auth"
@@ -53,13 +52,7 @@ func Handler(
 	gh.AddTransport(transport.POST{})
 	gh.AddTransport(transport.MultipartForm{})
 
-	gh.SetQueryCache(lru.New(1000))
-
 	gh.Use(extension.Introspection{})
-
-	gh.Use(extension.AutomaticPersistedQuery{
-		Cache: lru.New(100),
-	})
 
 	gh.Use(extension.FixedComplexityLimit(complexityLimit))
 
