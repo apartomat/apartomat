@@ -5,7 +5,6 @@ RUN apk add --no-cache tzdata
 WORKDIR /apartomat
 
 COPY ../../../bin/apartomat-lunux-amd64 .
-#COPY ../../../bin/migration-lunux-amd64 .
 
 COPY ../../../migration migration/
 
