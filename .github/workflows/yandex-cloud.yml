@@ -1,4 +1,4 @@
-name: Build images for Yandex Cloud
+name: Build images and deploy to Yandex Cloud
 
 on: workflow_dispatch
 
