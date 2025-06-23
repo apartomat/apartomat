@@ -32,7 +32,7 @@ jobs:
     - name: Build
       env:
         APARTOMAT_VERSION: ${{ github.run_number }}
-      run: GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o bin/apartomat-lunux-amd64 -ldflags "-X github.com/apartomat/apartomat/api/crm/graphql.Version=$APARTOMAT_VERSION" ./cmd/crm
+      run: GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o bin/crm-api -ldflags "-X github.com/apartomat/apartomat/api/crm/graphql.Version=$APARTOMAT_VERSION" ./cmd/crm
 
     - name: Login to Yandex Cloud Container Registry
       uses: yc-actions/yc-cr-login@v1
@@ -45,5 +45,5 @@ jobs:
         IMAGE_TAG: ${{ github.run_number }}
       run: |
         echo $APARTOMAT_PRIV_KEY | base64 --decode > apartomat.key
-        docker build -f ./deploy/yandex/apartomat/Dockerfile -t cr.yandex/$CR_REGISTRY_ID/$IMAGE_NAME:$IMAGE_TAG .
+        docker build -f ./deploy/docker/Dockerfile-crm-api -t cr.yandex/$CR_REGISTRY_ID/$IMAGE_NAME:$IMAGE_TAG .
         docker push cr.yandex/$CR_REGISTRY_ID/$IMAGE_NAME:$IMAGE_TAG

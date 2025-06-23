@@ -4,14 +4,12 @@ RUN apk add --no-cache tzdata
 
 WORKDIR /apartomat
 
-COPY ../../../bin/apartomat-lunux-amd64 .
-
+COPY ../../../bin/crm-api .
 COPY ../../../migration migration/
-
 COPY ../../../apartomat.key .
 
 ENV PATH="/apartomat:${PATH}"
 
-EXPOSE 80
+EXPOSE 8080
 
-ENTRYPOINT ["apartomat-lunux-amd64", "run"]
+ENTRYPOINT ["crm-api", "run"]
