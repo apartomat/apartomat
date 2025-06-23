@@ -47,3 +47,33 @@ jobs:
         echo $APARTOMAT_PRIV_KEY | base64 --decode > apartomat.key
         docker build -f ./deploy/docker/Dockerfile-crm-api -t cr.yandex/$CR_REGISTRY_ID/$IMAGE_NAME:$IMAGE_TAG .
         docker push cr.yandex/$CR_REGISTRY_ID/$IMAGE_NAME:$IMAGE_TAG
+
+  build-project-page-api:
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME: apartomat-project-page-api
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: "1.24.3"
+
+      - name: Build
+        env:
+          APARTOMAT_VERSION: ${{ github.run_number }}
+        run: GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o bin/project-page-api -ldflags "-X github.com/apartomat/apartomat/api/project-page/graphql.Version=$APARTOMAT_VERSION" ./cmd/project-page
+
+      - name: Login to Yandex Cloud Container Registry
+        uses: yc-actions/yc-cr-login@v1
+        with:
+          yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
+
+      - name: Push image to Yandex Cloud Container Registry
+        env:
+          IMAGE_TAG: ${{ github.run_number }}
+        run: |
+          docker build -f ./deploy/docker/Dockerfile-project-page-api -t cr.yandex/$CR_REGISTRY_ID/$IMAGE_NAME:$IMAGE_TAG .
+          docker push cr.yandex/$CR_REGISTRY_ID/$IMAGE_NAME:$IMAGE_TAG
