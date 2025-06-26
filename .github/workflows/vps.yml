@@ -45,7 +45,7 @@ jobs:
         IMAGE_TAG: ${{ github.run_number }}
       run: |
         echo $APARTOMAT_PRIV_KEY | base64 --decode > apartomat.key
-        docker build -f ./deploy/docker/Dockerfile-crm-api -t cr.yandex/$CR_REGISTRY_ID/$IMAGE_NAME:$IMAGE_TAG .
+        docker build -f ./build/docker/crm-api/Dockerfile -t cr.yandex/$CR_REGISTRY_ID/$IMAGE_NAME:$IMAGE_TAG .
         docker push cr.yandex/$CR_REGISTRY_ID/$IMAGE_NAME:$IMAGE_TAG
 
   build-project-page-api:
@@ -75,5 +75,5 @@ jobs:
         env:
           IMAGE_TAG: ${{ github.run_number }}
         run: |
-          docker build -f ./deploy/docker/Dockerfile-project-page-api -t cr.yandex/$CR_REGISTRY_ID/$IMAGE_NAME:$IMAGE_TAG .
+          docker build -f ./build/docker/project-page-api/Dockerfile -t cr.yandex/$CR_REGISTRY_ID/$IMAGE_NAME:$IMAGE_TAG .
           docker push cr.yandex/$CR_REGISTRY_ID/$IMAGE_NAME:$IMAGE_TAG
