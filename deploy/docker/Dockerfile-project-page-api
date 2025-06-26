@@ -9,4 +9,4 @@ ENV PATH="/apartomat:${PATH}"
 
 EXPOSE 8080
 
-ENTRYPOINT ["projecct-page-api"]
+ENTRYPOINT ["project-page-api"]
