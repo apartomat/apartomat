@@ -77,3 +77,23 @@ jobs:
         run: |
           docker build -f ./build/docker/project-page-api/Dockerfile -t cr.yandex/$CR_REGISTRY_ID/$IMAGE_NAME:$IMAGE_TAG .
           docker push cr.yandex/$CR_REGISTRY_ID/$IMAGE_NAME:$IMAGE_TAG
+
+  build-nginx:
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME: apartomat-nginx
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Login to Yandex Cloud Container Registry
+        uses: yc-actions/yc-cr-login@v1
+        with:
+          yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
+
+      - name: Build image and push to Yandex Cloud Container Registry
+        env:
+          IMAGE_TAG: ${{ github.run_number }}
+        run: |
+          docker build -f ./build/docker/nginx/Dockerfile -t cr.yandex/$CR_REGISTRY_ID/$IMAGE_NAME:$IMAGE_TAG .
+          docker push cr.yandex/$CR_REGISTRY_ID/$IMAGE_NAME:$IMAGE_TAG
