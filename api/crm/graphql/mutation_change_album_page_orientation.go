@@ -14,7 +14,7 @@ func (r *mutationResolver) ChangeAlbumPageOrientation(
 	albumID string,
 	orientation PageOrientation,
 ) (ChangeAlbumPageOrientationResult, error) {
-	album, err := r.useCases.ChangeAlbumPageOrientation(ctx, albumID, albums.PageOrientation(orientation))
+	album, err := r.crm.ChangeAlbumPageOrientation(ctx, albumID, albums.PageOrientation(orientation))
 
 	if err != nil {
 		if errors.Is(err, crm.ErrForbidden) {

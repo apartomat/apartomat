@@ -30,7 +30,7 @@ func (r *projectVisualizationsResolver) List(
 
 		return serverError()
 	} else {
-		res, err := r.useCases.GetVisualizations(
+		res, err := r.crm.GetVisualizations(
 			ctx,
 			project.ID,
 			filter.ToSpec(),
@@ -109,7 +109,7 @@ func (r *projectVisualizationsResolver) Total(
 
 		return serverError()
 	} else {
-		tot, err := r.useCases.CountVisualizations(
+		tot, err := r.crm.CountVisualizations(
 			ctx,
 			project.ID,
 		)

@@ -14,7 +14,7 @@ func (r *mutationResolver) AddHouse(
 	projectID string,
 	input AddHouseInput,
 ) (AddHouseResult, error) {
-	contact, err := r.useCases.AddHouse(
+	contact, err := r.crm.AddHouse(
 		ctx,
 		projectID,
 		input.City,

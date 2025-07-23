@@ -16,6 +16,10 @@ func toSpecQuery(spec Spec) (specQuery, error) {
 		return s, nil
 	}
 
+	if spec == nil {
+		return allSpecQuery{}, nil
+	}
+
 	switch s := spec.(type) {
 	case IDInSpec:
 		return idInSpecQuery{s}, nil
@@ -28,6 +32,12 @@ func toSpecQuery(spec Spec) (specQuery, error) {
 	}
 
 	return nil, errors.New("unknown albums spec")
+}
+
+type allSpecQuery struct{}
+
+func (s allSpecQuery) Expression() (goqu.Expression, error) {
+	return goqu.Ex{}, nil
 }
 
 type andSpecQuery struct {

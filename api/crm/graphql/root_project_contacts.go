@@ -30,7 +30,7 @@ func (r *projectContactsResolver) List(
 
 		return serverError()
 	} else {
-		items, err := r.useCases.GetContacts(
+		items, err := r.crm.GetContacts(
 			ctx,
 			project.ID,
 			limit,

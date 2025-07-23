@@ -9,7 +9,7 @@ import (
 )
 
 func (r *mutationResolver) ConfirmLoginLink(ctx context.Context, str string) (ConfirmLoginLinkResult, error) {
-	str, err := r.useCases.ConfirmEmailByToken(ctx, str)
+	str, err := r.crm.ConfirmEmailByToken(ctx, str)
 	if err != nil {
 		if errors.Is(err, paseto.ErrTokenValidationError) {
 			return InvalidToken{Message: "token is expired or not valid"}, nil

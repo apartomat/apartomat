@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/apartomat/apartomat/internal/crm"
-	albumFiles "github.com/apartomat/apartomat/internal/store/album_files"
+	"github.com/apartomat/apartomat/internal/store/albumfiles"
 	"github.com/apartomat/apartomat/internal/store/albums"
 )
 
@@ -34,14 +34,14 @@ func (r *subscriptionResolver) AlbumFileGenerated(ctx context.Context, id string
 				ch <- Unknown{"timeout"}
 				return
 			case <-tck.C:
-				albumFile, _, err := r.useCases.GetAlbumRecentFile(ctx, id)
+				albumFile, _, err := r.crm.GetAlbumRecentFile(ctx, id)
 				if err != nil {
 					switch {
 					case errors.Is(err, crm.ErrForbidden):
 						ch <- Forbidden{Message: "forbidden"}
 					case errors.Is(err, albums.ErrAlbumNotFound):
 						ch <- NotFound{Message: "not found"}
-					case errors.Is(err, albumFiles.ErrAlbumFileNotFound):
+					case errors.Is(err, albumfiles.ErrAlbumFileNotFound):
 						ch <- NotFound{Message: "not found"}
 					default:
 						ch <- ServerError{Message: "server error"}
@@ -51,7 +51,7 @@ func (r *subscriptionResolver) AlbumFileGenerated(ctx context.Context, id string
 					return
 				}
 
-				if albumFile.Status == albumFiles.StatusDone {
+				if albumFile.Status == albumfiles.StatusDone {
 					ch <- albumFileToGraphQL(albumFile)
 				}
 			}

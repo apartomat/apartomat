@@ -30,7 +30,7 @@ func (r *projectFilesResolver) List(
 
 		return serverError()
 	} else {
-		items, err := r.useCases.GetFiles(
+		items, err := r.crm.GetFiles(
 			ctx,
 			project.ID,
 			toFileTypes(filter.Type),
@@ -82,7 +82,7 @@ func (r *projectFilesResolver) Total(
 
 		return nil, errors.New("server error: can't resolver project files")
 	} else {
-		tot, err := r.useCases.CountFiles(
+		tot, err := r.crm.CountFiles(
 			ctx,
 			project.ID,
 			toFileTypes(filter.Type),

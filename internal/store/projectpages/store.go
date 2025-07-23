@@ -1,4 +1,4 @@
-package projectpage
+package projectpages
 
 import (
 	"context"

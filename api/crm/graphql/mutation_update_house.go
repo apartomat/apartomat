@@ -13,7 +13,7 @@ func (r *mutationResolver) UpdateHouse(
 	houseID string,
 	input UpdateHouseInput,
 ) (UpdateHouseResult, error) {
-	house, err := r.useCases.UpdateHouse(
+	house, err := r.crm.UpdateHouse(
 		ctx,
 		houseID,
 		input.City,

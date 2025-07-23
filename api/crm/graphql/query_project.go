@@ -10,7 +10,7 @@ import (
 )
 
 func (r *queryResolver) Project(ctx context.Context, id string) (ProjectResult, error) {
-	project, err := r.useCases.GetProject(ctx, id)
+	project, err := r.crm.GetProject(ctx, id)
 	if err != nil {
 		if errors.Is(err, crm.ErrForbidden) {
 			return forbidden()

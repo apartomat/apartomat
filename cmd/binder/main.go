@@ -17,8 +17,8 @@ import (
 
 	"github.com/apartomat/apartomat/internal/bookbinder"
 	bunhook "github.com/apartomat/apartomat/internal/pkg/bun"
-	. "github.com/apartomat/apartomat/internal/store/album_files"
-	albumFilesPostgres "github.com/apartomat/apartomat/internal/store/album_files/postgres"
+	. "github.com/apartomat/apartomat/internal/store/albumfiles"
+	albumFilesPostgres "github.com/apartomat/apartomat/internal/store/albumfiles/postgres"
 	"github.com/apartomat/apartomat/internal/store/albums"
 	albumsPostgres "github.com/apartomat/apartomat/internal/store/albums/postgres"
 	"github.com/apartomat/apartomat/internal/store/files"

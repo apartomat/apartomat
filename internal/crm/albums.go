@@ -4,8 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	"github.com/apartomat/apartomat/internal/crm/auth"
-	albumFiles "github.com/apartomat/apartomat/internal/store/album_files"
+	"github.com/apartomat/apartomat/internal/store/albumfiles"
 	. "github.com/apartomat/apartomat/internal/store/albums"
 	"github.com/apartomat/apartomat/internal/store/files"
 	"github.com/apartomat/apartomat/internal/store/projects"
@@ -260,7 +261,7 @@ func (u *CRM) ChangeAlbumPageOrientation(
 	return album, nil
 }
 
-func (u *CRM) GetAlbumRecentFile(ctx context.Context, albumID string) (*albumFiles.AlbumFile, *files.File, error) {
+func (u *CRM) GetAlbumRecentFile(ctx context.Context, albumID string) (*albumfiles.AlbumFile, *files.File, error) {
 	album, err := u.Albums.Get(ctx, IDIn(albumID))
 	if err != nil {
 		return nil, nil, err
@@ -272,7 +273,7 @@ func (u *CRM) GetAlbumRecentFile(ctx context.Context, albumID string) (*albumFil
 		return nil, nil, fmt.Errorf("can't get album (id=%s) recent file: %w", album.ID, ErrForbidden)
 	}
 
-	albumFile, err := u.AlbumFiles.GetLastVersion(ctx, albumFiles.And(albumFiles.AlbumIDIn(albumID)))
+	albumFile, err := u.AlbumFiles.GetLastVersion(ctx, albumfiles.And(albumfiles.AlbumIDIn(albumID)))
 	if err != nil {
 		return nil, nil, err
 	}
@@ -293,7 +294,7 @@ var (
 	ErrAlbumFileVersionExisted = errors.New("album file version existed")
 )
 
-func (u *CRM) StartGenerateAlbumFile(ctx context.Context, albumID string) (*albumFiles.AlbumFile, *files.File, error) {
+func (u *CRM) StartGenerateAlbumFile(ctx context.Context, albumID string) (*albumfiles.AlbumFile, *files.File, error) {
 	album, err := u.Albums.Get(ctx, IDIn(albumID))
 	if err != nil {
 		return nil, nil, err
@@ -305,8 +306,8 @@ func (u *CRM) StartGenerateAlbumFile(ctx context.Context, albumID string) (*albu
 		return nil, nil, fmt.Errorf("can't generate album (id=%s) file: %w", album.ID, ErrForbidden)
 	}
 
-	existedFile, err := u.AlbumFiles.GetLastVersion(ctx, albumFiles.And(albumFiles.AlbumIDIn(albumID)))
-	if err != nil && !errors.Is(err, albumFiles.ErrAlbumFileNotFound) {
+	existedFile, err := u.AlbumFiles.GetLastVersion(ctx, albumfiles.And(albumfiles.AlbumIDIn(albumID)))
+	if err != nil && !errors.Is(err, albumfiles.ErrAlbumFileNotFound) {
 		return nil, nil, err
 	}
 
@@ -319,7 +320,7 @@ func (u *CRM) StartGenerateAlbumFile(ctx context.Context, albumID string) (*albu
 		return nil, nil, err
 	}
 
-	af := albumFiles.NewAlbumFile(id, albumFiles.StatusNew, album.ID, album.Version)
+	af := albumfiles.NewAlbumFile(id, albumfiles.StatusNew, album.ID, album.Version)
 
 	if err := u.AlbumFiles.Save(ctx, af); err != nil {
 		return nil, nil, err

@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/apartomat/apartomat/internal/store"
-	"github.com/apartomat/apartomat/internal/store/projectpage"
+	"github.com/apartomat/apartomat/internal/store/projectpages"
 	"github.com/apartomat/apartomat/internal/store/projects"
 )
 
@@ -43,7 +43,7 @@ func (r *projectResolver) Albums(ctx context.Context, obj *Project) (*ProjectAlb
 }
 
 func (r *projectResolver) Page(ctx context.Context, obj *Project) (ProjectPageResult, error) {
-	page, err := r.useCases.GetProjectPage(ctx, obj.ID)
+	page, err := r.crm.GetProjectPage(ctx, obj.ID)
 	if err != nil {
 		if errors.Is(err, store.ErrNotFound) {
 			return notFound()
@@ -188,7 +188,7 @@ func newof[T any](val T) *T {
 	return &val
 }
 
-func projectPageToGraphQL(s *projectpage.ProjectPage) *ProjectPage {
+func projectPageToGraphQL(s *projectpages.ProjectPage) *ProjectPage {
 	if s == nil {
 		return nil
 	}
@@ -204,11 +204,11 @@ func projectPageToGraphQL(s *projectpage.ProjectPage) *ProjectPage {
 	}
 }
 
-func projectPageStatusToGraphQL(status projectpage.Status) ProjectPageStatus {
+func projectPageStatusToGraphQL(status projectpages.Status) ProjectPageStatus {
 	switch status {
-	case projectpage.StatusPublic:
+	case projectpages.StatusPublic:
 		return ProjectPageStatusPublic
-	case projectpage.StatusNotPublic:
+	case projectpages.StatusNotPublic:
 		return ProjectPageStatusNotPublic
 	}
 

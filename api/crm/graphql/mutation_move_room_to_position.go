@@ -13,7 +13,7 @@ func (r *mutationResolver) MoveRoomToPosition(
 	roomID string,
 	position int,
 ) (MoveRoomToPositionResult, error) {
-	room, err := r.useCases.MoveRoomToPosition(ctx, roomID, position)
+	room, err := r.crm.MoveRoomToPosition(ctx, roomID, position)
 	if err != nil {
 		if errors.Is(err, crm.ErrForbidden) {
 			return forbidden()

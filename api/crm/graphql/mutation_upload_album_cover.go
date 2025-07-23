@@ -13,7 +13,7 @@ func (r *mutationResolver) UploadAlbumCover(
 	albumID string,
 	file graphql.Upload,
 ) (UploadAlbumCoverResult, error) {
-	uploaded, err := r.useCases.UploadAlbumCover(
+	uploaded, err := r.crm.UploadAlbumCover(
 		ctx,
 		albumID,
 		crm.Upload{

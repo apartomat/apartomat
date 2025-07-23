@@ -13,7 +13,7 @@ func (r *mutationResolver) ChangeProjectStatus(
 	projectID string,
 	status ProjectStatus,
 ) (ChangeProjectStatusResult, error) {
-	project, err := r.useCases.ChangeProjectStatus(
+	project, err := r.crm.ChangeProjectStatus(
 		ctx,
 		projectID,
 		toProjectStatus(status),

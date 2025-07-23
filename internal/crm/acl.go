@@ -13,28 +13,28 @@ import (
 	"github.com/apartomat/apartomat/internal/store/rooms"
 	"github.com/apartomat/apartomat/internal/store/users"
 	"github.com/apartomat/apartomat/internal/store/visualizations"
-	"github.com/apartomat/apartomat/internal/store/workspace_users"
 	"github.com/apartomat/apartomat/internal/store/workspaces"
+	"github.com/apartomat/apartomat/internal/store/workspaceusers"
 	lru "github.com/hashicorp/golang-lru/v2/expirable"
 )
 
 type Acl struct {
-	wuCache  *lru.LRU[string, *workspace_users.WorkspaceUser]
+	wuCache  *lru.LRU[string, *workspaceusers.WorkspaceUser]
 	prjCache *lru.LRU[string, *projects.Project]
 	hCache   *lru.LRU[string, *houses.House]
 
-	workspaceUsers workspace_users.Store
+	workspaceUsers workspaceusers.Store
 	projects       projects.Store
 	houses         houses.Store
 }
 
 func NewAcl(
-	workspaceUsersStore workspace_users.Store,
+	workspaceUsersStore workspaceusers.Store,
 	projectsStore projects.Store,
 	housesStore houses.Store,
 ) *Acl {
 	return &Acl{
-		wuCache:  lru.NewLRU[string, *workspace_users.WorkspaceUser](100, nil, time.Minute),
+		wuCache:  lru.NewLRU[string, *workspaceusers.WorkspaceUser](100, nil, time.Minute),
 		prjCache: lru.NewLRU[string, *projects.Project](100, nil, time.Minute),
 		hCache:   lru.NewLRU[string, *houses.House](100, nil, time.Minute),
 
@@ -327,7 +327,7 @@ func (acl *Acl) CanGetWorkspaceProjectsOfWorkspaceID(ctx context.Context, subj *
 }
 
 func (acl *Acl) CanInviteUsersToWorkspace(ctx context.Context, subj *auth.UserCtx, obj *workspaces.Workspace) (bool, error) {
-	return acl.isWorkspaceUserAndRoleIn(ctx, subj, obj, workspace_users.WorkspaceUserRoleAdmin)
+	return acl.isWorkspaceUserAndRoleIn(ctx, subj, obj, workspaceusers.WorkspaceUserRoleAdmin)
 }
 
 func (acl *Acl) isWorkspaceUser(ctx context.Context, subj *auth.UserCtx, obj *workspaces.Workspace) (bool, error) {
@@ -360,7 +360,7 @@ func (acl *Acl) isWorkspaceUserAndRoleIn(
 	ctx context.Context,
 	subj *auth.UserCtx,
 	obj *workspaces.Workspace,
-	roles ...workspace_users.WorkspaceUserRole,
+	roles ...workspaceusers.WorkspaceUserRole,
 ) (bool, error) {
 	if subj == nil {
 		return false, nil
@@ -371,9 +371,9 @@ func (acl *Acl) isWorkspaceUserAndRoleIn(
 		return false, err
 	}
 
-	return workspace_users.And(
-		workspace_users.UserIDIn(subj.ID),
-		workspace_users.RoleIn(roles...),
+	return workspaceusers.And(
+		workspaceusers.UserIDIn(subj.ID),
+		workspaceusers.RoleIn(roles...),
 	).Is(wu), nil
 }
 
@@ -394,7 +394,7 @@ func (acl *Acl) isProjectUserAndRoleIn(
 	ctx context.Context,
 	subj *auth.UserCtx,
 	obj *projects.Project,
-	roles ...workspace_users.WorkspaceUserRole,
+	roles ...workspaceusers.WorkspaceUserRole,
 ) (bool, error) {
 	if subj == nil {
 		return false, nil
@@ -405,9 +405,9 @@ func (acl *Acl) isProjectUserAndRoleIn(
 		return false, err
 	}
 
-	return workspace_users.And(
-		workspace_users.UserIDIn(subj.ID),
-		workspace_users.RoleIn(roles...),
+	return workspaceusers.And(
+		workspaceusers.UserIDIn(subj.ID),
+		workspaceusers.RoleIn(roles...),
 	).Is(wu), nil
 }
 
@@ -449,7 +449,7 @@ func (acl *Acl) getProject(ctx context.Context, projectID string) (*projects.Pro
 	return prj, nil
 }
 
-func (acl *Acl) getWorkspaceUser(ctx context.Context, workspaceID, userID string) (*workspace_users.WorkspaceUser, error) {
+func (acl *Acl) getWorkspaceUser(ctx context.Context, workspaceID, userID string) (*workspaceusers.WorkspaceUser, error) {
 	var (
 		key = fmt.Sprintf("%s_%s", workspaceID, userID)
 	)
@@ -460,9 +460,9 @@ func (acl *Acl) getWorkspaceUser(ctx context.Context, workspaceID, userID string
 
 	wu, err := acl.workspaceUsers.Get(
 		ctx,
-		workspace_users.And(
-			workspace_users.WorkspaceIDIn(workspaceID),
-			workspace_users.UserIDIn(userID),
+		workspaceusers.And(
+			workspaceusers.WorkspaceIDIn(workspaceID),
+			workspaceusers.UserIDIn(userID),
 		),
 	)
 	if err != nil {

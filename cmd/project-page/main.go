@@ -5,11 +5,11 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/apartomat/apartomat/internal/project-page"
-	albumFiles "github.com/apartomat/apartomat/internal/store/album_files/postgres"
+	albumfiles "github.com/apartomat/apartomat/internal/store/albumfiles/postgres"
 	albums "github.com/apartomat/apartomat/internal/store/albums/postgres"
 	files "github.com/apartomat/apartomat/internal/store/files/postgres"
 	houses "github.com/apartomat/apartomat/internal/store/houses/postgres"
-	projectpage "github.com/apartomat/apartomat/internal/store/projectpage/postgres"
+	projectpage "github.com/apartomat/apartomat/internal/store/projectpages/postgres"
 	visualizations "github.com/apartomat/apartomat/internal/store/visualizations/postgres"
 	"github.com/jackc/pgx/v5"
 	"github.com/uptrace/bun"
@@ -51,7 +51,7 @@ func main() {
 		projectPageStore    = projectpage.NewStore(bundb)
 		visualizationsStore = visualizations.NewStore(bundb)
 		albumsStore         = albums.NewStore(bundb)
-		albumsFilesStore    = albumFiles.NewStore(bundb)
+		albumsFilesStore    = albumfiles.NewStore(bundb)
 		housesStore         = houses.NewStore(bundb)
 	)
 

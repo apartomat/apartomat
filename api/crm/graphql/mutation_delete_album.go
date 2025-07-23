@@ -9,7 +9,7 @@ import (
 )
 
 func (r *mutationResolver) DeleteAlbum(ctx context.Context, id string) (DeleteAlbumResult, error) {
-	album, err := r.useCases.DeleteAlbum(ctx, id)
+	album, err := r.crm.DeleteAlbum(ctx, id)
 	if err != nil {
 		if errors.Is(err, crm.ErrForbidden) {
 			return forbidden()

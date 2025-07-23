@@ -13,7 +13,7 @@ func (r *mutationResolver) AddVisualizationsToAlbum(
 	albumID string,
 	visualizations []string,
 ) (AddVisualizationsToAlbumResult, error) {
-	pages, n, err := r.useCases.AddVisualizationsToAlbum(ctx, albumID, visualizations)
+	pages, n, err := r.crm.AddVisualizationsToAlbum(ctx, albumID, visualizations)
 	if err != nil {
 		if errors.Is(err, crm.ErrForbidden) {
 			return forbidden()

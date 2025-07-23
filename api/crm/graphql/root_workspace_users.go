@@ -7,7 +7,7 @@ import (
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/apartomat/apartomat/internal/crm"
-	"github.com/apartomat/apartomat/internal/store/workspace_users"
+	"github.com/apartomat/apartomat/internal/store/workspaceusers"
 )
 
 func (r *rootResolver) WorkspaceUsers() WorkspaceUsersResolver {
@@ -36,7 +36,7 @@ func (r *workspaceUsersResolver) List(
 		workspace = w
 	}
 
-	users, err := r.useCases.GetWorkspaceUsers(ctx, workspace.ID, limit, 0)
+	users, err := r.crm.GetWorkspaceUsers(ctx, workspace.ID, limit, 0)
 	if err != nil {
 		if errors.Is(err, crm.ErrForbidden) {
 			return forbidden()
@@ -58,7 +58,7 @@ func (r *workspaceUsersResolver) Total(
 	return nil, errors.New("not implemented yet")
 }
 
-func workspaceUsersToGraphQL(users []*workspace_users.WorkspaceUser) []*WorkspaceUser {
+func workspaceUsersToGraphQL(users []*workspaceusers.WorkspaceUser) []*WorkspaceUser {
 	result := make([]*WorkspaceUser, 0, len(users))
 
 	for _, u := range users {
@@ -68,7 +68,7 @@ func workspaceUsersToGraphQL(users []*workspace_users.WorkspaceUser) []*Workspac
 	return result
 }
 
-func workspaceUserToGraphQL(wu *workspace_users.WorkspaceUser) *WorkspaceUser {
+func workspaceUserToGraphQL(wu *workspaceusers.WorkspaceUser) *WorkspaceUser {
 	return &WorkspaceUser{
 		ID:        wu.UserID,
 		Workspace: &ID{ID: wu.WorkspaceID},
@@ -76,11 +76,11 @@ func workspaceUserToGraphQL(wu *workspace_users.WorkspaceUser) *WorkspaceUser {
 	}
 }
 
-func workspaceUserRoleToGraphQL(role workspace_users.WorkspaceUserRole) WorkspaceUserRole {
+func workspaceUserRoleToGraphQL(role workspaceusers.WorkspaceUserRole) WorkspaceUserRole {
 	switch role {
-	case workspace_users.WorkspaceUserRoleAdmin:
+	case workspaceusers.WorkspaceUserRoleAdmin:
 		return WorkspaceUserRoleAdmin
-	case workspace_users.WorkspaceUserRoleUser:
+	case workspaceusers.WorkspaceUserRoleUser:
 		return WorkspaceUserRoleUser
 	}
 

@@ -6,24 +6,24 @@ import (
 	"log/slog"
 
 	"github.com/apartomat/apartomat/internal/crm"
-	"github.com/apartomat/apartomat/internal/store/projectpage"
+	"github.com/apartomat/apartomat/internal/store/projectpages"
 )
 
 func (r *mutationResolver) MakeProjectNotPublic(
 	ctx context.Context,
 	projectID string,
 ) (MakeProjectNotPublicResult, error) {
-	ps, err := r.useCases.MakeProjectNotPublic(ctx, projectID)
+	ps, err := r.crm.MakeProjectNotPublic(ctx, projectID)
 	if err != nil {
 		if errors.Is(err, crm.ErrForbidden) {
 			return forbidden()
 		}
 
-		if errors.Is(err, projectpage.ErrProjectPageNotFound) {
+		if errors.Is(err, projectpages.ErrProjectPageNotFound) {
 			return notFound()
 		}
 
-		if errors.Is(err, projectpage.ErrProjectPageIsNotPublic) {
+		if errors.Is(err, projectpages.ErrProjectPageIsNotPublic) {
 			return ProjectIsAlreadyNotPublic{}, nil
 		}
 

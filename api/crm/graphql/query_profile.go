@@ -12,7 +12,7 @@ import (
 
 func (r *queryResolver) Profile(ctx context.Context) (UserProfileResult, error) {
 	if userCtx := auth.UserFromCtx(ctx); userCtx != nil {
-		user, err := r.useCases.GetUserProfile(ctx, userCtx.ID)
+		user, err := r.crm.GetUserProfile(ctx, userCtx.ID)
 		if err != nil {
 			if errors.Is(err, crm.ErrForbidden) {
 				return forbidden()

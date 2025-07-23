@@ -5,7 +5,7 @@ import (
 	"time"
 
 	bunhook "github.com/apartomat/apartomat/internal/pkg/bun"
-	. "github.com/apartomat/apartomat/internal/store/projectpage"
+	. "github.com/apartomat/apartomat/internal/store/projectpages"
 	"github.com/uptrace/bun"
 )
 
@@ -13,7 +13,7 @@ type store struct {
 	db *bun.DB
 }
 
-func NewStore(db *bun.DB) Store {
+func NewStore(db *bun.DB) *store {
 	return &store{db}
 }
 

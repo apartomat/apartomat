@@ -12,7 +12,7 @@ func (r *mutationResolver) UploadFile(
 	ctx context.Context,
 	input UploadFileInput,
 ) (UploadFileResult, error) {
-	pf, err := r.useCases.UploadFile(
+	pf, err := r.crm.UploadFile(
 		ctx,
 		input.ProjectID,
 		crm.Upload{

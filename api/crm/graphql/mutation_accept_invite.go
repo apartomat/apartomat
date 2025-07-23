@@ -9,7 +9,7 @@ import (
 )
 
 func (r *mutationResolver) AcceptInvite(ctx context.Context, str string) (AcceptInviteResult, error) {
-	str, err := r.useCases.AcceptInviteToWorkspace(ctx, str)
+	str, err := r.crm.AcceptInviteToWorkspace(ctx, str)
 	if err != nil {
 		if errors.Is(err, paseto.ErrTokenValidationError) {
 			return InvalidToken{Message: "token is expired or not valid"}, nil

@@ -32,7 +32,7 @@ func (r *albumPageVisualizationResolver) SVG(ctx context.Context, obj *AlbumPage
 	}
 
 	if v, ok := obj.Visualization.(*Visualization); ok && v != nil {
-		vis, err := r.useCases.GetVisualization(ctx, v.ID)
+		vis, err := r.crm.GetVisualization(ctx, v.ID)
 		if err != nil {
 			if errors.Is(err, crm.ErrNotFound) {
 				return notFound()
@@ -43,7 +43,7 @@ func (r *albumPageVisualizationResolver) SVG(ctx context.Context, obj *AlbumPage
 			return serverError()
 		}
 
-		f, err := r.useCases.GetFile(ctx, vis.FileID)
+		f, err := r.crm.GetFile(ctx, vis.FileID)
 		if err != nil {
 			if errors.Is(err, crm.ErrNotFound) {
 				return notFound()
@@ -77,7 +77,7 @@ func (r *albumPageVisualizationResolver) Visualization(
 	obj *AlbumPageVisualization,
 ) (AlbumPageVisualizationResult, error) {
 	if v, ok := obj.Visualization.(*Visualization); ok && v != nil {
-		vis, err := r.useCases.GetVisualization(ctx, v.ID)
+		vis, err := r.crm.GetVisualization(ctx, v.ID)
 		if err != nil {
 			if errors.Is(err, crm.ErrNotFound) {
 				return notFound()

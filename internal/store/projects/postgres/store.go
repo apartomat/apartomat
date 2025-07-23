@@ -15,7 +15,7 @@ type store struct {
 	db *bun.DB
 }
 
-func NewStore(db *bun.DB) Store {
+func NewStore(db *bun.DB) *store {
 	return &store{db}
 }
 

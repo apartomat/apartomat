@@ -14,7 +14,7 @@ func (r *mutationResolver) ChangeAlbumPageSize(
 	albumID string,
 	size PageSize,
 ) (ChangeAlbumPageSizeResult, error) {
-	album, err := r.useCases.ChangeAlbumPageSize(ctx, albumID, albums.PageSize(size))
+	album, err := r.crm.ChangeAlbumPageSize(ctx, albumID, albums.PageSize(size))
 
 	if err != nil {
 		if errors.Is(err, crm.ErrForbidden) {

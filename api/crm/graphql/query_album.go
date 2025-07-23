@@ -9,7 +9,7 @@ import (
 )
 
 func (r *queryResolver) Album(ctx context.Context, id string) (AlbumResult, error) {
-	album, err := r.useCases.GetAlbum(ctx, id)
+	album, err := r.crm.GetAlbum(ctx, id)
 	if err != nil {
 		if errors.Is(err, crm.ErrForbidden) {
 			return forbidden()

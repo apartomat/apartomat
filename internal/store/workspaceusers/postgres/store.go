@@ -3,7 +3,7 @@ package postgres
 import (
 	"context"
 	bunhook "github.com/apartomat/apartomat/internal/pkg/bun"
-	. "github.com/apartomat/apartomat/internal/store/workspace_users"
+	. "github.com/apartomat/apartomat/internal/store/workspaceusers"
 	"github.com/uptrace/bun"
 	"time"
 )

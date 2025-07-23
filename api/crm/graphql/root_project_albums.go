@@ -29,7 +29,7 @@ func (r *projectAlbumsResolver) List(
 
 		return serverError()
 	} else {
-		items, err := r.useCases.GetAlbums(
+		items, err := r.crm.GetAlbums(
 			ctx,
 			project.ID,
 			limit,
@@ -74,7 +74,7 @@ func (r *projectAlbumsResolver) Total(
 
 		return serverError()
 	} else {
-		tot, err := r.useCases.CountAlbums(
+		tot, err := r.crm.CountAlbums(
 			ctx,
 			project.ID,
 		)

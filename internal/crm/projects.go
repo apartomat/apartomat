@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/apartomat/apartomat/internal/crm/auth"
-	"github.com/apartomat/apartomat/internal/store/projectpage"
+	"github.com/apartomat/apartomat/internal/store/projectpages"
 	. "github.com/apartomat/apartomat/internal/store/projects"
 	"github.com/apartomat/apartomat/internal/store/workspaces"
 )
@@ -53,13 +53,13 @@ func (u *CRM) CreateProject(
 
 	pageID := MustGenerateNanoID()
 
-	page := projectpage.NewProjectPage(
+	page := projectpages.NewProjectPage(
 		pageID,
 		name,
 		"",
 		u.ProjectPageURL(pageID),
-		projectpage.StatusNotPublic,
-		projectpage.Settings{
+		projectpages.StatusNotPublic,
+		projectpages.Settings{
 			AllowVisualizations: true,
 			AllowAlbums:         true,
 		},
@@ -115,14 +115,14 @@ func (u *CRM) ChangeProjectDates(ctx context.Context, projectID string, startAt,
 	return project, nil
 }
 
-func (u *CRM) GetProjectPage(ctx context.Context, projectId string) (*projectpage.ProjectPage, error) {
+func (u *CRM) GetProjectPage(ctx context.Context, projectId string) (*projectpages.ProjectPage, error) {
 	if ok, err := u.Acl.CanGetPublicSiteOfProjectID(ctx, auth.UserFromCtx(ctx), projectId); err != nil {
 		return nil, err
 	} else if !ok {
 		return nil, fmt.Errorf("can't get project (id=%s) page: %w", projectId, ErrForbidden)
 	}
 
-	page, err := u.ProjectPages.Get(ctx, projectpage.ProjectIDIn(projectId))
+	page, err := u.ProjectPages.Get(ctx, projectpages.ProjectIDIn(projectId))
 	if err != nil {
 		return nil, err
 	}
@@ -147,7 +147,7 @@ func (u *CRM) GetProjectPage(ctx context.Context, projectId string) (*projectpag
 	return page, nil
 }
 
-func (u *CRM) MakeProjectPublic(ctx context.Context, projectId string) (*projectpage.ProjectPage, error) {
+func (u *CRM) MakeProjectPublic(ctx context.Context, projectId string) (*projectpages.ProjectPage, error) {
 	proj, err := u.Projects.Get(ctx, IDIn(projectId))
 	if err != nil {
 		return nil, err
@@ -159,17 +159,17 @@ func (u *CRM) MakeProjectPublic(ctx context.Context, projectId string) (*project
 		return nil, fmt.Errorf("can't make project (id=%s) public: %w", proj.ID, ErrForbidden)
 	}
 
-	page, err := u.ProjectPages.Get(ctx, projectpage.ProjectIDIn(proj.ID))
-	if errors.Is(err, projectpage.ErrProjectPageNotFound) {
+	page, err := u.ProjectPages.Get(ctx, projectpages.ProjectIDIn(proj.ID))
+	if errors.Is(err, projectpages.ErrProjectPageNotFound) {
 		pageID := MustGenerateNanoID()
 
-		p := projectpage.NewProjectPage(
+		p := projectpages.NewProjectPage(
 			pageID,
 			proj.Name,
 			"",
 			u.ProjectPageURL(pageID),
-			projectpage.StatusNotPublic,
-			projectpage.Settings{
+			projectpages.StatusNotPublic,
+			projectpages.Settings{
 				AllowVisualizations: true,
 				AllowAlbums:         true,
 			},
@@ -193,7 +193,7 @@ func (u *CRM) MakeProjectPublic(ctx context.Context, projectId string) (*project
 	return page, nil
 }
 
-func (u *CRM) MakeProjectNotPublic(ctx context.Context, projectId string) (*projectpage.ProjectPage, error) {
+func (u *CRM) MakeProjectNotPublic(ctx context.Context, projectId string) (*projectpages.ProjectPage, error) {
 	proj, err := u.Projects.Get(ctx, IDIn(projectId))
 	if err != nil {
 		return nil, err
@@ -205,17 +205,17 @@ func (u *CRM) MakeProjectNotPublic(ctx context.Context, projectId string) (*proj
 		return nil, fmt.Errorf("can't make project (id=%s) not public: %w", proj.ID, ErrForbidden)
 	}
 
-	page, err := u.ProjectPages.Get(ctx, projectpage.ProjectIDIn(proj.ID))
-	if errors.Is(err, projectpage.ErrProjectPageNotFound) {
+	page, err := u.ProjectPages.Get(ctx, projectpages.ProjectIDIn(proj.ID))
+	if errors.Is(err, projectpages.ErrProjectPageNotFound) {
 		pageID := MustGenerateNanoID()
 
-		p := projectpage.NewProjectPage(
+		p := projectpages.NewProjectPage(
 			pageID,
 			proj.Name,
 			"",
 			u.ProjectPageURL(pageID),
-			projectpage.StatusPublic,
-			projectpage.Settings{
+			projectpages.StatusPublic,
+			projectpages.Settings{
 				AllowVisualizations: true,
 				AllowAlbums:         true,
 			},

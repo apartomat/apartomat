@@ -8,7 +8,7 @@ import (
 
 	"github.com/apartomat/apartomat/api/crm/graphql/dataloaders"
 	"github.com/apartomat/apartomat/internal/crm"
-	albumFiles "github.com/apartomat/apartomat/internal/store/album_files"
+	"github.com/apartomat/apartomat/internal/store/albumfiles"
 	"github.com/apartomat/apartomat/internal/store/albums"
 )
 
@@ -35,7 +35,7 @@ func (r *albumResolver) Project(ctx context.Context, obj *Album) (AlbumProjectRe
 		return serverError()
 	}
 
-	project, err := r.useCases.GetProject(ctx, gp.ID)
+	project, err := r.crm.GetProject(ctx, gp.ID)
 	if err != nil {
 		if errors.Is(err, crm.ErrForbidden) {
 			return forbidden()
@@ -54,7 +54,7 @@ func (r *albumResolver) Project(ctx context.Context, obj *Album) (AlbumProjectRe
 }
 
 func (r *albumResolver) File(ctx context.Context, obj *Album) (AlbumRecentFileResult, error) {
-	albumFile, file, err := r.useCases.GetAlbumRecentFile(ctx, obj.ID)
+	albumFile, file, err := r.crm.GetAlbumRecentFile(ctx, obj.ID)
 	if err != nil {
 		if errors.Is(err, crm.ErrForbidden) {
 			return forbidden()
@@ -64,7 +64,7 @@ func (r *albumResolver) File(ctx context.Context, obj *Album) (AlbumRecentFileRe
 			return notFound()
 		}
 
-		if errors.Is(err, albumFiles.ErrAlbumFileNotFound) {
+		if errors.Is(err, albumfiles.ErrAlbumFileNotFound) {
 			return notFound()
 		}
 
@@ -111,7 +111,7 @@ func (r *albumResolver) Cover(ctx context.Context, obj *Album) (AlbumCoverResult
 	return serverError()
 }
 
-func albumFileToGraphQL(file *albumFiles.AlbumFile) *AlbumFile {
+func albumFileToGraphQL(file *albumfiles.AlbumFile) *AlbumFile {
 	return &AlbumFile{
 		ID:                  file.ID,
 		Status:              albumFileStatusToGraphQL(file.Status),
@@ -121,13 +121,13 @@ func albumFileToGraphQL(file *albumFiles.AlbumFile) *AlbumFile {
 	}
 }
 
-func albumFileStatusToGraphQL(status albumFiles.Status) AlbumFileStatus {
+func albumFileStatusToGraphQL(status albumfiles.Status) AlbumFileStatus {
 	switch status {
-	case albumFiles.StatusNew:
+	case albumfiles.StatusNew:
 		return AlbumFileStatusNew
-	case albumFiles.StatusInProgress:
+	case albumfiles.StatusInProgress:
 		return AlbumFileStatusGeneratingInProgress
-	case albumFiles.StatusDone:
+	case albumfiles.StatusDone:
 		return AlbumFileStatusGeneratingDone
 	}
 

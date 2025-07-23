@@ -6,12 +6,12 @@ import (
 )
 
 type rootResolver struct {
-	db       *bun.DB
-	useCases *crm.CRM
+	db  *bun.DB
+	crm *crm.CRM
 }
 
 func NewRootResolver(db *bun.DB, useCases *crm.CRM) ResolverRoot {
-	return &rootResolver{db: db, useCases: useCases}
+	return &rootResolver{db: db, crm: useCases}
 }
 
 func notFound() (NotFound, error) {

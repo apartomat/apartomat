@@ -2,7 +2,7 @@ package postgres
 
 import (
 	"errors"
-	. "github.com/apartomat/apartomat/internal/store/workspace_users"
+	. "github.com/apartomat/apartomat/internal/store/workspaceusers"
 	"github.com/doug-martin/goqu/v9"
 	"github.com/doug-martin/goqu/v9/exp"
 )

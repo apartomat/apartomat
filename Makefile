@@ -20,6 +20,11 @@ gen-crm-api:
 gen-project-page-api:
 	go generate ./api/project-page/...
 
+.PHONY: gen-wire
+gen-wire:
+	$(call _info,"Generating DI for crm ...")
+	@go generate ./cmd/crm
+
 test:
 	env $(cat .env | xargs) go test ./... --tags=test,unit
 

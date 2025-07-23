@@ -9,7 +9,7 @@ import (
 )
 
 func (r *mutationResolver) GenerateAlbumFile(ctx context.Context, albumID string) (GenerateAlbumFileResult, error) {
-	albumFile, file, err := r.useCases.StartGenerateAlbumFile(ctx, albumID)
+	albumFile, file, err := r.crm.StartGenerateAlbumFile(ctx, albumID)
 	if err != nil {
 		if errors.Is(err, crm.ErrForbidden) {
 			return forbidden()

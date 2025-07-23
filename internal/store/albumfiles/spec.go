@@ -1,4 +1,4 @@
-package album_files
+package albumfiles
 
 type Spec interface {
 	Is(*AlbumFile) bool

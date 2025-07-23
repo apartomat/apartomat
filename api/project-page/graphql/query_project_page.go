@@ -5,7 +5,7 @@ import (
 	"errors"
 	"github.com/apartomat/apartomat/internal/project-page"
 	"github.com/apartomat/apartomat/internal/store"
-	"github.com/apartomat/apartomat/internal/store/projectpage"
+	"github.com/apartomat/apartomat/internal/store/projectpages"
 	"log/slog"
 )
 
@@ -28,7 +28,7 @@ func (r *queryResolver) ProjectPage(ctx context.Context, id string) (ProjectPage
 	return projectPageToGraphQL(ps), nil
 }
 
-func projectPageToGraphQL(p *projectpage.ProjectPage) ProjectPage {
+func projectPageToGraphQL(p *projectpages.ProjectPage) ProjectPage {
 	return ProjectPage{
 		ID:          p.ID,
 		Title:       p.Title,

@@ -9,7 +9,7 @@ import (
 )
 
 func (r *mutationResolver) AddRoom(ctx context.Context, houseID string, input AddRoomInput) (AddRoomResult, error) {
-	room, err := r.useCases.AddRoom(
+	room, err := r.crm.AddRoom(
 		ctx,
 		houseID,
 		input.Name,

@@ -34,7 +34,7 @@ func (r *albumPageCoverResolver) SVG(ctx context.Context, obj *AlbumPageCover) (
 	switch c := obj.Cover.(type) {
 	case *CoverUploaded:
 		if f, ok := c.File.(File); ok {
-			file, err := r.useCases.GetFile(ctx, f.ID)
+			file, err := r.crm.GetFile(ctx, f.ID)
 			if err != nil {
 				if errors.Is(err, crm.ErrNotFound) {
 					return notFound()

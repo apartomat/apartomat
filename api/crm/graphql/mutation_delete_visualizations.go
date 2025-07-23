@@ -9,7 +9,7 @@ import (
 )
 
 func (r *mutationResolver) DeleteVisualizations(ctx context.Context, id []string) (DeleteVisualizationsResult, error) {
-	res, err := r.useCases.DeleteVisualizations(ctx, id)
+	res, err := r.crm.DeleteVisualizations(ctx, id)
 	if err != nil {
 		if errors.Is(err, crm.ErrForbidden) {
 			return forbidden()

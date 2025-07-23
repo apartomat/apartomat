@@ -3,11 +3,12 @@ package project_page
 import (
 	"context"
 	"errors"
-	albumFiles "github.com/apartomat/apartomat/internal/store/album_files"
+
+	"github.com/apartomat/apartomat/internal/store/albumfiles"
 	"github.com/apartomat/apartomat/internal/store/albums"
 	"github.com/apartomat/apartomat/internal/store/files"
 	"github.com/apartomat/apartomat/internal/store/houses"
-	"github.com/apartomat/apartomat/internal/store/projectpage"
+	"github.com/apartomat/apartomat/internal/store/projectpages"
 	"github.com/apartomat/apartomat/internal/store/visualizations"
 )
 
@@ -17,19 +18,19 @@ var (
 
 type Service struct {
 	Files          files.Store
-	ProjectPages   projectpage.Store
+	ProjectPages   projectpages.Store
 	Visualizations visualizations.Store
 	Albums         albums.Store
-	AlbumFiles     albumFiles.Store
+	AlbumFiles     albumfiles.Store
 	Houses         houses.Store
 }
 
 func NewService(
 	filesStore files.Store,
-	projectPages projectpage.Store,
+	projectPages projectpages.Store,
 	visualizationsStore visualizations.Store,
 	albumsStore albums.Store,
-	albumsFilesStore albumFiles.Store,
+	albumsFilesStore albumfiles.Store,
 	housesStore houses.Store,
 ) *Service {
 	return &Service{
@@ -42,13 +43,13 @@ func NewService(
 	}
 }
 
-func (u *Service) GetProjectPage(ctx context.Context, id string) (*projectpage.ProjectPage, error) {
-	s, err := u.ProjectPages.Get(ctx, projectpage.IDIn(id))
+func (u *Service) GetProjectPage(ctx context.Context, id string) (*projectpages.ProjectPage, error) {
+	s, err := u.ProjectPages.Get(ctx, projectpages.IDIn(id))
 	if err != nil {
 		return nil, err
 	}
 
-	if !s.Is(projectpage.Public()) {
+	if !s.Is(projectpages.Public()) {
 		return nil, ErrForbidden
 	}
 

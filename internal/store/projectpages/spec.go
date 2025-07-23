@@ -1,4 +1,4 @@
-package projectpage
+package projectpages
 
 type Spec interface {
 	Is(*ProjectPage) bool

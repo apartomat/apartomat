@@ -9,7 +9,7 @@ import (
 )
 
 func (r *mutationResolver) DeleteContact(ctx context.Context, id string) (DeleteContactResult, error) {
-	contact, err := r.useCases.DeleteContact(
+	contact, err := r.crm.DeleteContact(
 		ctx,
 		id,
 	)

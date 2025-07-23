@@ -3,11 +3,11 @@ package project_page
 import (
 	"context"
 	"github.com/apartomat/apartomat/internal/store/houses"
-	"github.com/apartomat/apartomat/internal/store/projectpage"
+	"github.com/apartomat/apartomat/internal/store/projectpages"
 )
 
 func (u *Service) GetHouse(ctx context.Context, projectPageID string) (*houses.House, error) {
-	page, err := u.ProjectPages.Get(ctx, projectpage.IDIn(projectPageID))
+	page, err := u.ProjectPages.Get(ctx, projectpages.IDIn(projectPageID))
 	if err != nil {
 		return nil, err
 	}

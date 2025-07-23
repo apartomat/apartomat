@@ -8,8 +8,8 @@ import (
 	"github.com/apartomat/apartomat/internal/crm/auth"
 	"github.com/apartomat/apartomat/internal/store/projects"
 	"github.com/apartomat/apartomat/internal/store/users"
-	"github.com/apartomat/apartomat/internal/store/workspace_users"
 	"github.com/apartomat/apartomat/internal/store/workspaces"
+	"github.com/apartomat/apartomat/internal/store/workspaceusers"
 	"time"
 )
 
@@ -88,7 +88,7 @@ func (u *CRM) GetWorkspaceUserProfileDl(ctx context.Context, workspaceID, userID
 	return user, nil
 }
 
-func (u *CRM) GetWorkspaceUsers(ctx context.Context, workspaceID string, limit, offset int) ([]*workspace_users.WorkspaceUser, error) {
+func (u *CRM) GetWorkspaceUsers(ctx context.Context, workspaceID string, limit, offset int) ([]*workspaceusers.WorkspaceUser, error) {
 	if ok, err := u.Acl.CanGetWorkspaceUsersOfWorkspaceID(ctx, auth.UserFromCtx(ctx), workspaceID); err != nil {
 		return nil, err
 	} else if !ok {
@@ -97,8 +97,8 @@ func (u *CRM) GetWorkspaceUsers(ctx context.Context, workspaceID string, limit, 
 
 	wu, err := u.WorkspaceUsers.List(
 		ctx,
-		workspace_users.WorkspaceIDIn(workspaceID),
-		workspace_users.SortDefault,
+		workspaceusers.WorkspaceIDIn(workspaceID),
+		workspaceusers.SortDefault,
 		limit,
 		offset,
 	)
@@ -113,7 +113,7 @@ func (u *CRM) InviteUserToWorkspace(
 	ctx context.Context,
 	workspaceID string,
 	email string,
-	role workspace_users.WorkspaceUserRole,
+	role workspaceusers.WorkspaceUserRole,
 ) (string, time.Duration, error) {
 	workspace, err := u.Workspaces.Get(ctx, workspaces.IDIn(workspaceID))
 	if err != nil {
@@ -134,12 +134,12 @@ func (u *CRM) InviteUserToWorkspace(
 	if user != nil {
 		wus, err := u.WorkspaceUsers.Get(
 			ctx,
-			workspace_users.And(
-				workspace_users.UserIDIn(user.ID),
-				workspace_users.WorkspaceIDIn(workspace.ID),
+			workspaceusers.And(
+				workspaceusers.UserIDIn(user.ID),
+				workspaceusers.WorkspaceIDIn(workspace.ID),
 			),
 		)
-		if err != nil && !errors.Is(err, workspace_users.ErrWorkspaceUserNotFound) {
+		if err != nil && !errors.Is(err, workspaceusers.ErrWorkspaceUserNotFound) {
 			return "", 0, err
 		}
 
@@ -157,7 +157,7 @@ func (u *CRM) InviteUserToWorkspace(
 		return "", 0, err
 	}
 
-	err = u.Mailer.Send(u.MailFactory.MailInvite(email, token))
+	err = u.MailSender.Send(u.MailFactory.MailInvite(email, token))
 	if err != nil {
 		return "", 0, fmt.Errorf("can't send email to %s: %w", email, err)
 	}

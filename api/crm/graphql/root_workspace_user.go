@@ -19,7 +19,7 @@ func (r *rootResolver) WorkspaceUser() WorkspaceUserResolver {
 }
 
 func (r *workspaceUserResolver) Profile(ctx context.Context, obj *WorkspaceUser) (*UserProfile, error) {
-	user, err := r.useCases.GetWorkspaceUserProfileDl(ctx, obj.Workspace.ID, obj.ID)
+	user, err := r.crm.GetWorkspaceUserProfileDl(ctx, obj.Workspace.ID, obj.ID)
 	if err != nil {
 		slog.ErrorContext(ctx, "can't resolve workspace user profile", slog.String("user", obj.ID), slog.Any("err", err))
 

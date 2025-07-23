@@ -13,7 +13,7 @@ func (r *mutationResolver) CreateAlbum(
 	projectID, name string,
 	settings CreateAlbumSettingsInput,
 ) (CreateAlbumResult, error) {
-	album, err := r.useCases.CreateAlbum(
+	album, err := r.crm.CreateAlbum(
 		ctx,
 		projectID,
 		name,

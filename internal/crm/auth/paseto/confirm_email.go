@@ -42,15 +42,15 @@ func (token ConfirmEmailToken) Validate(validators ...paseto.Validator) error {
 	return token.JSONToken.Validate(validators...)
 }
 
-type confirmEmailTokenIssuerVerifier struct {
+type ConfirmEmailTokenIssuerVerifier struct {
 	privateKey ed25519.PrivateKey
 }
 
-func NewConfirmEmailTokenIssuerVerifier(key ed25519.PrivateKey) *confirmEmailTokenIssuerVerifier {
-	return &confirmEmailTokenIssuerVerifier{key}
+func NewConfirmEmailTokenIssuerVerifier(key ed25519.PrivateKey) *ConfirmEmailTokenIssuerVerifier {
+	return &ConfirmEmailTokenIssuerVerifier{key}
 }
 
-func (p *confirmEmailTokenIssuerVerifier) Issue(email string) (string, error) {
+func (p *ConfirmEmailTokenIssuerVerifier) Issue(email string) (string, error) {
 	token := NewConfirmEmailToken(email)
 	str, err := paseto.NewV2().Sign(p.privateKey, token, "")
 
@@ -61,7 +61,7 @@ func (p *confirmEmailTokenIssuerVerifier) Issue(email string) (string, error) {
 	return str, nil
 }
 
-func (p *confirmEmailTokenIssuerVerifier) Verify(str string) (auth.EmailConfirmToken, error) {
+func (p *ConfirmEmailTokenIssuerVerifier) Verify(str string) (auth.EmailConfirmToken, error) {
 	var (
 		token  ConfirmEmailToken
 		footer string

@@ -30,7 +30,7 @@ func (r *projectHousesResolver) List(
 
 		return serverError()
 	} else {
-		items, err := r.useCases.GetHouses(
+		items, err := r.crm.GetHouses(
 			ctx,
 			project.ID,
 			limit,

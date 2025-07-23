@@ -9,7 +9,7 @@ import (
 )
 
 func (r *mutationResolver) DeleteRoom(ctx context.Context, id string) (DeleteRoomResult, error) {
-	room, err := r.useCases.DeleteRoom(
+	room, err := r.crm.DeleteRoom(
 		ctx,
 		id,
 	)

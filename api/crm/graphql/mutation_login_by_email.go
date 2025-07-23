@@ -15,7 +15,7 @@ const (
 func (r *mutationResolver) LoginByEmail(ctx context.Context, email string, workspace string) (LoginByEmailResult, error) {
 	switch sendLink {
 	case true:
-		e, err := r.useCases.LoginByEmail(ctx, email, workspace)
+		e, err := r.crm.LoginByEmail(ctx, email, workspace)
 		if err != nil {
 			if errors.Is(err, crm.ErrInvalidEmail) {
 				return InvalidEmail{Message: err.Error()}, nil
@@ -28,7 +28,7 @@ func (r *mutationResolver) LoginByEmail(ctx context.Context, email string, works
 
 		return LinkSentByEmail{Email: e}, nil
 	default:
-		e, token, err := r.useCases.LoginEmailPIN(ctx, email, workspace)
+		e, token, err := r.crm.LoginEmailPIN(ctx, email, workspace)
 		if err != nil {
 			if errors.Is(err, crm.ErrInvalidEmail) {
 				return InvalidEmail{Message: err.Error()}, nil

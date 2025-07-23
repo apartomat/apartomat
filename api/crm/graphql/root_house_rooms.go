@@ -26,7 +26,7 @@ func (r *houseRoomsResolver) List(ctx context.Context, obj *HouseRooms, limit in
 	} else {
 		house := *phouse
 
-		items, err := r.useCases.GetRooms(
+		items, err := r.crm.GetRooms(
 			ctx,
 			house.ID,
 			limit,

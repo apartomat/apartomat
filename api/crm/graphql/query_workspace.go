@@ -10,7 +10,7 @@ import (
 )
 
 func (r *queryResolver) Workspace(ctx context.Context, id string) (WorkspaceResult, error) {
-	ws, err := r.useCases.GetWorkspace(ctx, id)
+	ws, err := r.crm.GetWorkspace(ctx, id)
 	if err != nil {
 		if errors.Is(err, crm.ErrForbidden) {
 			return forbidden()

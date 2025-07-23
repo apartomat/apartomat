@@ -14,7 +14,7 @@ func (r *mutationResolver) AddContact(
 	projectID string,
 	input AddContactInput,
 ) (AddContactResult, error) {
-	contact, err := r.useCases.AddContact(
+	contact, err := r.crm.AddContact(
 		ctx,
 		projectID,
 		crm.AddContactParams{

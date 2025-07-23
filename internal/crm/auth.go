@@ -9,8 +9,8 @@ import (
 	"math/rand"
 
 	. "github.com/apartomat/apartomat/internal/store/users"
-	"github.com/apartomat/apartomat/internal/store/workspace_users"
 	"github.com/apartomat/apartomat/internal/store/workspaces"
+	"github.com/apartomat/apartomat/internal/store/workspaceusers"
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/go-ozzo/ozzo-validation/v4/is"
 )
@@ -50,7 +50,7 @@ func (u *CRM) LoginByEmail(ctx context.Context, email string, workspaceName stri
 		return "", err
 	}
 
-	err = u.Mailer.Send(u.MailFactory.MailAuth(email, token))
+	err = u.MailSender.Send(u.MailFactory.MailAuth(email, token))
 	if err != nil {
 		return "", fmt.Errorf("sent error: %w", err)
 	}
@@ -95,7 +95,7 @@ func (u *CRM) LoginByEmail(ctx context.Context, email string, workspaceName stri
 			return "", err
 		}
 
-		wu := workspace_users.NewWorkspaceUser(wid, workspace_users.WorkspaceUserRoleAdmin, workspace.ID, user.ID)
+		wu := workspaceusers.NewWorkspaceUser(wid, workspaceusers.WorkspaceUserRoleAdmin, workspace.ID, user.ID)
 
 		if err := u.WorkspaceUsers.Save(ctx, wu); err != nil {
 			return "", err
@@ -130,7 +130,7 @@ func (u *CRM) LoginEmailPIN(ctx context.Context, email string, workspaceName str
 	if u.Params.SendPinByEmail {
 		slog.DebugContext(ctx, "send pin to", slog.String("email", email), slog.String("pin", pin))
 
-		err = u.Mailer.Send(u.MailFactory.MailPIN(email, pin))
+		err = u.MailSender.Send(u.MailFactory.MailPIN(email, pin))
 		if err != nil {
 			return "", "", fmt.Errorf("sent error: %w", err)
 		}
@@ -176,7 +176,7 @@ func (u *CRM) LoginEmailPIN(ctx context.Context, email string, workspaceName str
 			return "", "", err
 		}
 
-		wu := workspace_users.NewWorkspaceUser(wid, workspace_users.WorkspaceUserRoleAdmin, workspace.ID, user.ID)
+		wu := workspaceusers.NewWorkspaceUser(wid, workspaceusers.WorkspaceUserRoleAdmin, workspace.ID, user.ID)
 
 		if err := u.WorkspaceUsers.Save(ctx, wu); err != nil {
 			return "", "", err
@@ -231,12 +231,12 @@ func (u *CRM) AcceptInviteToWorkspace(ctx context.Context, str string) (string, 
 	if user != nil {
 		wus, err := u.WorkspaceUsers.Get(
 			ctx,
-			workspace_users.And(
-				workspace_users.UserIDIn(user.ID),
-				workspace_users.WorkspaceIDIn(workspace.ID),
+			workspaceusers.And(
+				workspaceusers.UserIDIn(user.ID),
+				workspaceusers.WorkspaceIDIn(workspace.ID),
 			),
 		)
-		if err != nil && !errors.Is(err, workspace_users.ErrWorkspaceUserNotFound) {
+		if err != nil && !errors.Is(err, workspaceusers.ErrWorkspaceUserNotFound) {
 			return "", err
 		}
 
@@ -259,9 +259,9 @@ func (u *CRM) AcceptInviteToWorkspace(ctx context.Context, str string) (string, 
 			return "", err
 		}
 
-		wuser := workspace_users.NewWorkspaceUser(
+		wuser := workspaceusers.NewWorkspaceUser(
 			id,
-			workspace_users.WorkspaceUserRole(confirmToken.Role()),
+			workspaceusers.WorkspaceUserRole(confirmToken.Role()),
 			workspace.ID,
 			user.ID,
 		)

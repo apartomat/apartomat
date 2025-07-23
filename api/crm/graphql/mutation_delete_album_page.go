@@ -13,7 +13,7 @@ func (r *mutationResolver) DeleteAlbumPage(
 	albumID string,
 	pageNumber int,
 ) (DeleteAlbumPageResult, error) {
-	page, err := r.useCases.DeleteAlbumPage(ctx, albumID, pageNumber)
+	page, err := r.crm.DeleteAlbumPage(ctx, albumID, pageNumber)
 	if err != nil {
 		if errors.Is(err, crm.ErrForbidden) {
 			return forbidden()

@@ -28,7 +28,7 @@ func (r *mutationResolver) UploadVisualizations(
 		}
 	}
 
-	res, err := r.useCases.UploadVisualizations(ctx, projectID, uploads, roomID)
+	res, err := r.crm.UploadVisualizations(ctx, projectID, uploads, roomID)
 	if err != nil {
 		if errors.Is(err, crm.ErrForbidden) {
 			return forbidden()

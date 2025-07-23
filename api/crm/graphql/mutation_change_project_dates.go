@@ -13,7 +13,7 @@ func (r *mutationResolver) ChangeProjectDates(
 	projectID string,
 	input ChangeProjectDatesInput,
 ) (ChangeProjectDatesResult, error) {
-	project, err := r.useCases.ChangeProjectDates(
+	project, err := r.crm.ChangeProjectDates(
 		ctx,
 		projectID,
 		input.StartAt,

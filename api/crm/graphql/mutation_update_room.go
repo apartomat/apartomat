@@ -13,7 +13,7 @@ func (r *mutationResolver) UpdateRoom(
 	roomID string,
 	input UpdateRoomInput,
 ) (UpdateRoomResult, error) {
-	room, err := r.useCases.UpdateRoom(
+	room, err := r.crm.UpdateRoom(
 		ctx,
 		roomID,
 		input.Name,

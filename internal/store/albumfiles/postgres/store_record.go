@@ -1,7 +1,7 @@
 package postgres
 
 import (
-	. "github.com/apartomat/apartomat/internal/store/album_files"
+	. "github.com/apartomat/apartomat/internal/store/albumfiles"
 	"github.com/uptrace/bun"
 	"time"
 )

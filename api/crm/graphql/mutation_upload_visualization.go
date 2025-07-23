@@ -17,7 +17,7 @@ func (r *mutationResolver) UploadVisualization(
 	file graphql.Upload,
 	roomID *string,
 ) (UploadVisualizationResult, error) {
-	uploaded, vis, err := r.useCases.UploadVisualization(
+	uploaded, vis, err := r.crm.UploadVisualization(
 		ctx,
 		projectID,
 		crm.Upload{

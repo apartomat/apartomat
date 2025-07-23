@@ -2,7 +2,7 @@ package postgres
 
 import (
 	"errors"
-	. "github.com/apartomat/apartomat/internal/store/album_files"
+	. "github.com/apartomat/apartomat/internal/store/albumfiles"
 	"github.com/doug-martin/goqu/v9"
 	"github.com/doug-martin/goqu/v9/exp"
 )

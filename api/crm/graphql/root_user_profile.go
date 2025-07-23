@@ -21,7 +21,7 @@ func (r *userProfileResolver) DefaultWorkspace(ctx context.Context, obj *UserPro
 		return obj.DefaultWorkspace, nil
 	}
 
-	w, err := r.useCases.GetWorkspace(ctx, obj.DefaultWorkspace.ID)
+	w, err := r.crm.GetWorkspace(ctx, obj.DefaultWorkspace.ID)
 	if err != nil {
 		slog.ErrorContext(ctx, "can't get default workspace", slog.Any("err", err))
 

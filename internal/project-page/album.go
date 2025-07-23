@@ -4,14 +4,14 @@ import (
 	"context"
 	"errors"
 
-	. "github.com/apartomat/apartomat/internal/store/album_files"
+	. "github.com/apartomat/apartomat/internal/store/albumfiles"
 	"github.com/apartomat/apartomat/internal/store/albums"
 	"github.com/apartomat/apartomat/internal/store/files"
-	"github.com/apartomat/apartomat/internal/store/projectpage"
+	"github.com/apartomat/apartomat/internal/store/projectpages"
 )
 
 func (u *Service) GetAlbumAndFile(ctx context.Context, projectPageID string) (*albums.Album, *files.File, error) {
-	page, err := u.ProjectPages.Get(ctx, projectpage.IDIn(projectPageID))
+	page, err := u.ProjectPages.Get(ctx, projectpages.IDIn(projectPageID))
 	if err != nil {
 		return nil, nil, err
 	}

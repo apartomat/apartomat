@@ -1,4 +1,4 @@
-package workspace_users
+package workspaceusers
 
 import "time"
 

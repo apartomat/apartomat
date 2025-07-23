@@ -2,38 +2,15 @@ package main
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"log/slog"
 	"os"
 
 	"github.com/apartomat/apartomat/api/crm/graphql"
 	"github.com/apartomat/apartomat/api/crm/graphql/dataloaders"
-	"github.com/apartomat/apartomat/internal/crm"
-	paseto2 "github.com/apartomat/apartomat/internal/crm/auth/paseto"
-	"github.com/apartomat/apartomat/internal/crm/image/minio"
-	"github.com/apartomat/apartomat/internal/crm/mail"
-	"github.com/apartomat/apartomat/internal/crm/mail/smtp"
-	bunhook "github.com/apartomat/apartomat/internal/pkg/bun"
-	gopghook "github.com/apartomat/apartomat/internal/pkg/go-pg"
+	crmparams "github.com/apartomat/apartomat/internal/crm"
 	"github.com/apartomat/apartomat/internal/pkg/log"
-	albumFiles "github.com/apartomat/apartomat/internal/store/album_files/postgres"
-	albums "github.com/apartomat/apartomat/internal/store/albums/postgres"
-	contacts "github.com/apartomat/apartomat/internal/store/contacts/postgres"
-	files "github.com/apartomat/apartomat/internal/store/files/postgres"
-	houses "github.com/apartomat/apartomat/internal/store/houses/postgres"
-	projectpage "github.com/apartomat/apartomat/internal/store/projectpage/postgres"
-	projects "github.com/apartomat/apartomat/internal/store/projects/postgres"
-	rooms "github.com/apartomat/apartomat/internal/store/rooms/postgres"
-	users "github.com/apartomat/apartomat/internal/store/users/postgres"
-	visualizations "github.com/apartomat/apartomat/internal/store/visualizations/postgres"
-	workspaceUsers "github.com/apartomat/apartomat/internal/store/workspace_users/postgres"
-	workspaces "github.com/apartomat/apartomat/internal/store/workspaces/postgres"
-	"github.com/go-pg/pg/v10"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/uptrace/bun"
-	"github.com/uptrace/bun/dialect/pgdialect"
-	"github.com/uptrace/bun/driver/pgdriver"
 )
 
 func main() {
@@ -76,69 +53,6 @@ func genKeyPair() {
 }
 
 func run() {
-	privateKey, err := readPrivateKeyFromFile("apartomat.key")
-	if err != nil {
-		slog.Error("cant read private key from file", slog.Any("err", err))
-		os.Exit(1)
-	}
-
-	confirmLoginIssuerVerifier := paseto2.NewConfirmEmailTokenIssuerVerifier(privateKey)
-	authIssuerVerifier := paseto2.NewAuthTokenIssuerVerifier(privateKey)
-	confirmEmailPin := paseto2.NewConfirmEmailPINTokenIssuerVerifier(privateKey)
-	invite := paseto2.NewInviteTokenIssuerVerifier(privateKey)
-
-	//
-
-	mailer := smtp.NewMailSender(smtp.Config{
-		Addr:     os.Getenv("SMTP_ADDR"),
-		User:     os.Getenv("SMTP_USER"),
-		Password: os.Getenv("SMTP_PASSWORD"),
-	})
-
-	pgopts, err := pg.ParseURL(os.Getenv("POSTGRES_DSN"))
-	if err != nil {
-		slog.Error("can't parse POSTGRES_DSN", slog.Any("err", err))
-		os.Exit(1)
-	}
-
-	pgdb := pg.Connect(pgopts)
-	pgdb.AddQueryHook(gopghook.NewLogQueryHook(slog.Default()))
-	pgdb.AddQueryHook(gopghook.NewQueryLatencyHook(observeSql))
-
-	if err := pgdb.Ping(gopghook.WithQueryContext(context.Background(), "ping")); err != nil {
-		slog.Error("can't connect to database", slog.Any("err", err))
-		os.Exit(1)
-	}
-
-	//
-
-	sqldb := sql.OpenDB(pgdriver.NewConnector(pgdriver.WithDSN(os.Getenv("POSTGRES_DSN"))))
-
-	bundb := bun.NewDB(sqldb, pgdialect.New())
-
-	if err := bundb.Ping(); err != nil {
-		slog.Error("can't connect to database", slog.Any("err", err))
-		os.Exit(1)
-	}
-
-	bundb.AddQueryHook(bunhook.NewLogQueryHook(slog.Default()))
-	bundb.AddQueryHook(bunhook.NewQueryLatencyHook(observeSql))
-
-	//
-
-	albumFilesStore := albumFiles.NewStore(bundb)
-	albumsStore := albums.NewStore(bundb)
-	contactsStore := contacts.NewStore(pgdb)
-	filesStore := files.NewStore(bundb)
-	housesStore := houses.NewStore(bundb)
-	projectsStore := projects.NewStore(bundb)
-	projectPageStore := projectpage.NewStore(bundb)
-	roomsStore := rooms.NewStore(bundb)
-	usersStore := users.NewStore(pgdb)
-	visualizationsStore := visualizations.NewStore(bundb)
-	workspaceUsersStore := workspaceUsers.NewStore(bundb)
-	workspacesStore := workspaces.NewStore(pgdb)
-
 	//uploader, err := s3.NewS3ImageUploaderWithCred(
 	//	ctx,
 	//	os.Getenv("S3_ACCESS_KEY_ID"),
@@ -150,41 +64,10 @@ func run() {
 	//	log.Fatalf("can't init s3: %s", err)
 	//}
 
-	uploader := minio.NewUploader("apartomat")
-
-	usecases := &crm.CRM{
-		Params:                       params(),
-		AuthTokenIssuer:              authIssuerVerifier,
-		AuthTokenVerifier:            authIssuerVerifier,
-		ConfirmTokenByEmailIssuer:    confirmLoginIssuerVerifier,
-		ConfirmTokenByEmailVerifier:  confirmLoginIssuerVerifier,
-		ConfirmEmailPINTokenIssuer:   confirmEmailPin,
-		ConfirmEmailPINTokenVerifier: confirmEmailPin,
-		InviteTokenIssuer:            invite,
-		InviteTokenVerifier:          invite,
-		Mailer:                       mailer,
-		MailFactory: mail.NewFactory(
-			os.Getenv("BASE_URL"),
-			os.Getenv("MAIL_FROM"),
-		),
-		Uploader:       uploader,
-		Albums:         albumsStore,
-		AlbumFiles:     albumFilesStore,
-		Contacts:       contactsStore,
-		Houses:         housesStore,
-		Projects:       projectsStore,
-		ProjectPages:   projectPageStore,
-		Files:          filesStore,
-		Rooms:          roomsStore,
-		Users:          usersStore,
-		Visualizations: visualizationsStore,
-		Workspaces:     workspacesStore,
-		WorkspaceUsers: workspaceUsersStore,
-		Acl: crm.NewAcl(
-			workspaceUsersStore,
-			projectsStore,
-			housesStore,
-		),
+	crm, err := InitializeCRM(context.Background())
+	if err != nil {
+		slog.Error("can't initialize app", slog.Any("err", err))
+		os.Exit(1)
 	}
 
 	var (
@@ -196,16 +79,16 @@ func run() {
 	}
 
 	h := graphql.Handler(
-		usecases.CheckAuthToken,
+		crm.CheckAuthToken,
 		func() *dataloaders.DataLoaders {
 			return dataloaders.NewDataLoaders(
-				filesStore,
-				roomsStore,
-				usersStore,
-				workspacesStore,
+				crm.Files,
+				crm.Rooms,
+				crm.Users,
+				crm.Workspaces,
 			)
 		},
-		graphql.NewRootResolver(bundb, usecases),
+		graphql.NewRootResolver(crm.DB, crm),
 		10000,
 	)
 
@@ -219,8 +102,8 @@ func run() {
 		Run(context.Background(), addr)
 }
 
-func params() crm.Params {
-	return crm.Params{
+func params() crmparams.Params {
+	return crmparams.Params{
 		SendPinByEmail:     GetEnvBool(EnvKeySendPinByEmail),
 		ProjectPageBaseURL: GetEnvProjectPageBaseURL(),
 	}

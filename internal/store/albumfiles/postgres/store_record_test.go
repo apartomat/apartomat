@@ -4,7 +4,7 @@
 package postgres
 
 import (
-	. "github.com/apartomat/apartomat/internal/store/album_files"
+	. "github.com/apartomat/apartomat/internal/store/albumfiles"
 	"reflect"
 	"testing"
 	"time"

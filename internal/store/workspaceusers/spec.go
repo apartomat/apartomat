@@ -1,4 +1,4 @@
-package workspace_users
+package workspaceusers
 
 type Spec interface {
 	Is(*WorkspaceUser) bool

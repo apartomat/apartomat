@@ -56,15 +56,15 @@ func (token InviteToken) Validate(validators ...paseto.Validator) error {
 	return token.JSONToken.Validate(validators...)
 }
 
-type inviteTokenIssuerVerifier struct {
+type InviteTokenIssuerVerifier struct {
 	privateKey ed25519.PrivateKey
 }
 
-func NewInviteTokenIssuerVerifier(key ed25519.PrivateKey) *inviteTokenIssuerVerifier {
-	return &inviteTokenIssuerVerifier{key}
+func NewInviteTokenIssuerVerifier(key ed25519.PrivateKey) *InviteTokenIssuerVerifier {
+	return &InviteTokenIssuerVerifier{key}
 }
 
-func (p *inviteTokenIssuerVerifier) Issue(email, workspaceID, role string, tokenExpiration time.Duration) (string, error) {
+func (p *InviteTokenIssuerVerifier) Issue(email, workspaceID, role string, tokenExpiration time.Duration) (string, error) {
 	token := NewInviteToken(email, workspaceID, role, tokenExpiration)
 
 	str, err := paseto.NewV2().Sign(p.privateKey, token, "")
@@ -76,7 +76,7 @@ func (p *inviteTokenIssuerVerifier) Issue(email, workspaceID, role string, token
 	return str, nil
 }
 
-func (p *inviteTokenIssuerVerifier) Verify(str string) (auth.InviteToken, error) {
+func (p *InviteTokenIssuerVerifier) Verify(str string) (auth.InviteToken, error) {
 	var (
 		token  InviteToken
 		footer string

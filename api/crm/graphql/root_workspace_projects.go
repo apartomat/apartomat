@@ -32,7 +32,7 @@ func (r *workspaceProjectsResolver) List(
 		return serverError()
 	}
 
-	items, err := r.useCases.GetWorkspaceProjects(
+	items, err := r.crm.GetWorkspaceProjects(
 		ctx,
 		workspace.ID,
 		toProjectStatuses(filter.Status),

@@ -6,7 +6,7 @@ package postgres
 import (
 	"context"
 	"database/sql"
-	. "github.com/apartomat/apartomat/internal/store/album_files"
+	. "github.com/apartomat/apartomat/internal/store/albumfiles"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/pgdialect"
 	"github.com/uptrace/bun/driver/pgdriver"

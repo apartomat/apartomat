@@ -8,7 +8,7 @@ import (
 
 	"github.com/apartomat/apartomat/internal/crm"
 
-	"github.com/apartomat/apartomat/internal/store/workspace_users"
+	"github.com/apartomat/apartomat/internal/store/workspaceusers"
 )
 
 func (r *mutationResolver) InviteUser(
@@ -17,7 +17,7 @@ func (r *mutationResolver) InviteUser(
 	email string,
 	role WorkspaceUserRole,
 ) (InviteUserToWorkspaceResult, error) {
-	res, expiration, err := r.useCases.InviteUserToWorkspace(ctx, workspaceID, email, workspace_users.WorkspaceUserRole(role))
+	res, expiration, err := r.crm.InviteUserToWorkspace(ctx, workspaceID, email, workspaceusers.WorkspaceUserRole(role))
 	if err != nil {
 		if errors.Is(err, crm.ErrForbidden) {
 			return forbidden()

@@ -42,15 +42,15 @@ func (token AuthToken) Validate(validators ...paseto.Validator) error {
 	return token.JSONToken.Validate(validators...)
 }
 
-type authTokenIssuerVerifier struct {
+type AuthTokenIssuerVerifier struct {
 	privateKey ed25519.PrivateKey
 }
 
-func NewAuthTokenIssuerVerifier(key ed25519.PrivateKey) *authTokenIssuerVerifier {
-	return &authTokenIssuerVerifier{key}
+func NewAuthTokenIssuerVerifier(key ed25519.PrivateKey) *AuthTokenIssuerVerifier {
+	return &AuthTokenIssuerVerifier{key}
 }
 
-func (p *authTokenIssuerVerifier) Issue(id string) (string, error) {
+func (p *AuthTokenIssuerVerifier) Issue(id string) (string, error) {
 	token := NewAuthToken(id)
 	str, err := paseto.NewV2().Sign(p.privateKey, token, "")
 
@@ -61,7 +61,7 @@ func (p *authTokenIssuerVerifier) Issue(id string) (string, error) {
 	return str, nil
 }
 
-func (p *authTokenIssuerVerifier) Verify(str string) (auth.AuthToken, error) {
+func (p *AuthTokenIssuerVerifier) Verify(str string) (auth.AuthToken, error) {
 	var (
 		token  AuthToken
 		footer string

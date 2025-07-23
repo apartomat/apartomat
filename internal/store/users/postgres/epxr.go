@@ -12,12 +12,12 @@ type query interface {
 }
 
 func toQuery(spec Spec) (query, error) {
-	if spec == nil {
-		return nil, nil
-	}
-
 	if s, ok := spec.(query); ok {
 		return s, nil
+	}
+
+	if spec == nil {
+		return allSpecQuery{}, nil
 	}
 
 	switch s := spec.(type) {
@@ -32,6 +32,12 @@ func toQuery(spec Spec) (query, error) {
 	}
 
 	return nil, errors.New("unknown user spec")
+}
+
+type allSpecQuery struct{}
+
+func (s allSpecQuery) Expression() (goqu.Expression, error) {
+	return goqu.Ex{}, nil
 }
 
 type idInSpecQuery struct {
