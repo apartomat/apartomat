@@ -1,11 +1,8 @@
-include .env
-export
-
 dev:
-	env $(cat .env | xargs) go run ./cmd/crm run
+	set -a; . ./.env; set +a; go run ./cmd/crm run
 
 dev-project-page:
-	env $(cat .env.project-page | xargs) go run ./cmd/project-page
+	set -a; . ./.env.project-page; set +a; go run ./cmd/project-page
 
 dev-binder:
 	env $(cat .env | xargs) go run ./cmd/binder
@@ -26,10 +23,10 @@ gen-wire:
 	@go generate ./cmd/crm
 
 test:
-	env $(cat .env | xargs) go test ./... --tags=test,unit
+	set -a; . ./.env.test; set +a; go test ./... --tags=test,unit
 
 test-integration:
-	env $(cat .env | xargs) go test --tags=test,integration ./...
+	set -a; . ./.env.test; set +a; go test --tags=test,integration ./...
 
 build:
 	GOOS=linux GOARCH=amd64 go build -o bin/apartomat-lunux-amd64 ./cmd/apartomat
