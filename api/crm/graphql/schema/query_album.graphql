@@ -42,7 +42,7 @@ interface AlbumPage {
     id: String!
     number: Int!
     rotate: Float!
-    svg: AlbumPageSvgResult!
+    svg: AlbumPageSvgResult! @deprecated(reason: "Render page on frontend instead.")
 }
 
 union AlbumPageSvgResult = Svg | NotFound | ServerError
@@ -56,14 +56,24 @@ type AlbumPageCover implements AlbumPage {
     number: Int!
     rotate: Float!
     svg: AlbumPageSvgResult! @goField(forceResolver: true)
-    cover: AlbumPageCoverResult! @goField(forceResolver: true)
+    cover: Cover!
 }
 
-union AlbumPageCoverResult = Cover | CoverUploaded | Forbidden | NotFound | ServerError
+union Cover = SplitCover | CoverUploaded
 
-type Cover {
-    id: String!
-    file: CoverFileResult! @goField(forceResolver: true)
+type SplitCover {
+    title: String!
+    subtitle: String
+    imgSrc: String!
+    qrCodeSrc: String
+    city: String
+    year: Int
+    variant: SplitCoverVariant!
+}
+
+enum SplitCoverVariant {
+    IMAGE_ON_THE_LEFT
+    IMAGE_ON_THE_RIGHT
 }
 
 type CoverUploaded {

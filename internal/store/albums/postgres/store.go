@@ -121,18 +121,23 @@ type settingsRecord struct {
 type pageRecordType string
 
 const (
-	pageRecordTypeCover         = "COVER"
+	pageRecordTypeSplitCover    = "SPLIT_COVER"
 	pageRecordTypeCoverUploaded = "COVER_UPLOADED"
 	pageRecordTypeVisualization = "VISUALIZATION"
 )
 
 type pageRecord struct {
-	ID              string `json:"id,omitempty"`
-	Type            pageRecordType
-	Rotate          float64
-	CoverID         string `json:"cover_id,omitempty"`
-	VisualizationID string `json:"visualization_id,omitempty"`
-	FileID          string `json:"file_id"`
+	ID              string         `json:"id,omitempty"`
+	Type            pageRecordType `json:"type"`
+	Rotate          float64        `json:"rotate,omitempty"`
+	VisualizationID string         `json:"visualization_id,omitempty"`
+	FileID          string         `json:"file_id,omitempty"`
+	Title           string         `json:"title,omitempty"`
+	Subtitle        string         `json:"sub_title,omitempty"`
+	ImgFileID       string         `json:"img_file_id,omitempty"`
+	WithQR          bool           `json:"qr,omitempty"`
+	City            string         `json:"city,omitempty"`
+	Year            int            `json:"year,omitempty"`
 }
 
 func toRecord(album *Album) record {
@@ -195,16 +200,20 @@ func toPageRecords(pages []AlbumPage) []pageRecord {
 
 	for i, p := range pages {
 		switch p.(type) {
-		case AlbumPageCover:
+		case AlbumPageSplitCover:
 			var (
-				page = (p).(AlbumPageCover)
+				page = (p).(AlbumPageSplitCover)
 			)
 			res[i] = pageRecord{
-				ID:      page.ID,
-				Type:    pageRecordTypeCover,
-				CoverID: page.CoverID,
-				FileID:  page.FileID,
-				Rotate:  page.Rotate,
+				ID:        page.ID,
+				Type:      pageRecordTypeSplitCover,
+				Rotate:    page.Rotate,
+				Title:     page.Title,
+				Subtitle:  *page.Subtitle,
+				ImgFileID: page.ImgFileID,
+				WithQR:    page.WithQR,
+				City:      *page.City,
+				Year:      *page.Year,
 			}
 		case AlbumPageCoverUploaded:
 			var (
@@ -212,9 +221,9 @@ func toPageRecords(pages []AlbumPage) []pageRecord {
 			)
 			res[i] = pageRecord{
 				ID:     page.ID,
+				Rotate: page.Rotate,
 				Type:   pageRecordTypeCoverUploaded,
 				FileID: page.FileID,
-				Rotate: page.Rotate,
 			}
 		case AlbumPageVisualization:
 			var (
@@ -223,10 +232,10 @@ func toPageRecords(pages []AlbumPage) []pageRecord {
 
 			res[i] = pageRecord{
 				ID:              page.ID,
+				Rotate:          page.Rotate,
 				Type:            pageRecordTypeVisualization,
 				VisualizationID: page.VisualizationID,
 				FileID:          page.FileID,
-				Rotate:          page.Rotate,
 			}
 		}
 	}
@@ -248,12 +257,16 @@ func fromPageRecords(recs []pageRecord) []AlbumPage {
 
 	for i, rec := range recs {
 		switch rec.Type {
-		case pageRecordTypeCover:
-			res[i] = AlbumPageCover{
-				ID:      rec.ID,
-				CoverID: rec.CoverID,
-				FileID:  rec.FileID,
-				Rotate:  rec.Rotate,
+		case pageRecordTypeSplitCover:
+			res[i] = AlbumPageSplitCover{
+				ID:        rec.ID,
+				Rotate:    rec.Rotate,
+				Title:     rec.Title,
+				Subtitle:  &rec.Subtitle,
+				ImgFileID: rec.FileID,
+				WithQR:    rec.WithQR,
+				City:      &rec.City,
+				Year:      &rec.Year,
 			}
 		case pageRecordTypeCoverUploaded:
 			res[i] = AlbumPageCoverUploaded{

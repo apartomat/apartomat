@@ -1,15 +1,16 @@
 import { Trash } from "grommet-icons"
 import { Button } from "grommet"
-import { useDeleteAlbumPage } from "pages/Album/DeletePage/api"
 import React, { useEffect, useState } from "react"
 import { Confirm } from "widgets/confirm"
+
+import { useDeleteAlbumPage } from "./api"
 
 export function DeletePage({
     albumId,
     pageNumber,
     onPageDeleted,
 }: {
-    key: React.Key,
+    key: React.Key
     albumId: string
     pageNumber
     onPageDeleted?: (pageNumber: number) => void

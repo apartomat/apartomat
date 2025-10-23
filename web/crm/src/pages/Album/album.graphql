@@ -141,16 +141,14 @@ fragment AlbumScreenAlbumPageCover on AlbumPageCover {
         }
     }
     cover {
-        ... on Cover {
-            id
-            file {
-                ... on File {
-                    url
-                }
-                ... on Error {
-                    message
-                }
-            }
+        ... on SplitCover {
+            title
+            subtitle
+            imgSrc
+            qrCodeSrc
+            city
+            year
+            variant
         }
         ... on CoverUploaded {
             file {
@@ -161,9 +159,6 @@ fragment AlbumScreenAlbumPageCover on AlbumPageCover {
                     message
                 }
             }
-        }
-        ... on Error {
-            message
         }
     }
 }

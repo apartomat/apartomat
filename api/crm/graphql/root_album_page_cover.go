@@ -61,26 +61,7 @@ func (r *albumPageCoverResolver) SVG(ctx context.Context, obj *AlbumPageCover) (
 		slog.ErrorContext(ctx, "can't convert AlbumPageCover.File to CoverUploaded")
 
 		return serverError()
-	case *Cover:
-		return notImplementedYetError()
-	default:
-		slog.ErrorContext(ctx, "unknown obj type")
-		return serverError()
-	}
-}
-
-func (r *albumPageCoverResolver) Cover(
-	ctx context.Context,
-	obj *AlbumPageCover,
-) (AlbumPageCoverResult, error) {
-	var (
-		cov interface{} = obj.Cover
-	)
-
-	switch c := cov.(type) {
-	case *CoverUploaded:
-		return c, nil
-	case *Cover:
+	case *SplitCover:
 		return notImplementedYetError()
 	default:
 		slog.ErrorContext(ctx, "unknown obj type")

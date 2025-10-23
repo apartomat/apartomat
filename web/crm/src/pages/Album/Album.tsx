@@ -1,9 +1,8 @@
-import React, { MouseEventHandler, useEffect, useRef, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { useParams, useNavigate } from "react-router-dom"
-import { InView } from "react-intersection-observer"
 
 import { Box, BoxExtendedProps, Button, Grid, Heading, Header, Text, Drop, Main } from "grommet"
-import {Add, Close} from "grommet-icons"
+import { Add, Close } from "grommet-icons"
 
 import useAlbum, {
     AlbumScreenVisualizationFragment,
@@ -20,8 +19,7 @@ import { PageSize, PageOrientation } from "./Settings/"
 import AddVisualizations from "pages/Album/AddVisualizations/AddVisualizations"
 import { GenerateFile as GenerateAlbumFile } from "pages/Album/GenerateFile"
 import { UploadCover } from "pages/Album/UploadCover"
-import { DeletePage } from "pages/Album/DeletePage/";
-import {Confirm} from "widgets/confirm";
+import { Page } from "pages/Album/Page"
 
 export function Album() {
     const { id } = useParams<"id">() as { id: string }
@@ -44,7 +42,7 @@ export function Album() {
 
     const [showUploadCover, setShowUploadCover] = useState(false)
 
-    const [scale, setScale] = useState(0.75)
+    const [scale, setScale] = useState(1.0)
 
     useEffect(() => {
         if (data?.album?.__typename === "Album") {
@@ -78,7 +76,7 @@ export function Album() {
                     setScale(0.5)
                     break
                 case PageSizeEnum.A4:
-                    setScale(0.707)
+                    setScale(0.7)
                     break
             }
         }
@@ -88,7 +86,7 @@ export function Album() {
 
     const [inView, setInView] = useState(0)
 
-    const [ hoverPage, setHoverPage ] = useState<number | undefined>()
+    const [hoverPage, setHoverPage] = useState<number | undefined>()
 
     const handlePageMouseEnter = (n: number) => {
         setHoverPage(n)
@@ -99,7 +97,7 @@ export function Album() {
     }
 
     return (
-        <Main overflow="scroll" style={{ position: "fixed", inset: 0 }}>
+        <Main overflow="scroll" style={{ position: "fixed", inset: 0 }} background="background-contrast">
             <Header
                 style={{
                     position: "fixed",
@@ -156,11 +154,7 @@ export function Album() {
                         <Heading level={5} margin={{ top: "none" }}>
                             Настройки для печати
                         </Heading>
-                        <PageSize
-                            albumId={id}
-                            size={settings.pageSize}
-                            onAlbumPageSizeChanged={() => refetch()}
-                        />
+                        <PageSize albumId={id} size={settings.pageSize} onAlbumPageSizeChanged={() => refetch()} />
                         <PageOrientation
                             albumId={id}
                             orientation={settings.pageOrientation}
@@ -191,96 +185,21 @@ export function Album() {
             />
 
             {pages.length > 0 && settings && (
-                <Box align="center" pad={{ top: "84px", bottom: "68px" }}>
+                <Box align="center" pad={{ top: "90px", bottom: "68px" }}>
                     <Grid width="100%">
-                        {pages.map((p, key) => {
+                        {pages.map((p, pageNumber) => {
                             return (
-                                <Box
-                                    key={key}
-                                    direction="row"
-                                    justify="center"
-                                    onMouseOver={() => {
-                                        handlePageMouseEnter(key)
-
+                                <Page
+                                    key={pageNumber}
+                                    pageNumber={pageNumber}
+                                    albumId={id}
+                                    page={p}
+                                    settings={settings}
+                                    scale={scale}
+                                    onPageDeleted={() => {
+                                        refetch()
                                     }}
-                                    onMouseOut={() => {
-                                        handlePageMouseLeave(key)
-                                    }}
-                                >
-                                    <Box direction="column" justify="center">
-                                        <Box
-                                            pad="xsmall"
-                                            style={{ visibility: hoverPage === key ? "visible": "hidden" }}
-                                            background="background-contrast"
-                                            round="small"
-                                            direction="column"
-                                            gap="small"
-                                            margin={{right: "xsmall"}}
-                                        >
-                                            <DeletePage
-                                                key={p.id}
-                                                albumId={id}
-                                                pageNumber={key}
-                                                onPageDeleted={() => {
-                                                    refetch()
-                                                }}
-                                            />
-                                        </Box>
-                                    </Box>
-                                    <Box
-                                        background="background-contrast"
-                                        margin={{ vertical: "xxsmall" }}
-                                        width={orientationWidth(settings.pageSize, settings.pageOrientation, scale)}
-                                        height={orientationHeight(settings.pageSize, settings.pageOrientation, scale)}
-
-                                    >
-                                        {(() => {
-                                            switch (p.__typename) {
-                                                case "AlbumPageVisualization":
-                                                    switch (p.visualization.__typename) {
-                                                        case "Visualization":
-                                                            return (
-                                                                <Box
-                                                                    style={{
-                                                                        transform: `scale(${scale})`,
-                                                                        transformOrigin: "left top",
-                                                                    }}
-                                                                >
-                                                                    {p.svg.__typename === "Svg" && (
-                                                                        <div dangerouslySetInnerHTML={svg(p.svg.svg)} />
-                                                                    )}
-                                                                </Box>
-                                                            )
-                                                        default:
-                                                            return <></>
-                                                    }
-                                                case "AlbumPageCover":
-                                                    switch (p.cover.__typename) {
-                                                        case "CoverUploaded":
-                                                            return (
-                                                                <Box
-                                                                    style={{
-                                                                        transform: `scale(${scale})`,
-                                                                        transformOrigin: "left top",
-                                                                    }}
-                                                                >
-                                                                    {p.svg.__typename === "Svg" && (
-                                                                        <div dangerouslySetInnerHTML={svg(p.svg.svg)} />
-                                                                    )}
-                                                                </Box>
-                                                            )
-                                                        default:
-                                                            return <></>
-                                                    }
-                                                default:
-                                                    return <></>
-                                            }
-                                        })()}
-                                    </Box>
-                                    <Box width="xxsmall"></Box>
-                                </Box>
-
-
+                                />
                             )
                         })}
                     </Grid>
@@ -317,24 +236,19 @@ export function Album() {
     )
 }
 
-function orientationWidth(
-    size: PageSizeEnum,
-    orientation: PageOrientationEnum,
-    scale: number = 1.0
-): string {
+function orientationWidth(size: PageSizeEnum, orientation: PageOrientationEnum, scale: number = 1.0): string {
     const width = {
         [PageSizeEnum.A3]: {
             [PageOrientationEnum.Portrait]: 297,
             [PageOrientationEnum.Landscape]: 420,
-
         },
         [PageSizeEnum.A4]: {
             [PageOrientationEnum.Portrait]: 210,
             [PageOrientationEnum.Landscape]: 297,
-        }
+        },
     }
 
-    return `${width[size][orientation] * scale}mm`;
+    return `${width[size][orientation] * scale}mm`
 }
 
 function orientationHeight(
@@ -346,15 +260,14 @@ function orientationHeight(
         [PageSizeEnum.A3]: {
             [PageOrientationEnum.Portrait]: 420,
             [PageOrientationEnum.Landscape]: 297,
-
         },
         [PageSizeEnum.A4]: {
             [PageOrientationEnum.Portrait]: 297,
             [PageOrientationEnum.Landscape]: 210,
-        }
+        },
     }
 
-    return `${height[size][orientation] * scale}mm`;
+    return `${height[size][orientation] * scale}mm`
 }
 
 /* eslint-disable  @typescript-eslint/no-explicit-any */

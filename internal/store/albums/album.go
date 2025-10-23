@@ -53,21 +53,25 @@ type AlbumPage interface {
 	IsAlbumPage() bool
 }
 
-type AlbumPageCover struct {
-	ID      string
-	CoverID string
-	FileID  string
-	Rotate  float64
+type AlbumPageSplitCover struct {
+	ID        string
+	Rotate    float64
+	Title     string
+	Subtitle  *string
+	ImgFileID string
+	WithQR    bool
+	City      *string
+	Year      *int
 }
 
-func (AlbumPageCover) IsAlbumPage() bool {
+func (AlbumPageSplitCover) IsAlbumPage() bool {
 	return true
 }
 
 type AlbumPageCoverUploaded struct {
 	ID     string
-	FileID string
 	Rotate float64
+	FileID string
 }
 
 func (AlbumPageCoverUploaded) IsAlbumPage() bool {
@@ -76,9 +80,9 @@ func (AlbumPageCoverUploaded) IsAlbumPage() bool {
 
 type AlbumPageVisualization struct {
 	ID              string
+	Rotate          float64
 	VisualizationID string
 	FileID          string
-	Rotate          float64
 }
 
 func (AlbumPageVisualization) IsAlbumPage() bool {

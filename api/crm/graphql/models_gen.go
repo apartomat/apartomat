@@ -48,10 +48,6 @@ type AlbumPage interface {
 	GetSVG() AlbumPageSVGResult
 }
 
-type AlbumPageCoverResult interface {
-	IsAlbumPageCoverResult()
-}
-
 type AlbumPageSVGResult interface {
 	IsAlbumPageSVGResult()
 }
@@ -98,6 +94,10 @@ type ConfirmLoginLinkResult interface {
 
 type ConfirmLoginPinResult interface {
 	IsConfirmLoginPinResult()
+}
+
+type Cover interface {
+	IsCover()
 }
 
 type CoverFileResult interface {
@@ -333,11 +333,11 @@ type AlbumFileGenerationStarted struct {
 func (AlbumFileGenerationStarted) IsGenerateAlbumFileResult() {}
 
 type AlbumPageCover struct {
-	ID     string               `json:"id"`
-	Number int                  `json:"number"`
-	Rotate float64              `json:"rotate"`
-	SVG    AlbumPageSVGResult   `json:"svg"`
-	Cover  AlbumPageCoverResult `json:"cover"`
+	ID     string             `json:"id"`
+	Number int                `json:"number"`
+	Rotate float64            `json:"rotate"`
+	SVG    AlbumPageSVGResult `json:"svg"`
+	Cover  Cover              `json:"cover"`
 }
 
 func (AlbumPageCover) IsAlbumPage()                    {}
@@ -451,18 +451,11 @@ type ContactUpdated struct {
 
 func (ContactUpdated) IsUpdateContactResult() {}
 
-type Cover struct {
-	ID   string          `json:"id"`
-	File CoverFileResult `json:"file"`
-}
-
-func (Cover) IsAlbumPageCoverResult() {}
-
 type CoverUploaded struct {
 	File CoverFileResult `json:"file"`
 }
 
-func (CoverUploaded) IsAlbumPageCoverResult() {}
+func (CoverUploaded) IsCover() {}
 
 type CreateAlbumSettingsInput struct {
 	PageSize    PageSize        `json:"pageSize"`
@@ -569,8 +562,6 @@ func (Forbidden) IsUploadVisualizationsResult() {}
 func (Forbidden) IsAlbumResult() {}
 
 func (Forbidden) IsAlbumProjectResult() {}
-
-func (Forbidden) IsAlbumPageCoverResult() {}
 
 func (Forbidden) IsCoverFileResult() {}
 
@@ -768,8 +759,6 @@ func (NotFound) IsAlbumResult() {}
 func (NotFound) IsAlbumProjectResult() {}
 
 func (NotFound) IsAlbumPageSVGResult() {}
-
-func (NotFound) IsAlbumPageCoverResult() {}
 
 func (NotFound) IsCoverFileResult() {}
 
@@ -1102,8 +1091,6 @@ func (ServerError) IsAlbumPagesResult() {}
 
 func (ServerError) IsAlbumPageSVGResult() {}
 
-func (ServerError) IsAlbumPageCoverResult() {}
-
 func (ServerError) IsCoverFileResult() {}
 
 func (ServerError) IsAlbumPageVisualizationResult() {}
@@ -1166,6 +1153,18 @@ type SomeVisualizationsUploaded struct {
 }
 
 func (SomeVisualizationsUploaded) IsUploadVisualizationsResult() {}
+
+type SplitCover struct {
+	Title     string            `json:"title"`
+	Subtitle  *string           `json:"subtitle,omitempty"`
+	ImgSrc    string            `json:"imgSrc"`
+	QRCodeSrc *string           `json:"qrCodeSrc,omitempty"`
+	City      *string           `json:"city,omitempty"`
+	Year      *int              `json:"year,omitempty"`
+	Variant   SplitCoverVariant `json:"variant"`
+}
+
+func (SplitCover) IsCover() {}
 
 type Subscription struct {
 }
@@ -1722,6 +1721,61 @@ func (e *ProjectStatus) UnmarshalJSON(b []byte) error {
 }
 
 func (e ProjectStatus) MarshalJSON() ([]byte, error) {
+	var buf bytes.Buffer
+	e.MarshalGQL(&buf)
+	return buf.Bytes(), nil
+}
+
+type SplitCoverVariant string
+
+const (
+	SplitCoverVariantImageOnTheLeft  SplitCoverVariant = "IMAGE_ON_THE_LEFT"
+	SplitCoverVariantImageOnTheRight SplitCoverVariant = "IMAGE_ON_THE_RIGHT"
+)
+
+var AllSplitCoverVariant = []SplitCoverVariant{
+	SplitCoverVariantImageOnTheLeft,
+	SplitCoverVariantImageOnTheRight,
+}
+
+func (e SplitCoverVariant) IsValid() bool {
+	switch e {
+	case SplitCoverVariantImageOnTheLeft, SplitCoverVariantImageOnTheRight:
+		return true
+	}
+	return false
+}
+
+func (e SplitCoverVariant) String() string {
+	return string(e)
+}
+
+func (e *SplitCoverVariant) UnmarshalGQL(v any) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = SplitCoverVariant(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid SplitCoverVariant", str)
+	}
+	return nil
+}
+
+func (e SplitCoverVariant) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+func (e *SplitCoverVariant) UnmarshalJSON(b []byte) error {
+	s, err := strconv.Unquote(string(b))
+	if err != nil {
+		return err
+	}
+	return e.UnmarshalGQL(s)
+}
+
+func (e SplitCoverVariant) MarshalJSON() ([]byte, error) {
 	var buf bytes.Buffer
 	e.MarshalGQL(&buf)
 	return buf.Bytes(), nil
