@@ -64,12 +64,14 @@ union Cover = SplitCover | CoverUploaded
 type SplitCover {
     title: String!
     subtitle: String
-    imgSrc: String!
+    image: SplitCoverImageFileResult! @goField(forceResolver: true)
     qrCodeSrc: String
     city: String
     year: Int
     variant: SplitCoverVariant!
 }
+
+union SplitCoverImageFileResult = File | NotFound | ServerError
 
 enum SplitCoverVariant {
     IMAGE_ON_THE_LEFT

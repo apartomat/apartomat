@@ -91,8 +91,18 @@ func (r *albumResolver) Cover(ctx context.Context, obj *Album) (AlbumCoverResult
 		}
 
 		if p, ok := pages.Items[0].(*AlbumPageCover); ok {
-			if c, ok := p.Cover.(*CoverUploaded); ok {
+			switch c := p.Cover.(type) {
+			case *CoverUploaded:
 				if f, ok := c.File.(File); ok {
+					file, err := dataloaders.FromContext(ctx).Files.Load(ctx, f.ID)
+					if err != nil {
+						return nil, err
+					}
+
+					return fileToGraphQL(file), nil
+				}
+			case *SplitCover:
+				if f, ok := c.Image.(File); ok {
 					file, err := dataloaders.FromContext(ctx).Files.Load(ctx, f.ID)
 					if err != nil {
 						return nil, err

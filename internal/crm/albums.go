@@ -207,6 +207,60 @@ func (u *CRM) UploadAlbumCover(
 	return file, nil
 }
 
+type SplitCoverForAddToAlbum struct {
+	Title     string
+	Subtitle  *string
+	ImgFileID string
+	WithQR    bool
+	City      *string
+	Year      *int
+}
+
+func (u *CRM) AddSplitCoverToAlbum(
+	ctx context.Context,
+	albumID string,
+	cover SplitCoverForAddToAlbum,
+) (*Album, error) {
+	album, err := u.Albums.Get(ctx, IDIn(albumID))
+	if err != nil {
+		return nil, err
+	}
+
+	if ok, err := u.Acl.CanAddPageToAlbum(ctx, auth.UserFromCtx(ctx), album); err != nil {
+		return nil, err
+	} else if !ok {
+		return nil, fmt.Errorf("can't add split cover to album (id=%s): %w", album.ID, ErrForbidden)
+	}
+
+	file, err := u.Files.Get(ctx, files.And(files.IDIn(cover.ImgFileID), files.ProjectIDIn(album.ProjectID)))
+	if err != nil {
+		if errors.Is(err, ErrNotFound) {
+			return nil, fmt.Errorf("image file (id=%s) doesn't belong to album project (id=%s): %w", cover.ImgFileID, album.ProjectID, ErrForbidden)
+
+		}
+
+		return nil, err
+	}
+
+	album.AddSplitCoverPageWithID(
+		MustGenerateNanoID(),
+		cover.Title,
+		cover.Subtitle,
+		file.ID,
+		cover.WithQR,
+		cover.City,
+		cover.Year,
+	)
+
+	album.UpVersion()
+
+	if err := u.Albums.Save(ctx, album); err != nil {
+		return nil, err
+	}
+
+	return album, nil
+}
+
 func (u *CRM) ChangeAlbumPageSize(
 	ctx context.Context,
 	albumID string,

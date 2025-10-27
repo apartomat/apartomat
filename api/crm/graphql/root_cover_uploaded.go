@@ -29,7 +29,7 @@ func (r *coverUploadedResolver) File(ctx context.Context, obj *CoverUploaded) (C
 		return fileToGraphQL(file), nil
 	}
 
-	slog.ErrorContext(ctx, "can't resolver uploaded cover file: obj.File is not a *File")
+	slog.ErrorContext(ctx, "can't resolve uploaded cover file: obj.File is not a File")
 
 	return serverError()
 }

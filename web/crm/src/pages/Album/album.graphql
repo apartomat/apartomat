@@ -144,7 +144,15 @@ fragment AlbumScreenAlbumPageCover on AlbumPageCover {
         ... on SplitCover {
             title
             subtitle
-            imgSrc
+            image {
+                ... on File {
+                    id
+                    url
+                }
+                ... on Error {
+                    message
+                }
+            }
             qrCodeSrc
             city
             year

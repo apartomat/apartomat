@@ -72,7 +72,7 @@ export function Page({
                                             qrcodeSrc={page.cover.qrCodeSrc}
                                             city={page.cover.city}
                                             year={page.cover.year}
-                                            imgSrc="http://localhost:9000/apartomat/p/K0UkDwTV8JUU792OKKojA/i2TtzpZ8F2D6Ax3hvpy43.jpg"
+                                            image={page.cover.image}
                                             logoText="PUHOVA"
                                         />
                                     )

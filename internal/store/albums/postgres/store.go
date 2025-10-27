@@ -2,10 +2,14 @@ package postgres
 
 import (
 	"context"
+	"database/sql/driver"
+	"encoding/json"
+	"errors"
+	"time"
+
 	bunhook "github.com/apartomat/apartomat/internal/pkg/bun"
 	. "github.com/apartomat/apartomat/internal/store/albums"
 	"github.com/uptrace/bun"
-	"time"
 )
 
 const (
@@ -39,7 +43,7 @@ func (s *store) List(ctx context.Context, spec Spec, sort Sort, limit, offset in
 		return nil, err
 	}
 
-	return fromRecords(recs), nil
+	return fromRecords(recs)
 }
 
 func (s *store) Get(ctx context.Context, spec Spec) (*Album, error) {
@@ -107,7 +111,7 @@ type record struct {
 	Name       string         `bun:"name"`
 	Version    int            `bun:"version"`
 	Settings   settingsRecord `bun:"settings"`
-	Pages      []pageRecord   `bun:"pages"`
+	Pages      pageRecords    `bun:"pages"`
 	CreatedAt  time.Time      `bun:"created_at"`
 	ModifiedAt time.Time      `bun:"modified_at"`
 	ProjectID  string         `bun:"project_id"`
@@ -127,17 +131,126 @@ const (
 )
 
 type pageRecord struct {
-	ID              string         `json:"id,omitempty"`
-	Type            pageRecordType `json:"type"`
-	Rotate          float64        `json:"rotate,omitempty"`
-	VisualizationID string         `json:"visualization_id,omitempty"`
-	FileID          string         `json:"file_id,omitempty"`
-	Title           string         `json:"title,omitempty"`
-	Subtitle        string         `json:"sub_title,omitempty"`
-	ImgFileID       string         `json:"img_file_id,omitempty"`
-	WithQR          bool           `json:"qr,omitempty"`
-	City            string         `json:"city,omitempty"`
-	Year            int            `json:"year,omitempty"`
+	ID     string         `json:"id,omitempty"`
+	Type   pageRecordType `json:"type"`
+	Rotate float64        `json:"rotate,omitempty"`
+}
+
+type splitCoverPageRecord struct {
+	pageRecord
+	Title     string `json:"title,omitempty"`
+	Subtitle  string `json:"sub_title,omitempty"`
+	ImgFileID string `json:"img_file_id,omitempty"`
+	WithQR    bool   `json:"qr,omitempty"`
+	City      string `json:"city,omitempty"`
+	Year      int    `json:"year,omitempty"`
+}
+
+type coverUploadedPageRecord struct {
+	pageRecord
+	FileID string `json:"file_id,omitempty"`
+}
+
+type visualizationPageRecord struct {
+	pageRecord
+	VisualizationID string `json:"visualization_id,omitempty"`
+	FileID          string `json:"file_id,omitempty"`
+}
+
+type pageRecordInterface interface {
+	GetID() string
+	GetType() pageRecordType
+	GetRotate() float64
+}
+
+type pageRecords []pageRecordInterface
+
+func (prs pageRecords) Value() (driver.Value, error) {
+	if len(prs) == 0 {
+		return "[]", nil
+	}
+
+	bytes, err := json.Marshal(prs)
+	if err != nil {
+		return nil, err
+	}
+
+	return string(bytes), nil
+}
+
+func (prs *pageRecords) Scan(value interface{}) error {
+	if value == nil {
+		*prs = nil
+		return nil
+	}
+
+	var bytes []byte
+	switch v := value.(type) {
+	case []byte:
+		bytes = v
+	case string:
+		bytes = []byte(v)
+	default:
+		return nil
+	}
+
+	var rawRecords []json.RawMessage
+	if err := json.Unmarshal(bytes, &rawRecords); err != nil {
+		return err
+	}
+
+	*prs = make([]pageRecordInterface, len(rawRecords))
+
+	for i, rawRecord := range rawRecords {
+		var baseRecord struct {
+			Type pageRecordType `json:"type"`
+		}
+		if err := json.Unmarshal(rawRecord, &baseRecord); err != nil {
+			return err
+		}
+
+		switch baseRecord.Type {
+		case pageRecordTypeSplitCover:
+			var rec splitCoverPageRecord
+			if err := json.Unmarshal(rawRecord, &rec); err != nil {
+				return err
+			}
+			(*prs)[i] = rec
+		case pageRecordTypeCoverUploaded:
+			var rec coverUploadedPageRecord
+			if err := json.Unmarshal(rawRecord, &rec); err != nil {
+				return err
+			}
+			(*prs)[i] = rec
+		case pageRecordTypeVisualization:
+			var rec visualizationPageRecord
+			if err := json.Unmarshal(rawRecord, &rec); err != nil {
+				return err
+			}
+			(*prs)[i] = rec
+		default:
+			// For backward compatibility, treat unknown types as visualization
+			var rec visualizationPageRecord
+			if err := json.Unmarshal(rawRecord, &rec); err != nil {
+				return err
+			}
+			(*prs)[i] = rec
+		}
+	}
+
+	return nil
+}
+
+func (p pageRecord) GetID() string {
+	return p.ID
+}
+
+func (p pageRecord) GetType() pageRecordType {
+	return p.Type
+}
+
+func (p pageRecord) GetRotate() float64 {
+	return p.Rotate
 }
 
 func toRecord(album *Album) record {
@@ -165,25 +278,30 @@ func toRecords(albums []*Album) []record {
 	return res
 }
 
-func fromRecords(recs []record) []*Album {
+func fromRecords(recs []record) ([]*Album, error) {
 	var (
 		res = make([]*Album, len(recs))
 	)
 
 	for i, rec := range recs {
+		pages, err := fromPageRecords(rec.Pages)
+		if err != nil {
+			return nil, err
+		}
+
 		res[i] = &Album{
 			ID:         rec.ID,
 			Name:       rec.Name,
 			Version:    rec.Version,
 			Settings:   fromSettingsRecord(rec.Settings),
-			Pages:      fromPageRecords(rec.Pages),
+			Pages:      pages,
 			CreatedAt:  rec.CreatedAt,
 			ModifiedAt: rec.ModifiedAt,
 			ProjectID:  rec.ProjectID,
 		}
 	}
 
-	return res
+	return res, nil
 }
 
 func toSettingsRecord(settings Settings) settingsRecord {
@@ -193,9 +311,9 @@ func toSettingsRecord(settings Settings) settingsRecord {
 	}
 }
 
-func toPageRecords(pages []AlbumPage) []pageRecord {
+func toPageRecords(pages []AlbumPage) pageRecords {
 	var (
-		res = make([]pageRecord, len(pages))
+		res = make([]pageRecordInterface, len(pages))
 	)
 
 	for i, p := range pages {
@@ -204,10 +322,12 @@ func toPageRecords(pages []AlbumPage) []pageRecord {
 			var (
 				page = (p).(AlbumPageSplitCover)
 			)
-			res[i] = pageRecord{
-				ID:        page.ID,
-				Type:      pageRecordTypeSplitCover,
-				Rotate:    page.Rotate,
+			res[i] = splitCoverPageRecord{
+				pageRecord: pageRecord{
+					ID:     page.ID,
+					Type:   pageRecordTypeSplitCover,
+					Rotate: page.Rotate,
+				},
 				Title:     page.Title,
 				Subtitle:  *page.Subtitle,
 				ImgFileID: page.ImgFileID,
@@ -219,28 +339,31 @@ func toPageRecords(pages []AlbumPage) []pageRecord {
 			var (
 				page = (p).(AlbumPageCoverUploaded)
 			)
-			res[i] = pageRecord{
-				ID:     page.ID,
-				Rotate: page.Rotate,
-				Type:   pageRecordTypeCoverUploaded,
+			res[i] = coverUploadedPageRecord{
+				pageRecord: pageRecord{
+					ID:     page.ID,
+					Type:   pageRecordTypeCoverUploaded,
+					Rotate: page.Rotate,
+				},
 				FileID: page.FileID,
 			}
 		case AlbumPageVisualization:
 			var (
 				page = (p).(AlbumPageVisualization)
 			)
-
-			res[i] = pageRecord{
-				ID:              page.ID,
-				Rotate:          page.Rotate,
-				Type:            pageRecordTypeVisualization,
+			res[i] = visualizationPageRecord{
+				pageRecord: pageRecord{
+					ID:     page.ID,
+					Type:   pageRecordTypeVisualization,
+					Rotate: page.Rotate,
+				},
 				VisualizationID: page.VisualizationID,
 				FileID:          page.FileID,
 			}
 		}
 	}
 
-	return res
+	return pageRecords(res)
 }
 
 func fromSettingsRecord(rec settingsRecord) Settings {
@@ -250,47 +373,47 @@ func fromSettingsRecord(rec settingsRecord) Settings {
 	}
 }
 
-func fromPageRecords(recs []pageRecord) []AlbumPage {
+func fromPageRecords(recs pageRecords) ([]AlbumPage, error) {
 	var (
 		res = make([]AlbumPage, len(recs))
 	)
 
 	for i, rec := range recs {
-		switch rec.Type {
+		switch rec.GetType() {
 		case pageRecordTypeSplitCover:
-			res[i] = AlbumPageSplitCover{
-				ID:        rec.ID,
-				Rotate:    rec.Rotate,
-				Title:     rec.Title,
-				Subtitle:  &rec.Subtitle,
-				ImgFileID: rec.FileID,
-				WithQR:    rec.WithQR,
-				City:      &rec.City,
-				Year:      &rec.Year,
+			if splitCoverRec, ok := rec.(splitCoverPageRecord); ok {
+				res[i] = AlbumPageSplitCover{
+					ID:        splitCoverRec.ID,
+					Rotate:    splitCoverRec.Rotate,
+					Title:     splitCoverRec.Title,
+					Subtitle:  &splitCoverRec.Subtitle,
+					ImgFileID: splitCoverRec.ImgFileID,
+					WithQR:    splitCoverRec.WithQR,
+					City:      &splitCoverRec.City,
+					Year:      &splitCoverRec.Year,
+				}
 			}
 		case pageRecordTypeCoverUploaded:
-			res[i] = AlbumPageCoverUploaded{
-				ID:     rec.ID,
-				FileID: rec.FileID,
-				Rotate: rec.Rotate,
+			if coverUploadedRec, ok := rec.(coverUploadedPageRecord); ok {
+				res[i] = AlbumPageCoverUploaded{
+					ID:     coverUploadedRec.ID,
+					FileID: coverUploadedRec.FileID,
+					Rotate: coverUploadedRec.Rotate,
+				}
 			}
 		case pageRecordTypeVisualization:
-			res[i] = AlbumPageVisualization{
-				ID:              rec.ID,
-				VisualizationID: rec.VisualizationID,
-				FileID:          rec.FileID,
-				Rotate:          rec.Rotate,
+			if visualizationRec, ok := rec.(visualizationPageRecord); ok {
+				res[i] = AlbumPageVisualization{
+					ID:              visualizationRec.ID,
+					VisualizationID: visualizationRec.VisualizationID,
+					FileID:          visualizationRec.FileID,
+					Rotate:          visualizationRec.Rotate,
+				}
 			}
 		default:
-			// for backward compatibility
-			res[i] = AlbumPageVisualization{
-				ID:              rec.ID,
-				VisualizationID: rec.VisualizationID,
-				FileID:          rec.FileID,
-				Rotate:          rec.Rotate,
-			}
+			return nil, errors.New("unknown pageRecordType")
 		}
 	}
 
-	return res
+	return res, nil
 }

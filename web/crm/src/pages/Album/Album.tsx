@@ -19,6 +19,7 @@ import { PageSize, PageOrientation } from "./Settings/"
 import AddVisualizations from "pages/Album/AddVisualizations/AddVisualizations"
 import { GenerateFile as GenerateAlbumFile } from "pages/Album/GenerateFile"
 import { UploadCover } from "pages/Album/UploadCover"
+import { AddSplitCover } from "./AddSplitCover/AddSplitCover"
 import { Page } from "pages/Album/Page"
 
 export function Album() {
@@ -41,6 +42,8 @@ export function Album() {
     const [showAddVisualizations, setShowAddVisualizations] = useState(false)
 
     const [showUploadCover, setShowUploadCover] = useState(false)
+
+    const [showAddSplitCover, setShowAddSplitCover] = useState(false)
 
     const [scale, setScale] = useState(1.0)
 
@@ -172,6 +175,7 @@ export function Album() {
             <AddVariants
                 onClickAddVisualizations={() => setShowAddVisualizations(true)}
                 onClickUploadCover={() => setShowUploadCover(true)}
+                onClickAddSplitCover={() => setShowAddSplitCover(true)}
                 style={{
                     position: "fixed",
                     bottom: 0,
@@ -232,6 +236,17 @@ export function Album() {
                     }}
                 />
             )}
+
+            {showAddSplitCover && (
+                <AddSplitCover
+                    albumId={id}
+                    onClickClose={() => setShowAddSplitCover(false)}
+                    onSplitCoverAdded={async () => {
+                        setShowAddSplitCover(false)
+                        await refetch()
+                    }}
+                />
+            )}
         </Main>
     )
 }
@@ -282,11 +297,13 @@ function ids(pages: (AlbumScreenAlbumPageCoverFragment | AlbumScreenAlbumPageVis
 function AddVariants({
     onClickAddVisualizations,
     onClickUploadCover,
+    onClickAddSplitCover,
     ...boxProps
 }: {
     onClickAddVisualizations?: () => void
     onClickUploadCover?: () => void
-} & { boxProps: BoxExtendedProps }) {
+    onClickAddSplitCover?: () => void
+} & BoxExtendedProps) {
     const [open, setOpen] = useState(false)
 
     const targetRef = useRef<HTMLDivElement>(null)
@@ -309,10 +326,19 @@ function AddVariants({
                     <Box gap="small" border={{ color: "background-front", size: "medium" }} direction="row">
                         <Button
                             primary
-                            label="Обложку"
+                            label="Загрузить обложку"
                             onClick={() => {
                                 setOpen(false)
                                 onClickUploadCover && onClickUploadCover()
+                            }}
+                        />
+                        <Button
+                            primary
+                            label="Обложку"
+                            color="accent-2"
+                            onClick={() => {
+                                setOpen(false)
+                                onClickAddSplitCover && onClickAddSplitCover()
                             }}
                         />
                         <Button

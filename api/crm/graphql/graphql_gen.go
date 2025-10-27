@@ -54,6 +54,7 @@ type ResolverRoot interface {
 	ProjectHouses() ProjectHousesResolver
 	ProjectVisualizations() ProjectVisualizationsResolver
 	Query() QueryResolver
+	SplitCover() SplitCoverResolver
 	Subscription() SubscriptionResolver
 	UserProfile() UserProfileResolver
 	Visualization() VisualizationResolver
@@ -267,6 +268,7 @@ type ComplexityRoot struct {
 		AddContact                 func(childComplexity int, projectID string, contact AddContactInput) int
 		AddHouse                   func(childComplexity int, projectID string, house AddHouseInput) int
 		AddRoom                    func(childComplexity int, houseID string, room AddRoomInput) int
+		AddSplitCoverToAlbum       func(childComplexity int, albumID string, input AddSplitCoverToAlbumInput) int
 		AddVisualizationsToAlbum   func(childComplexity int, albumID string, visualizations []string) int
 		ChangeAlbumPageOrientation func(childComplexity int, albumID string, orientation PageOrientation) int
 		ChangeAlbumPageSize        func(childComplexity int, albumID string, size PageSize) int
@@ -484,12 +486,16 @@ type ComplexityRoot struct {
 
 	SplitCover struct {
 		City      func(childComplexity int) int
-		ImgSrc    func(childComplexity int) int
+		Image     func(childComplexity int) int
 		QRCodeSrc func(childComplexity int) int
 		Subtitle  func(childComplexity int) int
 		Title     func(childComplexity int) int
 		Variant   func(childComplexity int) int
 		Year      func(childComplexity int) int
+	}
+
+	SplitCoverAdded struct {
+		Cover func(childComplexity int) int
 	}
 
 	Subscription struct {
@@ -623,6 +629,7 @@ type MutationResolver interface {
 	AddContact(ctx context.Context, projectID string, contact AddContactInput) (AddContactResult, error)
 	AddHouse(ctx context.Context, projectID string, house AddHouseInput) (AddHouseResult, error)
 	AddRoom(ctx context.Context, houseID string, room AddRoomInput) (AddRoomResult, error)
+	AddSplitCoverToAlbum(ctx context.Context, albumID string, input AddSplitCoverToAlbumInput) (AddSplitCoverToAlbumResult, error)
 	AddVisualizationsToAlbum(ctx context.Context, albumID string, visualizations []string) (AddVisualizationsToAlbumResult, error)
 	ChangeAlbumPageOrientation(ctx context.Context, albumID string, orientation PageOrientation) (ChangeAlbumPageOrientationResult, error)
 	ChangeAlbumPageSize(ctx context.Context, albumID string, size PageSize) (ChangeAlbumPageSizeResult, error)
@@ -688,6 +695,9 @@ type QueryResolver interface {
 	Profile(ctx context.Context) (UserProfileResult, error)
 	Project(ctx context.Context, id string) (ProjectResult, error)
 	Workspace(ctx context.Context, id string) (WorkspaceResult, error)
+}
+type SplitCoverResolver interface {
+	Image(ctx context.Context, obj *SplitCover) (SplitCoverImageFileResult, error)
 }
 type SubscriptionResolver interface {
 	Ping(ctx context.Context) (<-chan string, error)
@@ -1334,6 +1344,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.AddRoom(childComplexity, args["houseId"].(string), args["room"].(AddRoomInput)), true
+
+	case "Mutation.addSplitCoverToAlbum":
+		if e.complexity.Mutation.AddSplitCoverToAlbum == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_addSplitCoverToAlbum_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.AddSplitCoverToAlbum(childComplexity, args["albumId"].(string), args["input"].(AddSplitCoverToAlbumInput)), true
 
 	case "Mutation.addVisualizationsToAlbum":
 		if e.complexity.Mutation.AddVisualizationsToAlbum == nil {
@@ -2235,12 +2257,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.SplitCover.City(childComplexity), true
 
-	case "SplitCover.imgSrc":
-		if e.complexity.SplitCover.ImgSrc == nil {
+	case "SplitCover.image":
+		if e.complexity.SplitCover.Image == nil {
 			break
 		}
 
-		return e.complexity.SplitCover.ImgSrc(childComplexity), true
+		return e.complexity.SplitCover.Image(childComplexity), true
 
 	case "SplitCover.qrCodeSrc":
 		if e.complexity.SplitCover.QRCodeSrc == nil {
@@ -2276,6 +2298,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.SplitCover.Year(childComplexity), true
+
+	case "SplitCoverAdded.cover":
+		if e.complexity.SplitCoverAdded.Cover == nil {
+			break
+		}
+
+		return e.complexity.SplitCoverAdded.Cover(childComplexity), true
 
 	case "Subscription.albumFileGenerated":
 		if e.complexity.Subscription.AlbumFileGenerated == nil {
@@ -2621,6 +2650,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputAddContactInput,
 		ec.unmarshalInputAddHouseInput,
 		ec.unmarshalInputAddRoomInput,
+		ec.unmarshalInputAddSplitCoverToAlbumInput,
 		ec.unmarshalInputChangeProjectDatesInput,
 		ec.unmarshalInputContactDetailsInput,
 		ec.unmarshalInputCreateAlbumSettingsInput,
@@ -2750,7 +2780,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 	return introspection.WrapTypeFromDef(ec.Schema(), ec.Schema().Types[name]), nil
 }
 
-//go:embed "schema/mutation.graphql" "schema/mutation_accept_invite.graphql" "schema/mutation_add_contact.graphql" "schema/mutation_add_house.graphql" "schema/mutation_add_room.graphql" "schema/mutation_add_visualizations_to_album.graphql" "schema/mutation_change_album_page_orientation.graphql" "schema/mutation_change_album_page_size.graphql" "schema/mutation_change_project_dates.graphql" "schema/mutation_change_project_status.graphql" "schema/mutation_confirm_login_link.graphql" "schema/mutation_confirm_login_pin.graphql" "schema/mutation_create_album.graphql" "schema/mutation_create_project.graphql" "schema/mutation_delete_album.graphql" "schema/mutation_delete_album_page.graphql" "schema/mutation_delete_contact.graphql" "schema/mutation_delete_room.graphql" "schema/mutation_delete_visualizations.graphql" "schema/mutation_generate_album.graphql" "schema/mutation_invite_user.graphql" "schema/mutation_login_by_email.graphql" "schema/mutation_make_project_not_public.graphql" "schema/mutation_make_project_public.graphql" "schema/mutation_move_room_to_position.graphql" "schema/mutation_update_contact.graphql" "schema/mutation_update_house.graphql" "schema/mutation_update_room.graphql" "schema/mutation_upload_album_cover.graphql" "schema/mutation_upload_file.graphql" "schema/mutation_upload_visualization.graphql" "schema/mutation_upload_visualizations.graphql" "schema/query.graphql" "schema/query_album.graphql" "schema/query_profile.graphql" "schema/query_project.graphql" "schema/query_workspace.graphql" "schema/root.graphql" "schema/subscription.graphql" "schema/subscription_album_file_generated.graphql"
+//go:embed "schema/mutation.graphql" "schema/mutation_accept_invite.graphql" "schema/mutation_add_contact.graphql" "schema/mutation_add_house.graphql" "schema/mutation_add_room.graphql" "schema/mutation_add_split_cover_to_album.graphql" "schema/mutation_add_visualizations_to_album.graphql" "schema/mutation_change_album_page_orientation.graphql" "schema/mutation_change_album_page_size.graphql" "schema/mutation_change_project_dates.graphql" "schema/mutation_change_project_status.graphql" "schema/mutation_confirm_login_link.graphql" "schema/mutation_confirm_login_pin.graphql" "schema/mutation_create_album.graphql" "schema/mutation_create_project.graphql" "schema/mutation_delete_album.graphql" "schema/mutation_delete_album_page.graphql" "schema/mutation_delete_contact.graphql" "schema/mutation_delete_room.graphql" "schema/mutation_delete_visualizations.graphql" "schema/mutation_generate_album.graphql" "schema/mutation_invite_user.graphql" "schema/mutation_login_by_email.graphql" "schema/mutation_make_project_not_public.graphql" "schema/mutation_make_project_public.graphql" "schema/mutation_move_room_to_position.graphql" "schema/mutation_update_contact.graphql" "schema/mutation_update_house.graphql" "schema/mutation_update_room.graphql" "schema/mutation_upload_album_cover.graphql" "schema/mutation_upload_file.graphql" "schema/mutation_upload_visualization.graphql" "schema/mutation_upload_visualizations.graphql" "schema/query.graphql" "schema/query_album.graphql" "schema/query_profile.graphql" "schema/query_project.graphql" "schema/query_workspace.graphql" "schema/root.graphql" "schema/subscription.graphql" "schema/subscription_album_file_generated.graphql"
 var sourcesFS embed.FS
 
 func sourceData(filename string) string {
@@ -2767,6 +2797,7 @@ var sources = []*ast.Source{
 	{Name: "schema/mutation_add_contact.graphql", Input: sourceData("schema/mutation_add_contact.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_add_house.graphql", Input: sourceData("schema/mutation_add_house.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_add_room.graphql", Input: sourceData("schema/mutation_add_room.graphql"), BuiltIn: false},
+	{Name: "schema/mutation_add_split_cover_to_album.graphql", Input: sourceData("schema/mutation_add_split_cover_to_album.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_add_visualizations_to_album.graphql", Input: sourceData("schema/mutation_add_visualizations_to_album.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_change_album_page_orientation.graphql", Input: sourceData("schema/mutation_change_album_page_orientation.graphql"), BuiltIn: false},
 	{Name: "schema/mutation_change_album_page_size.graphql", Input: sourceData("schema/mutation_change_album_page_size.graphql"), BuiltIn: false},
@@ -3038,6 +3069,57 @@ func (ec *executionContext) field_Mutation_addRoom_argsRoom(
 	}
 
 	var zeroVal AddRoomInput
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_addSplitCoverToAlbum_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Mutation_addSplitCoverToAlbum_argsAlbumID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["albumId"] = arg0
+	arg1, err := ec.field_Mutation_addSplitCoverToAlbum_argsInput(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg1
+	return args, nil
+}
+func (ec *executionContext) field_Mutation_addSplitCoverToAlbum_argsAlbumID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	if _, ok := rawArgs["albumId"]; !ok {
+		var zeroVal string
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("albumId"))
+	if tmp, ok := rawArgs["albumId"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Mutation_addSplitCoverToAlbum_argsInput(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (AddSplitCoverToAlbumInput, error) {
+	if _, ok := rawArgs["input"]; !ok {
+		var zeroVal AddSplitCoverToAlbumInput
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+	if tmp, ok := rawArgs["input"]; ok {
+		return ec.unmarshalNAddSplitCoverToAlbumInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAddSplitCoverToAlbumInput(ctx, tmp)
+	}
+
+	var zeroVal AddSplitCoverToAlbumInput
 	return zeroVal, nil
 }
 
@@ -9102,6 +9184,61 @@ func (ec *executionContext) fieldContext_Mutation_addRoom(ctx context.Context, f
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_addSplitCoverToAlbum(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_addSplitCoverToAlbum(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().AddSplitCoverToAlbum(rctx, fc.Args["albumId"].(string), fc.Args["input"].(AddSplitCoverToAlbumInput))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(AddSplitCoverToAlbumResult)
+	fc.Result = res
+	return ec.marshalNAddSplitCoverToAlbumResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAddSplitCoverToAlbumResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_addSplitCoverToAlbum(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type AddSplitCoverToAlbumResult does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_addSplitCoverToAlbum_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_addVisualizationsToAlbum(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_addVisualizationsToAlbum(ctx, field)
 	if err != nil {
@@ -14383,8 +14520,8 @@ func (ec *executionContext) fieldContext_SplitCover_subtitle(_ context.Context, 
 	return fc, nil
 }
 
-func (ec *executionContext) _SplitCover_imgSrc(ctx context.Context, field graphql.CollectedField, obj *SplitCover) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_SplitCover_imgSrc(ctx, field)
+func (ec *executionContext) _SplitCover_image(ctx context.Context, field graphql.CollectedField, obj *SplitCover) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SplitCover_image(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -14397,7 +14534,7 @@ func (ec *executionContext) _SplitCover_imgSrc(ctx context.Context, field graphq
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.ImgSrc, nil
+		return ec.resolvers.SplitCover().Image(rctx, obj)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -14409,19 +14546,19 @@ func (ec *executionContext) _SplitCover_imgSrc(ctx context.Context, field graphq
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(SplitCoverImageFileResult)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalNSplitCoverImageFileResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐSplitCoverImageFileResult(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_SplitCover_imgSrc(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_SplitCover_image(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "SplitCover",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
+			return nil, errors.New("field of type SplitCoverImageFileResult does not have child fields")
 		},
 	}
 	return fc, nil
@@ -14589,6 +14726,66 @@ func (ec *executionContext) fieldContext_SplitCover_variant(_ context.Context, f
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type SplitCoverVariant does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SplitCoverAdded_cover(ctx context.Context, field graphql.CollectedField, obj *SplitCoverAdded) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SplitCoverAdded_cover(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Cover, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*SplitCover)
+	fc.Result = res
+	return ec.marshalNSplitCover2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐSplitCover(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SplitCoverAdded_cover(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SplitCoverAdded",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "title":
+				return ec.fieldContext_SplitCover_title(ctx, field)
+			case "subtitle":
+				return ec.fieldContext_SplitCover_subtitle(ctx, field)
+			case "image":
+				return ec.fieldContext_SplitCover_image(ctx, field)
+			case "qrCodeSrc":
+				return ec.fieldContext_SplitCover_qrCodeSrc(ctx, field)
+			case "city":
+				return ec.fieldContext_SplitCover_city(ctx, field)
+			case "year":
+				return ec.fieldContext_SplitCover_year(ctx, field)
+			case "variant":
+				return ec.fieldContext_SplitCover_variant(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type SplitCover", field.Name)
 		},
 	}
 	return fc, nil
@@ -18886,6 +19083,72 @@ func (ec *executionContext) unmarshalInputAddRoomInput(ctx context.Context, obj 
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputAddSplitCoverToAlbumInput(ctx context.Context, obj any) (AddSplitCoverToAlbumInput, error) {
+	var it AddSplitCoverToAlbumInput
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	if _, present := asMap["withQr"]; !present {
+		asMap["withQr"] = false
+	}
+
+	fieldsInOrder := [...]string{"title", "subtitle", "imgFileId", "withQr", "city", "year"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "title":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("title"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Title = data
+		case "subtitle":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("subtitle"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Subtitle = data
+		case "imgFileId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("imgFileId"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ImgFileID = data
+		case "withQr":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("withQr"))
+			data, err := ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.WithQR = data
+		case "city":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("city"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.City = data
+		case "year":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("year"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Year = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputChangeProjectDatesInput(ctx context.Context, obj any) (ChangeProjectDatesInput, error) {
 	var it ChangeProjectDatesInput
 	asMap := map[string]any{}
@@ -19561,6 +19824,43 @@ func (ec *executionContext) _AddRoomResult(ctx context.Context, sel ast.Selectio
 	}
 }
 
+func (ec *executionContext) _AddSplitCoverToAlbumResult(ctx context.Context, sel ast.SelectionSet, obj AddSplitCoverToAlbumResult) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
+	case NotFound:
+		return ec._NotFound(ctx, sel, &obj)
+	case *NotFound:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._NotFound(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
+	case SplitCoverAdded:
+		return ec._SplitCoverAdded(ctx, sel, &obj)
+	case *SplitCoverAdded:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._SplitCoverAdded(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
 func (ec *executionContext) _AddVisualizationsToAlbumResult(ctx context.Context, sel ast.SelectionSet, obj AddVisualizationsToAlbumResult) graphql.Marshaler {
 	switch obj := (obj).(type) {
 	case nil:
@@ -19616,6 +19916,13 @@ func (ec *executionContext) _AlbumCoverResult(ctx context.Context, sel ast.Selec
 			return graphql.Null
 		}
 		return ec._Forbidden(ctx, sel, obj)
+	case SplitCover:
+		return ec._SplitCover(ctx, sel, &obj)
+	case *SplitCover:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._SplitCover(ctx, sel, obj)
 	case File:
 		return ec._File(ctx, sel, &obj)
 	case *File:
@@ -21151,6 +21458,36 @@ func (ec *executionContext) _ProjectVisualizationsTotalResult(ctx context.Contex
 			return graphql.Null
 		}
 		return ec._ProjectVisualizationsTotal(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
+func (ec *executionContext) _SplitCoverImageFileResult(ctx context.Context, sel ast.SelectionSet, obj SplitCoverImageFileResult) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
+	case NotFound:
+		return ec._NotFound(ctx, sel, &obj)
+	case *NotFound:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._NotFound(ctx, sel, obj)
+	case File:
+		return ec._File(ctx, sel, &obj)
+	case *File:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._File(ctx, sel, obj)
 	default:
 		panic(fmt.Errorf("unexpected type %T", obj))
 	}
@@ -22814,7 +23151,7 @@ func (ec *executionContext) _ExpiredToken(ctx context.Context, sel ast.Selection
 	return out
 }
 
-var fileImplementors = []string{"File", "CoverFileResult", "AlbumCoverResult"}
+var fileImplementors = []string{"File", "SplitCoverImageFileResult", "CoverFileResult", "AlbumCoverResult"}
 
 func (ec *executionContext) _File(ctx context.Context, sel ast.SelectionSet, obj *File) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, fileImplementors)
@@ -22917,7 +23254,7 @@ func (ec *executionContext) _FileUploaded(ctx context.Context, sel ast.Selection
 	return out
 }
 
-var forbiddenImplementors = []string{"Forbidden", "AddContactResult", "AddHouseResult", "AddRoomResult", "AddVisualizationsToAlbumResult", "ChangeAlbumPageOrientationResult", "ChangeAlbumPageSizeResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "CreateAlbumResult", "CreateProjectResult", "DeleteAlbumResult", "DeleteAlbumPageResult", "DeleteContactResult", "DeleteRoomResult", "DeleteVisualizationsResult", "GenerateAlbumFileResult", "InviteUserToWorkspaceResult", "MakeProjectNotPublicResult", "MakeProjectPublicResult", "MoveRoomToPositionResult", "UpdateContactResult", "UpdateHouseResult", "UpdateRoomResult", "UploadAlbumCoverResult", "UploadFileResult", "UploadVisualizationResult", "UploadVisualizationsResult", "AlbumResult", "AlbumProjectResult", "CoverFileResult", "AlbumRecentFileResult", "AlbumCoverResult", "UserProfileResult", "ProjectResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "ProjectVisualizationsListResult", "ProjectVisualizationsTotalResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectAlbumsListResult", "ProjectAlbumsTotalResult", "WorkspaceResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "WorkspaceUsersListResult", "WorkspaceUsersTotalResult", "Error", "AlbumFileGenerated"}
+var forbiddenImplementors = []string{"Forbidden", "AddContactResult", "AddHouseResult", "AddRoomResult", "AddSplitCoverToAlbumResult", "AddVisualizationsToAlbumResult", "ChangeAlbumPageOrientationResult", "ChangeAlbumPageSizeResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "CreateAlbumResult", "CreateProjectResult", "DeleteAlbumResult", "DeleteAlbumPageResult", "DeleteContactResult", "DeleteRoomResult", "DeleteVisualizationsResult", "GenerateAlbumFileResult", "InviteUserToWorkspaceResult", "MakeProjectNotPublicResult", "MakeProjectPublicResult", "MoveRoomToPositionResult", "UpdateContactResult", "UpdateHouseResult", "UpdateRoomResult", "UploadAlbumCoverResult", "UploadFileResult", "UploadVisualizationResult", "UploadVisualizationsResult", "AlbumResult", "AlbumProjectResult", "CoverFileResult", "AlbumRecentFileResult", "AlbumCoverResult", "UserProfileResult", "ProjectResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "ProjectVisualizationsListResult", "ProjectVisualizationsTotalResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectAlbumsListResult", "ProjectAlbumsTotalResult", "WorkspaceResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "WorkspaceUsersListResult", "WorkspaceUsersTotalResult", "Error", "AlbumFileGenerated"}
 
 func (ec *executionContext) _Forbidden(ctx context.Context, sel ast.SelectionSet, obj *Forbidden) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, forbiddenImplementors)
@@ -23653,6 +23990,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "addSplitCoverToAlbum":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_addSplitCoverToAlbum(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "addVisualizationsToAlbum":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_addVisualizationsToAlbum(ctx, field)
@@ -23865,7 +24209,7 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 	return out
 }
 
-var notFoundImplementors = []string{"NotFound", "AddHouseResult", "AddRoomResult", "ChangeAlbumPageOrientationResult", "ChangeAlbumPageSizeResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "DeleteAlbumResult", "DeleteAlbumPageResult", "DeleteContactResult", "DeleteRoomResult", "DeleteVisualizationsResult", "GenerateAlbumFileResult", "InviteUserToWorkspaceResult", "MakeProjectNotPublicResult", "MakeProjectPublicResult", "MoveRoomToPositionResult", "UpdateContactResult", "UpdateHouseResult", "UpdateRoomResult", "AlbumResult", "AlbumProjectResult", "AlbumPageSvgResult", "CoverFileResult", "AlbumPageVisualizationResult", "AlbumRecentFileResult", "AlbumCoverResult", "ProjectResult", "ProjectPageResult", "WorkspaceResult", "Error", "AlbumFileGenerated"}
+var notFoundImplementors = []string{"NotFound", "AddHouseResult", "AddRoomResult", "AddSplitCoverToAlbumResult", "ChangeAlbumPageOrientationResult", "ChangeAlbumPageSizeResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "DeleteAlbumResult", "DeleteAlbumPageResult", "DeleteContactResult", "DeleteRoomResult", "DeleteVisualizationsResult", "GenerateAlbumFileResult", "InviteUserToWorkspaceResult", "MakeProjectNotPublicResult", "MakeProjectPublicResult", "MoveRoomToPositionResult", "UpdateContactResult", "UpdateHouseResult", "UpdateRoomResult", "AlbumResult", "AlbumProjectResult", "AlbumPageSvgResult", "SplitCoverImageFileResult", "CoverFileResult", "AlbumPageVisualizationResult", "AlbumRecentFileResult", "AlbumCoverResult", "ProjectResult", "ProjectPageResult", "WorkspaceResult", "Error", "AlbumFileGenerated"}
 
 func (ec *executionContext) _NotFound(ctx context.Context, sel ast.SelectionSet, obj *NotFound) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, notFoundImplementors)
@@ -26056,7 +26400,7 @@ func (ec *executionContext) _RoomUpdated(ctx context.Context, sel ast.SelectionS
 	return out
 }
 
-var serverErrorImplementors = []string{"ServerError", "AcceptInviteResult", "AddContactResult", "AddHouseResult", "AddVisualizationsToAlbumResult", "ChangeAlbumPageOrientationResult", "ChangeAlbumPageSizeResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "ConfirmLoginLinkResult", "ConfirmLoginPinResult", "CreateAlbumResult", "CreateProjectResult", "DeleteAlbumResult", "DeleteAlbumPageResult", "DeleteContactResult", "DeleteVisualizationsResult", "GenerateAlbumFileResult", "InviteUserToWorkspaceResult", "LoginByEmailResult", "MakeProjectNotPublicResult", "MakeProjectPublicResult", "MoveRoomToPositionResult", "UpdateContactResult", "UpdateHouseResult", "UploadAlbumCoverResult", "UploadFileResult", "UploadVisualizationResult", "UploadVisualizationsResult", "AlbumResult", "AlbumProjectResult", "AlbumPagesResult", "AlbumPageSvgResult", "CoverFileResult", "AlbumPageVisualizationResult", "AlbumRecentFileResult", "AlbumCoverResult", "UserProfileResult", "ProjectResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "ProjectVisualizationsListResult", "ProjectVisualizationsTotalResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectAlbumsListResult", "ProjectAlbumsTotalResult", "ProjectPageResult", "WorkspaceResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "WorkspaceUsersListResult", "WorkspaceUsersTotalResult", "Error", "AlbumFileGenerated"}
+var serverErrorImplementors = []string{"ServerError", "AcceptInviteResult", "AddContactResult", "AddHouseResult", "AddSplitCoverToAlbumResult", "AddVisualizationsToAlbumResult", "ChangeAlbumPageOrientationResult", "ChangeAlbumPageSizeResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "ConfirmLoginLinkResult", "ConfirmLoginPinResult", "CreateAlbumResult", "CreateProjectResult", "DeleteAlbumResult", "DeleteAlbumPageResult", "DeleteContactResult", "DeleteVisualizationsResult", "GenerateAlbumFileResult", "InviteUserToWorkspaceResult", "LoginByEmailResult", "MakeProjectNotPublicResult", "MakeProjectPublicResult", "MoveRoomToPositionResult", "UpdateContactResult", "UpdateHouseResult", "UploadAlbumCoverResult", "UploadFileResult", "UploadVisualizationResult", "UploadVisualizationsResult", "AlbumResult", "AlbumProjectResult", "AlbumPagesResult", "AlbumPageSvgResult", "SplitCoverImageFileResult", "CoverFileResult", "AlbumPageVisualizationResult", "AlbumRecentFileResult", "AlbumCoverResult", "UserProfileResult", "ProjectResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "ProjectVisualizationsListResult", "ProjectVisualizationsTotalResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectAlbumsListResult", "ProjectAlbumsTotalResult", "ProjectPageResult", "WorkspaceResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "WorkspaceUsersListResult", "WorkspaceUsersTotalResult", "Error", "AlbumFileGenerated"}
 
 func (ec *executionContext) _ServerError(ctx context.Context, sel ast.SelectionSet, obj *ServerError) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, serverErrorImplementors)
@@ -26173,7 +26517,7 @@ func (ec *executionContext) _SomeVisualizationsUploaded(ctx context.Context, sel
 	return out
 }
 
-var splitCoverImplementors = []string{"SplitCover", "Cover"}
+var splitCoverImplementors = []string{"SplitCover", "Cover", "AlbumCoverResult"}
 
 func (ec *executionContext) _SplitCover(ctx context.Context, sel ast.SelectionSet, obj *SplitCover) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, splitCoverImplementors)
@@ -26187,15 +26531,46 @@ func (ec *executionContext) _SplitCover(ctx context.Context, sel ast.SelectionSe
 		case "title":
 			out.Values[i] = ec._SplitCover_title(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "subtitle":
 			out.Values[i] = ec._SplitCover_subtitle(ctx, field, obj)
-		case "imgSrc":
-			out.Values[i] = ec._SplitCover_imgSrc(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
+		case "image":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._SplitCover_image(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
 			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "qrCodeSrc":
 			out.Values[i] = ec._SplitCover_qrCodeSrc(ctx, field, obj)
 		case "city":
@@ -26204,6 +26579,45 @@ func (ec *executionContext) _SplitCover(ctx context.Context, sel ast.SelectionSe
 			out.Values[i] = ec._SplitCover_year(ctx, field, obj)
 		case "variant":
 			out.Values[i] = ec._SplitCover_variant(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var splitCoverAddedImplementors = []string{"SplitCoverAdded", "AddSplitCoverToAlbumResult"}
+
+func (ec *executionContext) _SplitCoverAdded(ctx context.Context, sel ast.SelectionSet, obj *SplitCoverAdded) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, splitCoverAddedImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("SplitCoverAdded")
+		case "cover":
+			out.Values[i] = ec._SplitCoverAdded_cover(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -27799,6 +28213,21 @@ func (ec *executionContext) marshalNAddRoomResult2githubᚗcomᚋapartomatᚋapa
 	return ec._AddRoomResult(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNAddSplitCoverToAlbumInput2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAddSplitCoverToAlbumInput(ctx context.Context, v any) (AddSplitCoverToAlbumInput, error) {
+	res, err := ec.unmarshalInputAddSplitCoverToAlbumInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNAddSplitCoverToAlbumResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAddSplitCoverToAlbumResult(ctx context.Context, sel ast.SelectionSet, v AddSplitCoverToAlbumResult) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._AddSplitCoverToAlbumResult(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNAddVisualizationsToAlbumResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐAddVisualizationsToAlbumResult(ctx context.Context, sel ast.SelectionSet, v AddVisualizationsToAlbumResult) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -29092,6 +29521,26 @@ func (ec *executionContext) marshalNRoom2ᚖgithubᚗcomᚋapartomatᚋapartomat
 		return graphql.Null
 	}
 	return ec._Room(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNSplitCover2ᚖgithubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐSplitCover(ctx context.Context, sel ast.SelectionSet, v *SplitCover) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._SplitCover(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNSplitCoverImageFileResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐSplitCoverImageFileResult(ctx context.Context, sel ast.SelectionSet, v SplitCoverImageFileResult) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._SplitCoverImageFileResult(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNSplitCoverVariant2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐSplitCoverVariant(ctx context.Context, v any) (SplitCoverVariant, error) {

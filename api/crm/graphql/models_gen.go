@@ -28,6 +28,10 @@ type AddRoomResult interface {
 	IsAddRoomResult()
 }
 
+type AddSplitCoverToAlbumResult interface {
+	IsAddSplitCoverToAlbumResult()
+}
+
 type AddVisualizationsToAlbumResult interface {
 	IsAddVisualizationsToAlbumResult()
 }
@@ -213,6 +217,10 @@ type ProjectVisualizationsTotalResult interface {
 	IsProjectVisualizationsTotalResult()
 }
 
+type SplitCoverImageFileResult interface {
+	IsSplitCoverImageFileResult()
+}
+
 type UpdateContactResult interface {
 	IsUpdateContactResult()
 }
@@ -280,6 +288,15 @@ type AddRoomInput struct {
 	Name   string   `json:"name"`
 	Square *float64 `json:"square,omitempty"`
 	Level  *int     `json:"level,omitempty"`
+}
+
+type AddSplitCoverToAlbumInput struct {
+	Title     string  `json:"title"`
+	Subtitle  *string `json:"subtitle,omitempty"`
+	ImgFileID string  `json:"imgFileId"`
+	WithQR    *bool   `json:"withQr,omitempty"`
+	City      *string `json:"city,omitempty"`
+	Year      *int    `json:"year,omitempty"`
 }
 
 type Album struct {
@@ -491,6 +508,8 @@ type File struct {
 	Size     int      `json:"size"`
 }
 
+func (File) IsSplitCoverImageFileResult() {}
+
 func (File) IsCoverFileResult() {}
 
 func (File) IsAlbumCoverResult() {}
@@ -510,6 +529,8 @@ func (Forbidden) IsAddContactResult() {}
 func (Forbidden) IsAddHouseResult() {}
 
 func (Forbidden) IsAddRoomResult() {}
+
+func (Forbidden) IsAddSplitCoverToAlbumResult() {}
 
 func (Forbidden) IsAddVisualizationsToAlbumResult() {}
 
@@ -720,6 +741,8 @@ func (NotFound) IsAddHouseResult() {}
 
 func (NotFound) IsAddRoomResult() {}
 
+func (NotFound) IsAddSplitCoverToAlbumResult() {}
+
 func (NotFound) IsChangeAlbumPageOrientationResult() {}
 
 func (NotFound) IsChangeAlbumPageSizeResult() {}
@@ -759,6 +782,8 @@ func (NotFound) IsAlbumResult() {}
 func (NotFound) IsAlbumProjectResult() {}
 
 func (NotFound) IsAlbumPageSVGResult() {}
+
+func (NotFound) IsSplitCoverImageFileResult() {}
 
 func (NotFound) IsCoverFileResult() {}
 
@@ -1033,6 +1058,8 @@ func (ServerError) IsAddContactResult() {}
 
 func (ServerError) IsAddHouseResult() {}
 
+func (ServerError) IsAddSplitCoverToAlbumResult() {}
+
 func (ServerError) IsAddVisualizationsToAlbumResult() {}
 
 func (ServerError) IsChangeAlbumPageOrientationResult() {}
@@ -1090,6 +1117,8 @@ func (ServerError) IsAlbumProjectResult() {}
 func (ServerError) IsAlbumPagesResult() {}
 
 func (ServerError) IsAlbumPageSVGResult() {}
+
+func (ServerError) IsSplitCoverImageFileResult() {}
 
 func (ServerError) IsCoverFileResult() {}
 
@@ -1155,16 +1184,24 @@ type SomeVisualizationsUploaded struct {
 func (SomeVisualizationsUploaded) IsUploadVisualizationsResult() {}
 
 type SplitCover struct {
-	Title     string            `json:"title"`
-	Subtitle  *string           `json:"subtitle,omitempty"`
-	ImgSrc    string            `json:"imgSrc"`
-	QRCodeSrc *string           `json:"qrCodeSrc,omitempty"`
-	City      *string           `json:"city,omitempty"`
-	Year      *int              `json:"year,omitempty"`
-	Variant   SplitCoverVariant `json:"variant"`
+	Title     string                    `json:"title"`
+	Subtitle  *string                   `json:"subtitle,omitempty"`
+	Image     SplitCoverImageFileResult `json:"image"`
+	QRCodeSrc *string                   `json:"qrCodeSrc,omitempty"`
+	City      *string                   `json:"city,omitempty"`
+	Year      *int                      `json:"year,omitempty"`
+	Variant   SplitCoverVariant         `json:"variant"`
 }
 
 func (SplitCover) IsCover() {}
+
+func (SplitCover) IsAlbumCoverResult() {}
+
+type SplitCoverAdded struct {
+	Cover *SplitCover `json:"cover"`
+}
+
+func (SplitCoverAdded) IsAddSplitCoverToAlbumResult() {}
 
 type Subscription struct {
 }

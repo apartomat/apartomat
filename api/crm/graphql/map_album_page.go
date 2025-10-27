@@ -42,8 +42,18 @@ func albumPageToGraphQL(p albums.AlbumPage, pageNumber int) AlbumPage {
 }
 
 func albumPageSplitCoverToGraphQL(page albums.AlbumPageSplitCover, pageNumber int) *AlbumPageCover {
-	imgSrc := ""
-	qrCodeSrc := ""
+	var (
+		qrCodeSrc = ""
+
+		image SplitCoverImageFileResult
+	)
+
+	switch {
+	case page.ImgFileID != "":
+		image = File{ID: page.ImgFileID}
+	default:
+		image = NotFound{Message: "file not found"}
+	}
 
 	return &AlbumPageCover{
 		ID:     page.ID,
@@ -52,7 +62,7 @@ func albumPageSplitCoverToGraphQL(page albums.AlbumPageSplitCover, pageNumber in
 		Cover: &SplitCover{
 			Title:     page.Title,
 			Subtitle:  page.Subtitle,
-			ImgSrc:    imgSrc,
+			Image:     image,
 			QRCodeSrc: &qrCodeSrc,
 			City:      page.City,
 			Year:      page.Year,

@@ -2,6 +2,8 @@ package crm
 
 import (
 	"errors"
+	"net/url"
+
 	"github.com/apartomat/apartomat/internal/crm/auth"
 	"github.com/apartomat/apartomat/internal/crm/image"
 	"github.com/apartomat/apartomat/internal/crm/mail"
@@ -19,7 +21,6 @@ import (
 	"github.com/apartomat/apartomat/internal/store/workspaceusers"
 	nanoid "github.com/matoous/go-nanoid/v2"
 	"github.com/uptrace/bun"
-	"net/url"
 )
 
 type Params struct {

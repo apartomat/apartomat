@@ -6,7 +6,7 @@ export function SplitCover({
     qrcodeSrc,
     city,
     year,
-    imgSrc,
+    image,
     scale,
     logoText,
 }: {
@@ -15,7 +15,7 @@ export function SplitCover({
     qrcodeSrc?: string | null
     city?: string | null
     year?: number | null
-    imgSrc: string
+    image?: { __typename?: "File"; url: string } | { __typename?: "NotFound" | "ServerError"; message: string } | null
     scale: number
     logoText: string
 }) {
@@ -41,7 +41,7 @@ export function SplitCover({
                     </Footer>
                 </Left>
                 <Right>
-                    <img src={imgSrc} />
+                    {image?.__typename === "File" && <img src={image.url} />}
                     <Logo>{logoText}</Logo>
                 </Right>
             </Layout>

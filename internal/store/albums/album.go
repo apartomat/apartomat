@@ -1,8 +1,9 @@
 package albums
 
 import (
-	"github.com/apartomat/apartomat/internal/store/visualizations"
 	"time"
+
+	"github.com/apartomat/apartomat/internal/store/visualizations"
 )
 
 type Album struct {
@@ -112,6 +113,35 @@ func (album *Album) AddUploadedCoverPageWithID(
 ) (AlbumPageCoverUploaded, int) {
 	var (
 		page = AlbumPageCoverUploaded{ID: pageID, FileID: fileID}
+	)
+
+	album.Pages = append(
+		[]AlbumPage{page},
+		album.Pages...,
+	)
+
+	return page, 0
+}
+
+func (album *Album) AddSplitCoverPageWithID(
+	pageID string,
+	title string,
+	subtitle *string,
+	imgFileID string,
+	withQR bool,
+	city *string,
+	year *int,
+) (AlbumPageSplitCover, int) {
+	var (
+		page = AlbumPageSplitCover{
+			ID:        pageID,
+			Title:     title,
+			Subtitle:  subtitle,
+			ImgFileID: imgFileID,
+			WithQR:    withQR,
+			City:      city,
+			Year:      year,
+		}
 	)
 
 	album.Pages = append(

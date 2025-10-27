@@ -1,0 +1,22 @@
+extend type Mutation {
+    addSplitCoverToAlbum(
+        albumId: String!
+        input: AddSplitCoverToAlbumInput!
+    ): AddSplitCoverToAlbumResult!
+}
+
+input AddSplitCoverToAlbumInput {
+    title: String!
+    subtitle: String
+    imgFileId: String!
+    withQr: Boolean = false
+    city: String
+    year: Int
+}
+
+union AddSplitCoverToAlbumResult = SplitCoverAdded | Forbidden | NotFound | ServerError
+
+type SplitCoverAdded {
+    cover: SplitCover!
+}
+
