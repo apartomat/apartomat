@@ -43,18 +43,18 @@ func NewServer() *Server {
 	return &Server{router: chi.NewRouter()}
 }
 
-func (server *Server) Run(ctx context.Context, opts ...ServerOption) {
+func (s *Server) Run(ctx context.Context, opts ...ServerOption) {
 	var (
-		s = http.Server{
+		ser = http.Server{
 			Addr:         defaultAddr,
-			Handler:      server.router,
+			Handler:      s.router,
 			ReadTimeout:  5 * time.Second,
 			WriteTimeout: 5 * time.Second,
 		}
 	)
 
 	for _, opt := range opts {
-		opt(&s)
+		opt(&ser)
 	}
 
 	var (
@@ -72,7 +72,7 @@ func (server *Server) Run(ctx context.Context, opts ...ServerOption) {
 		shutdCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
 		defer cancel()
 
-		if err := s.Shutdown(shutdCtx); err != nil {
+		if err := ser.Shutdown(shutdCtx); err != nil {
 			slog.ErrorContext(ctx, "can't stop server", err)
 			os.Exit(1)
 		}
@@ -80,17 +80,17 @@ func (server *Server) Run(ctx context.Context, opts ...ServerOption) {
 		close(done)
 	}()
 
-	slog.InfoContext(ctx, fmt.Sprintf("Starting server at %s...", s.Addr))
+	slog.InfoContext(ctx, fmt.Sprintf("Starting server at %s...", ser.Addr))
 
 	go func() {
-		if err := s.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+		if err := ser.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			slog.ErrorContext(ctx, "Can't start server", slog.Any("err", err))
 			os.Exit(1)
 		}
 	}()
 
-	if server.withGraphQLPlayground {
-		slog.InfoContext(ctx, fmt.Sprintf("Visit http://%s%s for playground", serverHttpAddr(s.Addr), graphQLPlaygroundPath))
+	if s.withGraphQLPlayground {
+		slog.InfoContext(ctx, fmt.Sprintf("Visit http://%s%s for playground", serverHttpAddr(ser.Addr), graphQLPlaygroundPath))
 	}
 
 	<-done
@@ -98,29 +98,35 @@ func (server *Server) Run(ctx context.Context, opts ...ServerOption) {
 	slog.InfoContext(ctx, "Buy")
 }
 
-func (server *Server) Use(next func(http.Handler) http.Handler) *Server {
-	server.router.Use(next)
+func (s *Server) Use(next func(http.Handler) http.Handler) *Server {
+	s.router.Use(next)
 
-	return server
+	return s
 }
 
-func (server *Server) WithGraphQLHandler(h http.Handler) *Server {
-	server.router.Handle(graphQLPath, h)
+func (s *Server) Get(pattern string, handlerFn http.HandlerFunc) *Server {
+	s.router.Get(pattern, handlerFn)
 
-	return server
+	return s
 }
 
-func (server *Server) WithGraphQLPlayground() *Server {
-	server.withGraphQLPlayground = true
-	server.router.Handle(graphQLPlaygroundPath, playground.Handler("GraphQL playground", graphQLPath))
+func (s *Server) WithGraphQLHandler(h http.Handler) *Server {
+	s.router.Handle(graphQLPath, h)
 
-	return server
+	return s
 }
 
-func (server *Server) WithMetrics(h http.Handler) *Server {
-	server.router.Handle("/metrics", h)
+func (s *Server) WithGraphQLPlayground() *Server {
+	s.withGraphQLPlayground = true
+	s.router.Handle(graphQLPlaygroundPath, playground.Handler("GraphQL playground", graphQLPath))
 
-	return server
+	return s
+}
+
+func (s *Server) WithMetrics(h http.Handler) *Server {
+	s.router.Handle("/metrics", h)
+
+	return s
 }
 
 func serverHttpAddr(addr string) string {
