@@ -96,6 +96,7 @@ func run() {
 
 	NewServer().
 		Use(PrometheusLatencyMiddleware(reg)).
+		Get("/qr", Qr(crm)).
 		WithGraphQLHandler(h).
 		WithGraphQLPlayground().
 		WithMetrics(promhttp.HandlerFor(gath, promhttp.HandlerOpts{})).
