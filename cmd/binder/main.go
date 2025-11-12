@@ -5,17 +5,16 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	apartomat "github.com/apartomat/apartomat/internal/crm"
-	"github.com/apartomat/apartomat/internal/crm/image/minio"
 	"io"
 	"log/slog"
 	"mime"
-	"net/http"
 	"os"
 	"strings"
 	"time"
 
 	"github.com/apartomat/apartomat/internal/bookbinder"
+	apartomat "github.com/apartomat/apartomat/internal/crm"
+	"github.com/apartomat/apartomat/internal/crm/image/minio"
 	bunhook "github.com/apartomat/apartomat/internal/pkg/bun"
 	. "github.com/apartomat/apartomat/internal/store/albumfiles"
 	albumFilesPostgres "github.com/apartomat/apartomat/internal/store/albumfiles/postgres"
@@ -44,6 +43,8 @@ func main() {
 		albumFilesStore = albumFilesPostgres.NewStore(db)
 		albumsStore     = albumsPostgres.NewStore(db)
 		filesStore      = filesPostgres.NewStore(db)
+
+		binder = bookbinder.NewBinder(filesStore)
 	)
 
 	db.AddQueryHook(bunhook.NewLogQueryHook(slog.Default()))
@@ -89,12 +90,6 @@ func main() {
 				slog.Int("pages", len(album.Pages)),
 			)
 
-			images, err := download(filesStore)(ctx, album.Pages)
-			if err != nil {
-				slog.Error("can't download images", slog.Any("err", err))
-				return
-			}
-
 			var (
 				fileExt      = ".pdf"
 				fileMimeType = mime.TypeByExtension(fileExt)
@@ -102,7 +97,7 @@ func main() {
 				filePath     = fmt.Sprintf("pdf/%s/%s", album.ProjectID, fileName)
 			)
 
-			if r, err := bookbinder.Bind(orient, format, album.Pages, images); err != nil {
+			if r, err := binder.Bind(ctx, orient, format, album.Pages); err != nil {
 				slog.Error("can't bind album", slog.String("id", album.ID), slog.Any("err", err), slog.String("mime", fileMimeType))
 				os.Exit(1)
 			} else {
@@ -159,48 +154,5 @@ func main() {
 		}
 
 		time.Sleep(3 * time.Second)
-	}
-}
-
-func download(filesStore files.Store) func(ctx context.Context, pages []albums.AlbumPage) (map[albums.AlbumPage]io.Reader, error) {
-	return func(ctx context.Context, pages []albums.AlbumPage) (map[albums.AlbumPage]io.Reader, error) {
-		var (
-			images = make(map[albums.AlbumPage]io.Reader, len(pages))
-
-			ids = make([]string, 0, len(pages))
-		)
-
-		for _, p := range pages {
-			if vis, ok := p.(albums.AlbumPageVisualization); ok {
-				ids = append(ids, vis.FileID)
-			}
-
-		}
-
-		res, err := filesStore.List(ctx, files.IDIn(ids...), files.SortDefault, len(ids), 0)
-		if err != nil {
-			return nil, err
-		}
-
-		for _, f := range res {
-			resp, err := http.Get(f.URL)
-			if err != nil {
-				return nil, err
-			}
-
-			if b, err := io.ReadAll(resp.Body); err != nil {
-				return nil, err
-			} else {
-				for _, p := range pages {
-					if vis, ok := p.(albums.AlbumPageVisualization); ok && vis.FileID == f.ID {
-						images[p] = bytes.NewBuffer(b)
-					}
-				}
-			}
-
-			resp.Body.Close()
-		}
-
-		return images, nil
 	}
 }

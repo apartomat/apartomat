@@ -2,16 +2,19 @@ package bookbinder
 
 import (
 	"bytes"
+	"context"
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
-	"github.com/apartomat/apartomat/internal/store/albums"
-	"github.com/disintegration/gift"
-	"github.com/jung-kurt/gofpdf"
-	"image"
-	"image/jpeg"
+	_ "image/gif"
+	_ "image/png"
 	"io"
-	"log"
+	"log/slog"
+	"net/http"
+
+	"github.com/apartomat/apartomat/internal/store/albums"
+	"github.com/apartomat/apartomat/internal/store/files"
+	"github.com/jung-kurt/gofpdf"
 )
 
 type Orientation string
@@ -91,11 +94,19 @@ func init() {
 	}
 }
 
-func Bind(
+type Binder struct {
+	filesStore files.Store
+}
+
+func NewBinder(filesStore files.Store) *Binder {
+	return &Binder{filesStore: filesStore}
+}
+
+func (b *Binder) Bind(
+	ctx context.Context,
 	orientation Orientation,
 	format Format,
 	pages []albums.AlbumPage,
-	images map[albums.AlbumPage]io.Reader,
 ) (io.Reader, error) {
 	var (
 		pageSize = defaultSizes[format][orientation]
@@ -105,144 +116,71 @@ func Bind(
 		res = &bytes.Buffer{}
 	)
 
+	pdf.AddUTF8FontFromBytes("Arsenal", "", arsenalRegularTTF)
+	pdf.SetFont("Arsenal", "", 16)
+
 	for _, page := range pages {
-		if _, ok := images[page]; !ok {
+		switch t := page.(type) {
+		case albums.AlbumPageSplitCover:
+			if err := b.addSplitCoverPage(ctx, pdf, t, orientation, pageSize); err != nil {
+				return nil, err
+			}
+		case albums.AlbumPageVisualization:
+			if err := b.addVisualizationPage(ctx, pdf, t, orientation, pageSize); err != nil {
+				return nil, err
+			}
+		default:
+			slog.Warn("unknown page type")
 			continue
 		}
-
-		var (
-			opt = gofpdf.ImageOptions{
-				ImageType:             "jpg", // @todo
-				ReadDpi:               false,
-				AllowNegativePosition: false,
-			}
-		)
-
-		pdf.AddPage()
-
-		_, img, err := decode(images[page])
-		if err != nil {
-			log.Fatalf("can't decode file: %s", err)
-		}
-
-		_, img, _, x, y, w, h := process(img, orientation, pageSize)
-
-		b, err := json.Marshal(page)
-		if err != nil {
-			return nil, err
-		}
-
-		name := fmt.Sprintf("%x", md5.Sum(b))
-
-		pdf.RegisterImageOptionsReader(name, opt, img)
-
-		pdf.ImageOptions(name, x, y, w, h, false, opt, 0, "")
 	}
 
 	return res, pdf.Output(res)
 }
 
-func process(img io.Reader, orientation Orientation, page PageSize) (image.Image, io.Reader, bool, float64, float64, float64, float64) {
-	i, img, err := decode(img)
+func (b *Binder) downloadFile(ctx context.Context, id string) ([]byte, string, error) {
+	file, err := b.filesStore.Get(ctx, files.IDIn(id))
 	if err != nil {
-		log.Fatalf("can't decode: %s", err)
+		return nil, "", fmt.Errorf("can't get file %s: %w", id, err)
 	}
 
-	img, err, rotated := rotate(i, orientation)
+	resp, err := http.Get(file.URL)
 	if err != nil {
-		log.Fatalf("can't rotate: %s", err)
+		return nil, "", fmt.Errorf("can't download file from %s: %w", file.URL, err)
 	}
 
-	i, img, err = decode(img)
+	defer resp.Body.Close()
+
+	imgBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatalf("can't decode: %s", err)
+		return nil, "", fmt.Errorf("can't read file body: %w", err)
 	}
 
+	return imgBytes, file.MimeType, nil
+}
+
+func typeByMime(mimeType string) string {
 	var (
-		x0, y0 float64
+		imgType string
 	)
-	switch orientation {
-	case Portrait:
-		page, x0, y0 = pad(page, 20, 5, 5, 5)
-	case Landscape:
-		page, x0, y0 = pad(page, 5, 5, 5, 20)
+
+	switch mimeType {
+	case "image/png":
+		imgType = "png"
+	case "image/jpeg", "image/jpg":
+		imgType = "jpg"
+	case "image/gif":
+		imgType = "gif"
 	}
 
-	x, y, w, h := place(i, page, orientation)
-
-	return i, img, rotated, x0 + x, y0 + y, w, h
+	return imgType
 }
 
-func rotate(img image.Image, orientation Orientation) (io.Reader, error, bool) {
-	rotated := false
-
-	g := gift.New()
-
-	x := img.Bounds().Dx()
-	y := img.Bounds().Dy()
-	if (orientation == Landscape && y/x > 1) || (orientation == Portrait && y/x < 1) {
-		g.Add(gift.Rotate270())
-		rotated = true
-	}
-
-	dst := image.NewRGBA(g.Bounds(img.Bounds()))
-
-	g.Draw(dst, img)
-
-	b := &bytes.Buffer{}
-	err := jpeg.Encode(b, dst, nil)
+func pageUniqName(page albums.AlbumPage) (string, error) {
+	pageBytes, err := json.Marshal(page)
 	if err != nil {
-		return nil, err, false
+		return "", err
 	}
 
-	return b, nil, rotated
-}
-
-func pad(p PageSize, t, r, b, l float64) (PageSize, float64, float64) {
-	return PageSize{Width: p.Width - r - l, Height: p.Height - t - b, Units: p.Units}, l, t
-}
-
-func place(img image.Image, page PageSize, orientation Orientation) (float64, float64, float64, float64) {
-	switch orientation {
-	case Portrait:
-		bw1, bw2, bw3, bw4 := placeByWidth(img, page)
-		if bw1 < 0 || bw2 < 0 {
-			return placeByHeight(img, page)
-		}
-		return bw1, bw2, bw3, bw4
-	case Landscape:
-		bw1, bw2, bw3, bw4 := placeByHeight(img, page)
-		if bw1 < 0 || bw2 < 0 {
-			return placeByWidth(img, page)
-		}
-		return bw1, bw2, bw3, bw4
-	}
-
-	return 0, 0, 0, 0
-}
-
-func placeByWidth(img image.Image, page PageSize) (float64, float64, float64, float64) {
-	imgRat := float64(img.Bounds().Dy()) / float64(img.Bounds().Dx())
-	nh := page.Width * imgRat
-	return 0, (page.Height - nh) / 2, page.Width, nh
-}
-
-func placeByHeight(img image.Image, page PageSize) (float64, float64, float64, float64) {
-	imgRat := float64(img.Bounds().Dy()) / float64(img.Bounds().Dx())
-	nw := page.Height / imgRat
-	return (page.Width - nw) / 2, 0, nw, page.Height
-}
-
-func decode(img io.Reader) (image.Image, io.Reader, error) {
-	b, err := io.ReadAll(img)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	i, _, err := image.Decode(bytes.NewReader(b))
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return i, bytes.NewReader(b), nil
+	return fmt.Sprintf("split-%x", md5.Sum(pageBytes)), nil
 }
