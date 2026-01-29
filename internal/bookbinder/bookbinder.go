@@ -111,6 +111,7 @@ func (b *Binder) Bind(
 	var (
 		pageSize = defaultSizes[format][orientation]
 
+		// consider using https://github.com/signintech/gopdf
 		pdf = gofpdf.New(orientation.String(), pageSize.Units.String(), format.String(), "")
 
 		res = &bytes.Buffer{}
