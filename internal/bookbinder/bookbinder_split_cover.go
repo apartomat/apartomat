@@ -6,9 +6,20 @@ import (
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
+	"image"
+	"strings"
+
 	"github.com/apartomat/apartomat/internal/store/albums"
 	"github.com/jung-kurt/gofpdf"
-	"image"
+)
+
+const (
+	splitCoverTitleFontPx    = 48.0
+	splitCoverSubtitleFontPx = 20.0
+	splitCoverMetaFontPx     = 16.0
+
+	pxPerInch = 96.0
+	ptPerInch = 72.0
 )
 
 func (b *Binder) addSplitCoverPage(
@@ -20,23 +31,48 @@ func (b *Binder) addSplitCoverPage(
 ) error {
 	pdf.AddPage()
 
-	// Layout constants (mm) tuned to match reference spacing
-	leftMargin := 22.0
-	rightMargin := 12.0
-	topMargin := 30.0
-	bottomMargin := 26.0
-	gutter := 0.0 // no space between halves
+	switch orientation {
+	case Landscape:
+		return splitCoverLandscape(ctx, pdf, page, pageSize, b.downloadFile)
+	case Portrait:
+		return fmt.Errorf("split cover portrait not implemented yet")
+	default:
+		return fmt.Errorf("unsupported orientation %q", orientation)
+	}
+}
 
-	totalW := pageSize.Width
-	totalH := pageSize.Height
+func pxToPt(px float64) float64 {
+	return px * ptPerInch / pxPerInch
+}
 
-	// Compute halves
-	halfW := (totalW - leftMargin - rightMargin - gutter) / 2.0
-	leftX := leftMargin
-	rightX := leftMargin + halfW + gutter
+func splitCoverLandscape(
+	ctx context.Context,
+	pdf *gofpdf.Fpdf,
+	page albums.AlbumPageSplitCover,
+	pageSize PageSize,
+	download func(context.Context, string) ([]byte, string, error),
+) error {
+	imgBytes, mimeType, err := download(ctx, page.ImgFileID)
+	if err != nil {
+		return err
+	}
 
-	imgBytes, mimeType, err := b.downloadFile(ctx, page.ImgFileID)
+	if err := splitCoverRight(pdf, page, pageSize, imgBytes, mimeType); err != nil {
+		return err
+	}
 
+	splitCoverLeft(pdf, page, pageSize)
+
+	return nil
+}
+
+func splitCoverRight(
+	pdf *gofpdf.Fpdf,
+	page albums.AlbumPageSplitCover,
+	pageSize PageSize,
+	imgBytes []byte,
+	mimeType string,
+) error {
 	opt := gofpdf.ImageOptions{ImageType: typeByMime(mimeType), ReadDpi: false, AllowNegativePosition: false}
 
 	i, _, err := image.Decode(bytes.NewReader(imgBytes))
@@ -54,8 +90,10 @@ func (b *Binder) addSplitCoverPage(
 	pdf.RegisterImageOptionsReader(name, opt, bytes.NewReader(imgBytes))
 
 	// Target rect for image: entire right half without any inner margins
-	targetW := halfW
-	targetH := totalH
+	targetW := pageSize.Width / 2.0
+	targetH := pageSize.Height
+
+	rightX := pageSize.Width / 2.0
 
 	// Compute COVER fit (may crop). Scale so that image fully covers target
 	srcW := float64(i.Bounds().Dx())
@@ -72,77 +110,112 @@ func (b *Binder) addSplitCoverPage(
 
 	// Center inside right half; allow negative offsets (image may bleed outside)
 	x := rightX + (targetW-drawW)/2.0
-	y := (targetH - drawH) / 2.0
+	y := (pageSize.Height - drawH) / 2.0
 
 	pdf.ImageOptions(name, x, y, drawW, drawH, false, opt, 0, "")
 
 	// Ensure no bleed into the left half: paint left area white over any overflow
 	pdf.SetFillColor(255, 255, 255)
-	pdf.Rect(0, 0, rightX, totalH, "F")
-
-	// 2) Left half: title, subtitle (centered horizontally AND vertically as a block),
-	// bottom city and year (two lines, centered horizontally)
-	// Fonts
-	titleFontSize := 28.0
-	subtitleFontSize := 18.0
-	metaFontSize := 12.0
-
-	// Text area for left half
-	leftTextX := leftX
-	leftTextW := halfW
-	topTextY := topMargin
-	bottomTextY := totalH - bottomMargin
-
-	// Compute vertical centering for title/subtitle block
-	blockGap := subtitleFontSize * 0.8
-	hasSubtitle := page.Subtitle != nil && *page.Subtitle != ""
-	blockHeight := titleFontSize
-	if hasSubtitle {
-		blockHeight += blockGap + subtitleFontSize
-	}
-	leftRectH := totalH - topMargin - bottomMargin
-	blockStartY := topTextY + (leftRectH-blockHeight)/2.0 - 5.0 // lift a bit above exact center
-
-	// Title (centered horizontally)
-	pdf.SetFont("Arsenal", "", titleFontSize)
-	titleStr := page.Title
-	titleWidth := pdf.GetStringWidth(titleStr)
-	titleX := leftTextX + (leftTextW-titleWidth)/2.0
-	titleY := blockStartY + titleFontSize
-	pdf.Text(titleX, titleY, titleStr)
-
-	// Subtitle (if any), centered under title
-	if hasSubtitle {
-		pdf.SetFont("Arsenal", "", subtitleFontSize)
-		subStr := *page.Subtitle
-		subWidth := pdf.GetStringWidth(subStr)
-		subX := leftTextX + (leftTextW-subWidth)/2.0
-		subY := titleY + blockGap
-		pdf.Text(subX, subY, subStr)
-	}
-
-	// Bottom meta: city and year, two lines at the very bottom of left half
-	pdf.SetFont("Arsenal", "", metaFontSize)
-	// Line height
-	lh := metaFontSize * 1.4
-	metaY2 := bottomTextY
-	metaY1 := metaY2 - lh
-
-	// City on the first line (if present), centered horizontally
-	if page.City != nil && *page.City != "" {
-		cityStr := *page.City
-		cityWidth := pdf.GetStringWidth(cityStr)
-		cityX := leftTextX + (leftTextW-cityWidth)/2.0
-		pdf.Text(cityX, metaY1, cityStr)
-	}
-
-	// Year on the second line (if present), centered horizontally
-	if page.Year != nil {
-		yearStr := fmt.Sprintf("%d", *page.Year)
-		yearWidth := pdf.GetStringWidth(yearStr)
-		yearX := leftTextX + (leftTextW-yearWidth)/2.0
-		pdf.Text(yearX, metaY2, yearStr)
-	}
+	pdf.Rect(0, 0, rightX, pageSize.Height, "F")
 
 	return nil
+}
+
+func splitCoverLeft(
+	pdf *gofpdf.Fpdf,
+	page albums.AlbumPageSplitCover,
+	pageSize PageSize,
+) {
+
+	splitCoverLeftTitle(pdf, page, pageSize)
+	splitCoverLeftSubtitle(pdf, page, pageSize)
+	splitCoverLeftCity(pdf, page, pageSize)
+	splitCoverLeftYear(pdf, page, pageSize)
+}
+
+func splitCoverLeftTitle(
+	pdf *gofpdf.Fpdf,
+	page albums.AlbumPageSplitCover,
+	pageSize PageSize,
+) {
+	fontSize := pxToPt(splitCoverTitleFontPx)
+	pdf.SetFont("Arsenal", "", fontSize)
+
+	width := pdf.GetStringWidth(page.Title)
+
+	x := (pageSize.Width/2.0 - width) / 2.0
+	y := pageSize.Height/2.0 - pageSize.Height*0.07
+
+	pdf.Text(x, y, page.Title)
+}
+
+func splitCoverLeftSubtitle(
+	pdf *gofpdf.Fpdf,
+	page albums.AlbumPageSplitCover,
+	pageSize PageSize,
+) {
+	var (
+		lineHeight = 1.3
+		marginTop  = 4.0
+	)
+
+	if page.Subtitle == nil || *page.Subtitle == "" {
+		return
+	}
+
+	fontSize := pxToPt(splitCoverSubtitleFontPx)
+	pdf.SetFont("Arsenal", "", fontSize)
+
+	_, fontUnitSize := pdf.GetFontSize()
+
+	startY := pageSize.Height/2.0 - pageSize.Height*0.07 + fontUnitSize + marginTop
+
+	lines := strings.Split(*page.Subtitle, "\n")
+
+	for i, subStr := range lines {
+		width := pdf.GetStringWidth(subStr)
+		x := (pageSize.Width/2.0 - width) / 2.0
+		y := startY + float64(i)*fontUnitSize*lineHeight
+		pdf.Text(x, y, subStr)
+	}
+}
+
+func splitCoverLeftCity(
+	pdf *gofpdf.Fpdf,
+	page albums.AlbumPageSplitCover,
+	pageSize PageSize,
+) {
+	if page.City == nil || *page.City == "" {
+		return
+	}
+
+	fontSize := pxToPt(splitCoverMetaFontPx)
+	width := pageSize.Width / 2.0
+	y := pageSize.Height - pxToPt(16.0)
+
+	pdf.SetFont("Arsenal", "", fontSize)
+	cityStr := *page.City
+	cityWidth := pdf.GetStringWidth(cityStr)
+	cityX := (width - cityWidth) / 2.0
+	pdf.Text(cityX, y, cityStr)
+}
+
+func splitCoverLeftYear(
+	pdf *gofpdf.Fpdf,
+	page albums.AlbumPageSplitCover,
+	pageSize PageSize,
+) {
+	if page.Year == nil {
+		return
+	}
+
+	fontSize := pxToPt(splitCoverMetaFontPx)
+	width := pageSize.Width / 2.0
+	y := pageSize.Height - pxToPt(8)
+
+	pdf.SetFont("Arsenal", "", fontSize)
+	yearStr := fmt.Sprintf("•%d•", *page.Year)
+	yearWidth := pdf.GetStringWidth(yearStr)
+	yearX := (width - yearWidth) / 2.0
+	pdf.Text(yearX, y, yearStr)
 }
