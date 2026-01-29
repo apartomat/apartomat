@@ -234,7 +234,7 @@ func (u *CRM) AddSplitCoverToAlbum(
 
 	file, err := u.Files.Get(ctx, files.And(files.IDIn(cover.ImgFileID), files.ProjectIDIn(album.ProjectID)))
 	if err != nil {
-		if errors.Is(err, ErrNotFound) {
+		if errors.Is(err, files.ErrFileNotFound) {
 			return nil, fmt.Errorf("image file (id=%s) doesn't belong to album project (id=%s): %w", cover.ImgFileID, album.ProjectID, ErrForbidden)
 
 		}
