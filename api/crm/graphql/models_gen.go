@@ -217,6 +217,10 @@ type ProjectVisualizationsTotalResult interface {
 	IsProjectVisualizationsTotalResult()
 }
 
+type SplitCoverFormDefaultsResult interface {
+	IsSplitCoverFormDefaultsResult()
+}
+
 type SplitCoverImageFileResult interface {
 	IsSplitCoverImageFileResult()
 }
@@ -616,6 +620,8 @@ func (Forbidden) IsProjectAlbumsListResult() {}
 
 func (Forbidden) IsProjectAlbumsTotalResult() {}
 
+func (Forbidden) IsSplitCoverFormDefaultsResult() {}
+
 func (Forbidden) IsWorkspaceResult() {}
 
 func (Forbidden) IsWorkspaceProjectsListResult() {}
@@ -796,6 +802,8 @@ func (NotFound) IsAlbumCoverResult() {}
 func (NotFound) IsProjectResult() {}
 
 func (NotFound) IsProjectPageResult() {}
+
+func (NotFound) IsSplitCoverFormDefaultsResult() {}
 
 func (NotFound) IsWorkspaceResult() {}
 
@@ -1156,6 +1164,8 @@ func (ServerError) IsProjectAlbumsTotalResult() {}
 
 func (ServerError) IsProjectPageResult() {}
 
+func (ServerError) IsSplitCoverFormDefaultsResult() {}
+
 func (ServerError) IsWorkspaceResult() {}
 
 func (ServerError) IsWorkspaceProjectsListResult() {}
@@ -1195,13 +1205,19 @@ type SplitCover struct {
 
 func (SplitCover) IsCover() {}
 
-func (SplitCover) IsAlbumCoverResult() {}
-
 type SplitCoverAdded struct {
 	Cover *SplitCover `json:"cover"`
 }
 
 func (SplitCoverAdded) IsAddSplitCoverToAlbumResult() {}
+
+type SplitCoverFormDefaults struct {
+	City   *string `json:"city,omitempty"`
+	Year   int     `json:"year"`
+	WithQr bool    `json:"withQr"`
+}
+
+func (SplitCoverFormDefaults) IsSplitCoverFormDefaultsResult() {}
 
 type Subscription struct {
 }

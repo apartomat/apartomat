@@ -1,0 +1,11 @@
+extend type Query {
+    splitCoverFormDefaults(albumId: String!): SplitCoverFormDefaultsResult!
+}
+
+type SplitCoverFormDefaults {
+    city: String
+    year: Int!
+    withQr: Boolean!
+}
+
+union SplitCoverFormDefaultsResult = SplitCoverFormDefaults | Forbidden | NotFound | ServerError

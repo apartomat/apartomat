@@ -439,12 +439,13 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Album     func(childComplexity int, id string) int
-		Db        func(childComplexity int) int
-		Profile   func(childComplexity int) int
-		Project   func(childComplexity int, id string) int
-		Version   func(childComplexity int) int
-		Workspace func(childComplexity int, id string) int
+		Album                  func(childComplexity int, id string) int
+		Db                     func(childComplexity int) int
+		Profile                func(childComplexity int) int
+		Project                func(childComplexity int, id string) int
+		SplitCoverFormDefaults func(childComplexity int, albumID string) int
+		Version                func(childComplexity int) int
+		Workspace              func(childComplexity int, id string) int
 	}
 
 	Room struct {
@@ -496,6 +497,12 @@ type ComplexityRoot struct {
 
 	SplitCoverAdded struct {
 		Cover func(childComplexity int) int
+	}
+
+	SplitCoverFormDefaults struct {
+		City   func(childComplexity int) int
+		Year   func(childComplexity int) int
+		WithQr func(childComplexity int) int
 	}
 
 	Subscription struct {
@@ -694,6 +701,7 @@ type QueryResolver interface {
 	Album(ctx context.Context, id string) (AlbumResult, error)
 	Profile(ctx context.Context) (UserProfileResult, error)
 	Project(ctx context.Context, id string) (ProjectResult, error)
+	SplitCoverFormDefaults(ctx context.Context, albumID string) (SplitCoverFormDefaultsResult, error)
 	Workspace(ctx context.Context, id string) (WorkspaceResult, error)
 }
 type SplitCoverResolver interface {
@@ -2140,6 +2148,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Query.Project(childComplexity, args["id"].(string)), true
 
+	case "Query.splitCoverFormDefaults":
+		if e.complexity.Query.SplitCoverFormDefaults == nil {
+			break
+		}
+
+		args, err := ec.field_Query_splitCoverFormDefaults_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.SplitCoverFormDefaults(childComplexity, args["albumId"].(string)), true
+
 	case "Query.version":
 		if e.complexity.Query.Version == nil {
 			break
@@ -2305,6 +2325,27 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.SplitCoverAdded.Cover(childComplexity), true
+
+	case "SplitCoverFormDefaults.city":
+		if e.complexity.SplitCoverFormDefaults.City == nil {
+			break
+		}
+
+		return e.complexity.SplitCoverFormDefaults.City(childComplexity), true
+
+	case "SplitCoverFormDefaults.year":
+		if e.complexity.SplitCoverFormDefaults.Year == nil {
+			break
+		}
+
+		return e.complexity.SplitCoverFormDefaults.Year(childComplexity), true
+
+	case "SplitCoverFormDefaults.withQr":
+		if e.complexity.SplitCoverFormDefaults.WithQr == nil {
+			break
+		}
+
+		return e.complexity.SplitCoverFormDefaults.WithQr(childComplexity), true
 
 	case "Subscription.albumFileGenerated":
 		if e.complexity.Subscription.AlbumFileGenerated == nil {
@@ -2780,7 +2821,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 	return introspection.WrapTypeFromDef(ec.Schema(), ec.Schema().Types[name]), nil
 }
 
-//go:embed "schema/mutation.graphql" "schema/mutation_accept_invite.graphql" "schema/mutation_add_contact.graphql" "schema/mutation_add_house.graphql" "schema/mutation_add_room.graphql" "schema/mutation_add_split_cover_to_album.graphql" "schema/mutation_add_visualizations_to_album.graphql" "schema/mutation_change_album_page_orientation.graphql" "schema/mutation_change_album_page_size.graphql" "schema/mutation_change_project_dates.graphql" "schema/mutation_change_project_status.graphql" "schema/mutation_confirm_login_link.graphql" "schema/mutation_confirm_login_pin.graphql" "schema/mutation_create_album.graphql" "schema/mutation_create_project.graphql" "schema/mutation_delete_album.graphql" "schema/mutation_delete_album_page.graphql" "schema/mutation_delete_contact.graphql" "schema/mutation_delete_room.graphql" "schema/mutation_delete_visualizations.graphql" "schema/mutation_generate_album.graphql" "schema/mutation_invite_user.graphql" "schema/mutation_login_by_email.graphql" "schema/mutation_make_project_not_public.graphql" "schema/mutation_make_project_public.graphql" "schema/mutation_move_room_to_position.graphql" "schema/mutation_update_contact.graphql" "schema/mutation_update_house.graphql" "schema/mutation_update_room.graphql" "schema/mutation_upload_album_cover.graphql" "schema/mutation_upload_file.graphql" "schema/mutation_upload_visualization.graphql" "schema/mutation_upload_visualizations.graphql" "schema/query.graphql" "schema/query_album.graphql" "schema/query_profile.graphql" "schema/query_project.graphql" "schema/query_workspace.graphql" "schema/root.graphql" "schema/subscription.graphql" "schema/subscription_album_file_generated.graphql"
+//go:embed "schema/mutation.graphql" "schema/mutation_accept_invite.graphql" "schema/mutation_add_contact.graphql" "schema/mutation_add_house.graphql" "schema/mutation_add_room.graphql" "schema/mutation_add_split_cover_to_album.graphql" "schema/mutation_add_visualizations_to_album.graphql" "schema/mutation_change_album_page_orientation.graphql" "schema/mutation_change_album_page_size.graphql" "schema/mutation_change_project_dates.graphql" "schema/mutation_change_project_status.graphql" "schema/mutation_confirm_login_link.graphql" "schema/mutation_confirm_login_pin.graphql" "schema/mutation_create_album.graphql" "schema/mutation_create_project.graphql" "schema/mutation_delete_album.graphql" "schema/mutation_delete_album_page.graphql" "schema/mutation_delete_contact.graphql" "schema/mutation_delete_room.graphql" "schema/mutation_delete_visualizations.graphql" "schema/mutation_generate_album.graphql" "schema/mutation_invite_user.graphql" "schema/mutation_login_by_email.graphql" "schema/mutation_make_project_not_public.graphql" "schema/mutation_make_project_public.graphql" "schema/mutation_move_room_to_position.graphql" "schema/mutation_update_contact.graphql" "schema/mutation_update_house.graphql" "schema/mutation_update_room.graphql" "schema/mutation_upload_album_cover.graphql" "schema/mutation_upload_file.graphql" "schema/mutation_upload_visualization.graphql" "schema/mutation_upload_visualizations.graphql" "schema/query.graphql" "schema/query_album.graphql" "schema/query_profile.graphql" "schema/query_project.graphql" "schema/query_split_cover_form_defaults.graphql" "schema/query_workspace.graphql" "schema/root.graphql" "schema/subscription.graphql" "schema/subscription_album_file_generated.graphql"
 var sourcesFS embed.FS
 
 func sourceData(filename string) string {
@@ -2829,6 +2870,7 @@ var sources = []*ast.Source{
 	{Name: "schema/query_album.graphql", Input: sourceData("schema/query_album.graphql"), BuiltIn: false},
 	{Name: "schema/query_profile.graphql", Input: sourceData("schema/query_profile.graphql"), BuiltIn: false},
 	{Name: "schema/query_project.graphql", Input: sourceData("schema/query_project.graphql"), BuiltIn: false},
+	{Name: "schema/query_split_cover_form_defaults.graphql", Input: sourceData("schema/query_split_cover_form_defaults.graphql"), BuiltIn: false},
 	{Name: "schema/query_workspace.graphql", Input: sourceData("schema/query_workspace.graphql"), BuiltIn: false},
 	{Name: "schema/root.graphql", Input: sourceData("schema/root.graphql"), BuiltIn: false},
 	{Name: "schema/subscription.graphql", Input: sourceData("schema/subscription.graphql"), BuiltIn: false},
@@ -4926,6 +4968,34 @@ func (ec *executionContext) field_Query_project_argsID(
 
 	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
 	if tmp, ok := rawArgs["id"]; ok {
+		return ec.unmarshalNString2string(ctx, tmp)
+	}
+
+	var zeroVal string
+	return zeroVal, nil
+}
+
+func (ec *executionContext) field_Query_splitCoverFormDefaults_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := ec.field_Query_splitCoverFormDefaults_argsAlbumID(ctx, rawArgs)
+	if err != nil {
+		return nil, err
+	}
+	args["albumId"] = arg0
+	return args, nil
+}
+func (ec *executionContext) field_Query_splitCoverFormDefaults_argsAlbumID(
+	ctx context.Context,
+	rawArgs map[string]any,
+) (string, error) {
+	if _, ok := rawArgs["albumId"]; !ok {
+		var zeroVal string
+		return zeroVal, nil
+	}
+
+	ctx = graphql.WithPathContext(ctx, graphql.NewPathWithField("albumId"))
+	if tmp, ok := rawArgs["albumId"]; ok {
 		return ec.unmarshalNString2string(ctx, tmp)
 	}
 
@@ -13587,6 +13657,61 @@ func (ec *executionContext) fieldContext_Query_project(ctx context.Context, fiel
 	return fc, nil
 }
 
+func (ec *executionContext) _Query_splitCoverFormDefaults(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_splitCoverFormDefaults(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().SplitCoverFormDefaults(rctx, fc.Args["albumId"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(SplitCoverFormDefaultsResult)
+	fc.Result = res
+	return ec.marshalNSplitCoverFormDefaultsResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐSplitCoverFormDefaultsResult(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_splitCoverFormDefaults(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type SplitCoverFormDefaultsResult does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_splitCoverFormDefaults_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query_workspace(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query_workspace(ctx, field)
 	if err != nil {
@@ -14786,6 +14911,135 @@ func (ec *executionContext) fieldContext_SplitCoverAdded_cover(_ context.Context
 				return ec.fieldContext_SplitCover_variant(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type SplitCover", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SplitCoverFormDefaults_city(ctx context.Context, field graphql.CollectedField, obj *SplitCoverFormDefaults) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SplitCoverFormDefaults_city(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.City, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*string)
+	fc.Result = res
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SplitCoverFormDefaults_city(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SplitCoverFormDefaults",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SplitCoverFormDefaults_year(ctx context.Context, field graphql.CollectedField, obj *SplitCoverFormDefaults) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SplitCoverFormDefaults_year(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Year, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SplitCoverFormDefaults_year(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SplitCoverFormDefaults",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SplitCoverFormDefaults_withQr(ctx context.Context, field graphql.CollectedField, obj *SplitCoverFormDefaults) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SplitCoverFormDefaults_withQr(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.WithQr, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SplitCoverFormDefaults_withQr(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SplitCoverFormDefaults",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
 		},
 	}
 	return fc, nil
@@ -19916,13 +20170,6 @@ func (ec *executionContext) _AlbumCoverResult(ctx context.Context, sel ast.Selec
 			return graphql.Null
 		}
 		return ec._Forbidden(ctx, sel, obj)
-	case SplitCover:
-		return ec._SplitCover(ctx, sel, &obj)
-	case *SplitCover:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._SplitCover(ctx, sel, obj)
 	case File:
 		return ec._File(ctx, sel, &obj)
 	case *File:
@@ -21458,6 +21705,43 @@ func (ec *executionContext) _ProjectVisualizationsTotalResult(ctx context.Contex
 			return graphql.Null
 		}
 		return ec._ProjectVisualizationsTotal(ctx, sel, obj)
+	default:
+		panic(fmt.Errorf("unexpected type %T", obj))
+	}
+}
+
+func (ec *executionContext) _SplitCoverFormDefaultsResult(ctx context.Context, sel ast.SelectionSet, obj SplitCoverFormDefaultsResult) graphql.Marshaler {
+	switch obj := (obj).(type) {
+	case nil:
+		return graphql.Null
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
+	case NotFound:
+		return ec._NotFound(ctx, sel, &obj)
+	case *NotFound:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._NotFound(ctx, sel, obj)
+	case Forbidden:
+		return ec._Forbidden(ctx, sel, &obj)
+	case *Forbidden:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Forbidden(ctx, sel, obj)
+	case SplitCoverFormDefaults:
+		return ec._SplitCoverFormDefaults(ctx, sel, &obj)
+	case *SplitCoverFormDefaults:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._SplitCoverFormDefaults(ctx, sel, obj)
 	default:
 		panic(fmt.Errorf("unexpected type %T", obj))
 	}
@@ -23254,7 +23538,7 @@ func (ec *executionContext) _FileUploaded(ctx context.Context, sel ast.Selection
 	return out
 }
 
-var forbiddenImplementors = []string{"Forbidden", "AddContactResult", "AddHouseResult", "AddRoomResult", "AddSplitCoverToAlbumResult", "AddVisualizationsToAlbumResult", "ChangeAlbumPageOrientationResult", "ChangeAlbumPageSizeResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "CreateAlbumResult", "CreateProjectResult", "DeleteAlbumResult", "DeleteAlbumPageResult", "DeleteContactResult", "DeleteRoomResult", "DeleteVisualizationsResult", "GenerateAlbumFileResult", "InviteUserToWorkspaceResult", "MakeProjectNotPublicResult", "MakeProjectPublicResult", "MoveRoomToPositionResult", "UpdateContactResult", "UpdateHouseResult", "UpdateRoomResult", "UploadAlbumCoverResult", "UploadFileResult", "UploadVisualizationResult", "UploadVisualizationsResult", "AlbumResult", "AlbumProjectResult", "CoverFileResult", "AlbumRecentFileResult", "AlbumCoverResult", "UserProfileResult", "ProjectResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "ProjectVisualizationsListResult", "ProjectVisualizationsTotalResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectAlbumsListResult", "ProjectAlbumsTotalResult", "WorkspaceResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "WorkspaceUsersListResult", "WorkspaceUsersTotalResult", "Error", "AlbumFileGenerated"}
+var forbiddenImplementors = []string{"Forbidden", "AddContactResult", "AddHouseResult", "AddRoomResult", "AddSplitCoverToAlbumResult", "AddVisualizationsToAlbumResult", "ChangeAlbumPageOrientationResult", "ChangeAlbumPageSizeResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "CreateAlbumResult", "CreateProjectResult", "DeleteAlbumResult", "DeleteAlbumPageResult", "DeleteContactResult", "DeleteRoomResult", "DeleteVisualizationsResult", "GenerateAlbumFileResult", "InviteUserToWorkspaceResult", "MakeProjectNotPublicResult", "MakeProjectPublicResult", "MoveRoomToPositionResult", "UpdateContactResult", "UpdateHouseResult", "UpdateRoomResult", "UploadAlbumCoverResult", "UploadFileResult", "UploadVisualizationResult", "UploadVisualizationsResult", "AlbumResult", "AlbumProjectResult", "CoverFileResult", "AlbumRecentFileResult", "AlbumCoverResult", "UserProfileResult", "ProjectResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "ProjectVisualizationsListResult", "ProjectVisualizationsTotalResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectAlbumsListResult", "ProjectAlbumsTotalResult", "SplitCoverFormDefaultsResult", "WorkspaceResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "WorkspaceUsersListResult", "WorkspaceUsersTotalResult", "Error", "AlbumFileGenerated"}
 
 func (ec *executionContext) _Forbidden(ctx context.Context, sel ast.SelectionSet, obj *Forbidden) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, forbiddenImplementors)
@@ -24209,7 +24493,7 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 	return out
 }
 
-var notFoundImplementors = []string{"NotFound", "AddHouseResult", "AddRoomResult", "AddSplitCoverToAlbumResult", "ChangeAlbumPageOrientationResult", "ChangeAlbumPageSizeResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "DeleteAlbumResult", "DeleteAlbumPageResult", "DeleteContactResult", "DeleteRoomResult", "DeleteVisualizationsResult", "GenerateAlbumFileResult", "InviteUserToWorkspaceResult", "MakeProjectNotPublicResult", "MakeProjectPublicResult", "MoveRoomToPositionResult", "UpdateContactResult", "UpdateHouseResult", "UpdateRoomResult", "AlbumResult", "AlbumProjectResult", "AlbumPageSvgResult", "SplitCoverImageFileResult", "CoverFileResult", "AlbumPageVisualizationResult", "AlbumRecentFileResult", "AlbumCoverResult", "ProjectResult", "ProjectPageResult", "WorkspaceResult", "Error", "AlbumFileGenerated"}
+var notFoundImplementors = []string{"NotFound", "AddHouseResult", "AddRoomResult", "AddSplitCoverToAlbumResult", "ChangeAlbumPageOrientationResult", "ChangeAlbumPageSizeResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "DeleteAlbumResult", "DeleteAlbumPageResult", "DeleteContactResult", "DeleteRoomResult", "DeleteVisualizationsResult", "GenerateAlbumFileResult", "InviteUserToWorkspaceResult", "MakeProjectNotPublicResult", "MakeProjectPublicResult", "MoveRoomToPositionResult", "UpdateContactResult", "UpdateHouseResult", "UpdateRoomResult", "AlbumResult", "AlbumProjectResult", "AlbumPageSvgResult", "SplitCoverImageFileResult", "CoverFileResult", "AlbumPageVisualizationResult", "AlbumRecentFileResult", "AlbumCoverResult", "ProjectResult", "ProjectPageResult", "SplitCoverFormDefaultsResult", "WorkspaceResult", "Error", "AlbumFileGenerated"}
 
 func (ec *executionContext) _NotFound(ctx context.Context, sel ast.SelectionSet, obj *NotFound) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, notFoundImplementors)
@@ -26133,6 +26417,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "splitCoverFormDefaults":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_splitCoverFormDefaults(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "workspace":
 			field := field
 
@@ -26400,7 +26706,7 @@ func (ec *executionContext) _RoomUpdated(ctx context.Context, sel ast.SelectionS
 	return out
 }
 
-var serverErrorImplementors = []string{"ServerError", "AcceptInviteResult", "AddContactResult", "AddHouseResult", "AddSplitCoverToAlbumResult", "AddVisualizationsToAlbumResult", "ChangeAlbumPageOrientationResult", "ChangeAlbumPageSizeResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "ConfirmLoginLinkResult", "ConfirmLoginPinResult", "CreateAlbumResult", "CreateProjectResult", "DeleteAlbumResult", "DeleteAlbumPageResult", "DeleteContactResult", "DeleteVisualizationsResult", "GenerateAlbumFileResult", "InviteUserToWorkspaceResult", "LoginByEmailResult", "MakeProjectNotPublicResult", "MakeProjectPublicResult", "MoveRoomToPositionResult", "UpdateContactResult", "UpdateHouseResult", "UploadAlbumCoverResult", "UploadFileResult", "UploadVisualizationResult", "UploadVisualizationsResult", "AlbumResult", "AlbumProjectResult", "AlbumPagesResult", "AlbumPageSvgResult", "SplitCoverImageFileResult", "CoverFileResult", "AlbumPageVisualizationResult", "AlbumRecentFileResult", "AlbumCoverResult", "UserProfileResult", "ProjectResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "ProjectVisualizationsListResult", "ProjectVisualizationsTotalResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectAlbumsListResult", "ProjectAlbumsTotalResult", "ProjectPageResult", "WorkspaceResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "WorkspaceUsersListResult", "WorkspaceUsersTotalResult", "Error", "AlbumFileGenerated"}
+var serverErrorImplementors = []string{"ServerError", "AcceptInviteResult", "AddContactResult", "AddHouseResult", "AddSplitCoverToAlbumResult", "AddVisualizationsToAlbumResult", "ChangeAlbumPageOrientationResult", "ChangeAlbumPageSizeResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "ConfirmLoginLinkResult", "ConfirmLoginPinResult", "CreateAlbumResult", "CreateProjectResult", "DeleteAlbumResult", "DeleteAlbumPageResult", "DeleteContactResult", "DeleteVisualizationsResult", "GenerateAlbumFileResult", "InviteUserToWorkspaceResult", "LoginByEmailResult", "MakeProjectNotPublicResult", "MakeProjectPublicResult", "MoveRoomToPositionResult", "UpdateContactResult", "UpdateHouseResult", "UploadAlbumCoverResult", "UploadFileResult", "UploadVisualizationResult", "UploadVisualizationsResult", "AlbumResult", "AlbumProjectResult", "AlbumPagesResult", "AlbumPageSvgResult", "SplitCoverImageFileResult", "CoverFileResult", "AlbumPageVisualizationResult", "AlbumRecentFileResult", "AlbumCoverResult", "UserProfileResult", "ProjectResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "ProjectVisualizationsListResult", "ProjectVisualizationsTotalResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectAlbumsListResult", "ProjectAlbumsTotalResult", "ProjectPageResult", "SplitCoverFormDefaultsResult", "WorkspaceResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "WorkspaceUsersListResult", "WorkspaceUsersTotalResult", "Error", "AlbumFileGenerated"}
 
 func (ec *executionContext) _ServerError(ctx context.Context, sel ast.SelectionSet, obj *ServerError) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, serverErrorImplementors)
@@ -26517,7 +26823,7 @@ func (ec *executionContext) _SomeVisualizationsUploaded(ctx context.Context, sel
 	return out
 }
 
-var splitCoverImplementors = []string{"SplitCover", "Cover", "AlbumCoverResult"}
+var splitCoverImplementors = []string{"SplitCover", "Cover"}
 
 func (ec *executionContext) _SplitCover(ctx context.Context, sel ast.SelectionSet, obj *SplitCover) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, splitCoverImplementors)
@@ -26618,6 +26924,52 @@ func (ec *executionContext) _SplitCoverAdded(ctx context.Context, sel ast.Select
 			out.Values[i] = graphql.MarshalString("SplitCoverAdded")
 		case "cover":
 			out.Values[i] = ec._SplitCoverAdded_cover(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var splitCoverFormDefaultsImplementors = []string{"SplitCoverFormDefaults", "SplitCoverFormDefaultsResult"}
+
+func (ec *executionContext) _SplitCoverFormDefaults(ctx context.Context, sel ast.SelectionSet, obj *SplitCoverFormDefaults) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, splitCoverFormDefaultsImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("SplitCoverFormDefaults")
+		case "city":
+			out.Values[i] = ec._SplitCoverFormDefaults_city(ctx, field, obj)
+		case "year":
+			out.Values[i] = ec._SplitCoverFormDefaults_year(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "withQr":
+			out.Values[i] = ec._SplitCoverFormDefaults_withQr(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -29531,6 +29883,16 @@ func (ec *executionContext) marshalNSplitCover2ᚖgithubᚗcomᚋapartomatᚋapa
 		return graphql.Null
 	}
 	return ec._SplitCover(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNSplitCoverFormDefaultsResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐSplitCoverFormDefaultsResult(ctx context.Context, sel ast.SelectionSet, v SplitCoverFormDefaultsResult) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._SplitCoverFormDefaultsResult(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNSplitCoverImageFileResult2githubᚗcomᚋapartomatᚋapartomatᚋapiᚋcrmᚋgraphqlᚐSplitCoverImageFileResult(ctx context.Context, sel ast.SelectionSet, v SplitCoverImageFileResult) graphql.Marshaler {

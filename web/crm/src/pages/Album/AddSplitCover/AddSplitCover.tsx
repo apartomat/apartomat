@@ -1,7 +1,16 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { Box, BoxExtendedProps, Button, Form, FormField, TextInput, LayerExtendedProps, CheckBox } from "grommet"
 import { Modal, Header as ModalHeader } from "widgets/modal"
-import { useAddSplitCoverToAlbum } from "./api"
+import { useAddSplitCoverToAlbum, useSplitCoverFormDefaults } from "./api"
+
+const initialValue = {
+    title: "",
+    subtitle: "",
+    imgFileId: "",
+    city: "",
+    year: "",
+    withQr: false,
+}
 
 export function AddSplitCover({
     albumId,
@@ -14,17 +23,30 @@ export function AddSplitCover({
     onSplitCoverAdded?: () => void
 } & LayerExtendedProps) {
     const [addSplitCover, { loading, error, success }] = useAddSplitCoverToAlbum(albumId)
+    const defaults = useSplitCoverFormDefaults(albumId)
+    const [value, setValue] = useState(initialValue)
 
-    const handleSubmit = async ({ value }: { value: any }) => {
-        const year = value.year ? parseInt(value.year) : undefined
-        const city = value.city || undefined
-        const subtitle = value.subtitle || undefined
+    useEffect(() => {
+        if (defaults) {
+            setValue((prev) => ({
+                ...prev,
+                city: defaults.city ?? "",
+                year: defaults.year != null ? String(defaults.year) : "",
+                withQr: defaults.withQr ?? false,
+            }))
+        }
+    }, [defaults])
+
+    const handleSubmit = async ({ value: submitValue }: { value: any }) => {
+        const year = submitValue.year ? parseInt(submitValue.year) : undefined
+        const city = submitValue.city || undefined
+        const subtitle = submitValue.subtitle || undefined
 
         const result = await addSplitCover({
-            title: value.title.trim(),
+            title: submitValue.title.trim(),
             subtitle,
-            imgFileId: value.imgFileId.trim(),
-            withQr: value.withQr || false,
+            imgFileId: submitValue.imgFileId.trim(),
+            withQr: submitValue.withQr || false,
             city,
             year,
         })
@@ -36,7 +58,7 @@ export function AddSplitCover({
 
     return (
         <Modal header="Добавить обложку" onClickClose={onClickClose} error={error} {...props}>
-            <Form onSubmit={handleSubmit}>
+            <Form value={value} onChange={(next) => setValue(next)} onSubmit={handleSubmit}>
                 <Box gap="medium">
                     <FormField label="Заголовок" name="title" required>
                         <TextInput

@@ -1,5 +1,29 @@
-import { useMutation } from "@apollo/client"
+import { useMutation, useQuery } from "@apollo/client"
 import { gql } from "@apollo/client"
+
+const SPLIT_COVER_FORM_DEFAULTS = gql`
+    query SplitCoverFormDefaults($albumId: String!) {
+        splitCoverFormDefaults(albumId: $albumId) {
+            ... on SplitCoverFormDefaults {
+                city
+                year
+                withQr
+            }
+        }
+    }
+`
+
+export function useSplitCoverFormDefaults(albumId: string) {
+    const { data } = useQuery(SPLIT_COVER_FORM_DEFAULTS, {
+        variables: { albumId },
+        skip: !albumId,
+    })
+    const defaults =
+        data?.splitCoverFormDefaults?.__typename === "SplitCoverFormDefaults"
+            ? data.splitCoverFormDefaults
+            : null
+    return defaults
+}
 
 const ADD_SPLIT_COVER_TO_ALBUM = gql`
     mutation AddSplitCoverToAlbum($albumId: String!, $input: AddSplitCoverToAlbumInput!) {

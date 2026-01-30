@@ -4,11 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/apartomat/apartomat/internal/crm/auth"
 	"github.com/apartomat/apartomat/internal/store/albumfiles"
 	. "github.com/apartomat/apartomat/internal/store/albums"
 	"github.com/apartomat/apartomat/internal/store/files"
+	"github.com/apartomat/apartomat/internal/store/projectpages"
 	"github.com/apartomat/apartomat/internal/store/projects"
 	"github.com/apartomat/apartomat/internal/store/visualizations"
 )
@@ -214,6 +216,47 @@ type SplitCoverForAddToAlbum struct {
 	WithQR    bool
 	City      *string
 	Year      *int
+}
+
+type SplitCoverFormDefaults struct {
+	City   *string
+	Year   int
+	WithQr bool
+}
+
+func (u *CRM) GetSplitCoverFormDefaults(ctx context.Context, albumID string) (*SplitCoverFormDefaults, error) {
+	album, err := u.Albums.Get(ctx, IDIn(albumID))
+	if err != nil {
+		if errors.Is(err, ErrAlbumNotFound) {
+			return nil, ErrNotFound
+		}
+
+		return nil, err
+	}
+
+	if ok, err := u.Acl.CanAddPageToAlbum(ctx, auth.UserFromCtx(ctx), album); err != nil {
+		return nil, err
+	} else if !ok {
+		return nil, fmt.Errorf("can't get split cover form defaults for album (id=%s): %w", album.ID, ErrForbidden)
+	}
+
+	year := time.Now().Year()
+
+	var city *string
+	if houses, err := u.GetHouses(ctx, album.ProjectID, 1, 0); err == nil && len(houses) > 0 && houses[0].City != "" {
+		city = &houses[0].City
+	}
+
+	withQr := false
+	if page, err := u.GetProjectPage(ctx, album.ProjectID); err == nil {
+		withQr = page.Is(projectpages.Public())
+	}
+
+	return &SplitCoverFormDefaults{
+		City:   city,
+		Year:   year,
+		WithQr: withQr,
+	}, nil
 }
 
 func (u *CRM) AddSplitCoverToAlbum(
