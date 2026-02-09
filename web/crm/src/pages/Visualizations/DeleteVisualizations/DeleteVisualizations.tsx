@@ -5,7 +5,13 @@ import { ConfirmDelete } from "./ConfirmDelete"
 
 import useDeleteVisualizations from "./api/useDeleteVisualizations"
 
-export function DeleteVisualizations({ visualizations, onDelete }: { visualizations; onDelete?: (n: number) => void }) {
+export function DeleteVisualizations({
+    visualizations,
+    onDelete,
+}: {
+    visualizations: string[]
+    onDelete?: (n: number) => void
+}) {
     const [showConfirmDialog, setShowConfirmDialog] = useState(false)
 
     const [deleteVisualizations, { data: deleteData, loading: deleteLoading }] = useDeleteVisualizations()

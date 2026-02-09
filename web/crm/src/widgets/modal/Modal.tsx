@@ -26,7 +26,7 @@ export function Modal({
     )
 }
 
-export function Header({ children, onClickClose }) {
+export function Header({ children, onClickClose }: { children: React.ReactNode; onClickClose?: () => void }) {
     return (
         <Box direction="row" justify="between" align="center">
             <Heading level={3} margin="none">

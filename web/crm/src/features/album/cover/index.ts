@@ -1,1 +1,1 @@
-export * from "./SplitCover"
+export * from "./SplitCover/SplitCover"

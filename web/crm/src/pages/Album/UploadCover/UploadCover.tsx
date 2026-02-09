@@ -229,7 +229,7 @@ function FileForUpload({
     )
 }
 
-function useFiles() {
+function useFiles(): [File[], (list: File[]) => void, (i: number) => void] {
     const [files, setFiles] = useState<File[]>([])
 
     const removeFile = (i: number) => {

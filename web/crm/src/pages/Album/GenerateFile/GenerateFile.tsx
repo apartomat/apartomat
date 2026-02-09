@@ -136,10 +136,10 @@ function getFileUrl(album: AlbumScreenAlbumFragment): string {
     return ""
 }
 
-function getFileSize(album: AlbumScreenAlbumFragment): number {
+function getFileSize(album: AlbumScreenAlbumFragment): string {
     if (album?.file?.__typename === "AlbumFile" && album.file.file?.size) {
         return filesize(album.file.file.size)
     }
 
-    return 0
+    return ""
 }
