@@ -27,15 +27,7 @@ fragment ProjectPageScreenProject on ProjectPage {
             __typename
             ... on VisualizationsList {
                 items {
-                    id
-                    file {
-                        ... on VisualizationFile {
-                            url
-                        }
-                        ... on Error {
-                            message
-                        }
-                    }
+                    ...ProjectPageScreenVisualization
                 }
             }
         }
@@ -66,4 +58,16 @@ fragment ProjectPageScreenHouse on House {
     city
     address
     housingComplex
+}
+
+fragment ProjectPageScreenVisualization on Visualization {
+    id
+    file {
+        ... on VisualizationFile {
+            url
+        }
+        ... on Error {
+            message
+        }
+    }
 }

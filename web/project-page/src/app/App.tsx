@@ -57,7 +57,7 @@ export function App() {
     )
 }
 
-function id(path) {
+function id(path: string): string {
     return path.replace(/^\//, '').replace(/\/$/, '')
 
 }

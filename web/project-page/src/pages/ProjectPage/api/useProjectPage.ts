@@ -16,3 +16,4 @@ export function useProjectPage(id: string): QueryResult<ProjectPageScreenQuery, 
 export type { ProjectPageScreenProjectFragment as ProjectPage } from "api/graphql"
 export type { ProjectPageScreenHouseFragment as House } from "api/graphql"
 export type { ProjectPageScreenAlbumFragment as Album } from "api/graphql"
+export type { ProjectPageScreenVisualizationFragment as Visualization } from "api/graphql"

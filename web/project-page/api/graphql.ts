@@ -167,11 +167,26 @@ export type ProjectPageScreenAlbumFragment = { __typename?: 'Album', id: string,
 
 export type ProjectPageScreenHouseFragment = { __typename?: 'House', city: string, address: string, housingComplex: string };
 
+export type ProjectPageScreenVisualizationFragment = { __typename?: 'Visualization', id: string, file: { __typename?: 'Forbidden', message: string } | { __typename?: 'NotFound', message: string } | { __typename?: 'ServerError', message: string } | { __typename?: 'VisualizationFile', url: any } };
+
 export const ProjectPageScreenHouseFragmentDoc = gql`
     fragment ProjectPageScreenHouse on House {
   city
   address
   housingComplex
+}
+    `;
+export const ProjectPageScreenVisualizationFragmentDoc = gql`
+    fragment ProjectPageScreenVisualization on Visualization {
+  id
+  file {
+    ... on VisualizationFile {
+      url
+    }
+    ... on Error {
+      message
+    }
+  }
 }
     `;
 export const ProjectPageScreenAlbumFragmentDoc = gql`
@@ -200,15 +215,7 @@ export const ProjectPageScreenProjectFragmentDoc = gql`
       __typename
       ... on VisualizationsList {
         items {
-          id
-          file {
-            ... on VisualizationFile {
-              url
-            }
-            ... on Error {
-              message
-            }
-          }
+          ...ProjectPageScreenVisualization
         }
       }
     }
@@ -228,6 +235,7 @@ export const ProjectPageScreenProjectFragmentDoc = gql`
   }
 }
     ${ProjectPageScreenHouseFragmentDoc}
+${ProjectPageScreenVisualizationFragmentDoc}
 ${ProjectPageScreenAlbumFragmentDoc}`;
 export const ProjectPageScreenDocument = gql`
     query projectPageScreen($id: String!) {

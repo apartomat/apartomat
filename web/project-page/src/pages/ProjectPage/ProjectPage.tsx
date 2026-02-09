@@ -3,8 +3,8 @@ import { DocumentPdf } from "grommet-icons"
 import { memo, useEffect, useState } from "react"
 import Lightbox from "yet-another-react-lightbox"
 import "yet-another-react-lightbox/styles.css"
-import { useProjectPage, ProjectPage as ProjectPageType, House, Album } from "./api"
 import { filesize } from "filesize"
+import { useProjectPage, ProjectPage as ProjectPageType, House, Album, Visualization } from "./api"
 
 export function ProjectPage({ id }: { id: string }) {
     const { data, loading } = useProjectPage(id)
@@ -15,7 +15,7 @@ export function ProjectPage({ id }: { id: string }) {
 
     const [house, setHouse] = useState<House | undefined>()
 
-    const [visualizations, setVisualizations] = useState([])
+    const [visualizations, setVisualizations] = useState<Visualization[]>([])
 
     const [album, setAlbum] = useState<Album | undefined>()
 
@@ -111,15 +111,22 @@ export function ProjectPage({ id }: { id: string }) {
                         </Box>
                         <Box overflow="auto">
                             <Grid columns="small" style={{ gridAutoFlow: "column", overflowX: "scroll" }} gap="xsmall">
-                                {visualizations.map((vis, index) => (
-                                    <Box width="small" height="small" background="light-2">
-                                        <Image
-                                            src={vis.file.url}
-                                            fit="contain"
-                                            onDoubleClick={() => setShowAlbumFullscreen(index)}
-                                        />
-                                    </Box>
-                                ))}
+                                {visualizations.map((vis, index) => {
+                                    switch (vis.file.__typename) {
+                                        case "VisualizationFile":
+                                            return (
+                                                <Box width="small" height="small" background="light-2">
+                                                    <Image
+                                                        src={vis.file.url}
+                                                        fit="contain"
+                                                        onDoubleClick={() => setShowAlbumFullscreen(index)}
+                                                    />
+                                                </Box>
+                                            )
+                                        default:
+                                            return <></>
+                                    }
+                                })}
                             </Grid>
                         </Box>
                     </Box>
@@ -147,8 +154,13 @@ export function ProjectPage({ id }: { id: string }) {
                 <Lightbox
                     open={showAlbumFullscreen !== undefined}
                     close={() => setShowAlbumFullscreen(undefined)}
-                    slides={visualizations.map((vis) => {
-                        return { src: vis.file.url }
+                    slides={visualizations.flatMap((vis) => {
+                        switch (vis.file.__typename) {
+                            case "VisualizationFile":
+                                return [{ src: vis.file.url }]
+                            default:
+                                return []
+                        }
                     })}
                     index={showAlbumFullscreen || 0}
                 ></Lightbox>

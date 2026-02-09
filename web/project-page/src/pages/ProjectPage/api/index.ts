@@ -1,1 +1,1 @@
-export * from "./useProjectPage.ts"
+export * from "./useProjectPage"

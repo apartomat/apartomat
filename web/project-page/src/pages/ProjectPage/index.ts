@@ -1,1 +1,1 @@
-export { ProjectPage } from "./ProjectPage.tsx"
+export { ProjectPage } from "./ProjectPage"
