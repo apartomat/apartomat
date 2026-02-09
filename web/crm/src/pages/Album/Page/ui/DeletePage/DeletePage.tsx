@@ -12,7 +12,7 @@ export function DeletePage({
 }: {
     key: React.Key
     albumId: string
-    pageNumber
+    pageNumber: number
     onPageDeleted?: (pageNumber: number) => void
 }) {
     const [deletePage, { loading, data, success }] = useDeleteAlbumPage(albumId)

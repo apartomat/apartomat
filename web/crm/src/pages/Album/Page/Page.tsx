@@ -1,6 +1,6 @@
-import { Box } from "grommet"
-import { DeletePage } from "pages/Album/Page/ui/DeletePage"
-import React, { Key, useState } from "react"
+import { Box, Button, Text } from "grommet"
+
+import { Key, useState } from "react"
 import {
     AlbumScreenAlbumPageCoverFragment,
     AlbumScreenAlbumPageVisualizationFragment,
@@ -9,6 +9,9 @@ import {
     PageSize as PageSizeEnum,
 } from "api/graphql"
 import { SplitCover } from "features/album/cover/SplitCover/SplitCover"
+import { Edit } from "grommet-icons"
+
+import { DeletePage, InnerHtmlPage } from "./ui"
 
 export function Page({
     pageNumber,
@@ -39,7 +42,7 @@ export function Page({
                 setHovered(false)
             }}
         >
-            <Box direction="column" justify="center">
+            <Box direction="column" justify="center" gap="small">
                 <Box
                     pad="xsmall"
                     style={{ visibility: hovered ? "visible" : "hidden" }}
@@ -48,6 +51,7 @@ export function Page({
                     direction="column"
                     gap="small"
                     margin={{ right: "xsmall" }}
+                    alignSelf="end"
                 >
                     <DeletePage key={page.id} albumId={albumId} pageNumber={pageNumber} onPageDeleted={onPageDeleted} />
                 </Box>
@@ -78,16 +82,10 @@ export function Page({
                                     )
                                 case "CoverUploaded":
                                     return (
-                                        <Box
-                                            style={{
-                                                transform: `scale(${scale})`,
-                                                transformOrigin: "left top",
-                                            }}
-                                        >
-                                            {page.svg.__typename === "Svg" && (
-                                                <div dangerouslySetInnerHTML={svg(page.svg.svg)} />
-                                            )}
-                                        </Box>
+                                        <InnerHtmlPage
+                                            scale={scale}
+                                            html={page.svg.__typename === "Svg" ? page.svg.svg : ""}
+                                        />
                                     )
                                 default:
                                     return <></>
@@ -96,16 +94,10 @@ export function Page({
                             switch (page.visualization.__typename) {
                                 case "Visualization":
                                     return (
-                                        <Box
-                                            style={{
-                                                transform: `scale(${scale})`,
-                                                transformOrigin: "left top",
-                                            }}
-                                        >
-                                            {page.svg.__typename === "Svg" && (
-                                                <div dangerouslySetInnerHTML={svg(page.svg.svg)} />
-                                            )}
-                                        </Box>
+                                        <InnerHtmlPage
+                                            scale={scale}
+                                            html={page.svg.__typename === "Svg" ? page.svg.svg : ""}
+                                        />
                                     )
                                 default:
                                     return <></>
@@ -115,13 +107,27 @@ export function Page({
                     }
                 })()}
             </Box>
-            <Box width="xxsmall"></Box>
+            {false && (
+                <Box direction="column" justify="center" gap="small">
+                    <Box
+                      pad="xsmall"
+                      style={{ visibility: hovered ? "visible" : "hidden" }}
+                      background="background-contrast"
+                      round="small"
+                      direction="column"
+                      gap="small"
+                      margin={{ left: "xsmall" }}
+                      alignSelf="end"
+                    >
+                        <Button plain>
+                            <Edit />
+                        </Button>
+                    </Box>
+                </Box>
+              )
+            }
         </Box>
     )
-}
-
-function svg(html: string) {
-    return { __html: html }
 }
 
 function orientationWidth(size: PageSizeEnum, orientation: PageOrientationEnum, scale: number = 1.0): string {
