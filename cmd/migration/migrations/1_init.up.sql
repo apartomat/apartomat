@@ -109,7 +109,7 @@ create table apartomat.visualizations (
     file_id char(21) not null,
     room_id char(21),
     constraint visualizations_project_id_fkey foreign key (project_id) references apartomat.projects on delete cascade,
-    constraint visualizations_project_file_id_fkey foreign key (project_file_id) references apartomat.files on delete cascade,
+    constraint visualizations_project_file_id_fkey foreign key (file_id) references apartomat.files on delete cascade,
     constraint visualizations_room_id_fkey foreign key (room_id) references apartomat.rooms
 );
 
