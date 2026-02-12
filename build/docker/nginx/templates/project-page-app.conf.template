@@ -3,6 +3,8 @@ server {
     listen  [::]:80;
     server_name  project-page-app.apartomat.ru;
 
+    resolver ${NGINX_RESOLVER} ipv6=off valid=30s;
+
     #access_log  /var/log/nginx/project-page-app.access.log  main;
 
     location / {
@@ -12,7 +14,8 @@ server {
     }
 
     location /api/ {
-        proxy_pass http://${PROJECT_PAGE_API}/;
+        set $project_page_api ${PROJECT_PAGE_API};
+        proxy_pass http://$project_page_api/;
     }
 
     #error_page  404              /404.html;

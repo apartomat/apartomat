@@ -3,6 +3,8 @@ server {
     listen  [::]:80;
     server_name  crm-app.apartomat.ru;
 
+    resolver ${NGINX_RESOLVER} ipv6=off valid=30s;
+
     #access_log  /var/log/nginx/crm-app.access.log  main;
 
     location / {
@@ -12,7 +14,8 @@ server {
     }
 
     location /api/ {
-        proxy_pass http://${CRM_API}/;
+        set $crm_api ${CRM_API};
+        proxy_pass http://$crm_api/;
     }
 
     #error_page  404              /404.html;
