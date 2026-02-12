@@ -12,7 +12,7 @@ const (
 )
 
 func GetEnvBool(key string) bool {
-	if val, err := strconv.ParseBool(os.Getenv(key)); err != nil {
+	if val, err := strconv.ParseBool(os.Getenv(key)); err == nil {
 		return val
 	}
 
