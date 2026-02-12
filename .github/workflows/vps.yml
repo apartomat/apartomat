@@ -32,7 +32,9 @@ jobs:
     - name: Build
       env:
         APARTOMAT_VERSION: ${{ github.run_number }}
-      run: GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o bin/crm-api -ldflags "-X github.com/apartomat/apartomat/api/crm/graphql.Version=$APARTOMAT_VERSION" ./cmd/crm
+      run: |
+        GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o bin/crm-api -ldflags "-X github.com/apartomat/apartomat/api/crm/graphql.Version=$APARTOMAT_VERSION" ./cmd/crm
+        GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o bin/migration ./cmd/migration
 
     - name: Login to Yandex Cloud Container Registry
       uses: yc-actions/yc-cr-login@v1

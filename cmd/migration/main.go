@@ -1,12 +1,18 @@
 package main
 
 import (
+	"embed"
 	"flag"
 	"fmt"
+	"net/http"
+	"os"
+
 	"github.com/go-pg/migrations/v8"
 	"github.com/go-pg/pg/v10"
-	"os"
 )
+
+//go:embed migrations/*.sql
+var migrationsFS embed.FS
 
 const usage = `This program runs command on the db. Supported commands are:
   - init - creates version info table in the database
@@ -36,13 +42,24 @@ func main() {
 		os.Exit(1)
 	}
 
-	db := pg.Connect(pgopts)
+	var (
+		db = pg.Connect(pgopts)
 
-	migrations.SetTableName("public.migrations")
+		collection = migrations.NewCollection()
+	)
 
-	prev, cur, err := migrations.Run(db, flag.Args()...)
+	collection.DisableSQLAutodiscover(true)
+
+	if err := collection.DiscoverSQLMigrationsFromFilesystem(http.FS(migrationsFS), "migrations"); err != nil {
+		fmt.Fprintf(os.Stderr, "can't discover migrations: %v", err)
+		os.Exit(1)
+	}
+
+	collection.SetTableName("apartomat._migrations")
+
+	prev, cur, err := collection.Run(db, flag.Args()...)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, err.Error())
+		fmt.Fprint(os.Stderr, err)
 		os.Exit(1)
 	}
 

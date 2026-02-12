@@ -1,4 +1,4 @@
-create schema apartomat;
+create schema if not exists apartomat;
 
 create table apartomat.users (
     id char(21) primary key,
