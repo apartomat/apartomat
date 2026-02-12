@@ -15,7 +15,8 @@ server {
 
     location /api/ {
         set $project_page_api ${PROJECT_PAGE_API};
-        proxy_pass http://$project_page_api/;
+        rewrite ^/api/(.*)$ /$1 break;
+        proxy_pass http://$project_page_api;
     }
 
     #error_page  404              /404.html;

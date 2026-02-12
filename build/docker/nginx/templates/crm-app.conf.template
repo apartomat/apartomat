@@ -15,7 +15,8 @@ server {
 
     location /api/ {
         set $crm_api ${CRM_API};
-        proxy_pass http://$crm_api/;
+        rewrite ^/api/(.*)$ /$1 break;
+        proxy_pass http://$crm_api;
     }
 
     #error_page  404              /404.html;
