@@ -4,11 +4,13 @@ import (
 	"bytes"
 	"crypto/tls"
 	"fmt"
-	"github.com/apartomat/apartomat/internal/crm/mail"
 	"net"
 	transport "net/smtp"
 	"net/textproto"
+	"strings"
 	"time"
+
+	"github.com/apartomat/apartomat/internal/crm/mail"
 )
 
 type Config struct {
@@ -46,39 +48,63 @@ func (ms *mailSender) Send(m *mail.Mail) error {
 
 	body := buffer.Bytes()
 
-	host, _, _ := net.SplitHostPort(ms.config.Addr)
+	host, port, err := net.SplitHostPort(ms.config.Addr)
+	if err != nil {
+		return fmt.Errorf("invalid smtp addr %q: %w", ms.config.Addr, err)
+	}
 	auth := transport.PlainAuth("", ms.config.User, ms.config.Password, host)
 
-	conn, err := tls.Dial(
-		"tcp",
-		ms.config.Addr,
-		&tls.Config{
-			InsecureSkipVerify: true,
-			ServerName:         host,
-		},
-	)
+	if port == "465" {
+		conn, err := tls.Dial(
+			"tcp",
+			ms.config.Addr,
+			&tls.Config{
+				InsecureSkipVerify: true,
+				ServerName:         host,
+			},
+		)
+		if err != nil {
+			return err
+		}
+
+		client, err := transport.NewClient(conn, host)
+		if err != nil {
+			return err
+		}
+
+		defer client.Close()
+
+		return sendWithClient(client, auth, m.From, m.To, body)
+	}
+
+	client, err := transport.Dial(ms.config.Addr)
 	if err != nil {
 		return err
 	}
-
-	client, err := transport.NewClient(conn, host)
-	if err != nil {
-		return err
-	}
-
-	if err = client.Auth(auth); err != nil {
-		return err
-	}
-
-	//
 
 	defer client.Close()
 
-	if err := client.Mail(m.From); err != nil {
+	if ok, _ := client.Extension("STARTTLS"); ok {
+		if err := client.StartTLS(&tls.Config{InsecureSkipVerify: true, ServerName: host}); err != nil {
+			return err
+		}
+	} else if strings.HasSuffix(port, "587") {
+		return fmt.Errorf("smtp server does not support STARTTLS on %s", ms.config.Addr)
+	}
+
+	return sendWithClient(client, auth, m.From, m.To, body)
+}
+
+func sendWithClient(client *transport.Client, auth transport.Auth, from, to string, body []byte) error {
+	if err := client.Auth(auth); err != nil {
 		return err
 	}
 
-	if err := client.Rcpt(m.To); err != nil {
+	if err := client.Mail(from); err != nil {
+		return err
+	}
+
+	if err := client.Rcpt(to); err != nil {
 		return err
 	}
 
