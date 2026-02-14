@@ -1066,6 +1066,8 @@ func (ServerError) IsAddContactResult() {}
 
 func (ServerError) IsAddHouseResult() {}
 
+func (ServerError) IsAddRoomResult() {}
+
 func (ServerError) IsAddSplitCoverToAlbumResult() {}
 
 func (ServerError) IsAddVisualizationsToAlbumResult() {}
@@ -1092,6 +1094,8 @@ func (ServerError) IsDeleteAlbumPageResult() {}
 
 func (ServerError) IsDeleteContactResult() {}
 
+func (ServerError) IsDeleteRoomResult() {}
+
 func (ServerError) IsDeleteVisualizationsResult() {}
 
 func (ServerError) IsGenerateAlbumFileResult() {}
@@ -1109,6 +1113,8 @@ func (ServerError) IsMoveRoomToPositionResult() {}
 func (ServerError) IsUpdateContactResult() {}
 
 func (ServerError) IsUpdateHouseResult() {}
+
+func (ServerError) IsUpdateRoomResult() {}
 
 func (ServerError) IsUploadAlbumCoverResult() {}
 
@@ -1214,7 +1220,7 @@ func (SplitCoverAdded) IsAddSplitCoverToAlbumResult() {}
 type SplitCoverFormDefaults struct {
 	City   *string `json:"city,omitempty"`
 	Year   int     `json:"year"`
-	WithQr bool    `json:"withQr"`
+	WithQR bool    `json:"withQr"`
 }
 
 func (SplitCoverFormDefaults) IsSplitCoverFormDefaultsResult() {}

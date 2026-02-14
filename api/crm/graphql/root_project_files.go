@@ -80,7 +80,7 @@ func (r *projectFilesResolver) Total(
 	if project, ok := graphql.GetFieldContext(ctx).Parent.Parent.Result.(*Project); !ok {
 		slog.ErrorContext(ctx, "can't resolve project files", slog.String("err", "unknown project"))
 
-		return nil, errors.New("server error: can't resolver project files")
+		return serverError()
 	} else {
 		tot, err := r.crm.CountFiles(
 			ctx,
@@ -94,7 +94,7 @@ func (r *projectFilesResolver) Total(
 
 			slog.ErrorContext(ctx, "can't resolve project files", slog.String("project", project.ID), slog.Any("err", err))
 
-			return nil, errors.New("server error: can't resolver project files")
+			return serverError()
 		}
 
 		return ProjectFilesTotal{Total: tot}, nil

@@ -19,7 +19,12 @@ type projectResolver struct {
 }
 
 func (r *projectResolver) Period(ctx context.Context, obj *Project, timezone *string) (*string, error) {
-	return period(obj.StartAt, obj.EndAt, timezone)
+	p, err := period(obj.StartAt, obj.EndAt, timezone)
+	if err != nil {
+		slog.ErrorContext(ctx, "can't resolve project period", slog.String("projectId", obj.ID), slog.Any("err", err))
+	}
+
+	return p, err
 }
 
 func (r *projectResolver) Contacts(ctx context.Context, obj *Project) (*ProjectContacts, error) {

@@ -8,7 +8,7 @@ input AddRoomInput {
     level: Int
 }
 
-union AddRoomResult = RoomAdded | NotFound | Forbidden
+union AddRoomResult = RoomAdded | NotFound | Forbidden | ServerError
 
 type RoomAdded {
     room: Room!

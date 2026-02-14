@@ -27,7 +27,7 @@ func (r *mutationResolver) AddRoom(ctx context.Context, houseID string, input Ad
 
 		slog.ErrorContext(ctx, "can't add room", slog.Any("err", err))
 
-		return nil, errors.New("server error: can't add room")
+		return serverError()
 	}
 
 	return RoomAdded{Room: roomToGraphQL(room)}, nil

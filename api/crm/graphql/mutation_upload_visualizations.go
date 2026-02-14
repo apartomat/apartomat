@@ -36,7 +36,7 @@ func (r *mutationResolver) UploadVisualizations(
 
 		slog.ErrorContext(ctx, "can't upload file to project", slog.String("project", projectID), slog.Any("err", err))
 
-		return nil, err
+		return serverError()
 	}
 
 	if len(res) != len(files) {

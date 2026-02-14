@@ -501,8 +501,8 @@ type ComplexityRoot struct {
 
 	SplitCoverFormDefaults struct {
 		City   func(childComplexity int) int
+		WithQR func(childComplexity int) int
 		Year   func(childComplexity int) int
-		WithQr func(childComplexity int) int
 	}
 
 	Subscription struct {
@@ -2333,19 +2333,19 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.SplitCoverFormDefaults.City(childComplexity), true
 
+	case "SplitCoverFormDefaults.withQr":
+		if e.complexity.SplitCoverFormDefaults.WithQR == nil {
+			break
+		}
+
+		return e.complexity.SplitCoverFormDefaults.WithQR(childComplexity), true
+
 	case "SplitCoverFormDefaults.year":
 		if e.complexity.SplitCoverFormDefaults.Year == nil {
 			break
 		}
 
 		return e.complexity.SplitCoverFormDefaults.Year(childComplexity), true
-
-	case "SplitCoverFormDefaults.withQr":
-		if e.complexity.SplitCoverFormDefaults.WithQr == nil {
-			break
-		}
-
-		return e.complexity.SplitCoverFormDefaults.WithQr(childComplexity), true
 
 	case "Subscription.albumFileGenerated":
 		if e.complexity.Subscription.AlbumFileGenerated == nil {
@@ -15015,7 +15015,7 @@ func (ec *executionContext) _SplitCoverFormDefaults_withQr(ctx context.Context, 
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.WithQr, nil
+		return obj.WithQR, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -20052,6 +20052,13 @@ func (ec *executionContext) _AddRoomResult(ctx context.Context, sel ast.Selectio
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
 	case NotFound:
 		return ec._NotFound(ctx, sel, &obj)
 	case *NotFound:
@@ -20907,6 +20914,13 @@ func (ec *executionContext) _DeleteRoomResult(ctx context.Context, sel ast.Selec
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
 	case NotFound:
 		return ec._NotFound(ctx, sel, &obj)
 	case *NotFound:
@@ -21855,6 +21869,13 @@ func (ec *executionContext) _UpdateRoomResult(ctx context.Context, sel ast.Selec
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
+	case ServerError:
+		return ec._ServerError(ctx, sel, &obj)
+	case *ServerError:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._ServerError(ctx, sel, obj)
 	case NotFound:
 		return ec._NotFound(ctx, sel, &obj)
 	case *NotFound:
@@ -26706,7 +26727,7 @@ func (ec *executionContext) _RoomUpdated(ctx context.Context, sel ast.SelectionS
 	return out
 }
 
-var serverErrorImplementors = []string{"ServerError", "AcceptInviteResult", "AddContactResult", "AddHouseResult", "AddSplitCoverToAlbumResult", "AddVisualizationsToAlbumResult", "ChangeAlbumPageOrientationResult", "ChangeAlbumPageSizeResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "ConfirmLoginLinkResult", "ConfirmLoginPinResult", "CreateAlbumResult", "CreateProjectResult", "DeleteAlbumResult", "DeleteAlbumPageResult", "DeleteContactResult", "DeleteVisualizationsResult", "GenerateAlbumFileResult", "InviteUserToWorkspaceResult", "LoginByEmailResult", "MakeProjectNotPublicResult", "MakeProjectPublicResult", "MoveRoomToPositionResult", "UpdateContactResult", "UpdateHouseResult", "UploadAlbumCoverResult", "UploadFileResult", "UploadVisualizationResult", "UploadVisualizationsResult", "AlbumResult", "AlbumProjectResult", "AlbumPagesResult", "AlbumPageSvgResult", "SplitCoverImageFileResult", "CoverFileResult", "AlbumPageVisualizationResult", "AlbumRecentFileResult", "AlbumCoverResult", "UserProfileResult", "ProjectResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "ProjectVisualizationsListResult", "ProjectVisualizationsTotalResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectAlbumsListResult", "ProjectAlbumsTotalResult", "ProjectPageResult", "SplitCoverFormDefaultsResult", "WorkspaceResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "WorkspaceUsersListResult", "WorkspaceUsersTotalResult", "Error", "AlbumFileGenerated"}
+var serverErrorImplementors = []string{"ServerError", "AcceptInviteResult", "AddContactResult", "AddHouseResult", "AddRoomResult", "AddSplitCoverToAlbumResult", "AddVisualizationsToAlbumResult", "ChangeAlbumPageOrientationResult", "ChangeAlbumPageSizeResult", "ChangeProjectDatesResult", "ChangeProjectStatusResult", "ConfirmLoginLinkResult", "ConfirmLoginPinResult", "CreateAlbumResult", "CreateProjectResult", "DeleteAlbumResult", "DeleteAlbumPageResult", "DeleteContactResult", "DeleteRoomResult", "DeleteVisualizationsResult", "GenerateAlbumFileResult", "InviteUserToWorkspaceResult", "LoginByEmailResult", "MakeProjectNotPublicResult", "MakeProjectPublicResult", "MoveRoomToPositionResult", "UpdateContactResult", "UpdateHouseResult", "UpdateRoomResult", "UploadAlbumCoverResult", "UploadFileResult", "UploadVisualizationResult", "UploadVisualizationsResult", "AlbumResult", "AlbumProjectResult", "AlbumPagesResult", "AlbumPageSvgResult", "SplitCoverImageFileResult", "CoverFileResult", "AlbumPageVisualizationResult", "AlbumRecentFileResult", "AlbumCoverResult", "UserProfileResult", "ProjectResult", "ProjectContactsListResult", "ProjectContactsTotalResult", "ProjectHousesListResult", "ProjectHousesTotalResult", "HouseRoomsListResult", "ProjectVisualizationsListResult", "ProjectVisualizationsTotalResult", "ProjectFilesListResult", "ProjectFilesTotalResult", "ProjectAlbumsListResult", "ProjectAlbumsTotalResult", "ProjectPageResult", "SplitCoverFormDefaultsResult", "WorkspaceResult", "WorkspaceProjectsListResult", "WorkspaceProjectsTotalResult", "WorkspaceUsersListResult", "WorkspaceUsersTotalResult", "Error", "AlbumFileGenerated"}
 
 func (ec *executionContext) _ServerError(ctx context.Context, sel ast.SelectionSet, obj *ServerError) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, serverErrorImplementors)

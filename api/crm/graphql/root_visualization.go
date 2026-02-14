@@ -2,6 +2,8 @@ package graphql
 
 import (
 	"context"
+	"log/slog"
+
 	"github.com/apartomat/apartomat/api/crm/graphql/dataloaders"
 )
 
@@ -20,6 +22,8 @@ func (r *visualizationResolver) File(ctx context.Context, obj *Visualization) (*
 
 	f, err := dataloaders.FromContext(ctx).Files.Load(ctx, obj.File.ID)
 	if err != nil {
+		slog.ErrorContext(ctx, "can't resolve visualization file", slog.String("file", obj.File.ID), slog.Any("err", err))
+
 		return nil, err
 	}
 
@@ -33,6 +37,8 @@ func (r *visualizationResolver) Room(ctx context.Context, obj *Visualization) (*
 
 	room, err := dataloaders.FromContext(ctx).Rooms.Load(ctx, obj.Room.ID)
 	if err != nil {
+		slog.ErrorContext(ctx, "can't resolve visualization room", slog.String("room", obj.Room.ID), slog.Any("err", err))
+
 		return nil, err
 	}
 

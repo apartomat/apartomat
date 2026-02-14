@@ -41,7 +41,7 @@ export type AddRoomInput = {
   square?: InputMaybe<Scalars['Float']>;
 };
 
-export type AddRoomResult = Forbidden | NotFound | RoomAdded;
+export type AddRoomResult = Forbidden | NotFound | RoomAdded | ServerError;
 
 export type AddSplitCoverToAlbumInput = {
   city?: InputMaybe<Scalars['String']>;
@@ -52,7 +52,7 @@ export type AddSplitCoverToAlbumInput = {
   year?: InputMaybe<Scalars['Int']>;
 };
 
-export type AddSplitCoverToAlbumResult = Forbidden | NotFound | PageOrientationNotSupported | ServerError | SplitCoverAdded;
+export type AddSplitCoverToAlbumResult = Forbidden | NotFound | ServerError | SplitCoverAdded;
 
 export type AddVisualizationsToAlbumResult = Forbidden | ServerError | VisualizationsAddedToAlbum;
 
@@ -275,7 +275,7 @@ export type DeleteAlbumResult = AlbumDeleted | Forbidden | NotFound | ServerErro
 
 export type DeleteContactResult = ContactDeleted | Forbidden | NotFound | ServerError;
 
-export type DeleteRoomResult = Forbidden | NotFound | RoomDeleted;
+export type DeleteRoomResult = Forbidden | NotFound | RoomDeleted | ServerError;
 
 export type DeleteVisualizationsResult = Forbidden | NotFound | ServerError | SomeVisualizationsDeleted | VisualizationsDeleted;
 
@@ -644,11 +644,6 @@ export enum PageOrientation {
   Portrait = 'PORTRAIT'
 }
 
-export type PageOrientationNotSupported = {
-  __typename?: 'PageOrientationNotSupported';
-  message: Scalars['String'];
-};
-
 export enum PageSize {
   A3 = 'A3',
   A4 = 'A4'
@@ -943,6 +938,7 @@ export type Query = {
   db: Scalars['Boolean'];
   profile: UserProfileResult;
   project: ProjectResult;
+  splitCoverFormDefaults: SplitCoverFormDefaultsResult;
   version: Scalars['String'];
   workspace: WorkspaceResult;
 };
@@ -955,6 +951,11 @@ export type QueryAlbumArgs = {
 
 export type QueryProjectArgs = {
   id: Scalars['String'];
+};
+
+
+export type QuerySplitCoverFormDefaultsArgs = {
+  albumId: Scalars['String'];
 };
 
 
@@ -1023,6 +1024,15 @@ export type SplitCoverAdded = {
   cover: SplitCover;
 };
 
+export type SplitCoverFormDefaults = {
+  __typename?: 'SplitCoverFormDefaults';
+  city?: Maybe<Scalars['String']>;
+  withQr: Scalars['Boolean'];
+  year: Scalars['Int'];
+};
+
+export type SplitCoverFormDefaultsResult = Forbidden | NotFound | ServerError | SplitCoverFormDefaults;
+
 export type SplitCoverImageFileResult = File | NotFound | ServerError;
 
 export enum SplitCoverVariant {
@@ -1072,7 +1082,7 @@ export type UpdateRoomInput = {
   square?: InputMaybe<Scalars['Float']>;
 };
 
-export type UpdateRoomResult = Forbidden | NotFound | RoomUpdated;
+export type UpdateRoomResult = Forbidden | NotFound | RoomUpdated | ServerError;
 
 export type UploadAlbumCoverResult = AlbumCoverUploaded | Forbidden | ServerError;
 
@@ -1464,14 +1474,14 @@ export type AddRoomMutationVariables = Exact<{
 }>;
 
 
-export type AddRoomMutation = { __typename?: 'Mutation', addRoom: { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'RoomAdded', room: { __typename?: 'Room', id: string, name: string, square?: number | null, level?: number | null } } };
+export type AddRoomMutation = { __typename?: 'Mutation', addRoom: { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'RoomAdded', room: { __typename?: 'Room', id: string, name: string, square?: number | null, level?: number | null } } | { __typename: 'ServerError', message: string } };
 
 export type DeleteRoomMutationVariables = Exact<{
   id: Scalars['String'];
 }>;
 
 
-export type DeleteRoomMutation = { __typename?: 'Mutation', deleteRoom: { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'RoomDeleted', room: { __typename?: 'Room', id: string } } };
+export type DeleteRoomMutation = { __typename?: 'Mutation', deleteRoom: { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'RoomDeleted', room: { __typename?: 'Room', id: string } } | { __typename: 'ServerError' } };
 
 export type UpdateRoomMutationVariables = Exact<{
   roomId: Scalars['String'];
@@ -1479,7 +1489,7 @@ export type UpdateRoomMutationVariables = Exact<{
 }>;
 
 
-export type UpdateRoomMutation = { __typename?: 'Mutation', updateRoom: { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'RoomUpdated', room: { __typename?: 'Room', id: string, name: string, square?: number | null, level?: number | null } } };
+export type UpdateRoomMutation = { __typename?: 'Mutation', updateRoom: { __typename: 'Forbidden', message: string } | { __typename: 'NotFound', message: string } | { __typename: 'RoomUpdated', room: { __typename?: 'Room', id: string, name: string, square?: number | null, level?: number | null } } | { __typename: 'ServerError' } };
 
 export type MoveRoomToPositionMutationVariables = Exact<{
   roomId: Scalars['String'];

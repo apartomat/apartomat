@@ -24,7 +24,7 @@ func (r *mutationResolver) DeleteRoom(ctx context.Context, id string) (DeleteRoo
 
 		slog.ErrorContext(ctx, "can't delete room", slog.Any("err", err))
 
-		return nil, errors.New("server error: can't delete room")
+		return serverError()
 	}
 
 	return RoomDeleted{Room: roomToGraphQL(room)}, nil

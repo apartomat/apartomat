@@ -8,7 +8,7 @@ input UpdateRoomInput {
     level: Int
 }
 
-union UpdateRoomResult = RoomUpdated | NotFound | Forbidden
+union UpdateRoomResult = RoomUpdated | NotFound | Forbidden | ServerError
 
 type RoomUpdated {
     room: Room!

@@ -62,7 +62,7 @@ func (r *workspaceProjectsResolver) Total(
 	obj *WorkspaceProjects,
 	filter WorkspaceProjectsFilter,
 ) (WorkspaceProjectsTotalResult, error) {
-	return notImplementedYetError() // TODO
+	return notImplementedYetError()
 }
 
 func projectsToGraphQL(projects []*projects.Project) []*Project {

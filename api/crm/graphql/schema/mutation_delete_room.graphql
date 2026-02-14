@@ -2,7 +2,7 @@ extend type Mutation {
     deleteRoom(id: String!): DeleteRoomResult!
 }
 
-union DeleteRoomResult = RoomDeleted | NotFound | Forbidden
+union DeleteRoomResult = RoomDeleted | NotFound | Forbidden | ServerError
 
 type RoomDeleted {
     room: Room!

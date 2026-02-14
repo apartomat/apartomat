@@ -25,7 +25,7 @@ func (r *mutationResolver) MoveRoomToPosition(
 
 		slog.ErrorContext(ctx, "can't move room", slog.Any("err", err))
 
-		return nil, errors.New("server error: can't move room")
+		return serverError()
 	}
 
 	return RoomMovedToPosition{Room: roomToGraphQL(room)}, nil

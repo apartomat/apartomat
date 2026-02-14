@@ -3,8 +3,9 @@ package graphql
 import (
 	"context"
 	"errors"
-	"github.com/99designs/gqlgen/graphql"
 	"log/slog"
+
+	"github.com/99designs/gqlgen/graphql"
 
 	"github.com/apartomat/apartomat/internal/crm"
 	svg "github.com/apartomat/apartomat/internal/crm/album"
@@ -58,10 +59,11 @@ func (r *albumPageCoverResolver) SVG(ctx context.Context, obj *AlbumPageCover) (
 			return SVG{res}, nil
 		}
 
-		slog.ErrorContext(ctx, "can't convert AlbumPageCover.File to CoverUploaded")
+		slog.ErrorContext(ctx, "can't resolve album project: CoverUploaded.File is not a File")
 
 		return serverError()
 	case *SplitCover:
+		slog.ErrorContext(ctx, "can't get svg for split cover", slog.String("err", "not implemented yet"))
 		return notImplementedYetError()
 	default:
 		slog.ErrorContext(ctx, "unknown obj type")

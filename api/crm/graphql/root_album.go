@@ -3,7 +3,6 @@ package graphql
 import (
 	"context"
 	"errors"
-	"fmt"
 	"log/slog"
 
 	"github.com/apartomat/apartomat/api/crm/graphql/dataloaders"
@@ -23,34 +22,28 @@ func (r *albumResolver) Pages(ctx context.Context, obj *Album) (AlbumPagesResult
 }
 
 func (r *albumResolver) Project(ctx context.Context, obj *Album) (AlbumProjectResult, error) {
-	var (
-		gp *Project
-	)
+	if p, ok := obj.Project.(Project); ok {
+		project, err := r.crm.GetProject(ctx, p.ID)
+		if err != nil {
+			if errors.Is(err, crm.ErrForbidden) {
+				return forbidden()
+			}
 
-	if pr, ok := obj.Project.(Project); ok {
-		gp = &pr
-	}
+			if errors.Is(err, crm.ErrNotFound) {
+				return notFound()
+			}
 
-	if gp == nil {
-		return serverError()
-	}
+			slog.ErrorContext(ctx, "can't resolve project", slog.String("project", p.ID), slog.Any("err", err))
 
-	project, err := r.crm.GetProject(ctx, gp.ID)
-	if err != nil {
-		if errors.Is(err, crm.ErrForbidden) {
-			return forbidden()
+			return serverError()
 		}
 
-		if errors.Is(err, crm.ErrNotFound) {
-			return notFound()
-		}
-
-		slog.ErrorContext(ctx, "can't resolve project", slog.String("project", gp.ID), slog.Any("err", err))
-
-		return nil, fmt.Errorf("can't resolve project (id=%s): %w", gp.ID, err)
+		return projectToGraphQL(project), nil
 	}
 
-	return projectToGraphQL(project), nil
+	slog.ErrorContext(ctx, "can't resolve album project: obj.Project is not a Project")
+
+	return serverError()
 }
 
 func (r *albumResolver) File(ctx context.Context, obj *Album) (AlbumRecentFileResult, error) {
@@ -70,7 +63,7 @@ func (r *albumResolver) File(ctx context.Context, obj *Album) (AlbumRecentFileRe
 
 		slog.ErrorContext(ctx, "can't resolve recent album file", slog.String("project", obj.ID), slog.Any("err", err))
 
-		return nil, fmt.Errorf("can't resolve album (id=%s) recent file: %w", obj.ID, err)
+		return serverError()
 	}
 
 	var (
@@ -96,7 +89,8 @@ func (r *albumResolver) Cover(ctx context.Context, obj *Album) (AlbumCoverResult
 				if f, ok := c.File.(File); ok {
 					file, err := dataloaders.FromContext(ctx).Files.Load(ctx, f.ID)
 					if err != nil {
-						return nil, err
+						slog.ErrorContext(ctx, "can't load cover uploaded file", slog.String("file", f.ID), slog.Any("err", err))
+						return serverError()
 					}
 
 					return fileToGraphQL(file), nil
@@ -105,7 +99,8 @@ func (r *albumResolver) Cover(ctx context.Context, obj *Album) (AlbumCoverResult
 				if f, ok := c.Image.(File); ok {
 					file, err := dataloaders.FromContext(ctx).Files.Load(ctx, f.ID)
 					if err != nil {
-						return nil, err
+						slog.ErrorContext(ctx, "can't load split cover image file", slog.String("file", f.ID), slog.Any("err", err))
+						return serverError()
 					}
 
 					return fileToGraphQL(file), nil

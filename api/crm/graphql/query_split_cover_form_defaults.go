@@ -32,6 +32,6 @@ func (r *queryResolver) SplitCoverFormDefaults(ctx context.Context, albumID stri
 	return &SplitCoverFormDefaults{
 		City:   defaults.City,
 		Year:   defaults.Year,
-		WithQr: defaults.WithQr,
+		WithQR: defaults.WithQr,
 	}, nil
 }

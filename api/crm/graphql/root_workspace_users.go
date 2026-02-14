@@ -55,7 +55,7 @@ func (r *workspaceUsersResolver) Total(
 	obj *WorkspaceUsers,
 	filter WorkspaceUsersFilter,
 ) (WorkspaceUsersTotalResult, error) {
-	return nil, errors.New("not implemented yet")
+	return notImplementedYetError()
 }
 
 func workspaceUsersToGraphQL(users []*workspaceusers.WorkspaceUser) []*WorkspaceUser {

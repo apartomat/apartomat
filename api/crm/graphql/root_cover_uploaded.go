@@ -23,7 +23,8 @@ func (r *coverUploadedResolver) File(ctx context.Context, obj *CoverUploaded) (C
 	if f, ok := obj.File.(File); ok {
 		file, err := dataloaders.FromContext(ctx).Files.Load(ctx, f.ID)
 		if err != nil {
-			return nil, err
+			slog.ErrorContext(ctx, "can't resolve uploaded cover file", slog.String("file", f.ID), slog.Any("err", err))
+			return serverError()
 		}
 
 		return fileToGraphQL(file), nil

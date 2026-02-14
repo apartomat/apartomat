@@ -31,7 +31,7 @@ func (r *mutationResolver) UpdateRoom(
 
 		slog.ErrorContext(ctx, "can't update room", slog.Any("err", err))
 
-		return nil, errors.New("server error: can't update room")
+		return serverError()
 	}
 
 	return RoomUpdated{Room: roomToGraphQL(room)}, nil
