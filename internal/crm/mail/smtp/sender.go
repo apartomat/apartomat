@@ -23,6 +23,8 @@ type mailSender struct {
 	config Config
 }
 
+const smtpSendTimeout = 60 * time.Second
+
 func NewMailSender(config Config) mail.Sender {
 	return &mailSender{config: config}
 }
@@ -55,7 +57,9 @@ func (ms *mailSender) Send(m *mail.Mail) error {
 	auth := transport.PlainAuth("", ms.config.User, ms.config.Password, host)
 
 	if port == "465" {
-		conn, err := tls.Dial(
+		dialer := &net.Dialer{Timeout: smtpSendTimeout}
+		conn, err := tls.DialWithDialer(
+			dialer,
 			"tcp",
 			ms.config.Addr,
 			&tls.Config{
@@ -66,9 +70,11 @@ func (ms *mailSender) Send(m *mail.Mail) error {
 		if err != nil {
 			return err
 		}
+		_ = conn.SetDeadline(time.Now().Add(smtpSendTimeout))
 
 		client, err := transport.NewClient(conn, host)
 		if err != nil {
+			_ = conn.Close()
 			return err
 		}
 
@@ -77,8 +83,15 @@ func (ms *mailSender) Send(m *mail.Mail) error {
 		return sendWithClient(client, auth, m.From, m.To, body)
 	}
 
-	client, err := transport.Dial(ms.config.Addr)
+	conn, err := (&net.Dialer{Timeout: smtpSendTimeout}).Dial("tcp", ms.config.Addr)
 	if err != nil {
+		return err
+	}
+	_ = conn.SetDeadline(time.Now().Add(smtpSendTimeout))
+
+	client, err := transport.NewClient(conn, host)
+	if err != nil {
+		_ = conn.Close()
 		return err
 	}
 
