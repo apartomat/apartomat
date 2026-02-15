@@ -23,7 +23,7 @@ type mailSender struct {
 	config Config
 }
 
-const smtpSendTimeout = 60 * time.Second
+const smtpSendTimeout = 30 * time.Second
 
 func NewMailSender(config Config) mail.Sender {
 	return &mailSender{config: config}
