@@ -4,7 +4,9 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"net/http"
 	"os"
+	"time"
 
 	"github.com/apartomat/apartomat/api/crm/graphql"
 	"github.com/apartomat/apartomat/api/crm/graphql/dataloaders"
@@ -52,6 +54,10 @@ func genKeyPair() {
 	os.Exit(0)
 }
 
+const (
+	graphqlHandlerTimeout = 50 * time.Second
+)
+
 func run() {
 	//uploader, err := s3.NewS3ImageUploaderWithCred(
 	//	ctx,
@@ -97,7 +103,7 @@ func run() {
 	NewServer().
 		Use(PrometheusLatencyMiddleware(reg)).
 		Get("/qr", Qr(crm)).
-		WithGraphQLHandler(h).
+		WithGraphQLHandler(withTimeout(graphqlHandlerTimeout)(h)).
 		WithGraphQLPlayground().
 		WithMetrics(promhttp.HandlerFor(gath, promhttp.HandlerOpts{})).
 		Run(context.Background(), addr)
@@ -107,5 +113,15 @@ func params() crmparams.Params {
 	return crmparams.Params{
 		SendPinByEmail:     GetEnvBool(EnvKeySendPinByEmail),
 		ProjectPageBaseURL: GetEnvProjectPageBaseURL(),
+	}
+}
+
+func withTimeout(timeout time.Duration) func(next http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			ctx, cancel := context.WithTimeout(r.Context(), timeout)
+			defer cancel()
+			next.ServeHTTP(w, r.WithContext(ctx))
+		})
 	}
 }

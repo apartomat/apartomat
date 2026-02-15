@@ -4,9 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/99designs/gqlgen/graphql/playground"
-	"github.com/go-chi/chi/v5"
-	"github.com/prometheus/client_golang/prometheus"
 	"log/slog"
 	"net"
 	"net/http"
@@ -15,6 +12,10 @@ import (
 	"strings"
 	"syscall"
 	"time"
+
+	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/go-chi/chi/v5"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 const (
@@ -46,10 +47,12 @@ func NewServer() *Server {
 func (s *Server) Run(ctx context.Context, opts ...ServerOption) {
 	var (
 		ser = http.Server{
-			Addr:         defaultAddr,
-			Handler:      s.router,
-			ReadTimeout:  5 * time.Second,
-			WriteTimeout: 5 * time.Second,
+			Addr:              defaultAddr,
+			Handler:           s.router,
+			ReadHeaderTimeout: 5 * time.Second,
+			ReadTimeout:       10 * time.Second,
+			WriteTimeout:      60 * time.Second,
+			IdleTimeout:       90 * time.Second,
 		}
 	)
 
@@ -73,7 +76,7 @@ func (s *Server) Run(ctx context.Context, opts ...ServerOption) {
 		defer cancel()
 
 		if err := ser.Shutdown(shutdCtx); err != nil {
-			slog.ErrorContext(ctx, "can't stop server", err)
+			slog.ErrorContext(ctx, "can't stop server", slog.Any("err", err))
 			os.Exit(1)
 		}
 
