@@ -23,6 +23,10 @@ gen-crm-api:
 gen-project-page-api:
 	go generate ./api/project-page/...
 
+.PHONY: wire
+wire:
+	make gen-wire-crm
+
 .PHONY: gen-wire-crm
 gen-wire-crm:
 	$(call _info,"Generating DI for crm ...")

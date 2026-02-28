@@ -14,7 +14,7 @@ import (
 	"github.com/apartomat/apartomat/internal/crm"
 	"github.com/apartomat/apartomat/internal/crm/auth/paseto"
 	"github.com/apartomat/apartomat/internal/crm/image"
-	"github.com/apartomat/apartomat/internal/crm/image/minio"
+	"github.com/apartomat/apartomat/internal/crm/image/s3"
 	"github.com/apartomat/apartomat/internal/crm/mail"
 	"github.com/apartomat/apartomat/internal/crm/mail/smtp"
 	bun2 "github.com/apartomat/apartomat/internal/pkg/bun"
@@ -64,7 +64,7 @@ func InitializeCRM(ctx context.Context) (*crm.CRM, error) {
 	if err != nil {
 		return nil, err
 	}
-	uploader, err := ProvideUploader()
+	uploader, err := ProvideUploader(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -134,8 +134,11 @@ func ProvidePg(ctx context.Context) (*pg.DB, error) {
 	return db, nil
 }
 
-func ProvideUploader() (image.Uploader, error) {
-	return minio.NewUploader("apartomat"), nil
+func ProvideUploader(ctx context.Context) (image.Uploader, error) {
+	return s3.NewS3ImageUploaderWithCred(
+		ctx, os.Getenv("S3_ACCESS_KEY_ID"), os.Getenv("S3_SECRET_ACCESS_KEY"), os.Getenv("S3_REGION"), os.Getenv("S3_BUCKET_NAME"),
+	)
+
 }
 
 func ProvideMailFactory() (*mail.Factory, error) {

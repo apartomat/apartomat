@@ -3,26 +3,27 @@ package s3
 import (
 	"context"
 	"fmt"
+	"io"
+
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"io"
 )
 
-type s3ImageUploader struct {
+type Uploader struct {
 	client     *s3.Client
 	region     string
 	bucketName string
 }
 
-func NewS3ImageUploader(client *s3.Client, region, bucketName string) *s3ImageUploader {
-	return &s3ImageUploader{client, region, bucketName}
+func NewS3ImageUploader(client *s3.Client, region, bucketName string) *Uploader {
+	return &Uploader{client, region, bucketName}
 }
 
 func NewS3ImageUploaderWithCred(
 	ctx context.Context,
 	accessKeyID, secretAccessKey, region, bucketName string,
-) (*s3ImageUploader, error) {
+) (*Uploader, error) {
 	var (
 		cred aws.CredentialsProviderFunc = func(ctx context.Context) (aws.Credentials, error) {
 			return aws.Credentials{
@@ -46,7 +47,13 @@ func NewS3ImageUploaderWithCred(
 	return NewS3ImageUploader(client, region, bucketName), nil
 }
 
-func (u *s3ImageUploader) Upload(ctx context.Context, reader io.Reader, size int64, path, contentType string) (string, error) {
+func (u *Uploader) Upload(
+	ctx context.Context,
+	reader io.Reader,
+	_ int64,
+	path,
+	contentType string,
+) (string, error) {
 	inp := &s3.PutObjectInput{
 		Bucket:      aws.String(u.bucketName),
 		Body:        reader,
@@ -59,7 +66,7 @@ func (u *s3ImageUploader) Upload(ctx context.Context, reader io.Reader, size int
 		return "", err
 	}
 
-	url := fmt.Sprintf("https://%s.s3.%s.amazonaws.com/%s", u.bucketName, u.region, path)
+	url := fmt.Sprintf("https://storage.yandexcloud.net/%s/%s", u.bucketName, path)
 
 	return url, nil
 }
