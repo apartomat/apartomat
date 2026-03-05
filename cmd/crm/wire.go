@@ -124,6 +124,7 @@ func ProvideUploader(ctx context.Context) (image.Uploader, error) {
 		os.Getenv("S3_SECRET_ACCESS_KEY"),
 		os.Getenv("S3_REGION"),
 		os.Getenv("S3_BUCKET_NAME"),
+		os.Getenv("S3_ENDPOINT"),
 	)
 	//return minio.NewUploader("apartomat"), nil
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
@@ -14,15 +15,16 @@ type Uploader struct {
 	client     *s3.Client
 	region     string
 	bucketName string
+	endpoint   string
 }
 
-func NewS3ImageUploader(client *s3.Client, region, bucketName string) *Uploader {
-	return &Uploader{client, region, bucketName}
+func NewS3ImageUploader(client *s3.Client, region, bucketName, endpoint string) *Uploader {
+	return &Uploader{client, region, bucketName, endpoint}
 }
 
 func NewS3ImageUploaderWithCred(
 	ctx context.Context,
-	accessKeyID, secretAccessKey, region, bucketName string,
+	accessKeyID, secretAccessKey, region, bucketName, endpoint string,
 ) (*Uploader, error) {
 	var (
 		cred aws.CredentialsProviderFunc = func(ctx context.Context) (aws.Credentials, error) {
@@ -31,6 +33,8 @@ func NewS3ImageUploaderWithCred(
 				SecretAccessKey: secretAccessKey,
 			}, nil
 		}
+
+		clientOpts []func(*s3.Options)
 	)
 
 	cfg, err := config.LoadDefaultConfig(
@@ -42,9 +46,16 @@ func NewS3ImageUploaderWithCred(
 		return nil, err
 	}
 
-	client := s3.NewFromConfig(cfg)
+	if endpoint != "" {
+		clientOpts = append(clientOpts, func(o *s3.Options) {
+			o.BaseEndpoint = aws.String(strings.TrimSuffix(endpoint, "/"))
+			o.UsePathStyle = true
+		})
+	}
 
-	return NewS3ImageUploader(client, region, bucketName), nil
+	client := s3.NewFromConfig(cfg, clientOpts...)
+
+	return NewS3ImageUploader(client, region, bucketName, endpoint), nil
 }
 
 func (u *Uploader) Upload(
@@ -66,7 +77,15 @@ func (u *Uploader) Upload(
 		return "", err
 	}
 
-	url := fmt.Sprintf("https://storage.yandexcloud.net/%s/%s", u.bucketName, path)
+	var (
+		baseURL = fmt.Sprintf("s3.%s.amazonaws.com", u.region)
+	)
 
-	return url, nil
+	if u.endpoint != "" {
+		baseURL = u.endpoint
+	}
+
+	baseURL = strings.TrimSuffix(baseURL, "/")
+
+	return fmt.Sprintf("%s/%s/%s", baseURL, u.bucketName, path), nil
 }

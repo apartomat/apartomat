@@ -136,7 +136,7 @@ func ProvidePg(ctx context.Context) (*pg.DB, error) {
 
 func ProvideUploader(ctx context.Context) (image.Uploader, error) {
 	return s3.NewS3ImageUploaderWithCred(
-		ctx, os.Getenv("S3_ACCESS_KEY_ID"), os.Getenv("S3_SECRET_ACCESS_KEY"), os.Getenv("S3_REGION"), os.Getenv("S3_BUCKET_NAME"),
+		ctx, os.Getenv("S3_ACCESS_KEY_ID"), os.Getenv("S3_SECRET_ACCESS_KEY"), os.Getenv("S3_REGION"), os.Getenv("S3_BUCKET_NAME"), os.Getenv("S3_ENDPOINT"),
 	)
 
 }
