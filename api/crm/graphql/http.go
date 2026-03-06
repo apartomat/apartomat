@@ -50,7 +50,9 @@ func Handler(
 	gh.AddTransport(transport.Options{})
 	gh.AddTransport(transport.GET{})
 	gh.AddTransport(transport.POST{})
-	gh.AddTransport(transport.MultipartForm{})
+	gh.AddTransport(transport.MultipartForm{
+		MaxUploadSize: 100 << 20, // 100MB
+	})
 
 	gh.Use(extension.Introspection{})
 
