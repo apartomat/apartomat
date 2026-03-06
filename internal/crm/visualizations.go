@@ -145,7 +145,7 @@ func (u *CRM) CountVisualizations(
 	}
 
 	var (
-		spec = ProjectIDIn(projectID)
+		spec = And(ProjectIDIn(projectID), StatusNotIn(VisualizationStatusDeleted))
 	)
 
 	return u.Visualizations.Count(ctx, spec)
