@@ -11,7 +11,11 @@ export function Upload({
     projectId: string
     rooms: { id: string; name: string }[]
     roomId?: string
-    onVisualizationsUploaded?: ({ files }: { files: File[] }) => void
+    onVisualizationsUploaded?: (payload: {
+        files: File[]
+        uploadedCount: number
+        failedCount: number
+    }) => void
 }) {
     const [showUploadForm, setShowUploadForm] = useState(false)
 
@@ -27,9 +31,9 @@ export function Upload({
                     onClickClose={() => setShowUploadForm(false)}
                     onClickOutside={() => setShowUploadForm(false)}
                     onEsc={() => setShowUploadForm(false)}
-                    onVisualizationsUploaded={(files) => {
+                    onVisualizationsUploaded={(payload) => {
                         setShowUploadForm(false)
-                        onVisualizationsUploaded && onVisualizationsUploaded(files)
+                        onVisualizationsUploaded && onVisualizationsUploaded(payload)
                     }}
                 />
             )}

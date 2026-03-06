@@ -3,7 +3,6 @@ import React, {
     DragEvent,
     ChangeEvent,
     useEffect,
-    useCallback,
     useRef,
     useImperativeHandle,
     forwardRef,
@@ -32,6 +31,12 @@ import { useUploadVisualizations } from "./api/useUploadVisualizations"
 
 export type Rooms = { id: string; name: string }[]
 
+export type VisualizationsUploadedPayload = {
+    files: File[]
+    uploadedCount: number
+    failedCount: number
+}
+
 export function UploadVisualizations({
     projectId,
     rooms,
@@ -44,7 +49,7 @@ export function UploadVisualizations({
     rooms: Rooms
     roomId?: string
     onClickClose?: () => void
-    onVisualizationsUploaded?: ({ files }: { files: File[] }) => void
+    onVisualizationsUploaded?: (payload: VisualizationsUploadedPayload) => void
 } & LayerExtendedProps) {
     const [files, setFiles] = useState<File[]>([])
 
@@ -55,26 +60,49 @@ export function UploadVisualizations({
     const [upload, { loading, error, data }] = useUploadVisualizations()
 
     useEffect(() => {
-        const complete = data?.uploadVisualizations.__typename === "VisualizationsUploaded"
+        const result = data?.uploadVisualizations
 
-        if (complete) {
-            onVisualizationsUploaded && onVisualizationsUploaded({ files })
+        if (result?.__typename === "VisualizationsUploaded") {
+            setErrorMessage(undefined)
+            onVisualizationsUploaded &&
+                onVisualizationsUploaded({
+                    files,
+                    uploadedCount: result.visualizations.length,
+                    failedCount: 0,
+                })
         }
     }, [data, files, onVisualizationsUploaded])
 
     useEffect(() => {
-        const complete = data?.uploadVisualizations.__typename === "SomeVisualizationsUploaded"
+        const result = data?.uploadVisualizations
 
-        if (complete) {
-            onVisualizationsUploaded && onVisualizationsUploaded({ files })
+        if (result?.__typename === "SomeVisualizationsUploaded") {
+            const { visualizations } = result
+
+            if (visualizations.length === 0) {
+                setErrorMessage("Визуализации не загружены")
+            } else {
+                setErrorMessage(undefined)
+                onVisualizationsUploaded &&
+                    onVisualizationsUploaded({
+                        files,
+                        uploadedCount: visualizations.length,
+                        failedCount: files.length - visualizations.length,
+                    })
+            }
         }
     }, [data, files, onVisualizationsUploaded])
 
     useEffect(() => {
-        const error = data?.uploadVisualizations.__typename === "Forbidden"
+        const result = data?.uploadVisualizations
 
-        if (error) {
-            setErrorMessage("Доступ запрещен")
+        switch (result?.__typename) {
+            case "Forbidden":
+                setErrorMessage("Доступ запрещен")
+                break
+            case "ServerError":
+                setErrorMessage("Ошибка сервера")
+                break
         }
     }, [data])
 
@@ -88,6 +116,7 @@ export function UploadVisualizations({
         event.preventDefault()
 
         if (files && !loading) {
+            setErrorMessage(undefined)
             await upload({ projectId, files, roomId: room })
         }
     }

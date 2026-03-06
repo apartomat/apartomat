@@ -291,15 +291,22 @@ export function Project() {
                     <UploadVisualizations
                         projectId={project.id}
                         rooms={rooms as RoomsForUpload}
-                        onVisualizationsUploaded={({ files }: { files: File[] }) => {
+                        onVisualizationsUploaded={({ uploadedCount, failedCount }) => {
                             setShowUploadVisualizations(false)
-                            notify({
-                                message:
-                                    files?.length === 1
-                                        ? "Визуализация загружена"
-                                        : `Загружено визуализаций ${files?.length}`,
-                                callback: refetch,
-                            })
+
+                            let message = `Загружено визуализаций ${uploadedCount}`
+
+                            if (uploadedCount === 1) {
+                                message = "Визуализация загружена"
+                            }
+
+                            if (failedCount > 0) {
+                                message = `Не все визуализации были загружены`
+                            }
+
+                            const severity = failedCount > 0 ? "warning" : "ok"
+
+                            notify({ message, severity, callback: refetch })
                         }}
                         onClickOutside={() => {
                             setShowUploadVisualizations(false)

@@ -119,14 +119,20 @@ export function Visualizations() {
                             projectId={project.id}
                             rooms={rooms as Rooms}
                             roomId={roomsFilter[0]}
-                            onVisualizationsUploaded={({ files }) => {
-                                notify({
-                                    message:
-                                        files?.length === 1
-                                            ? "Визуализация загружена"
-                                            : `Загружено визуализаций ${files?.length}`,
-                                    callback: refetch,
-                                })
+                            onVisualizationsUploaded={({ uploadedCount, failedCount }) => {
+                                let message = `Загружено визуализаций ${uploadedCount}`
+
+                                if (uploadedCount === 1) {
+                                    message = "Визуализация загружена"
+                                }
+
+                                if (failedCount > 0) {
+                                    message = `Не все визуализации были загружены`
+                                }
+
+                                const severity = failedCount > 0 ? "warning" : "ok"
+
+                                notify({ message, severity, callback: refetch })
                             }}
                         />
                     )}
