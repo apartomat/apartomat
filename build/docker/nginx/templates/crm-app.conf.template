@@ -37,6 +37,8 @@ server {
     }
 
     location /api/ {
+        client_max_body_size 100m;
+
         set $crm_api ${CRM_API};
         rewrite ^/api/(.*)$ /$1 break;
         proxy_pass http://$crm_api;
