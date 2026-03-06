@@ -2,7 +2,7 @@ extend type Mutation {
     uploadVisualization(projectId: String! file: Upload! roomId: String): UploadVisualizationResult!
 }
 
-union UploadVisualizationResult = VisualizationUploaded | Forbidden | ServerError
+union UploadVisualizationResult = VisualizationUploaded | Forbidden | ServerError | FileTooLarge
 
 type VisualizationUploaded {
     visualization: Visualization!

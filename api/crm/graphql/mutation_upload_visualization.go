@@ -29,6 +29,14 @@ func (r *mutationResolver) UploadVisualization(
 		roomID,
 	)
 	if err != nil {
+		var (
+			fileTooLarge *crm.FileTooLargeError
+		)
+
+		if errors.As(err, &fileTooLarge) {
+			return fileToLarge(int(fileTooLarge.ActualSize), int(fileTooLarge.MaxSize))
+		}
+
 		if errors.Is(err, crm.ErrForbidden) {
 			return forbidden()
 		}

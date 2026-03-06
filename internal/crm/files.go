@@ -11,6 +11,15 @@ import (
 	"github.com/apartomat/apartomat/internal/store/projects"
 )
 
+type FileTooLargeError struct {
+	ActualSize int64
+	MaxSize    int64
+}
+
+func (e *FileTooLargeError) Error() string {
+	return "file too large"
+}
+
 type Upload struct {
 	Name     string
 	MimeType string

@@ -29,3 +29,11 @@ func serverError() (ServerError, error) {
 func notImplementedYetError() (ServerError, error) {
 	return ServerError{Message: "not implemented yet"}, nil
 }
+
+func fileToLarge(actualSize, maxSize int) (FileTooLarge, error) {
+	return FileTooLarge{
+		Message:    "file too large",
+		ActualSize: actualSize,
+		MaxSize:    maxSize,
+	}, nil
+}

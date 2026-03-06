@@ -192,6 +192,12 @@ type ComplexityRoot struct {
 		URL      func(childComplexity int) int
 	}
 
+	FileTooLarge struct {
+		ActualSize func(childComplexity int) int
+		MaxSize    func(childComplexity int) int
+		Message    func(childComplexity int) int
+	}
+
 	FileUploaded struct {
 		File func(childComplexity int) int
 	}
@@ -1138,6 +1144,27 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.File.URL(childComplexity), true
+
+	case "FileTooLarge.actualSize":
+		if e.complexity.FileTooLarge.ActualSize == nil {
+			break
+		}
+
+		return e.complexity.FileTooLarge.ActualSize(childComplexity), true
+
+	case "FileTooLarge.maxSize":
+		if e.complexity.FileTooLarge.MaxSize == nil {
+			break
+		}
+
+		return e.complexity.FileTooLarge.MaxSize(childComplexity), true
+
+	case "FileTooLarge.message":
+		if e.complexity.FileTooLarge.Message == nil {
+			break
+		}
+
+		return e.complexity.FileTooLarge.Message(childComplexity), true
 
 	case "FileUploaded.file":
 		if e.complexity.FileUploaded.File == nil {
@@ -7893,6 +7920,138 @@ func (ec *executionContext) _File_size(ctx context.Context, field graphql.Collec
 func (ec *executionContext) fieldContext_File_size(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "File",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _FileTooLarge_message(ctx context.Context, field graphql.CollectedField, obj *FileTooLarge) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_FileTooLarge_message(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Message, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_FileTooLarge_message(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "FileTooLarge",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _FileTooLarge_actualSize(ctx context.Context, field graphql.CollectedField, obj *FileTooLarge) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_FileTooLarge_actualSize(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ActualSize, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_FileTooLarge_actualSize(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "FileTooLarge",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _FileTooLarge_maxSize(ctx context.Context, field graphql.CollectedField, obj *FileTooLarge) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_FileTooLarge_maxSize(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MaxSize, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_FileTooLarge_maxSize(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "FileTooLarge",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -21058,6 +21217,13 @@ func (ec *executionContext) _Error(ctx context.Context, sel ast.SelectionSet, ob
 			return graphql.Null
 		}
 		return ec._Forbidden(ctx, sel, obj)
+	case FileTooLarge:
+		return ec._FileTooLarge(ctx, sel, &obj)
+	case *FileTooLarge:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._FileTooLarge(ctx, sel, obj)
 	case ExpiredToken:
 		return ec._ExpiredToken(ctx, sel, &obj)
 	case *ExpiredToken:
@@ -21987,6 +22153,13 @@ func (ec *executionContext) _UploadVisualizationResult(ctx context.Context, sel 
 			return graphql.Null
 		}
 		return ec._Forbidden(ctx, sel, obj)
+	case FileTooLarge:
+		return ec._FileTooLarge(ctx, sel, &obj)
+	case *FileTooLarge:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._FileTooLarge(ctx, sel, obj)
 	case VisualizationUploaded:
 		return ec._VisualizationUploaded(ctx, sel, &obj)
 	case *VisualizationUploaded:
@@ -23494,6 +23667,55 @@ func (ec *executionContext) _File(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "size":
 			out.Values[i] = ec._File_size(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var fileTooLargeImplementors = []string{"FileTooLarge", "UploadVisualizationResult", "Error"}
+
+func (ec *executionContext) _FileTooLarge(ctx context.Context, sel ast.SelectionSet, obj *FileTooLarge) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, fileTooLargeImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("FileTooLarge")
+		case "message":
+			out.Values[i] = ec._FileTooLarge_message(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "actualSize":
+			out.Values[i] = ec._FileTooLarge_actualSize(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "maxSize":
+			out.Values[i] = ec._FileTooLarge_maxSize(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}

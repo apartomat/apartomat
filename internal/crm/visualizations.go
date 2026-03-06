@@ -10,12 +10,18 @@ import (
 	"path/filepath"
 )
 
+const maxVisualizationFileSize = 5 << 20 // 5MB
+
 func (u *CRM) UploadVisualization(
 	ctx context.Context,
 	projectID string,
 	upload Upload,
 	roomID *string,
 ) (*files.File, *Visualization, error) {
+	if err := checkUploadToFileSize(upload, maxVisualizationFileSize); err != nil {
+		return nil, nil, err
+	}
+
 	file, err := u.UploadFile(ctx, projectID, upload, files.FileTypeVisualization)
 	if err != nil {
 		return nil, nil, err
@@ -72,6 +78,10 @@ func (u *CRM) UploadVisualizations(
 	}
 
 	for _, file := range uploads {
+		if err := checkUploadToFileSize(file, maxVisualizationFileSize); err != nil {
+			continue
+		}
+
 		position++
 
 		fileID, err := GenerateNanoID()
@@ -183,4 +193,14 @@ func (u *CRM) GetVisualization(
 	}
 
 	return visualization, nil
+}
+
+func checkUploadToFileSize(upload Upload, maxSize int64) error {
+	if upload.Size > maxVisualizationFileSize {
+		return &FileTooLargeError{
+			ActualSize: upload.Size,
+			MaxSize:    maxSize,
+		}
+	}
+	return nil
 }

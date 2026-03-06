@@ -518,6 +518,17 @@ func (File) IsCoverFileResult() {}
 
 func (File) IsAlbumCoverResult() {}
 
+type FileTooLarge struct {
+	Message    string `json:"message"`
+	ActualSize int    `json:"actualSize"`
+	MaxSize    int    `json:"maxSize"`
+}
+
+func (FileTooLarge) IsUploadVisualizationResult() {}
+
+func (FileTooLarge) IsError()                {}
+func (this FileTooLarge) GetMessage() string { return this.Message }
+
 type FileUploaded struct {
 	File *File `json:"file"`
 }

@@ -29,6 +29,11 @@ type Unknown implements Error {
     message: String!
 }
 
+type FileTooLarge implements Error {
+    message: String!
+    actualSize: Int!
+    maxSize: Int!
+}
 
 type Gravatar {
     url: String!

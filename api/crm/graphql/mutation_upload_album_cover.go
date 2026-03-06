@@ -3,9 +3,10 @@ package graphql
 import (
 	"context"
 	"errors"
+	"log/slog"
+
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/apartomat/apartomat/internal/crm"
-	"log/slog"
 )
 
 func (r *mutationResolver) UploadAlbumCover(
