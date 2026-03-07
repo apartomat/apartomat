@@ -10,8 +10,9 @@ import CreateProject from "./CreateProject/CreateProject"
 import Projects from "./Projects/Projects"
 import Users from "./Users/Users"
 import Archive from "./Archive/Archive"
-import Notification from "./Notification/Notification"
 import { Spinner } from "shared/ui/Spinner"
+import { Notifications } from "features/notification"
+import { useNotifications } from "shared/context/notifications/context"
 
 export function Workspace() {
     const { id } = useParams<"id">() as { id: string }
@@ -33,28 +34,7 @@ export function Workspace() {
         setError(fetchError ? "Ошибка сервера" : undefined)
     }, [fetchError])
 
-    const [notification, setNotification] = useState<string | undefined>(undefined)
-
-    const notify = ({
-        message,
-        callback,
-        timeout = 250,
-        duration = 1500,
-    }: {
-        message: string
-        callback?: () => void
-        timeout?: number
-        duration?: number
-    }) => {
-        setTimeout(() => {
-            setNotification(message)
-
-            setTimeout(() => {
-                setNotification(undefined)
-                callback && callback()
-            }, duration)
-        }, timeout)
-    }
+    const { notify } = useNotifications()
 
     useEffect(() => {
         if (data) {
@@ -105,7 +85,7 @@ export function Workspace() {
 
     return (
         <Main>
-            {notification && <Notification message={notification} />}
+            <Notifications />
 
             <Header margin={{ top: "large", horizontal: "large", bottom: "medium" }}>
                 <Box>
