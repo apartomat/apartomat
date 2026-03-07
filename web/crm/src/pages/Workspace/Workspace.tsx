@@ -1,23 +1,18 @@
 import React, { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
 
-import { useAuthContext } from "shared/context/auth/context"
 import { useWorkspace, WorkspaceScreenFragment } from "./useWorkspace"
 
-import { Box, Button, Header, Heading, Text, Main, Paragraph } from "grommet"
-import UserAvatar from "./UserAvatar"
+import { Box, Button } from "grommet"
 import CreateProject from "./CreateProject/CreateProject"
 import Projects from "./Projects/Projects"
 import Users from "./Users/Users"
 import Archive from "./Archive/Archive"
-import { Spinner } from "shared/ui/Spinner"
-import { Notifications } from "features/notification"
+import { MainLayout } from "widgets/main-layout/MainLayout"
 import { useNotifications } from "shared/context/notifications/context"
 
 export function Workspace() {
     const { id } = useParams<"id">() as { id: string }
-
-    const { user } = useAuthContext()
 
     const [error, setError] = useState<string | undefined>(undefined)
 
@@ -57,87 +52,50 @@ export function Workspace() {
 
     const [showCreateProject, setShowCreateProject] = useState(false)
 
-    if (loading) {
-        return (
-            <Main pad="large">
-                <Box direction="row" gap="small" align="center">
-                    <Spinner message="Загрузка..." />
-                    <Text>Загрузка...</Text>
-                </Box>
-            </Main>
-        )
-    }
-
-    if (error) {
-        return (
-            <Main pad="large">
-                <Heading>Ошибка</Heading>
-                <Paragraph>{error}</Paragraph>
-            </Main>
-        )
-    }
-
-    if (!screen) {
-        return null
-    }
-
-    const { projects, users } = screen
-
     return (
-        <Main>
-            <Notifications />
-
-            <Header margin={{ top: "large", horizontal: "large", bottom: "medium" }}>
-                <Box>
-                    <Text size="xlarge" weight="bold" color="brand">
-                        apartomat
-                    </Text>
+        <MainLayout
+            loading={loading}
+            error={error}
+            header={screen?.name}
+            headerMenu={
+                <Box justify="center">
+                    <Button color="brand" label="Новый проект" onClick={() => setShowCreateProject(true)} />
                 </Box>
-                <Box>
-                    <UserAvatar user={user} />
-                </Box>
-            </Header>
-
-            <Box margin={{ horizontal: "large" }}>
-                <Box margin={{ bottom: "medium" }}>
-                    <Box direction="row" margin={{ vertical: "medium" }} justify="between">
-                        <Heading level={2} margin="none">
-                            {screen.name}
-                        </Heading>
-                        <Box justify="center">
-                            <Button color="brand" label="Новый проект" onClick={() => setShowCreateProject(true)} />
-                        </Box>
+            }
+        >
+            {screen && (
+                <>
+                    <Box margin={{ bottom: "medium" }}>
+                        <Projects projects={screen.projects} />
                     </Box>
 
-                    <Projects projects={projects} />
-                </Box>
+                    <Archive projects={screen.projects} />
 
-                <Archive projects={projects} />
+                    <Users
+                        workspaceId={screen.id}
+                        users={screen.users}
+                        margin={{ vertical: "medium" }}
+                        roles={screen.roles}
+                        onUserInviteSent={(email) => {
+                            notify({ message: `Приглашение отправлено на ${email}` })
+                        }}
+                    />
 
-                <Users
-                    workspaceId={screen.id}
-                    users={users}
-                    margin={{ vertical: "medium" }}
-                    roles={screen.roles}
-                    onUserInviteSent={(email) => {
-                        notify({ message: `Приглашение отправлено на ${email}` })
-                    }}
-                />
-            </Box>
-
-            {showCreateProject && (
-                <CreateProject
-                    workspaceId={screen.id}
-                    onClickClose={() => setShowCreateProject(false)}
-                    onCreate={async () => {
-                        setShowCreateProject(false)
-                        notify({
-                            message: "Проект создан",
-                        })
-                        await refetch()
-                    }}
-                />
+                    {showCreateProject && (
+                        <CreateProject
+                            workspaceId={screen.id}
+                            onClickClose={() => setShowCreateProject(false)}
+                            onCreate={async () => {
+                                setShowCreateProject(false)
+                                notify({
+                                    message: "Проект создан",
+                                })
+                                await refetch()
+                            }}
+                        />
+                    )}
+                </>
             )}
-        </Main>
+        </MainLayout>
     )
 }
