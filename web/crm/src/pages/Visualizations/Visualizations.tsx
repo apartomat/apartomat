@@ -1,11 +1,11 @@
-import { MouseEvent, useEffect, useState } from "react"
+import { MouseEvent, useEffect, useState, useCallback } from "react"
 import { useParams } from "react-router-dom"
 import { useVisualizations, VisualizationStatus } from "./api/useVisualizations"
 import { VisualizationsScreenHouseRoomFragment, VisualizationsScreenVisualizationFragment } from "api/graphql"
 import { MainLayout } from "widgets/main-layout/MainLayout"
 import { AnchorLink } from "shared/ui"
 import { LinkPrevious } from "grommet-icons"
-import { Box, Button, Grid, Image, Text } from "grommet"
+import { Box, Button, Text } from "grommet"
 
 import { Rooms, useSearchParamsRoomsFilter } from "./Rooms"
 import { DeleteVisualizations } from "./DeleteVisualizations"
@@ -13,6 +13,72 @@ import { useNotifications } from "shared/context/notifications/context"
 import { Upload } from "./Upload"
 
 type Rooms = Pick<VisualizationsScreenHouseRoomFragment, "id" | "name">[]
+
+const MAX_SIZE = 192
+
+function VisualizationThumbnail({
+    src,
+    selected,
+}: {
+    src: string
+    selected: boolean
+}) {
+    const [size, setSize] = useState<{ w: number; h: number } | null>(null)
+
+    const onLoad = useCallback((e: React.SyntheticEvent<HTMLImageElement>) => {
+        const img = e.currentTarget
+        const nw = img.naturalWidth
+        const nh = img.naturalHeight
+        if (nw <= 0 || nh <= 0) return
+        let w = nw
+        let h = nh
+        if (w > MAX_SIZE || h > MAX_SIZE) {
+            const r = Math.min(MAX_SIZE / w, MAX_SIZE / h)
+            w = Math.round(w * r)
+            h = Math.round(h * r)
+        }
+        setSize({ w, h })
+    }, [])
+
+    return (
+        <span
+            style={{
+                display: "inline-block",
+                padding: "3px",
+                borderRadius: "4px",
+                boxShadow: selected ? "0 0 0 2px #7D4CDB" : "none",
+            }}
+        >
+            <span
+                style={{
+                    display: "block",
+                    overflow: "hidden",
+                    width: size ? `${size.w}px` : `${MAX_SIZE}px`,
+                    height: size ? `${size.h}px` : `${MAX_SIZE}px`,
+                    maxWidth: MAX_SIZE,
+                    maxHeight: MAX_SIZE,
+                }}
+            >
+                <img
+                    src={src}
+                    alt=""
+                    onLoad={onLoad}
+                    style={{
+                        display: "block",
+                        width: size ? `${size.w}px` : "auto",
+                        height: size ? `${size.h}px` : "auto",
+                        maxWidth: MAX_SIZE,
+                        maxHeight: MAX_SIZE,
+                        objectFit: "contain",
+                        verticalAlign: "top",
+                        margin: 0,
+                        padding: 0,
+                    }}
+                />
+            </span>
+        </span>
+    )
+}
 
 export function Visualizations() {
     const { id } = useParams<"id">() as { id: string }
@@ -153,10 +219,12 @@ export function Visualizations() {
                     )}
                 </Box>
 
-                <Grid
-                    columns="small"
-                    rows="small"
-                    gap={{ row: "large", column: "medium" }}
+                <div
+                    style={{
+                        display: "grid",
+                        gridTemplateColumns: "repeat(auto-fill, 198px)",
+                        gap: "24px",
+                    }}
                     onClick={() => {
                         setSelected([])
                     }}
@@ -165,28 +233,24 @@ export function Visualizations() {
                         return (
                             <Box
                                 key={id}
-                                width={{ max: "small" }}
-                                height={{ max: "small" }}
+                                width="198px"
+                                height="198px"
                                 justify="center"
                                 align="center"
+                                focusIndicator={false}
+                                onClick={(event: MouseEvent) => {
+                                    selectVisisualization(id, event.metaKey)
+                                    event.stopPropagation()
+                                }}
                             >
-                                <Image
-                                    onClick={(event: MouseEvent) => {
-                                        selectVisisualization(id, event.metaKey)
-                                        event.stopPropagation()
-                                    }}
-                                    fit="contain"
+                                <VisualizationThumbnail
                                     src={`${file.url}?h=192`}
-                                    style={{
-                                        padding: "3px",
-                                        borderRadius: "4px",
-                                        boxShadow: selected.includes(id) ? "0 0 0px 2px #7D4CDB" : "none",
-                                    }}
+                                    selected={selected.includes(id)}
                                 />
                             </Box>
                         )
                     })}
-                </Grid>
+                </div>
             </Box>
         </MainLayout>
     )
