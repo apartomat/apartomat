@@ -27,5 +27,5 @@ func GetEnvProjectPageBaseURL() url.URL {
 		}
 	}
 
-	return url.URL{Scheme: "https", Host: "p.apartomat.ru"}
+	return url.URL{Scheme: "https", Host: "pub.apartomat.ru"}
 }
