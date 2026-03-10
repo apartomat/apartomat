@@ -1,7 +1,7 @@
 server {
     listen       80;
     listen  [::]:80;
-    server_name  crm-app.vd.apartomat.ru;
+    server_name crm.apartomat.ru;
 
     resolver ${NGINX_RESOLVER} ipv6=off valid=30s;
 
@@ -17,12 +17,12 @@ server {
 server {
     listen       443 ssl;
     listen  [::]:443 ssl;
-    server_name  crm-app.vd.apartomat.ru;
+    server_name crm.apartomat.ru;
 
     resolver ${NGINX_RESOLVER} ipv6=off valid=30s;
 
-    ssl_certificate     /etc/letsencrypt/live/crm-app.vd.apartomat.ru/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/crm-app.vd.apartomat.ru/privkey.pem;
+    ssl_certificate     /etc/letsencrypt/live/crm.apartomat.ru/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/crm.apartomat.ru/privkey.pem;
     ssl_session_timeout 1d;
     ssl_session_cache shared:SSL:10m;
     ssl_protocols TLSv1.2 TLSv1.3;
